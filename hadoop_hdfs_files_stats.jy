@@ -1,0 +1,229 @@
+#!/usr/bin/env jython
+#
+#  Author: Hari Sekhon
+#  Date: 2013-06-08 22:06:27 +0100 (Sat, 08 Jun 2013)
+#
+#  http://github.com/harisekhon/toolbox
+#
+#  License: see accompanying LICENSE file
+#
+#  vim:ts=4:sts=4:sw=4:et:filetype=python
+
+__author__  = "Hari Sekhon"
+__version__ = "0.8.5"
+
+import os, sys, time, socket
+# Refusing to use either optparse or argparse since it's annoyingly non-portable across different versions of Python
+import getopt
+sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + "/lib")
+from HariSekhonUtils import *
+#import array # using jarray for byte arrays
+jython_only()
+import jarray
+try:
+    from java.nio import ByteBuffer
+except ImportError, e:
+    die("Couldn't find java.nio class, not running inside Jython?")
+try:
+    from org.apache.hadoop.conf import Configuration
+    #from org.apache.hadoop.fs import FileSystem
+    from org.apache.hadoop.fs import Path
+    from org.apache.hadoop.hdfs import DistributedFileSystem
+except ImportError, e:
+    die("Couldn't find Hadoop Java classes, try:  jython -J-cp `hadoop classpath` hadoop_hdfs_files_stat.jy <args>")
+
+def usage(*msg):
+    """ Print usage and exit """
+
+    if msg:
+        printerr(msg)
+    die("""
+Hari Sekhon - https://github.com/harisekhon/toolbox
+
+================================================================================
+%s - version %s
+================================================================================
+
+Jython program to output HDFS stats for files under given directories - shows blocksize, data size and number of HDFS blocks.
+
+
+USAGE:  jython -J-cp `hadoop classpath` %s [options] <list of HDFS files and/or directories>
+
+-n --no-header      Don't output headers and timing summary
+
+
+I tested this on one of my NN HA Kerberized clusters, should work fine under all circumstances where you have Jython and correctly deployed Hadoop client configuration as long as you have enough RAM, should be no more than 1GB or ~ java -Xmx + HDFS blocksize
+
+watch memory usage with top like so:    top -p $(pgrep -f jython|tr '\n' ','|sed 's/,$//')
+
+================================================================================
+""" % (os.path.basename(__file__), __version__, os.path.basename(__file__)), ERRORS["UNKNOWN"])
+#-a --all-blocks         Fetch all copies of all blocks from all datanodes (--one-block-per-DN shortcuts this) [Not implemented yet]
+# TODO: add multiple files and dir recursion
+
+
+def main():
+    """ Parse cli args and call HDFS block read speed test for the given file / directory arguments """
+
+    noheader = False
+    try:
+        opts, args = getopt.gnu_getopt(sys.argv[1:], "hn", ["help", "usage" "no-header"])
+    except getopt.GetoptError, e:
+        usage("error: %s" % e)
+    for o, a in opts:
+        if o in ("-h", "--help", "--usage"):
+            usage()
+        elif o in ("-n", "--no=header"):
+            noheader = True
+        else:
+            usage()
+    filelist = set()
+    for arg in args:
+        filelist.add(arg)
+    if not filelist:
+        usage("no file / directory specified")
+    filelist = sorted(filelist)
+    try:
+        HDFSBlockCounter().printBlockCounts(filelist, noheader)
+    except KeyboardInterrupt, e:
+        printerr("Caught Control-C...", 1)
+        sys.exit(ERRORS["OK"])
+    except Exception, e:
+        printerr("Error running HDFSBlockCounter: %s" % e, 1)
+        if java_oom in e.message:
+            printerr(java_oom_fix)
+        sys.exit(ERRORS["CRITICAL"])
+    except:
+        printerr("Error: %s" % sys.exc_info()[1].toString())
+        if sys.exc_info()[1].toString() == java_oom:
+            printerr(java_oom_fix)
+        sys.exit(ERRORS["CRITICAL"])
+
+
+class HDFSBlockCounter:
+    """ Class to hold HDFS Block Counter State """
+
+    def __init__(self):
+        """ Instantiate HDFSBlockCounter State """
+
+        self.files = 0
+        try:
+            self.fqdn = socket.getfqdn()
+            # time.strftime("%z") doesn't work in Jython
+            print >> sys.stderr, ">>  %s  Running on %s\n" % (time.strftime("%Y/%m/%d %H:%M:%S %Z"), self.fqdn)
+        except:
+            printerr("Failed to get fqdn of local host, continuing anyway...\n\nError: %s\n" % sys.exc_info()[1].toString())
+            self.fqdn = None
+
+        conf      = Configuration()
+        self.fs   = DistributedFileSystem.get(conf)
+
+        #self.fh = self.fs.open(path)
+        # The client one tells you which DN you are reading from
+        try:
+            self.client = self.fs.getClient()
+        except:
+            raise Exception, "Failed to create hdfs client: %s" % sys.exc_info()[1].toString()
+        #in = client.DFSDataInputStream(self.fh)
+
+
+    def get_path(self, filename):
+        """ Return the path object for a given filename """
+        try:
+            path = Path(filename)
+        except Exception, e:
+            return None
+        if path:
+            return path
+        else:
+            return None
+
+
+    def printBlockCounts(self, filelist, noheader):
+        """ Recurses directories and calls printFileBlocks(file) per file """
+
+        if not noheader:
+            start_time = time.time()
+            print "=" * 80
+            print "Blocksize  Blocks  Replication       Size          Size   Small  Filename"
+            print "   (MB)              Factor         (bytes)        (MB)   file"
+            print "=" * 80
+        for filename in filelist:
+            path = self.get_path(filename)
+            if not path:
+                printerr("Failed to get HDFS path object for file " + filename, 1)
+                continue
+            if not self.fs.exists(path):
+                #raise IOError, "HDFS File not found: %s" % filename
+                printerr("HDFS file/dir not found: %s" % filename, 1)
+                continue
+            self.recurse_path(filename, path)
+        if not noheader:
+            end_time = time.time()
+            total_time = end_time - start_time
+            plural = "s"
+            if self.files == 1:
+                plural = ""
+            print "\nFinished reading block counts from %s file%s in %.4f secs\n" % (self.files, plural, total_time)
+
+
+    def recurse_path(self, filename, path):
+        """ Recurse filename, path """
+
+        if self.fs.isFile(path):
+            try:
+                self.printFileBlockCounts(filename, path)
+            except Exception, e:
+                printerr(e, 1)
+        elif self.fs.isDirectory(path):
+            # even if there is only one file under the whole directory tree since it's now different to the specified arg we should print it
+            try:
+                l = self.fs.listStatus(path)
+                for i in range(0, len(l)):
+                    try:
+                        p = l[i].getPath()
+                        self.recurse_path(p.toUri().getPath(), p)
+                    except:
+                        printerr(sys.exc_info()[1].message.split("\n")[0], 1)
+            except:
+                printerr(sys.exc_info()[1].message.split("\n")[0], 1)
+        else:
+            raise IOError, ">>> %s is not a file or directory" % filename
+
+
+    def printFileBlockCounts(self, filename, path):
+        """ Prints block counts for the given file """
+
+        self.filename   = filename
+        self.block_num  = 0
+        self.offset     = 0
+        self.length     = 1
+        try:
+            self.fh = self.client.open(filename)
+        except:
+            raise IOError, "Failed to get client filehandle to HDFS file %s: %s" % (filename, sys.exc_info()[1].toString())
+        if self.fh == None:
+            raise IOError, "Failed to get client filehandle to HDFS file %s" % filename
+
+        try:
+            filestatus = self.fs.getFileStatus(path)
+            blocksize  = filestatus.getBlockSize() # in bytes
+            size       = filestatus.getLen()       # in bytes
+            repl       = filestatus.getReplication()
+            num_blocks = int((size / blocksize)+1)
+        except:
+            print "Failed to get file stats for HDFS file %s: %s" (filename, sys.exc_info()[1].toString())
+            return 0
+        if(size < blocksize):
+            smallfile = "YES"
+        else:
+            smallfile = "NO"
+
+        #print "blocksize: %.0fMB  blocks: %d  replication factor: %d  bytes: %d (%.2fMB)  %s%s" % ((blocksize/(1024*1024)), num_blocks, repl, size, (size/(1024*1024)), filename, smallfile)
+        print "%-9.2f %7d %6d %17d %12.2f   %-3s    %s" % ((blocksize/(1024*1024)), num_blocks, repl, size, (size/(1024*1024)), smallfile, filename)
+        self.files += 1
+        return 1
+
+
+if __name__ == "__main__":
+    main()

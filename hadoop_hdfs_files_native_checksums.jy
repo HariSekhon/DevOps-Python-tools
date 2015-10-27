@@ -1,0 +1,173 @@
+#!/usr/bin/env jython
+#
+#  Author: Hari Sekhon
+#  Date: 2013-06-20 18:21:02 +0100 (Thu, 20 Jun 2013)
+#
+#  http://github.com/harisekhon/toolbox
+#
+#  License: see accompanying LICENSE file
+#
+#  vim:ts=4:sts=4:sw=4:et:filetype=python
+
+__author__  = "Hari Sekhon"
+__version__ = 0.3
+
+import os, sys
+# Refusing to use either optparse or argparse since it's annoyingly non-portable across different versions of Python
+import getopt
+sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + "/lib")
+from HariSekhonUtils import *
+jython_only()
+try:
+    from org.apache.hadoop.conf import Configuration
+    from org.apache.hadoop.fs import Path
+    from org.apache.hadoop.hdfs import DistributedFileSystem
+    from org.apache.hadoop.fs import FileSystem
+    from org.apache.hadoop.util import StringUtils
+    #from org.apache.hadoop.security import AccessControlException
+except ImportError, e:
+    die("Couldn't find Hadoop Java classes, try:  jython -J-cp `hadoop classpath` hadoop_hdfs_get_file_checksums.jy <args>")
+
+
+def usage(*msg):
+    """ Print usage and exit """
+
+    if msg:
+        printerr("".join(msg))
+    die("""
+Hari Sekhon - https://github.com/harisekhon/toolbox
+
+================================================================================
+%s - version %s
+================================================================================
+
+Jython program to fetch the HDFS native checksums for given files / all files under given directories.
+
+Quick way of checking for duplicate files but not checking content itself. This is at least ~100x more efficient in terms of data transfer than 'hadoop fs -cat | md5sum'.
+Caveat: files with differing block sizes will not match
+
+Will be implemented in hadoop-9209 jira for versions 3.0.0, 0.23.7, 2.1.0-beta using a new command line param: hadoop fs -checksum
+
+
+USAGE:  jython -J-cp `hadoop classpath` %s <list of HDFS files and/or directories>
+
+-n --no-header      Don't output headers
+""" % (os.path.basename(__file__), __version__, os.path.basename(__file__)), ERRORS["UNKNOWN"] )
+
+
+def main():
+    """ Parse cli args and launch hdfs_get_file_checksum() """
+
+    noheader = False
+    try:
+        opts, args = getopt.gnu_getopt(sys.argv[1:], "hn", ["help", "usage", "no-header"])
+    except getopt.GetoptError, e:
+        usage("error: %s" % e)
+    for o, a in opts:
+        if o in ("-n", "--no-header"):
+            noheader = True
+        elif o in ("-h", "--help", "--usage"):
+            usage()
+        else:
+            usage()
+    filelist = set()
+    for arg in args:
+        filelist.add(arg)
+    if not filelist:
+        usage("no file / directory specified")
+    filelist = sorted(filelist)
+    try:
+        HDFSChecksumReader().print_checksums(filelist, noheader)
+    except KeyboardInterrupt, e:
+        printerr("Caught Control-C...", 1)
+        sys.exit("OK")
+    except Exception, e:
+        printerr("Error running HDFSChecksumReader: %s" % e, 1)
+        if java_oom in e.message:
+            printerr(java_oom_fix)
+        #import traceback; traceback.print_exc()
+        sys.exit("CRITICAL")
+    except:
+        print_jython_exception()
+        sys.exit("CRITICAL")
+
+
+class HDFSChecksumReader:
+    """ Class to hold HDFS Checksum Read state """
+
+    def __init__(self):
+        """ Instantiate State """
+
+        conf      = Configuration()
+        #self.fs   = DistributedFileSystem.get(conf)
+        self.fs   = FileSystem.get(conf)
+
+    def get_path(self, filename):
+        """ Return the path object for a given filename """
+        try:
+            path = Path(filename)
+        except Exception, e:
+            return None
+        if path:
+            return path
+        else:
+            return None
+
+    def print_checksums(self, filelist, noheader):
+        """ Recurses directories and calls print_checksum(filename) per file """
+
+        if not noheader:
+            print "=" * 150
+            print "%-56s  %-25s  %-12s  %s" % ("Checksum", "Algorithm", "BlockSize", "Filename")
+            print "=" * 150
+        for filename in filelist:
+            path = self.get_path(filename)
+            if not path:
+                printerr("Failed to get HDFS path object for file " + filename, 1)
+                continue
+            if not self.fs.exists(path):
+                #raise IOError, "HDFS File not found: %s" % filename
+                printerr("HDFS file/dir not found: %s" % filename, 1)
+                continue
+            self.print_checksum_recurse(filename, path)
+
+    def print_checksum_recurse(self, filename, path):
+        """ Recurses a path object if directory or passes to print_checksum if file """
+
+        if self.fs.isFile(path):
+            self.print_checksum(filename, path)
+        elif self.fs.isDirectory(path):
+            try:
+                l = self.fs.listStatus(path)
+                for i in range(0, len(l)):
+                    p = l[i].getPath()
+                    self.print_checksum_recurse(p.toUri().getPath(), p)
+            except:
+                printerr(sys.exc_info()[1].message.split("\n")[0], 1)
+        else:
+            raise IOError, ">>> %s is not a file or directory" % filename
+
+    def print_checksum(self, filename, path):
+        """ Prints the HDFS checksum for the given file + fs path object """
+
+        try:
+            checksum = self.fs.getFileChecksum(path)
+            if checksum:
+                print "%-56s  %-25s  %-12s  %s" % (
+                        StringUtils.byteToHexString(checksum.getBytes(), 0, checksum.getLength()),
+                        checksum.getAlgorithmName(),
+                        self.fs.getFileStatus(path).getBlockSize(),
+                        filename)
+            else:
+                printerr("<NO CHECKSUM for file " + filename + ">", 1)
+                return 0
+        except Exception, e:
+            printerr(e, 1)
+        except:
+            print ">>> " + sys.exc_info()[1].message.split("\n")[0]
+            return 0
+        return 1
+
+
+if __name__ == "__main__":
+    main()

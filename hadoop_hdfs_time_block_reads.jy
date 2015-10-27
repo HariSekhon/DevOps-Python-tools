@@ -1,0 +1,450 @@
+#!/usr/bin/env jython
+#
+#  Author: Hari Sekhon
+#  Date: 2013-06-08 22:06:27 +0100 (Sat, 08 Jun 2013)
+#
+#  http://github.com/harisekhon/toolbox
+#
+#  License: see accompanying LICENSE file
+#
+#  vim:ts=4:sts=4:sw=4:et:filetype=python
+
+""" Jython program to find a slow Hadoop HDFS node by querying all the nodes for a given HDFS files / all files under given directories and printing the per block read times as well as a summary report of the slowest datanodes in descending order along with rack locations, blocks and timings """
+
+# BASIC USAGE:  jython -J-cp `hadoop classpath` hadoop_hdfs_time_block_reads.jy [options] <list of HDFS files and/or directories>
+
+# I tested this on one of my NN HA Kerberized clusters, should work fine under all circumstances where you have Jython and correctly deployed Hadoop client configuration as long as you have enough RAM, should be no more than 1GB or ~ java -Xmx + HDFS blocksize
+#
+# watch memory usage with top like so:    top -p $(pgrep -f jython|tr '\n' ','|sed 's/,$//')
+
+__author__  = "Hari Sekhon"
+__version__ = "0.8.6"
+
+import os
+
+usage_msg = """
+Hari Sekhon - https://github.com/harisekhon/toolbox
+
+================================================================================
+%s - version %s
+================================================================================
+
+Times reads of nearest block replica(s) for every HDFS block for given files / all files under given directories to find out which datanode is the slowest from this client.
+
+Same block access pattern as \"hadoop fs -cat\" but with far superior yet concise information about every block's datanode, rack location and millisecond accurate read timing.
+
+Generates a summary report of slow datanodes in descending order with their rack location, slowest block details and read times.
+
+================================================================================
+
+USAGE: %s [options] <list of HDFS files and/or directories>
+
+-m --multiple-blocks    Fetch multiple replicas of each block not just the nearest replica. This helps to debug performance across nodes
+-o --one-block-per-DN   Only read 1 block from each DataNode for quickness, not as thorough. Optional, not the default
+
+================================================================================
+                                Example Usage
+================================================================================
+
+1. (Optional) Generate a test file. If you want to test all nodes, simply make sure the number of blocks
+   and replication factor is high enough that all nodes will contain blocks for this test file
+   This part is highly tunable depending on your circumstances and what you're trying to test, adjust to suit your needs if generating a workload,
+   ramp this up for a bigger cluster or just use one of the files you had problems with accessing slowly
+
+   >>>  dd if=/dev/urandom bs=10M count=100 | hadoop fs -D dfs.block.size=${BLOCK_SIZE:-$((10*1024*1024))} -D dfs.replication=${REPLICATION_FACTOR:-3} -put - /tmp/testfile
+
+2. (Optional) inspect new test file's block locations
+
+   >>>  hadoop fsck /tmp/testfile -files -blocks -locations
+
+3. Run this program against the file to see the block read speeds from the different datanodes
+
+   >>>  jython -J-cp `hadoop classpath` hadoop_hdfs_time_block_reads.jy /tmp/testfile
+
+4. Run against a directory tree to see the block locations and read timings of all the files under the directory tree
+
+   >>>  jython -J-cp `hadoop classpath` hadoop_hdfs_time_block_reads.jy /path/to/data/dir
+
+================================================================================
+Known Issues:
+
+- no way to direct HDFS API to fetch blocks from specific datanodes
+- GPFS is not supported at this time even on Hadoop clusters due to differences in the GPFS API. (I've tried this on IBM's GPFS-FPO as a drop-in replacement to HDFS on a Hadoop cluster running IBM BigInsights 2.1.2 but it results in the following exception: 'com.ibm.biginsights.fs.gpfs.GeneralParallelFileSys' object has no attribute 'getClient')
+
+================================================================================
+Implications:
+
+- will not fetch blocks from any datanode more than 1 rack level away while datanodes are still available in the current rack level
+- no way to get datanode information from HDFS API for a datanode before the block read() so cannot print which datanode we are currently trying to read a block from. This means if a datanode becomes unavailable during the test this program will hang but you won't know which datanode it's hanging on since we couldn't get the DN information from the API before the read to print it out ahead of time
+
+================================================================================
+""" % (os.path.basename(__file__), __version__, os.path.basename(__file__))
+#-a --all-blocks         Fetch all copies of all blocks from all datanodes (--one-block-per-DN shortcuts this) [Not implemented yet]
+
+import getopt
+import socket
+import sys
+import time
+sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + "/lib")
+from HariSekhonUtils import *
+#import array # using jarray for byte arrays
+jython_only()
+import jarray
+try:
+    from java.nio import ByteBuffer
+except ImportError, e:
+    die("Couldn't find java.nio class, not running inside Jython?")
+try:
+    from org.apache.hadoop.conf import Configuration
+    #from org.apache.hadoop.fs import FileSystem
+    from org.apache.hadoop.fs import Path
+    from org.apache.hadoop.hdfs import DistributedFileSystem
+except ImportError, e:
+    die("Couldn't find Hadoop Java classes, try:  jython -J-cp `hadoop classpath` hadoop_hdfs_time_block_reads.jy <args>")
+
+def usage(*msg):
+    """ Print usage and exit """
+
+    if msg:
+        printerr(msg)
+    die(usage_msg, ERRORS["UNKNOWN"])
+
+def main():
+    """ Parse cli args and call HDFS block read speed test for the given file / directory arguments """
+
+    try:
+        opts, args = getopt.gnu_getopt(sys.argv[1:], "hamo", ["help", "usage", "all-blocks", "multiple-blocks", "one-block-per-DN"])
+    except getopt.GetoptError, e:
+        usage("error: %s" % e)
+    all_blocks       = False
+    multiple_blocks  = False
+    one_block_per_DN = False
+    for o, a in opts:
+        if o in ("-a", "--all-blocks"):
+            all_blocks = True
+            print "--all not implemented yet"
+            sys.exit(2)
+        elif o in ("-m", "--multiple-blocks"):
+            multiple_blocks = True
+        elif o in ("-o", "--one-block-per-DN"):
+            one_block_per_DN = True
+        elif o in ("-h", "--help", "--usage"):
+            usage()
+        else:
+            usage()
+    filelist = set()
+    for arg in args:
+        filelist.add(arg)
+    if not filelist:
+        usage("no file / directory specified")
+    filelist = sorted(filelist)
+    try:
+        HDFSBlockReader(multiple_blocks, one_block_per_DN).fetchFilelistBlocksTimed(filelist)
+    except KeyboardInterrupt, e:
+        printerr("Caught Control-C...", 1)
+        sys.exit(ERRORS["OK"])
+    except Exception, e:
+        printerr("Error running HDFSBlockReader: %s" % e, 1)
+        if java_oom in e.message:
+            printerr(java_oom_fix)
+        sys.exit(ERRORS["CRITICAL"])
+    except:
+        printerr("Error: %s" % sys.exc_info()[1])
+        if sys.exc_info()[1] == java_oom:
+            printerr(java_oom_fix)
+        sys.exit(ERRORS["CRITICAL"])
+
+
+class HDFSBlockReader:
+    """ Class to hold HDFS Block Read State """
+
+    def __init__(self, multiple_blocks, one_block_per_DN):
+        """ Instantiate HDFSBlockReader State """
+
+        self.fileoutput         = ""
+        self.files_read         = set()
+        self.multiple_files     = False
+        self.multiple_blocks    = multiple_blocks
+        self.one_block_per_DN   = one_block_per_DN
+        self.datanodes_tested   = set()
+        self.nodes_failed_reads = set()
+        self.highest_node_times = {}
+        self.block_num          = 0
+        self.offset             = 0
+        self.length             = 1
+        self.read_count         = 0
+        # this ensures we try multiple datanodes to try to get one timed block read from every datanode (caveat: currently won't go to blocks more than 1 rack level away while there are still functioning DNs)
+        if self.one_block_per_DN:
+            self.multiple_blocks = 1
+        try:
+            self.fqdn = socket.getfqdn()
+            # time.strftime("%z") doesn't work in Jython
+            print ">>  %s  Running on %s\n" % (time.strftime("%Y/%m/%d %H:%M:%S %Z"), self.fqdn)
+        except:
+            printerr("Failed to get fqdn of this local host, won't be able to tell you if we're reading from a local datanode\n\nError: %s\n" % sys.exc_info()[1])
+            self.fqdn = None
+
+        conf      = Configuration()
+        self.fs   = DistributedFileSystem.get(conf)
+
+        #self.fh = self.fs.open(path)
+        # The client one tells you which DN you are reading from
+        try:
+            self.client = self.fs.getClient()
+        except:
+            raise Exception, "Failed to create hdfs client: %s" % sys.exc_info()[1]
+        #in = client.DFSDataInputStream(self.fh)
+
+
+    def get_path(self, filename):
+        """ Return the path object for a given filename """
+        try:
+            path = Path(filename)
+        except Exception, e:
+            return None
+        if path:
+            return path
+        else:
+            return None
+
+
+    def fetchFilelistBlocksTimed(self, filelist):
+        """ Recurses directories and calls fetchFileBlocksTimed(file) per file """
+
+        
+        #if(len(filelist) > 1 or (self.get_path(filelist[0]) and self.fs.isDirectory(self.get_path(filelist[0])))):
+        if(len(filelist) > 1 or self.fs.isDirectory(self.get_path(filelist[0]))):
+            # even if there is only one file under the whole directory tree since it's now different to the specified arg we should print it
+            self.multiple_files = True
+        else:
+            self.multiple_files = False
+        start_time = time.time()
+        for filename in filelist:
+            path = self.get_path(filename)
+            if not path:
+                printerr("Failed to get HDFS path object for file " + filename, 1)
+                continue
+            if not self.fs.exists(path):
+                #raise IOError, "HDFS File not found: %s" % filename
+                printerr("HDFS file/dir not found: %s" % filename, 1)
+                continue
+            self.recurse_path(filename, path)
+        end_time = time.time()
+        total_time = end_time - start_time
+        plural = "s"
+        if len(self.files_read) == 1:
+            plural = ""
+        print "\nFinished reading blocks from %s file%s in %.4f secs\n" % (len(self.files_read), plural, total_time)
+
+        if self.fqdn:
+            if self.fqdn in self.datanodes_tested:
+                print "Local DataNode is %s\n" % self.fqdn
+            else:
+                print "No local DataNode reads\n"
+        if self.nodes_failed_reads:
+            print "The following nodes FAILED to return blocks:\n"
+            for node in sorted(self.nodes_failed_reads):
+                print node
+            print ""
+        print "Summary - DataNodes by highest block read time descending:\n"
+        slowest_times = {}
+        for datanode in self.highest_node_times.keys():
+            slowest_time = self.highest_node_times[datanode][0]
+            rack         = self.highest_node_times[datanode][1]
+            filename     = self.highest_node_times[datanode][2]
+            block_num    = self.highest_node_times[datanode][3]
+            block_offset = self.highest_node_times[datanode][4]
+            block_length = self.highest_node_times[datanode][5]
+            if(slowest_time in slowest_times):
+                slowest_times[slowest_time].append([datanode, rack, filename, block_num, block_offset, block_length])
+            else:
+                slowest_times[slowest_time] = [[datanode, rack, filename, block_num, block_offset, block_length]]
+        for time_taken in reversed(sorted(slowest_times.keys())):
+            for t in slowest_times[time_taken]:
+                print "datanode %s rack %s highest read time was for" % (t[0], t[1]),
+                if self.multiple_files:
+                    print "file %s" % t[2],
+                print "block %d (offset %d, length %d) => %.4f secs" % (t[3], t[4], t[5], time_taken)
+
+        return slowest_times
+
+
+    def recurse_path(self, filename, path):
+        """ Recurse filename, path """
+
+        if self.fs.isFile(path):
+            try:
+                if not self.multiple_files:
+                    print "Reading File %s\n" % filename
+                self.fetchFileBlocksTimed(filename, path)
+            except Exception, e:
+                printerr(e, 1)
+        elif self.fs.isDirectory(path):
+            # even if there is only one file under the whole directory tree since it's now different to the specified arg we should print it
+            self.multiple_files = True
+            try:
+                l = self.fs.listStatus(path)
+                for i in range(0, len(l)):
+                    try:
+                        p = l[i].getPath()
+                        self.recurse_path(p.toUri().getPath(), p)
+                    except:
+                        printerr(sys.exc_info()[1].message.split("\n")[0], 1)
+            except:
+                printerr(sys.exc_info()[1].message.split("\n")[0], 1)
+        else:
+            raise IOError, ">>> %s is not a file or directory" % filename
+
+
+    def fetchFileBlocksTimed(self, filename, path):
+        """ Fetches all block replicas from all datanodes with timings """
+
+        self.filename   = filename
+        self.block_num  = 0
+        self.offset     = 0
+        self.length     = 1
+        if self.multiple_files:
+            self.fileoutput = "file %s " % filename
+        try:
+            self.fh = self.client.open(filename)
+        except:
+            raise IOError, "Failed to get client filehandle to HDFS file %s: %s" % (filename, sys.exc_info()[1])
+        if self.fh == None:
+            raise IOError, "Failed to get client filehandle to HDFS file %s" % filename
+
+        while True:
+            self.block_num += 1
+            try:
+                block_locations = self.fs.getFileBlockLocations(path, self.offset, self.length)
+            except:
+                raise IOError, "Failed to get block locations for %sblock %d (offset %d, length %d): %s" (self.fileoutput, self.block_num, self.offset, self.length, sys.exc_info()[1])
+            if not block_locations:
+                return
+            for block in block_locations:
+                #print "block_locations " + block.toString()
+                try:
+                    self.block_offset = block.getOffset()
+                    self.block_length = block.getLength()
+                    if self.block_length == 0:
+                        return
+                    self.offset       = self.block_offset + self.block_length
+                except:
+                    raise IOError, "Failed to get %sblock %d offset/length: %s" % (self.fileoutput, self.block_num, sys.exc_info()[1])
+                try:
+                    self.readBlockFromDNs()
+                except Exception, e:
+                    raise IOError, "Failed to read %sblock %d (offset %d, length %d) from datanodes: %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length, e)
+
+    def readBlockFromDNs(self):
+        """ Read current block self.offset to self.length from all datanodes """
+        self.read_count += 1
+        self.block_read_DNs = set()
+        self.fh.seek(self.block_offset) # local node first otherwise NPE when trying seekToNewSource()
+        print "read %d %sblock %d (offset %d, length %d) from" % (self.read_count, self.fileoutput, self.block_num, self.block_offset, self.block_length),
+        # XXX: force 0 byte read for API to select DN otherwise the API doesn't populate the DN info till after the read and we can't figure out what DN we are currently reading from
+        bytes_read = self.fh.read(ByteBuffer.allocate(0))
+        # would like to put this earlier to show which block reading in case you get stuck on one but it looks like the HDFS API only populates this after the read()
+        self.dn    = self.fh.getCurrentDatanode()
+        if not self.dn:
+            printerr("ERROR: no datanode info for read of %sblock %d (offset, %d, length %d), read must have failed unexpectedly" % (self.fileoutput, self.block_num, self.block_offset, self.block_length))
+            return
+        self.host  = self.dn.getHostName()
+        self.rack  = self.dn.getNetworkLocation()
+        print "rack %s datanode %s => " % (self.rack, self.host),
+        ## looks like this isn't populated until first read, check on second pass on seekToNewSource()
+        #self.dn = self.fh.getCurrentDatanode()
+        self.readBlockFromDN()
+        if self.multiple_blocks:
+            while self.fh.seekToNewSource(self.block_offset):
+                self.read_count += 1
+                # self.dn must be populated by here or something is wrong
+                self.dn = self.fh.getCurrentDatanode()
+                if self.dn == None:
+                    raise IOError, "Failed to get current DataNode for %sblock %s offset %s length %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length)
+                self.host = self.dn.getHostName()
+                if not self.host:
+                    raise Exception, "Failed to get current DataNode host name for %sblock %s offset %s length %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length)
+                # I've come back to the first DN, done with this block
+                if self.host in self.block_read_DNs:
+                    return
+                if not self.readBlockFromDN():
+                    return
+
+    def readBlockFromDN(self):
+        """ Read current block from current DN """
+        if self.dn:
+            self.host = self.dn.getHostName()
+            if(self.one_block_per_DN):
+                if(self.host in self.datanodes_tested):
+                    return False
+            if(self.host in self.block_read_DNs):
+                return False
+        self.readBlockTimed()
+
+    def readBlockTimed(self):
+        """ Read the current block with timings """
+        start_time = time.time()
+        try:
+            # This appears to print a traceback and continue with another node, not much I can do about that since it doesn't raise anything and succeeds eventually. You will see it in output however
+            # XXX: this reads UP TO the byte buffer length, doing partial reads and returning too quickly
+            #bytes_read = self.fh.read(ByteBuffer.allocate(self.block_length))
+            # XXX: PROBLEM is this requires a byte array of equal size to the file being read due to indexing
+            #bytes_read = self.fh.read(ByteBuffer.allocate(self.block_length * 100).array(), self.offset, self.block_length)
+            #bytes_read = self.fh.read(self.block_offset, ByteBuffer.allocate(self.block_length).array(), 0, self.block_length)
+            #bytes_read = self.fh.read(self.block_offset, jarray.zeros(self.block_length, "b"), 0, self.block_length)
+            bytes_read = self.fh.readFully(self.block_offset, jarray.zeros(self.block_length, "b"), 0, self.block_length)
+            # readFully doesn't return number of bytes read
+#            if not bytes_read:
+#                self.dn    = self.fh.getCurrentDatanode()
+#                if self.dn:
+#                    self.host  = self.dn.getHostName()
+#                    rack       = self.dn.getNetworkLocation()
+#                    self.nodes_failed_reads.add(self.host)
+#                    printerr("Error: failed to read bytes from %sblock %d (offset %d, length %d) from rack %s datanode %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length, rack, self.host))
+#                else:
+#                    printerr("ERROR: Failed to read bytes from %sblock %d (offset %d, length %d) [datanode info not available]" % (self.fileoutput, self.block_num, self.block_offset, self.block_length))
+#                return
+        except Exception, e:
+            raise Exception, e
+        except:
+            self.dn    = self.fh.getCurrentDatanode()
+            if self.dn:
+                self.host  = self.dn.getHostName()
+                self.rack  = self.dn.getNetworkLocation()
+                self.nodes_failed_reads.add(self.host)
+                print "Error: failed to read %sblock %d (offset %d, length %d) from rack %s datanode %s: %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length, self.rack, self.host, sys.exc_info()[1])
+            else:
+                raise IOError, sys.exc_info()[1]
+            return
+        end_time   = time.time()
+        time_taken = end_time - start_time
+        self.block_read_DNs.add(self.host)
+        self.datanodes_tested.add(self.host)
+        self.files_read.add(self.filename)
+        throughput = self.block_length / time_taken
+        units = "B"
+        if((throughput / 1024.0) > 1):
+            throughput = throughput / 1024.0
+            units = "KB"
+            if((throughput / 1024.0) > 1):
+                throughput = throughput / 1024.0
+                units = "MB"
+        #isLocal = ""
+        #if self.fqdn == self.host:
+        #    isLocal = " (local)"
+        #print "read %d %sblock %d (offset %d, length %d) from rack %s datanode %s in %.4f secs" % (self.read_count, self.fileoutput, self.block_num, self.block_offset, self.block_length, rack, self.host, time_taken)
+        print "%.4f secs  (%.2f %s/s)" % (time_taken, throughput, units)
+        # readFully doesn't return number of bytes read
+        #print "%s bytes read" % bytes_read
+        #if bytes_read != self.block_length:
+        #    printerr("WARNING: bytes read = %s  vs  block length = %s" % (bytes_read, self.block_length))
+        # TODO: somehow broken listing first time
+        if(self.host in self.highest_node_times):
+            if(time_taken > self.highest_node_times[self.host][0]):
+                self.highest_node_times[self.host] = [time_taken, self.rack, self.filename, self.block_num, self.block_offset, self.block_length]
+        else:
+            self.highest_node_times[self.host] = [time_taken, self.rack, self.filename, self.block_num, self.block_offset, self.block_length]
+
+
+if __name__ == "__main__":
+    main()
