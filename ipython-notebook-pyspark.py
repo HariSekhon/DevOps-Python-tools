@@ -3,7 +3,7 @@
 #  Author: Hari Sekhon
 #  Date: 6/8/2014
 #
-#  http://github.com/harisekhon/toolbox
+#  http://github.com/harisekhon/pytools
 #
 #  License: see accompanying LICENSE file
 #
@@ -24,7 +24,7 @@ from IPython.lib import passwd
 from jinja2 import Template
 
 if len(sys.argv) > 1 or not "linux" in sys.platform:
-    print >> sys.stderr, """Hari Sekhon - https://github.com/harisekhon/toolbox
+    print >> sys.stderr, """Hari Sekhon - https://github.com/harisekhon/pytools
 
 usage: %s
 

@@ -3,7 +3,7 @@
 #  Author: Hari Sekhon
 #  Date: 2013-06-08 22:06:27 +0100 (Sat, 08 Jun 2013)
 #
-#  http://github.com/harisekhon/toolbox
+#  http://github.com/harisekhon/pytools
 #
 #  License: see accompanying LICENSE file
 #
@@ -23,7 +23,7 @@ __version__ = "0.8.6"
 import os
 
 usage_msg = """
-Hari Sekhon - https://github.com/harisekhon/toolbox
+Hari Sekhon - https://github.com/harisekhon/pytools
 
 ================================================================================
 %s - version %s

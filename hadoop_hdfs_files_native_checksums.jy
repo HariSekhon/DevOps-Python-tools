@@ -3,7 +3,7 @@
 #  Author: Hari Sekhon
 #  Date: 2013-06-20 18:21:02 +0100 (Thu, 20 Jun 2013)
 #
-#  http://github.com/harisekhon/toolbox
+#  http://github.com/harisekhon/pytools
 #
 #  License: see accompanying LICENSE file
 #
@@ -35,7 +35,7 @@ def usage(*msg):
     if msg:
         printerr("".join(msg))
     die("""
-Hari Sekhon - https://github.com/harisekhon/toolbox
+Hari Sekhon - https://github.com/harisekhon/pytools
 
 ================================================================================
 %s - version %s
