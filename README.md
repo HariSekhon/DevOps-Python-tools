@@ -1,5 +1,7 @@
-Hari Sekhon's PyTools - Hadoop and Unix Tools [![Build Status](https://travis-ci.org/harisekhon/pytools.svg?branch=master)](https://travis-ci.org/harisekhon/pytools)
+Hari Sekhon's PyTools [![Build Status](https://travis-ci.org/harisekhon/pytools.svg?branch=master)](https://travis-ci.org/harisekhon/pytools)
 ================================
+
+### Hadoop, Spark and Linux Tools ###
 
 A few of the Hadoop and other nifty "Unixy" / Linux tools I've written over the years that are generally useful across environments. All programs have --help to list the available options.
 
