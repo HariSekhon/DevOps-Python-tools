@@ -67,7 +67,7 @@ The ```-J-cp `hadoop classpath` ``` bit does the right thing in finding the Hado
 
 #### Configuration ####
 
-Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list as done via the lib submodule. See [PyLib](https://github.com/harisekhon/pylib) for details on extending this for custom TLDs like ```.local``` or ```.intranet``` (supported by default).
+Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list as done via the [PyLib](https://github.com/harisekhon/pylib) - see there for details on extending this for custom TLDs like ```.local``` or ```.intranet``` (supported by default).
 
 ### Updating ###
 
