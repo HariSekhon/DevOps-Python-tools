@@ -65,9 +65,9 @@ Then add the Jython untarred directory to the $PATH or specify the /path/to/jyth
 
 The ```-J-cp `hadoop classpath` ``` bit does the right thing in finding the Hadoop java classes required to use the Hadoop APIs.
 
-#### Configuration ####
+#### Configuration for Strict Domain / FQDN validation ####
 
-Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list as done via the [PyLib](https://github.com/harisekhon/pylib) - see there for details on extending this for custom TLDs like ```.local``` or ```.intranet``` (supported by default).
+Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list as done via the [PyLib](https://github.com/harisekhon/pylib) - see there for details on configuring this to permit custom TLDs like ```.local``` or ```.intranet``` (both supported by default).
 
 ### Updating ###
 
