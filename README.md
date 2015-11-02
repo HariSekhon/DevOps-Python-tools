@@ -67,15 +67,7 @@ The ```-J-cp `hadoop classpath` ``` bit does the right thing in finding the Hado
 
 #### Configuration ####
 
-Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list, a snapshot of which is shipped as part of this project.
-
-To update the bundled official IANA TLD list with the latest valid TLDs do
-```
-make tld
-```
-##### Custom TLDs #####
-
-If using bespoke internal domains such as ```.local``` or ```.intranet``` that aren't part of the official IANA TLD list then this is additionally supported via a custom configuration file at the top level called ```custom_tlds.txt``` containing one TLD per line, with support for # comment prefixes. Just add your bespoke internal TLD to the file and it will then pass the host/domain/fqdn validations.
+Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list as done via the lib submodule. See [PyLib](https://github.com/harisekhon/pylib) for details on extended for custom TLDs like ```.local``` or ```.intranet``` (supported by default).
 
 ### Updating ###
 
