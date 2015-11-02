@@ -16,6 +16,7 @@ Tested on Mac OS X and Linux
 
 """
 
+__author__  = "Hari Sekhon"
 __version__ = "1.0"
 
 import os
