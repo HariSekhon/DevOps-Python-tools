@@ -44,6 +44,7 @@ git clone https://github.com/harisekhon/pytools
 cd pytools
 git submodule init
 git submodule update
+pip install jinja2 MySQL-python
 ```
 
 ### Jython for Hadoop Utils ###
