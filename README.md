@@ -20,8 +20,9 @@ http://www.linkedin.com/in/harisekhon
 - ```hadoop_hdfs_time_block_reads.jy``` - Hadoop HDFS per-block read timing debugger with datanode and rack locations for a given file or directory tree. Reports the slowest Hadoop datanodes in descending order at the end
 - ```hadoop_hdfs_files_native_checksums.jy``` - fetches native HDFS checksums for quicker file comparisons (about 100x faster than doing hdfs dfs -cat | md5sum)
 - ```hadoop_hdfs_files_stats.jy``` - fetches HDFS file stats
-- ```ipython-notebook-pyspark.py``` - per-user authenticated IPython Notebook + PySpark integration to allow each user to auto-create their own password protected IPython Notebook running Spark
 - ```pig-udfs.jy``` - Pig Jython UDFs for Hadoop
+- ```ipython-notebook-pyspark.py``` - per-user authenticated IPython Notebook + PySpark integration to allow each user to auto-create their own password protected IPython Notebook running Spark
+- ```spark-json-to-parquet.py``` - PySpark JSON => Parquet converter
 - ```welcome.py``` - cool spinning welcome message (there is a slightly better perl version in the [Tools](https://github.com/harisekhon/tools) repo
 
 ### Setup ###
