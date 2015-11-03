@@ -18,7 +18,7 @@
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 try:
     import os
@@ -48,23 +48,33 @@ except Exception, e:
 def main():
     parser = OptionParser()
     parser.add_option('-j', '--json', dest='jsonFile', help='JSON input file/dir', metavar='<file/dir>')
-    parser.add_option('-p', '--parquet', dest='parquetFile', help='Parquet output dir', metavar='<dir>')
+    parser.add_option('-p', '--parquetDir', dest='parquetDir', help='Parquet output dir', metavar='<dir>')
 
     (options, args) = parser.parse_args()
 
-    jsonFile    = options.jsonFile
-    parquetFile = options.parquetFile
+    jsonFile   = options.jsonFile
+    parquetDir = options.parquetDir
 
-    if args or not jsonFile or not parquetFile:
+    if args or not jsonFile or not parquetDir:
         parser.print_help()
         sys.exit(ERRORS['UNKNOWN'])
 
     conf = SparkConf().setAppName('HS PySpark JSON => Parquet')
     sc = SparkContext(conf=conf)
     sqlContext = SQLContext(sc)
-    # Spark 1.3 - API has changed for newer versions
-    json = sqlContext.jsonFile(jsonFile)
-    json.saveAsParquetFile(parquetFile)
+    spark_version = sc.version
+    print('Spark version detected as %s' % spark_version)
+    major_version = int(spark_version.split('.')[0])
+    minor_version = int(spark_version.split('.')[1])
+    print('major version = %s, minor version = %s' % (major_version, minor_version))
+    # Spark <= 1.3 - API has changed for newer versions
+    if major_version <= 1 and minor_version <= 3:
+        print('running legacy code for Spark <= 1.3')
+        json = sqlContext.jsonFile(jsonFile)
+        json.saveAsParquetFile(parquetDir)
+    else:
+        json = sqlContext.read.json(jsonFile)
+        json.write.parquet(parquetDir)
 
 if __name__ == '__main__':
     try:
