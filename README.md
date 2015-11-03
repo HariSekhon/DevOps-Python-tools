@@ -94,4 +94,4 @@ Patches, improvements and even general feedback are welcome in the form of GitHu
 
 [My Python library repo](https://github.com/harisekhon/lib) - leveraged in this repo as a submodule
 
-[Spark => Elasticsearch](https://github.com/harisekhon/spark-to-elasticsearch) - Scala application to index from Spark to Elasticsearch. Used to index data in Hadoop clusters or local data via Spark standalone. This started as a Scala Spark port of ```pig-text-to-elasticsearch.pig``` from this repo.
+[Spark => Elasticsearch](https://github.com/harisekhon/spark-to-elasticsearch) - Scala application to index from Spark to Elasticsearch. Used to index data in Hadoop clusters or local data via Spark standalone. This started as a Scala Spark port of ```pig-text-to-elasticsearch.pig``` from my [Tools](https://github.com/harisekhon/tools) repo.
