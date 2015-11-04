@@ -18,9 +18,10 @@
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.3'
 
 try:
+    import glob
     import os
     import sys
     # using optparse rather than argparse for servers still on Python 2.6
@@ -29,10 +30,13 @@ try:
     from HariSekhonUtils import *
     spark_home = os.getenv('SPARK_HOME', None)
     if spark_home:
+        # doesn't contain py4j may as well just use the already unpacked version
+        #sys.path.append(os.path.join(spark_home, 'python/lib/pyspark.zip'))
         sys.path.append(os.path.join(spark_home, 'python'))
-        # better to use build dir it's more generic as it's not tied to a specific version
-        #sys.path.append(os.path.join(spark_home, 'python/lib/py4j-0.8.2.1-src.zip'))
-        sys.path.append(os.path.join(spark_home, 'python/build'))
+        # more abstract without version number but not available in spark bin download
+        #sys.path.append(os.path.join(spark_home, 'python/build'))
+        for x in glob.glob(os.path.join(spark_home, 'python/lib/py4j-*-src.zip')):
+            sys.path.append(x)
     else:
         warn("SPARK_HOME not set - probably won't find PySpark libs")
     from pyspark import SparkContext
@@ -65,8 +69,11 @@ def main():
     spark_version = sc.version
     print('Spark version detected as %s' % spark_version)
     try:
-        major_version = int(spark_version.split('.')[0])
-        minor_version = int(spark_version.split('.')[1])
+        parts = spark_version.split('.')
+        if parts < 2:
+            raise ValueError('no dot detected in spark version')
+        major_version = int(parts[0])
+        minor_version = int(parts[1])
     except ValueError, e:
         die('failed to detect Spark version: %s' % e)
     print('major version = %s, minor version = %s' % (major_version, minor_version))
