@@ -33,6 +33,7 @@ except Exception, e:
     printerr('exception encountered during module import: %s' % e)
     sys.exit(3)
 
+
 def construct_msg():
     try:
         try:
