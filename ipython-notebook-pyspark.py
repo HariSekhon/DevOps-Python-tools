@@ -58,10 +58,18 @@ except ImportError, e:
 except Exception, e:
     printerr('exception encountered during module import: %s' % e)
     sys.exit(3)
+if not isPythonVersion(2.7):
+    warn('Python < 2.7 - IPython may not be available on this version of Python (supplied auto-build will likely have failed for this module)')
 try:
     from IPython.lib import passwd
 except ImportError, e:
-    die('failed to import from IPython.lib: %s' % e)
+    die("""failed to import from IPython.lib
+
+Perhaps you need to 'pip install \"ipython[notebook]\"'
+
+(probably the auto build supplied with this tool failed to install IPython because IPython requires Python >= 2.7
+
+Exception message: %s""" % e)
 
 try:
     linux_only()
