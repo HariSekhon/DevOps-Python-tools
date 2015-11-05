@@ -32,6 +32,7 @@ make:
 	cd lib && make
 
 	pip install jinja2
+	pip install "ipython[notebook]"
 
 .PHONY: apt-packages
 apt-packages:
