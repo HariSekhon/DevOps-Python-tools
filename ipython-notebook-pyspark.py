@@ -33,8 +33,6 @@ Uses Jinja2 template files co-located in the same directory as this program:
 .ipython-notebook-pyspark.00-pyspark-setup.py
 .ipython-notebook-pyspark.ipython_notebook_config.py.j2 
 
-Only supports Linux at this time
-
 Tested on Spark 1.0.x on Hortonworks 2.1 (Yarn + Standalone) and IBM BigInsights 2.1.2 (Standalone)
 """
 
