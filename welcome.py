@@ -117,7 +117,7 @@ def print_welcome():
 if __name__ == '__main__':
     if(len(sys.argv) > 1):
         printerr(__doc__)
-        printerr('usage: welcome.py')
+        printerr('usage: welcome.py\n')
         sys.exit(ERRORS['UNKNOWN'])
     #try:
     print_welcome()
