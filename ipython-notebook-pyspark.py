@@ -39,7 +39,7 @@ Tested on Spark 1.0.x on Hortonworks 2.1 (Yarn + Standalone) and IBM BigInsights
 """
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.2.3'
+__version__ = '0.2.4'
 
 try:
     import getpass
@@ -59,22 +59,26 @@ except Exception, e:
     printerr('exception encountered during module import: %s' % e)
     sys.exit(3)
 if not isPythonVersion(2.7):
-    warn('Python < 2.7 - IPython may not be available on this version of Python (supplied auto-build will likely have failed for this module)')
+    warn('Python < 2.7 - IPython may not be available on this version of Python (supplied auto-build will likely have failed for this module)\n')
 try:
     from IPython.lib import passwd
 except ImportError, e:
-    die("""failed to import from IPython.lib
+    printerr("""failed to import from IPython.lib
 
 Perhaps you need to 'pip install \"ipython[notebook]\"'
 
 (probably the auto build supplied with this tool failed to install IPython because IPython requires Python >= 2.7
 
 Exception message: %s""" % e)
+    if not isPythonVersion(2.7):
+        sys.exit(ERRORS['UNKNOWN'])
+    sys.exit(ERRORS['CRITICAL'])
 
-try:
-    linux_only()
-except LinuxOnlyException, e:
-    die(e)
+# Mac now supported
+#try:
+#    linux_only()
+#except LinuxOnlyException, e:
+#    die(e)
 
 if len(sys.argv) > 1:
     printerr("""Hari Sekhon - https://github.com/harisekhon/pytools
@@ -155,8 +159,14 @@ pyspark_startup_src = dir + "/.ipython-notebook-pyspark.00-pyspark-setup.py"
 default_ip = "0.0.0.0"
 
 # try setting to the main IP with default gw to give better feedback to user where to connect
-ip = os.popen("ifconfig $(netstat -rn | awk '/^0.0.0.0[[:space:]]/ {print $8}') | sed -n '2 s/.*inet addr://; 2 s/ .*// p'").read().rstrip('\n')
-if not re.match('^\d+\.\d+\.\d+\.\d+$', ip):
+if isLinux():
+    ip = os.popen("ifconfig $(netstat -rn | awk '/^0.0.0.0[[:space:]]/ {print $8}') | sed -n '2 s/.*inet addr://; 2 s/ .*// p'").read().rstrip('\n')
+elif isMac():
+    ip = os.popen("ifconfig $(netstat -rn | awk '/^default[[:space:]]/ {print $6}') | sed -n '4 s/.*inet //; 4 s/ .*// p'").read().rstrip('\n')
+else:
+    warn('OS is not Linux or Mac, IP detection will not work')
+if not isIP(ip):
+    warn('defaulting IP to %s' % default_ip)
     ip = default_ip
 
 ipython_profile_name = "pyspark"
