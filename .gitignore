@@ -4,3 +4,6 @@ solr-env.sh
 *.log
 *.swp
 .idea
+tests/spark-*-bin-hadoop2.6*
+tests/test-spark-*-bin-hadoop2.6.parquet
+tests/test.json
