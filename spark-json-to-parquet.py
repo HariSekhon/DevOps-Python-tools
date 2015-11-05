@@ -68,23 +68,15 @@ def main():
     sqlContext = SQLContext(sc)
     spark_version = sc.version
     print('Spark version detected as %s' % spark_version)
-    try:
-        parts = spark_version.split('.')
-        if parts < 2:
-            raise ValueError('no dot detected in spark version')
-        major_version = int(parts[0])
-        minor_version = int(parts[1])
-    except ValueError, e:
-        die('failed to detect Spark version: %s' % e)
-    print('major version = %s, minor version = %s' % (major_version, minor_version))
-    # Spark <= 1.3 - API has changed for newer versions
-    if major_version <= 1 and minor_version <= 3:
+    if not isVersionLax(spark_version):
+        die(support_msg('pytools'))
+    if isMinVersion(spark_version, 1.4):
+        json = sqlContext.read.json(jsonFile)
+        json.write.parquet(parquetDir)
+    else:
         print('running legacy code for Spark <= 1.3')
         json = sqlContext.jsonFile(jsonFile)
         json.saveAsParquetFile(parquetDir)
-    else:
-        json = sqlContext.read.json(jsonFile)
-        json.write.parquet(parquetDir)
 
 if __name__ == '__main__':
     try:
