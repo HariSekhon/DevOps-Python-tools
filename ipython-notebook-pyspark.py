@@ -67,10 +67,9 @@ except ImportError, e:
 
 Perhaps you need to 'pip install \"ipython[notebook]\"'
 
-(probably the auto build supplied with this tool failed to install IPython because IPython requires Python >= 2.7
-
 Exception message: %s""" % e)
     if not isPythonVersion(2.7):
+        printerr('Python < 2.7 - the supplied make auto build with this tool probably failed to install IPython because IPython requires Python >= 2.7')
         sys.exit(ERRORS['UNKNOWN'])
     sys.exit(ERRORS['CRITICAL'])
 
