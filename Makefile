@@ -32,7 +32,8 @@ make:
 	cd lib && make
 
 	pip install jinja2
-	pip install "ipython[notebook]"
+	# Python >= 2.7 - won't build on 2.6
+	pip install "ipython[notebook]" || :
 
 .PHONY: apt-packages
 apt-packages:
