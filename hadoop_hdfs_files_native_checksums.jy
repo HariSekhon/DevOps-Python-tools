@@ -26,7 +26,7 @@ try:
     from org.apache.hadoop.util import StringUtils
     #from org.apache.hadoop.security import AccessControlException
 except ImportError, e:
-    die("Couldn't find Hadoop Java classes, try:  jython -J-cp `hadoop classpath` hadoop_hdfs_get_file_checksums.jy <args>")
+    die("Couldn't find Hadoop Java classes, try:  jython -J-cp `hadoop classpath` %s <args>" % sys.argv[0])
 
 
 def usage(*msg):
