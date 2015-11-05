@@ -8,28 +8,7 @@
 #  License: see accompanying LICENSE file
 #
 
-# Quick Wrapper for per user IPython Notebook instances that are individually password protected
-
-__author__  = "Hari Sekhon"
-__version__ = "0.2.2"
-
-import getpass
-import glob
-import os
-import re
-import shutil
-import sys
-import time
-from IPython.lib import passwd
-from jinja2 import Template
-
-if len(sys.argv) > 1 or not "linux" in sys.platform:
-    print >> sys.stderr, """Hari Sekhon - https://github.com/harisekhon/pytools
-
-usage: %s
-
-version %s
-
+"""
 Starts a unique password protected instance of IPython Notebook integrated with PySpark for the user running this program.
 
 This is a workaround to IPython Notebook not have multi-user support as of 2014.
@@ -57,7 +36,45 @@ Uses Jinja2 template files co-located in the same directory as this program:
 Only supports Linux at this time
 
 Tested on Spark 1.0.x on Hortonworks 2.1 (Yarn + Standalone) and IBM BigInsights 2.1.2 (Standalone)
-""" % ( os.path.basename(sys.argv[0]), __version__)
+"""
+
+__author__  = 'Hari Sekhon'
+__version__ = '0.2.3'
+
+try:
+    import getpass
+    import glob
+    import os
+    import re
+    import shutil
+    import sys
+    import time
+    from jinja2 import Template
+    sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/lib')
+    from HariSekhonUtils import *
+except ImportError, e:
+    printerr('module import failed: %s' % e)
+    sys.exit(3)
+except Exception, e:
+    printerr('exception encountered during module import: %s' % e)
+    sys.exit(3)
+try:
+    from IPython.lib import passwd
+except ImportError, e:
+    die('failed to import from IPython.lib: %s' % e)
+
+try:
+    linux_only()
+except LinuxOnlyException, e:
+    die(e)
+
+if len(sys.argv) > 1:
+    printerr("""Hari Sekhon - https://github.com/harisekhon/pytools
+
+usage: %s
+
+version %s
+%s""" % ( os.path.basename(sys.argv[0]), __version__, __doc__) )
     sys.exit(3)
 
 dir = os.path.abspath(os.path.dirname(sys.argv[0]))
