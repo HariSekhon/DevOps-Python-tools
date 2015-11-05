@@ -30,7 +30,7 @@ try:
     from org.apache.hadoop.fs import Path
     from org.apache.hadoop.hdfs import DistributedFileSystem
 except ImportError, e:
-    die("Couldn't find Hadoop Java classes, try:  jython -J-cp `hadoop classpath` hadoop_hdfs_files_stat.jy <args>")
+    die("Couldn't find Hadoop Java classes, try:  jython -J-cp `hadoop classpath` %s <args>" % sys.argv[0])
 
 def usage(*msg):
     """ Print usage and exit """
