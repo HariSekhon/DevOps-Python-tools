@@ -20,7 +20,6 @@ cd "$srcdir/..";
 
 . tests/travis.sh
 
-cd "$srcdir/.."
 for x in $(echo *.pl *.py *.rb 2>/dev/null); do
     [[ "$x" =~ ^\* ]] && continue
     set +e
