@@ -76,7 +76,7 @@ def main():
     spark_version = sc.version
     print('Spark version detected as %s' % spark_version)
     if not isVersionLax(spark_version):
-        die(support_msg('pytools'))
+        die("Spark version couldn't be determined. " + support_msg('pytools'))
     if isMinVersion(spark_version, 1.4):
         json = sqlContext.read.json(jsonFile)
         json.write.parquet(parquetDir)
