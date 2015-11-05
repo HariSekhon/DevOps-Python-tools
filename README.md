@@ -24,7 +24,7 @@ http://www.linkedin.com/in/harisekhon
 - ```pig-udfs.jy``` - Pig Jython UDFs for Hadoop
 - ```ipython-notebook-pyspark.py``` - per-user authenticated IPython Notebook + PySpark integration to allow each user to auto-create their own password protected IPython Notebook running Spark
 - ```spark-json-to-parquet.py``` - PySpark JSON => Parquet converter
-- ```welcome.py``` - cool spinning welcome message (there is a slightly better perl version in the [Tools](https://github.com/harisekhon/tools) repo
+- ```welcome.py``` - cool spinning welcome message (there is a slightly better perl version in the [Tools](https://github.com/harisekhon/tools) repo)
 
 ### Setup ###
 
