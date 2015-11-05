@@ -67,4 +67,4 @@ update:
 .PHONY: update2
 update2:
 	git pull
-	git submodule update
+	git submodule update --init
