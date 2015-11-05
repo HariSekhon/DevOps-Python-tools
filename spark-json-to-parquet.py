@@ -54,9 +54,9 @@ except Exception, e:
     sys.exit(3)
 
 def main():
-    # bit hacky and hard to keep aligned with docstring changes
-    usage = '\r\b\r\b\r' + __doc__ + "usage: %prog -j file.json -p directory.parquet"
-    #parser = OptionParser(usage=usage, version='%prog ' + __version__)
+    # bit hackish and hard to keep aligned with docstring changes, not using this
+    # usage = '\r\b\r\b\r' + __doc__ + "usage: %prog -j file.json -p directory.parquet"
+    # parser = OptionParser(usage=usage, version='%prog ' + __version__)
     parser = OptionParser(version='%prog ' + __version__)
     parser.add_option('-j', '--json', dest='jsonFile', help='JSON input file/dir', metavar='<file/dir>')
     parser.add_option('-p', '--parquetDir', dest='parquetDir', help='Parquet output dir', metavar='<dir>')
