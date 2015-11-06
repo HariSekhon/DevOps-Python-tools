@@ -22,7 +22,7 @@ PySpark program to convert JSON file(s) to Parquet
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.3.1'
 
 try:
     import glob
@@ -47,10 +47,10 @@ try:
     from pyspark import SparkConf
     from pyspark.sql import SQLContext
 except ImportError, e:
-    printerr('module import failed: %s' % e)
+    print('module import failed: %s' % e)
     sys.exit(3)
 except Exception, e:
-    printerr('exception encountered during module import: %s' % e)
+    print('exception encountered during module import: %s' % e)
     sys.exit(3)
 
 def main():
