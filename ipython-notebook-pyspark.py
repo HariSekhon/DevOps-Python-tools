@@ -56,7 +56,7 @@ except ImportError, e:
 except Exception, e:
     printerr('exception encountered during module import: %s' % e)
     sys.exit(3)
-if not isPythonVersion(2.7):
+if not isPythonMinVersion(2.7):
     warn('Python < 2.7 - IPython may not be available on this version of Python (supplied auto-build will likely have failed for this module)\n')
 try:
     from IPython.lib import passwd
@@ -66,7 +66,7 @@ except ImportError, e:
 Perhaps you need to 'pip install \"ipython[notebook]\"'
 
 Exception message: %s""" % e)
-    if not isPythonVersion(2.7):
+    if not isPythonMinVersion(2.7):
         printerr('Python < 2.7 - the supplied make auto build with this tool probably failed to install IPython because IPython requires Python >= 2.7')
         sys.exit(ERRORS['UNKNOWN'])
     sys.exit(ERRORS['CRITICAL'])
