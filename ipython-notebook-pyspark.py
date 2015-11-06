@@ -37,7 +37,7 @@ Tested on Spark 1.0.x on Hortonworks 2.1 (Yarn + Standalone) and IBM BigInsights
 """
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.2.4'
+__version__ = '0.2.5'
 
 try:
     import getpass
@@ -51,11 +51,12 @@ try:
     sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/lib')
     from HariSekhonUtils import *
 except ImportError, e:
-    printerr('module import failed: %s' % e)
+    print('module import failed: %s' % e)
     sys.exit(3)
 except Exception, e:
-    printerr('exception encountered during module import: %s' % e)
+    print('exception encountered during module import: %s' % e)
     sys.exit(3)
+
 if not isPythonMinVersion(2.7):
     warn('Python < 2.7 - IPython may not be available on this version of Python (supplied auto-build will likely have failed for this module)\n')
 try:
