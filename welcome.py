@@ -15,7 +15,7 @@ Tested on Mac OS X and Linux
 """
 
 __author__  = 'Hari Sekhon'
-__version__ = '1.1'
+__version__ = '1.1.1'
 
 try:
     import os
@@ -27,10 +27,10 @@ try:
     sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/lib')
     from HariSekhonUtils import *
 except ImportError, e:
-    printerr('module import failed: %s' % e)
+    print('module import failed: %s' % e)
     sys.exit(3)
 except Exception, e:
-    printerr('exception encountered during module import: %s' % e)
+    print('exception encountered during module import: %s' % e)
     sys.exit(3)
 
 
@@ -43,7 +43,7 @@ def construct_msg():
         except KeyError:
             user = "user"
         if not isUser(user):
-            print "invalid user '%s' determined from environment variable $USER, failed regex validation" % user
+            print("invalid user '%s' determined from environment variable $USER, failed regex validation" % user)
             sys.exit(ERRORS['CRITICAL'])
         if user == "root":
             user = user.upper()
@@ -71,7 +71,7 @@ def construct_msg():
             # strip up to "Day Mon NN" ie "%a %b %e ..."
             (last, num_replacements) = re.subn('.*(\w{3}\s+\w{3}\s+\d+)', '\g<1>', last)
             if(not num_replacements):
-                print "failed to find the date format in the last log";
+                print("failed to find the date format in the last log");
                 sys.exit(2)
             last = re.sub(' *$', '', last)
             if(last_user == "ROOT"):
@@ -111,7 +111,7 @@ def print_welcome():
                 j += 1
                 time.sleep(0.0085)
     except KeyboardInterrupt:
-        print "\b\b\b\b%s" % msg[i:]
+        print("\b\b\b\b%s" % msg[i:])
 
 
 if __name__ == '__main__':
