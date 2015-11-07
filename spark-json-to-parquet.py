@@ -86,8 +86,4 @@ def main():
         json.saveAsParquetFile(parquetDir)
 
 if __name__ == '__main__':
-    #try:
     main()
-    #except Exception, e:
-    #    print("unhandled exception occurred during main() execution: %s" % e)
-    #    sys.exit(ERRORS["UNKNOWN"])
