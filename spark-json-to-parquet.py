@@ -26,6 +26,7 @@ __version__ = '0.3.1'
 
 try:
     import glob
+    import logging
     import os
     import sys
     # using optparse rather than argparse for servers still on Python 2.6
@@ -54,6 +55,7 @@ except Exception, e:
     sys.exit(3)
 
 def main():
+    log.setLevel(logging.INFO)
     # bit hackish and hard to keep aligned with docstring changes, not using this
     # usage = '\r\b\r\b\r' + __doc__ + "usage: %prog -j file.json -p directory.parquet"
     # parser = OptionParser(usage=usage, version='%prog ' + __version__)
@@ -74,14 +76,14 @@ def main():
     sc = SparkContext(conf=conf)
     sqlContext = SQLContext(sc)
     spark_version = sc.version
-    print('Spark version detected as %s' % spark_version)
+    log.info('Spark version detected as %s' % spark_version)
     if not isVersionLax(spark_version):
         die("Spark version couldn't be determined. " + support_msg('pytools'))
     if isMinVersion(spark_version, 1.4):
         json = sqlContext.read.json(jsonFile)
         json.write.parquet(parquetDir)
     else:
-        print('running legacy code for Spark <= 1.3')
+        log.warn('running legacy code for Spark <= 1.3')
         json = sqlContext.jsonFile(jsonFile)
         json.saveAsParquetFile(parquetDir)
 
