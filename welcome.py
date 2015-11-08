@@ -119,8 +119,7 @@ if __name__ == '__main__':
         printerr(__doc__)
         printerr('usage: welcome.py\n')
         sys.exit(ERRORS['UNKNOWN'])
-    #try:
-    print_welcome()
-    #except Exception, e:
-    #    print('unhandled exception occurred during main() execution: %s' % e)
-    #    sys.exit(ERRORS['UNKNOWN'])
+    try:
+        print_welcome()
+    except KeyboardInterrupt:
+        pass

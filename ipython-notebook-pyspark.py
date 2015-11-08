@@ -233,4 +233,4 @@ try:
     #print cmd
     os.system(cmd)
 except KeyboardInterrupt:
-    sys.exit(0)
+    pass
