@@ -44,7 +44,7 @@ except Exception, e:
 
 class AmbariBlueprint():
 
-    def __init__(self, host, port, user, password, ssl=False):
+    def __init__(self, host, port, user, password, ssl=False, dir=''):
         # must set X-Requested-By in newer versions of Ambari
         self.X_Requested_By = os.getenv('USER', user)
         if not isHost(host) or not isPort(port) or not isUser(user) or not password:
@@ -71,7 +71,10 @@ class AmbariBlueprint():
         #                           password)
         # opener = urllib2.build_opener(auth_handler)
         # urllib2.install_opener(opener)
-        self.blueprint_dir = os.path.join(os.path.dirname(sys.argv[0]), 'ambari_blueprints')
+        if dir:
+            self.blueprint_dir = dir
+        else:
+            self.blueprint_dir = os.path.join(os.path.dirname(sys.argv[0]), 'ambari_blueprints')
         try:
             if not os.path.exists(self.blueprint_dir):
                 log.info("creating blueprint data dir '%s'" % self.blueprint_dir)
@@ -146,6 +149,7 @@ def main():
     parser.add_option('-p', '--password', dest='password', help='Ambari login password ($AMBARI_PASSWORD)', metavar='<password>')
     parser.add_option('-s', '--ssl', dest='ssl', help='Use SSL connection', action='store_true', default=False)
     parser.add_option('-b', '--blueprint', dest='blueprint', help='Ambari blueprint name', metavar='<name>')
+    parser.add_option('-d', '--dir', dest='dir', help='Ambari Blueprints storage directory', metavar='<dir>')
     # parser.add_option('-v', '--verbose', dest='verbose', help='Verbose mode (use multiple times for increasing verbosity)', action='count')
 
     host     = os.getenv('AMBARI_HOST')
@@ -176,13 +180,15 @@ def main():
         validate_port(port)
         validate_user(user)
         validate_password(password)
+        if options.dir:
+            validate_dirname(options.dir, 'blueprints')
     except InvalidOptionException, e:
         usage(parser, e)
 
     if args:
         usage(parser)
 
-    a = AmbariBlueprint(host, port, user, password, ssl)
+    a = AmbariBlueprint(host, port, user, password, ssl, options.dir)
     if options.blueprint:
         a.save_blueprint(blueprint)
     else:
