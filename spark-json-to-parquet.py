@@ -17,6 +17,8 @@
 
 PySpark program to convert JSON file(s) to Parquet
 
+Written to work across Python 2.x and Spark versions, especially Spark given that the Spark API changed after 1.3
+
 """
 
 from __future__ import print_function
