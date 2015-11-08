@@ -55,6 +55,7 @@ except Exception, e:
     sys.exit(3)
 
 def main():
+    log = logging.getLogger(prog)
     log.setLevel(logging.INFO)
     # bit hackish and hard to keep aligned with docstring changes, not using this
     # usage = '\r\b\r\b\r' + __doc__ + "usage: %prog -j file.json -p directory.parquet"
