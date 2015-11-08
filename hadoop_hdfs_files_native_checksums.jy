@@ -88,7 +88,7 @@ def main():
         #import traceback; traceback.print_exc()
         sys.exit("CRITICAL")
     except:
-        print_jython_exception()
+        log_jython_exception()
         sys.exit("CRITICAL")
 
 

@@ -150,7 +150,7 @@ def main():
         sys.exit(ERRORS["CRITICAL"])
     except:
         # printerr("Error: %s" % get_jython_exception())
-        print_jython_exception()
+        log_jython_exception()
         if isJavaOOM(get_jython_exception()):
             printerr(java_oom_fix_msg())
         sys.exit(ERRORS["CRITICAL"])
