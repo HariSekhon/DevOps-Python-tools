@@ -17,6 +17,7 @@ http://www.linkedin.com/in/harisekhon
 
 ### PyTools ###
 
+- ```ambari_blueprints.py``` - Ambari Blueprint fetcher, retrieves blueprints via Ambari API and writes them to json files in given dir
 - ```hadoop_hdfs_time_block_reads.jy``` - Hadoop HDFS per-block read timing debugger with datanode and rack locations for a given file or directory tree. Reports the slowest Hadoop datanodes in descending order at the end
 - ```hadoop_hdfs_files_native_checksums.jy``` - fetches native HDFS checksums for quicker file comparisons (about 100x faster than doing hdfs dfs -cat | md5sum)
 - ```hadoop_hdfs_files_stats.jy``` - fetches HDFS file stats
