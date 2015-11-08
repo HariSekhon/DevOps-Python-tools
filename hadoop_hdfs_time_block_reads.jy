@@ -145,13 +145,14 @@ def main():
         sys.exit(ERRORS["OK"])
     except Exception, e:
         printerr("Error running HDFSBlockReader: %s" % e, 1)
-        if java_oom in e.message:
-            printerr(java_oom_fix)
+        if isJavaOOM(e.message):
+            printerr(java_oom_fix_msg())
         sys.exit(ERRORS["CRITICAL"])
     except:
-        printerr("Error: %s" % sys.exc_info()[1])
-        if sys.exc_info()[1] == java_oom:
-            printerr(java_oom_fix)
+        # printerr("Error: %s" % get_jython_exception())
+        print_jython_exception()
+        if isJavaOOM(get_jython_exception()):
+            printerr(java_oom_fix_msg())
         sys.exit(ERRORS["CRITICAL"])
 
 
@@ -181,7 +182,7 @@ class HDFSBlockReader:
             # time.strftime("%z") doesn't work in Jython
             print ">>  %s  Running on %s\n" % (time.strftime("%Y/%m/%d %H:%M:%S %Z"), self.fqdn)
         except:
-            printerr("Failed to get fqdn of this local host, won't be able to tell you if we're reading from a local datanode\n\nError: %s\n" % sys.exc_info()[1])
+            printerr("Failed to get fqdn of this local host, won't be able to tell you if we're reading from a local datanode\n\nError: %s\n" % get_jython_exception())
             self.fqdn = None
 
         conf      = Configuration()
@@ -192,7 +193,7 @@ class HDFSBlockReader:
         try:
             self.client = self.fs.getClient()
         except:
-            raise Exception, "Failed to create hdfs client: %s" % sys.exc_info()[1]
+            raise Exception, "Failed to create hdfs client: %s" % get_jython_exception()
         #in = client.DFSDataInputStream(self.fh)
 
 
@@ -289,9 +290,9 @@ class HDFSBlockReader:
                         p = l[i].getPath()
                         self.recurse_path(p.toUri().getPath(), p)
                     except:
-                        printerr(sys.exc_info()[1].message.split("\n")[0], 1)
+                        printerr(get_jython_exception().split("\n")[0], 1)
             except:
-                printerr(sys.exc_info()[1].message.split("\n")[0], 1)
+                printerr(get_jython_exception().split("\n")[0], 1)
         else:
             raise IOError, ">>> %s is not a file or directory" % filename
 
@@ -308,7 +309,7 @@ class HDFSBlockReader:
         try:
             self.fh = self.client.open(filename)
         except:
-            raise IOError, "Failed to get client filehandle to HDFS file %s: %s" % (filename, sys.exc_info()[1])
+            raise IOError, "Failed to get client filehandle to HDFS file %s: %s" % (filename, get_jython_exception())
         if self.fh == None:
             raise IOError, "Failed to get client filehandle to HDFS file %s" % filename
 
@@ -317,7 +318,7 @@ class HDFSBlockReader:
             try:
                 block_locations = self.fs.getFileBlockLocations(path, self.offset, self.length)
             except:
-                raise IOError, "Failed to get block locations for %sblock %d (offset %d, length %d): %s" (self.fileoutput, self.block_num, self.offset, self.length, sys.exc_info()[1])
+                raise IOError, "Failed to get block locations for %sblock %d (offset %d, length %d): %s" (self.fileoutput, self.block_num, self.offset, self.length, get_jython_exception())
             if not block_locations:
                 return
             for block in block_locations:
@@ -329,7 +330,7 @@ class HDFSBlockReader:
                         return
                     self.offset       = self.block_offset + self.block_length
                 except:
-                    raise IOError, "Failed to get %sblock %d offset/length: %s" % (self.fileoutput, self.block_num, sys.exc_info()[1])
+                    raise IOError, "Failed to get %sblock %d offset/length: %s" % (self.fileoutput, self.block_num, get_jython_exception())
                 try:
                     self.readBlockFromDNs()
                 except Exception, e:
@@ -412,9 +413,9 @@ class HDFSBlockReader:
                 self.host  = self.dn.getHostName()
                 self.rack  = self.dn.getNetworkLocation()
                 self.nodes_failed_reads.add(self.host)
-                print "Error: failed to read %sblock %d (offset %d, length %d) from rack %s datanode %s: %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length, self.rack, self.host, sys.exc_info()[1])
+                print "Error: failed to read %sblock %d (offset %d, length %d) from rack %s datanode %s: %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length, self.rack, self.host, get_jython_exception())
             else:
-                raise IOError, sys.exc_info()[1]
+                raise IOError, get_jython_exception()
             return
         end_time   = time.time()
         time_taken = end_time - start_time

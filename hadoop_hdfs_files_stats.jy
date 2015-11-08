@@ -90,13 +90,13 @@ def main():
         sys.exit(ERRORS["OK"])
     except Exception, e:
         printerr("Error running HDFSBlockCounter: %s" % e, 1)
-        if java_oom in e.message:
-            printerr(java_oom_fix)
+        if isJavaOOM(e.message):
+            printerr(java_oom_fix_msg())
         sys.exit(ERRORS["CRITICAL"])
     except:
-        printerr("Error: %s" % sys.exc_info()[1].toString())
-        if sys.exc_info()[1].toString() == java_oom:
-            printerr(java_oom_fix)
+        printerr("Error: %s" % get_jython_exception())
+        if isJavaOOM(get_jython_exception()):
+            printerr(java_oom_fix_msg())
         sys.exit(ERRORS["CRITICAL"])
 
 
@@ -112,7 +112,7 @@ class HDFSBlockCounter:
             # time.strftime("%z") doesn't work in Jython
             print >> sys.stderr, ">>  %s  Running on %s\n" % (time.strftime("%Y/%m/%d %H:%M:%S %Z"), self.fqdn)
         except:
-            printerr("Failed to get fqdn of local host, continuing anyway...\n\nError: %s\n" % sys.exc_info()[1].toString())
+            printerr("Failed to get fqdn of local host, continuing anyway...\n\nError: %s\n" % get_jython_exception())
             self.fqdn = None
 
         conf      = Configuration()
@@ -123,7 +123,7 @@ class HDFSBlockCounter:
         try:
             self.client = self.fs.getClient()
         except:
-            raise Exception, "Failed to create hdfs client: %s" % sys.exc_info()[1].toString()
+            raise Exception, "Failed to create hdfs client: %s" % get_jython_exception()
         #in = client.DFSDataInputStream(self.fh)
 
 
@@ -184,9 +184,9 @@ class HDFSBlockCounter:
                         p = l[i].getPath()
                         self.recurse_path(p.toUri().getPath(), p)
                     except:
-                        printerr(sys.exc_info()[1].message.split("\n")[0], 1)
+                        printerr(get_jython_exception().split("\n")[0], 1)
             except:
-                printerr(sys.exc_info()[1].message.split("\n")[0], 1)
+                printerr(get_jython_exception().split("\n")[0], 1)
         else:
             raise IOError, ">>> %s is not a file or directory" % filename
 
@@ -201,7 +201,7 @@ class HDFSBlockCounter:
         try:
             self.fh = self.client.open(filename)
         except:
-            raise IOError, "Failed to get client filehandle to HDFS file %s: %s" % (filename, sys.exc_info()[1].toString())
+            raise IOError, "Failed to get client filehandle to HDFS file %s: %s" % (filename, get_jython_exception())
         if self.fh == None:
             raise IOError, "Failed to get client filehandle to HDFS file %s" % filename
 
@@ -212,7 +212,7 @@ class HDFSBlockCounter:
             repl       = filestatus.getReplication()
             num_blocks = int((size / blocksize)+1)
         except:
-            print "Failed to get file stats for HDFS file %s: %s" (filename, sys.exc_info()[1].toString())
+            print "Failed to get file stats for HDFS file %s: %s" (filename, get_jython_exception())
             return 0
         if(size < blocksize):
             smallfile = "YES"
