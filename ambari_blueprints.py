@@ -71,7 +71,7 @@ class AmbariBlueprint():
         #                           password)
         # opener = urllib2.build_opener(auth_handler)
         # urllib2.install_opener(opener)
-        self.blueprint_dir = os.path.join(os.path.dirname(sys.argv[0]), 'ambari_blueprint_data')
+        self.blueprint_dir = os.path.join(os.path.dirname(sys.argv[0]), 'ambari_blueprints')
         try:
             if not os.path.exists(self.blueprint_dir):
                 log.info("creating blueprint data dir '%s'" % self.blueprint_dir)
