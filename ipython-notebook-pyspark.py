@@ -37,16 +37,16 @@ Tested on Spark 1.0.x on Hortonworks 2.1 (Yarn + Standalone) and IBM BigInsights
 """
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.2.5'
+__version__ = '0.2.6'
 
+import getpass
+import glob
+import os
+import re
+import shutil
+import sys
+import time
 try:
-    import getpass
-    import glob
-    import os
-    import re
-    import shutil
-    import sys
-    import time
     from jinja2 import Template
     sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/lib')
     from HariSekhonUtils import *

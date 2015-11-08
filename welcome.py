@@ -15,16 +15,16 @@ Tested on Mac OS X and Linux
 """
 
 __author__  = 'Hari Sekhon'
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 
+import os
+import random
+import re
+import string
+import sys
+import time
+sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/lib')
 try:
-    import os
-    import random
-    import re
-    import string
-    import sys
-    import time
-    sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/lib')
     from HariSekhonUtils import *
 except ImportError, e:
     print('module import failed: %s' % e)

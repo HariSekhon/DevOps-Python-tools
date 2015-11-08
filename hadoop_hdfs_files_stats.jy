@@ -9,10 +9,13 @@
 #
 #  vim:ts=4:sts=4:sw=4:et:filetype=python
 
-__author__  = "Hari Sekhon"
-__version__ = "0.8.5"
+__author__  = 'Hari Sekhon'
+__version__ = '0.8.6'
 
-import os, sys, time, socket
+import os
+import sys
+import time
+import socket
 # Refusing to use either optparse or argparse since it's annoyingly non-portable across different versions of Python
 import getopt
 sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + "/lib")

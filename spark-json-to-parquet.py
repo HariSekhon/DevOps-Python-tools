@@ -22,16 +22,16 @@ PySpark program to convert JSON file(s) to Parquet
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
+import glob
+import logging
+import os
+import sys
+# using optparse rather than argparse for servers still on Python 2.6
+from optparse import OptionParser
+sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/lib')
 try:
-    import glob
-    import logging
-    import os
-    import sys
-    # using optparse rather than argparse for servers still on Python 2.6
-    from optparse import OptionParser
-    sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/lib')
     from HariSekhonUtils import *
     spark_home = os.getenv('SPARK_HOME', None)
     if spark_home:
