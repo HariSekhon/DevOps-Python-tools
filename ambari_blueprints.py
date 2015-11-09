@@ -18,6 +18,8 @@
 
 Tool to fetch and save Ambari Blueprints and/or Blueprint existing clusters
 
+Tested on Ambari 2.1.0 for Hortonworks HDP 2.2 & 2.3 clusters
+
 """
 
 from __future__ import print_function
