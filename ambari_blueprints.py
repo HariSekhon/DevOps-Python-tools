@@ -48,7 +48,7 @@ except Exception, e:
     sys.exit(3)
 
 # TODO: POST /blueprints/$name - register POST blueprint.json with Ambari
-# TODO: POST /clusters/$name - create cluster POST hostmapping.json
+# TODO: POST /clusters/$name - create cluster POST hostmapping.json which references blueprint name from blueprint.json
 # TODO: auto-store to git - see perl tools
 
 class AmbariBlueprint():
@@ -146,7 +146,12 @@ class AmbariBlueprint():
         jsonData = json.load(data)
         if not self.keep_config:
             log.debug('not keeping config section of blueprint')
-            del jsonData['configurations']
+            try:
+                del jsonData['configurations']
+                for hostgroup in jsonData['host_groups']:
+                    del hostgroup['configurations']
+            except KeyError, e:
+                pass
         log.debug('blueprint = %s' % jsonData)
         return json.dumps(jsonData, sort_keys=True, indent=4, separators=(',', ': '))
 
@@ -194,7 +199,7 @@ def main():
     parser.add_option('-b', '--blueprint', dest='blueprint', help='Ambari blueprint name', metavar='<name>')
     parser.add_option('-c', '--cluster', dest='cluster', help='Ambari cluster to blueprint (case sensitive)', metavar='<name>')
     parser.add_option('-d', '--dir', dest='dir', help="Ambari Blueprints storage directory (defaults to 'ambari_blueprints' directory adjacent to this tool)", metavar='<dir>')
-    parser.add_option('--keep-config', dest='keep_config', help='Keep cluster configuration section when querying a cluster', action='store_true', default=False)
+    parser.add_option('--keep-config', dest='keep_config', help='Keep configuration sections when saving', action='store_true', default=False)
     parser.add_option('-v', '--verbose', dest='verbose', help='Verbose mode', action='count', default=0)
 
     host     = os.getenv('AMBARI_HOST')
