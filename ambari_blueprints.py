@@ -21,6 +21,7 @@ __version__ = '0.1'
 
 import base64
 import json
+import logging
 import os
 import sys
 # using optparse rather than argparse for servers still on Python 2.6
@@ -155,7 +156,7 @@ def main():
     parser.add_option('-s', '--ssl', dest='ssl', help='Use SSL connection', action='store_true', default=False)
     parser.add_option('-b', '--blueprint', dest='blueprint', help='Ambari blueprint name', metavar='<name>')
     parser.add_option('-d', '--dir', dest='dir', help="Ambari Blueprints storage directory (defaults to 'ambari_blueprints' directory adjacent to this tool)", metavar='<dir>')
-    parser.add_option('-v', '--verbose', dest='verbose', help='Verbose mode', action='count')
+    parser.add_option('-v', '--verbose', dest='verbose', help='Verbose mode', action='count', default=0)
 
     host     = os.getenv('AMBARI_HOST')
     port     = os.getenv('AMBARI_PORT', 8080)
@@ -173,9 +174,10 @@ def main():
     blueprint = options.blueprint if options.blueprint else None
     verbose = options.verbose
 
-    log.setLevel(logging.INFO)
     # log.setLevel(logging.WARN)
-    if(verbose):
+    log.setLevel(logging.INFO)
+    # log.info('verbose level: %s' % verbose)
+    if verbose:
         log.setLevel(logging.DEBUG)
 
     try:
