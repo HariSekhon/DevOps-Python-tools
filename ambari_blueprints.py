@@ -155,7 +155,7 @@ def main():
     parser.add_option('-s', '--ssl', dest='ssl', help='Use SSL connection', action='store_true', default=False)
     parser.add_option('-b', '--blueprint', dest='blueprint', help='Ambari blueprint name', metavar='<name>')
     parser.add_option('-d', '--dir', dest='dir', help="Ambari Blueprints storage directory (defaults to 'ambari_blueprints' directory adjacent to this tool)", metavar='<dir>')
-    # parser.add_option('-v', '--verbose', dest='verbose', help='Verbose mode (use multiple times for increasing verbosity)', action='count')
+    parser.add_option('-v', '--verbose', dest='verbose', help='Verbose mode', action='count')
 
     host     = os.getenv('AMBARI_HOST')
     port     = os.getenv('AMBARI_PORT', 8080)
@@ -171,14 +171,12 @@ def main():
     password = options.password if options.password else password
     ssl = options.ssl if options.ssl else ssl
     blueprint = options.blueprint if options.blueprint else None
-    # verbose = options.verbose
+    verbose = options.verbose
 
     log.setLevel(logging.INFO)
     # log.setLevel(logging.WARN)
-    # if verbose > 1:
-    #     log.setLevel(logging.INFO)
-    # if verbose > 2:
-    #     log.setLevel(logging.DEBUG)
+    if(verbose):
+        log.setLevel(logging.DEBUG)
 
     try:
         validate_host(host)
