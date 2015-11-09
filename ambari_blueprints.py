@@ -108,7 +108,7 @@ class AmbariBlueprint():
 
     def list(self, url):
         url = self.url_base + '/' + url
-        log.info('GET %s' % url)
+        log.debug('GET %s' % url)
         req = urllib2.Request(url)
         req.add_header('X-Requested-By', self.X_Requested_By)
         req.add_header("Authorization", "Basic %s" % self.base64authtok)
@@ -130,7 +130,7 @@ class AmbariBlueprint():
 
     def fetch(self, url):
         url = self.url_base + '/' + url
-        log.info('GET %s' % url)
+        log.debug('GET %s' % url)
         req = urllib2.Request(url)
         req.add_header('X-Requested-By', self.X_Requested_By)
         req.add_header("Authorization", "Basic %s" % self.base64authtok)
