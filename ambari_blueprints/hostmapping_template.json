@@ -1,0 +1,34 @@
+{
+    "blueprint": "blueprint1",
+    "host-groups": [
+        {
+            "name": "host_group_1",
+            "hosts": [
+                {
+                    "fqdn": "host1.internal"
+                }
+            ]
+        },
+        {
+            "name": "host_group_2",
+            "hosts": [
+                {
+                    "fqdn": "host2.internal"
+                }
+            ]
+        },
+        {
+            "name": "host_group_3",
+            "hosts": [
+                {
+                    "fqdn": "host3.internal"
+                }
+            ]
+        },
+        {
+            "name": "group-using-host-count",
+            "host_count": 5,
+            "host_predicate": "Hosts/os_type=centos6&Hosts/cpu_count=2"
+        }
+    ]
+}
