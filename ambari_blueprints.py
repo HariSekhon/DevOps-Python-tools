@@ -23,7 +23,7 @@ Tool to fetch and save Ambari Blueprints and/or Blueprint existing clusters
 from __future__ import print_function
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.5'
 
 import base64
 import json
@@ -45,13 +45,13 @@ except Exception, e:
     print('exception encountered during module import: %s' % e)
     sys.exit(3)
 
-# TODO: POST /blueprints/$name - register blueprint with Ambari
-# TODO: POST /clusters/$name - create cluster
+# TODO: POST /blueprints/$name - register POST blueprint.json with Ambari
+# TODO: POST /clusters/$name - create cluster POST hostmapping.json
 # TODO: auto-store to git - see perl tools
 
 class AmbariBlueprint():
 
-    def __init__(self, host, port, user, password, ssl=False, dir=''):
+    def __init__(self, host, port, user, password, ssl=False, dir='', keep_config=False):
         # must set X-Requested-By in newer versions of Ambari
         # log.info("contacting Ambari as '%s'" % self.user)
         self.X_Requested_By = os.getenv('USER', user)
@@ -63,6 +63,7 @@ class AmbariBlueprint():
         self.host     = host
         self.port     = port
         self.user     = user
+        self.keep_config = keep_config
         self.url_base = '%(proto)s://%(host)s:%(port)s/api/v1' % locals()
         # hack per req because otherwise needs to catch and then retry which is tedious
         self.base64authtok = base64.encodestring('%s:%s' % (user, password)).replace('\n', '')
@@ -141,6 +142,9 @@ class AmbariBlueprint():
             log.critical(err)
             quit('CRITICAL', err)
         jsonData = json.load(data)
+        if not self.keep_config:
+            log.debug('not keeping config section of blueprint')
+            del jsonData['configurations']
         log.debug('blueprint = %s' % jsonData)
         return json.dumps(jsonData, sort_keys=True, indent=4, separators=(',', ': '))
 
@@ -188,6 +192,7 @@ def main():
     parser.add_option('-b', '--blueprint', dest='blueprint', help='Ambari blueprint name', metavar='<name>')
     parser.add_option('-c', '--cluster', dest='cluster', help='Ambari cluster to blueprint (case sensitive)', metavar='<name>')
     parser.add_option('-d', '--dir', dest='dir', help="Ambari Blueprints storage directory (defaults to 'ambari_blueprints' directory adjacent to this tool)", metavar='<dir>')
+    parser.add_option('--keep-config', dest='keep_config', help='Keep cluster configuration section when querying a cluster', action='store_true', default=False)
     parser.add_option('-v', '--verbose', dest='verbose', help='Verbose mode', action='count', default=0)
 
     host     = os.getenv('AMBARI_HOST')
@@ -229,7 +234,7 @@ def main():
     if blueprint and cluster:
         usage(parser, '--blueprint/--cluster are mutually exclusive')
 
-    a = AmbariBlueprint(host, port, user, password, ssl, options.dir)
+    a = AmbariBlueprint(host, port, user, password, ssl, options.dir, options.keep_config)
     if options.blueprint:
         a.save_blueprint(blueprint)
     elif options.cluster:
