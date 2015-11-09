@@ -3,6 +3,7 @@
 #
 #  Author: Hari Sekhon
 #  Date: 2015-11-08 14:09:50 +0000 (Sun, 08 Nov 2015)
+#  (re-instantiated from a Perl version in 2014)
 #
 #  https://github.com/harisekhon/pytools
 #
@@ -137,6 +138,9 @@ class AmbariBlueprint():
             quit('CRITICAL', "failed to write blueprint file to '%s': %s" % (blueprint_file, e))
 
     def save_all(self):
+        blueprints = self.list_blueprints()
+        if not blueprints:
+            quit('UNKNOWN', 'no Ambari Blueprints found on server')
         for blueprint in self.list_blueprints():
             self.save_blueprint(blueprint)
 
@@ -144,17 +148,18 @@ class AmbariBlueprint():
 def main():
     parser = OptionParser()
     parser.add_option('-H', '--host', dest='host', help='Ambari Host ($AMBARI_HOST)', metavar='<host>')
-    parser.add_option('-P', '--port', dest='port', help='Ambari Port ($AMBARI_PORT, default 8080)', metavar='8080')
-    parser.add_option('-u', '--user', dest='user', help='Ambari login user ($AMBARI_USER)', metavar='<user>')
+    parser.add_option('-P', '--port', dest='port', help='Ambari Port ($AMBARI_PORT, default: 8080)', metavar='8080')
+    parser.add_option('-u', '--user', dest='user', help='Ambari login user ($AMBARI_USER, default: admin)', metavar='<user>')
     parser.add_option('-p', '--password', dest='password', help='Ambari login password ($AMBARI_PASSWORD)', metavar='<password>')
+    # TODO: certificate validation not tested yet
     parser.add_option('-s', '--ssl', dest='ssl', help='Use SSL connection', action='store_true', default=False)
     parser.add_option('-b', '--blueprint', dest='blueprint', help='Ambari blueprint name', metavar='<name>')
-    parser.add_option('-d', '--dir', dest='dir', help='Ambari Blueprints storage directory', metavar='<dir>')
+    parser.add_option('-d', '--dir', dest='dir', help="Ambari Blueprints storage directory (defaults to 'ambari_blueprints' directory adjacent to this tool)", metavar='<dir>')
     # parser.add_option('-v', '--verbose', dest='verbose', help='Verbose mode (use multiple times for increasing verbosity)', action='count')
 
     host     = os.getenv('AMBARI_HOST')
     port     = os.getenv('AMBARI_PORT', 8080)
-    user     = os.getenv('AMBARI_USER')
+    user     = os.getenv('AMBARI_USER', 'admin')
     password = os.getenv('AMBARI_PASSWORD')
     ssl      = False
 
