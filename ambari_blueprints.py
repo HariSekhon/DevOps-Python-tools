@@ -16,7 +16,9 @@
 
 """
 
-Tool to fetch and save Ambari Blueprints and/or Blueprint existing clusters
+Tool to fetch and save Ambari Blueprints and/or Blueprint existing clusters.
+
+Ambari Blueprints are supported for Ambari 1.6.0 upwards.
 
 Tested on Ambari 2.1.0 for Hortonworks HDP 2.2 & 2.3 clusters
 
