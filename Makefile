@@ -32,11 +32,11 @@ make:
 	cd lib && make
 
 	# for ipython-notebook-pyspark.py
-	pip install jinja2
+	$(SUDO) pip install jinja2
 	# Python >= 2.7 - won't build on 2.6
-	pip install "ipython[notebook]" || :
+	$(SUDO) pip install "ipython[notebook]" || :
 	# HiveServer2
-	pip install pyhs2 || :
+	$(SUDO) pip install pyhs2 || :
 
 .PHONY: apt-packages
 apt-packages:
@@ -55,7 +55,8 @@ yum-packages:
 	rpm -q python-setuptools python-pip python-devel || $(SUDO) yum install -y python-setuptools python-pip python-devel || :
 	rpm -q ipython-notebook || $(SUDO) yum install -y ipython-notebook || :
 	# needed to build pyhs2
-	yum install -y cyrus-sasl-devel || : # libgsasl-devel saslwrapper-devel
+	# libgsasl-devel saslwrapper-devel
+	rpm -q cyrus-sasl-devel || $(SUDO) yum install -y cyrus-sasl-devel || :
 
 .PHONY: test
 test:
