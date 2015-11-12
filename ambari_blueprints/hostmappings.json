@@ -27,8 +27,8 @@
         },
         {
             "name": "group-using-host-count",
-            "host_count": 5,
-            "host_predicate": "Hosts/os_type=centos6&Hosts/cpu_count=2"
+            "host_count": 9,
+            "host_predicate": "Hosts/os_type=centos7"
         }
     ]
 }
