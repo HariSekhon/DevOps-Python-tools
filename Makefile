@@ -31,9 +31,12 @@ make:
 
 	cd lib && make
 
+	# for ipython-notebook-pyspark.py
 	pip install jinja2
 	# Python >= 2.7 - won't build on 2.6
 	pip install "ipython[notebook]" || :
+	# HiveServer2
+	pip install pyhs2 || :
 
 .PHONY: apt-packages
 apt-packages:
@@ -51,6 +54,8 @@ yum-packages:
 	rpm -ivh "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`awk '{print substr($$3, 0, 1); exit}' /etc/*release`.noarch.rpm" || :
 	rpm -q python-setuptools python-pip python-devel || $(SUDO) yum install -y python-setuptools python-pip python-devel || :
 	rpm -q ipython-notebook || $(SUDO) yum install -y ipython-notebook || :
+	# needed to build pyhs2
+	yum install -y cyrus-sasl-devel || : # libgsasl-devel saslwrapper-devel
 
 .PHONY: test
 test:
