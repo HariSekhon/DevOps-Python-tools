@@ -72,8 +72,7 @@ def main():
     parquetDir = options.parquetDir
 
     if args or not jsonFile or not parquetDir:
-        parser.print_help()
-        sys.exit(ERRORS['UNKNOWN'])
+        usage(parser)
 
     conf = SparkConf().setAppName('HS PySpark JSON => Parquet')
     sc = SparkContext(conf=conf)
