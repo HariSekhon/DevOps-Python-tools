@@ -32,11 +32,13 @@ make:
 	cd lib && make
 
 	# for ipython-notebook-pyspark.py
-	pip install jinja2
+	$(SUDO2) pip install jinja2
 	# Python >= 2.7 - won't build on 2.6
-	pip install "ipython[notebook]" || :
+	$(SUDO2) pip install "ipython[notebook]" || :
 	# HiveServer2
-	pip install pyhs2 || :
+	$(SUDO2) pip install pyhs2 || :
+	# Impala
+	$(SUDO2) pip install impyla || :
 
 .PHONY: apt-packages
 apt-packages:
