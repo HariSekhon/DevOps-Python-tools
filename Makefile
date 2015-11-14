@@ -31,14 +31,18 @@ make:
 
 	cd lib && make
 
-	# in case of Python 2.6
+	# in case Python < 2.7
 	$(SUDO2) pip install json
+
 	# for ipython-notebook-pyspark.py
 	$(SUDO2) pip install jinja2
+
 	# Python >= 2.7 - won't build on 2.6
 	$(SUDO2) pip install "ipython[notebook]" || :
+
 	# HiveServer2
 	$(SUDO2) pip install pyhs2 || :
+
 	# Impala
 	$(SUDO2) pip install impyla || :
 
