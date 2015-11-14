@@ -16,20 +16,32 @@
 
 """
 
-Tool to fetch and save Ambari Blueprints and/or Blueprint existing clusters.
+Ambari Blueprints Tool
+
+Features:
+
+1. find and fetch all Ambari Blueprints and/or Blueprint existing clusters
+2. fetch a specific given blueprint
+3. blueprint an existing cluster (<== I like this one)
+3. strips out href that is not valid to re-submit
+4. strips out configuration settings values to make the blueprint generic, option to --keep-config
+5. push a given blueprint file to Ambari
+6. create a new cluster using a previously uploaded blueprint and a hostmapping file
+7. list available blueprints, clusters and hosts
 
 Ambari Blueprints are supported for Ambari 1.6.0 upwards.
 
-Tested on Ambari 2.1.0 for Hortonworks HDP 2.2 & 2.3 clusters
+Tested on Ambari 2.1.0 and Hortonworks HDP 2.2 / 2.3 clusters
 
 """
 
 from __future__ import print_function
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
+__version__ = '0.6.0'
 
 import base64
+from httplib import BadStatusLine
 import json
 import logging
 import os
@@ -55,7 +67,7 @@ except Exception, e:
 
 class AmbariBlueprint():
 
-    def __init__(self, host, port, user, password, ssl=False, dir='', keep_config=False):
+    def __init__(self, host, port, user, password, ssl=False, **kwargs):
         # must set X-Requested-By in newer versions of Ambari
         # log.info("contacting Ambari as '%s'" % self.user)
         self.X_Requested_By = os.getenv('USER', user)
@@ -67,7 +79,10 @@ class AmbariBlueprint():
         self.host     = host
         self.port     = port
         self.user     = user
-        self.keep_config = keep_config
+        self.keep_config = False
+        if kwargs.has_key('keep_config'):
+            self.keep_config = True
+        self.timeout_per_req = 30
         self.url_base = '%(proto)s://%(host)s:%(port)s/api/v1' % locals()
         # hack per req because otherwise needs to catch and then retry which is tedious
         self.base64authtok = base64.encodestring('%s:%s' % (user, password)).replace('\n', '')
@@ -84,8 +99,8 @@ class AmbariBlueprint():
         #                           password)
         # opener = urllib2.build_opener(auth_handler)
         # urllib2.install_opener(opener)
-        if dir:
-            self.blueprint_dir = dir
+        if kwargs.has_key('dir'):
+            self.blueprint_dir = kwargs['dir']
         else:
             self.blueprint_dir = os.path.join(os.path.dirname(sys.argv[0]), 'ambari_blueprints')
         try:
@@ -97,55 +112,108 @@ class AmbariBlueprint():
         except IOError, e:
             die("'failed to create dir '%s': %s" % (self.blueprint_dir, e))
 
-    def list_clusters(self):
+    def parse_cluster_name(self, item):
+        if isStr(item):
+            item = json.loads(item)
+        try:
+            return item['Clusters']['cluster_name']
+        except Exception, e:
+            quit('CRITICAL', 'failed to parse Ambari cluster name: %s' % e)
+
+    def get_clusters(self):
+        log.debug('get_clusters()')
         jsonData = self.list('clusters')
-        try:
-            return [ item['Clusters']['cluster_name'] for item in jsonData['items'] ]
-        except Exception, e:
-            quit('CRITICAL', 'Ambari returned no clusters: %s' % e)
+        return [ self.parse_cluster_name(item) for item in jsonData['items'] ]
 
-    def list_blueprints(self):
+    def parse_blueprint_name(self, item):
+        if isStr(item):
+            item = json.loads(item)
+        try:
+            return item['Blueprints']['blueprint_name']
+        except Exception, e:
+            quit('CRITICAL', 'failed to parse Ambari blueprint name: %s' % e)
+
+    def get_blueprints(self):
+        # log.debug('get_blueprints()')
         jsonData = self.list('blueprints')
-        try:
-            return [ item['Blueprints']['blueprint_name'] for item in jsonData['items'] ]
-        except Exception, e:
-            quit('CRITICAL', 'Ambari returned no blueprints: %s' % e)
+        return [ self.parse_blueprint_name(item) for item in jsonData['items'] ]
 
-    def list(self, url):
-        url = self.url_base + '/' + url
-        log.debug('GET %s' % url)
-        req = urllib2.Request(url)
-        req.add_header('X-Requested-By', self.X_Requested_By)
-        req.add_header("Authorization", "Basic %s" % self.base64authtok)
+    def parse_host_name(self, item):
+        if isStr(item):
+            item = json.loads(item)
         try:
-            data = urllib2.urlopen(req, None, 30)
+            return item['Hosts']['host_name']
+        except Exception, e:
+            quit('CRITICAL', 'failed to parse Ambari host name: %s' % e)
+
+    def get_hosts(self):
+        log.debug('get_hosts()')
+        jsonData = self.list('hosts')
+        return [ self.parse_host_name(item) for item in jsonData['items'] ]
+
+    def list(self, url_suffix):
+        self.url = self.url_base + '/' + url_suffix
+        try:
+            data = self.get(url_suffix)
         except URLError, e:
             err = 'failed to fetch list of Ambari Blueprints: %s' % e
             log.critical(err)
             quit('CRITICAL', err)
         jsonData = json.load(data)
-        log.debug('jsonData = %s' % jsonData)
+        if log.isEnabledFor(logging.DEBUG):
+            log.debug("jsonData = " + jsonpp(jsonData))
         return jsonData
 
-    def fetch_cluster(self, cluster):
+    def get_cluster_blueprint(self, cluster):
         return self.fetch('clusters/%s?format=blueprint' % cluster)
 
-    def fetch_blueprint(self, blueprint):
+    def get_blueprint(self, blueprint):
         return self.fetch('blueprints/%s' % blueprint)
 
-    def fetch(self, url):
-        url = self.url_base + '/' + url
-        log.debug('GET %s' % url)
-        req = urllib2.Request(url)
+    # throws URLError - catch in caller for more specific exception handling error reporting
+    def req(self, url_suffix, data=None):
+        self.url = self.url_base + '/' + url_suffix
+        if data:
+            log.debug('POST %s' % self.url)
+        else:
+            log.debug('GET %s' % self.url)
+        req = urllib2.Request(self.url) #, data, self.timeout)
         req.add_header('X-Requested-By', self.X_Requested_By)
         req.add_header("Authorization", "Basic %s" % self.base64authtok)
+        # XXX: losing error body with more specific error message here
+        data = urllib2.urlopen(req, data, self.timeout_per_req)
+        return data
+
+    def get(self, url_suffix):
+        return self.req(url_suffix)
+
+    def post(self, url_suffix, data):
+        return self.req(url_suffix, data)
+
+    def fetch(self, url_suffix):
+        err = ''
         try:
-            data = urllib2.urlopen(req, None, 30)
+            data = self.get(url_suffix)
         except URLError, e:
-            err = "failed to fetch Ambari Blueprint from '%s': %s" % (url, e)
+            err = "failed to fetch Ambari Blueprint from '%s': %s" % (self.url, e)
+        # This happens with stale SSH tunnels
+        except BadStatusLine, e:
+            err = "failed to fetch Ambari Blueprint from '%s' due to BadStatusLine returned: %s" % (self.url, e)
+        if err:
             log.critical(err)
-            quit('CRITICAL', err)
+            quit('CRITICAL', e)
         jsonData = json.load(data)
+        if log.isEnabledFor(logging.DEBUG):
+            log.debug("blueprint = " + jsonpp(jsonData))
+        try:
+            del jsonData['href']
+            log.debug("stripped href as it's not valid if re-submitting the blueprint to Ambari")
+        except KeyError, e:
+            pass
+        # Ambari 2.1.3 supports this according to https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-ClusterCreationTemplateStructure
+        # jsonData['config_recommendation_strategy'] = 'NEVER_APPLY' # default
+        # jsonData['config_recommendation_strategy'] = 'ONLY_STACK_DEFAULTS_APPLY'
+        # jsonData['config_recommendation_strategy'] = 'ALWAYS_APPLY'
         if not self.keep_config:
             log.debug('not keeping config section of blueprint')
             try:
@@ -154,38 +222,139 @@ class AmbariBlueprint():
                     del hostgroup['configurations']
             except KeyError, e:
                 pass
-        log.debug('blueprint = %s' % jsonData)
-        return json.dumps(jsonData, sort_keys=True, indent=4, separators=(',', ': '))
+        return jsonpp(jsonData)
 
-    def save_blueprint(self, blueprint):
-        data = self.fetch_blueprint(blueprint)
-        self.save(blueprint, data)
+    def send(self, url_suffix, data):
+        # log.debug('send(%s, %s)' % url_suffix, data)
+        self.url = self.url_base + '/' + url_suffix
+        err = ''
+        conflict_err = " (is there an existing blueprint with the same --blueprint name or a blueprint with the same Blueprints -> blueprint_name field? Try changing --blueprint and/or the blueprint_name field in the blueprint file you're trying to --push)"
+        try:
+            data = self.post(url_suffix, data)
+        except URLError, e:
+            err = "failed to POST Ambari Blueprint to '%s': %s - %s" % (self.url, e, e)
+            if 'Conflict' in str(e):
+                err += conflict_err
+            # if data:
+            #     err += ", response='%s'" % data
+        # This happens with stale SSH tunnels
+        except BadStatusLine, e:
+            err = "failed to POST Ambari Blueprint to '%s' due to BadStatusLine returned: %s" % (self.url, e)
+            if 'Conflict' in str(e):
+                err += conflict_err
+        if err:
+            log.critical(err)
+            quit('CRITICAL', err)
+        try:
+            jsonData = json.load(data)
+        except ValueError, e:
+            log.debug('no valid json returned by Ambari server: %s' % e)
+        if log.isEnabledFor(logging.DEBUG):
+            log.debug("response = " + jsonpp(jsonData))
+        return True
 
-    def save_cluster(self, cluster):
-        data = self.fetch_cluster(cluster)
-        self.save(cluster, data)
+    def send_blueprint_file(self, file, name=''):
+        # log.debug('send_blueprint_file(%s, %s)' % (file, name))
+        validate_file(file, 'blueprint', nolog=True)
+        try:
+            fh = open(str(file))
+            file_data = fh.read()
+        except IOError, e:
+            err = "failed to read Ambari Blueprint from file '%s': %s" % (file, e)
+            log.critical(err)
+            quit('CRITICAL', err)
+        if not name:
+            try:
+                name = self.parse_blueprint_name(file_data)
+                log.info("name not specified, determined blueprint name from file contents as '%s'" % name)
+            except KeyError, e:
+                pass
+        if not name:
+            name = os.path.splitext(os.path.basename(file))[0]
+            log.info("name not specified and couldn't determine blueprint name from blueprint data, reverting to using filename without extension '%s'" % name)
+        # this solves the issue of having duplicate Blueprint.blueprint_name keys
+        try:
+            jsonData = json.loads(file_data)
+            jsonData['Blueprints']['blueprint_name'] = name
+            data = json.dumps(jsonData)
+            log.info("reset blueprint field name to '%s'" % name)
+        except ValueError, e:
+            quit('CRITICAL', "invalid json found in file '%s': %s" % (file, name))
+        except KeyError, e:
+            vlog.warn('failed to reset the Blueprint name: %s' % e)
+        return self.send_blueprint(name, data)
 
-    def save(self, name, data):
+    def create_cluster(self, cluster, file):
+        # log.debug('create_cluster(%s, %s)' % (file, name))
+        validate_file(file, 'cluster hosts mapping', nolog=True)
+        try:
+            fh = open(str(file))
+            file_data = fh.read()
+        except IOError, e:
+            err = "failed to read Ambari cluster host mapping from file '%s': %s" % (file, e)
+            log.critical(err)
+            quit('CRITICAL', err)
+        log.info("creating cluster '%s' using file '%s'" % (cluster, file))
+        response = self.send('clusters/%s' % cluster, file_data)
+        vlog.info("Cluster creation submitted, see Ambari web UI to track progress")
+        return response
+
+    def send_blueprint(self, name, data):
+        # log.debug('save_blueprint(%s, %s)' % (name, data))
+        blueprints = self.get_blueprints()
+        if name in blueprints:
+            log.warn("blueprint with name '%s' already exists" % name)
+        log.info("sending blueprint '%s'" % name)
+        log.debug("blueprint data = '%s'" % data)
+        # not exposing this to user via switches - shouldn't be using this right now
+        # return self.send('blueprints/%s?validate_topology=false' % name, data)
+        # quit('UNKNOWN', 'cluster creation not supported yet')
+        return self.send('blueprints/%s' % name, data)
+
+    def save_blueprint(self, blueprint, path=''):
+        # log.debug('save_blueprint(%s, %s' % (blueprint, name))
+        if not path:
+            path = os.path.normpath(os.path.join(self.blueprint_dir, blueprint))
+        data = self.get_blueprint(blueprint)
+        # log.debug("saving blueprint = " + data)
+        self.save(blueprint, path, data)
+
+    def save_cluster(self, cluster, path=''):
+        # log.debug('save_cluster(%s, %s)' % (cluster, name))
+        if not path:
+            path = os.path.normpath(os.path.join(self.blueprint_dir, cluster))
+        data = self.get_cluster_blueprint(cluster)
+        log.debug("saving cluster blueprint = " + data)
+        self.save(cluster, path, data)
+
+    def save(self, name, path, data):
+        # log.debug('save(%s, %s)' % (name, data))
         if data == None:
             err = "blueprint '%s' returned None" % name
             log.critical(err)
             quit('CRITICAL', err)
-        blueprint_file = os.path.join(self.blueprint_dir, name.lower() + '.json')
+        # blueprint_file = os.path.basename(name).lower().rstrip('.json') + '.json'
+        # if not os.pathsep not in blueprint_file:
+        #     blueprint_file = os.path.normpath(os.path.join(self.blueprint_dir, blueprint_file))
+        if os.path.splitext(path)[1] != 'json':
+            path += '.json'
         try:
-            log.info("writing blueprint '%s' to file '%s'" % (name, blueprint_file))
-            f = open(blueprint_file, 'w')
+            log.info("writing blueprint '%s' to file '%s'" % (name, path))
+            f = open(path, 'w')
             f.write(data)
             f.close()
+            print("Saved blueprint '%s' to file '%s'" % (name, path))
         except IOError, e:
-            quit('CRITICAL', "failed to write blueprint file to '%s': %s" % (blueprint_file, e))
+            quit('CRITICAL', "failed to write blueprint file to '%s': %s" % (path, e))
 
     def save_all(self):
-        blueprints = self.list_blueprints()
-        clusters   = self.list_clusters()
+        # log.debug('save_all()')
+        blueprints = self.get_blueprints()
+        clusters   = self.get_clusters()
         if not blueprints and not clusters:
             quit('UNKNOWN', 'no Ambari Blueprints or Clusters found on server')
         for blueprint in blueprints:
-            self.save_blueprint(cluster)
+            self.save_blueprint(blueprint)
         for cluster in clusters:
             self.save_cluster(cluster)
 
@@ -200,7 +369,14 @@ def main():
     parser.add_option('-s', '--ssl', dest='ssl', help='Use SSL connection', action='store_true', default=False)
     parser.add_option('-b', '--blueprint', dest='blueprint', help='Ambari blueprint name', metavar='<name>')
     parser.add_option('-c', '--cluster', dest='cluster', help='Ambari cluster to blueprint (case sensitive)', metavar='<name>')
-    parser.add_option('-d', '--dir', dest='dir', help="Ambari Blueprints storage directory (defaults to 'ambari_blueprints' directory adjacent to this tool)", metavar='<dir>')
+    parser.add_option('--get', dest='get', help='Get and store Ambari Blueprints locally in --dir', action='store_true')
+    parser.add_option('--push', dest='push',  help='Push a local Ambari blueprint to the Ambari server', action='store_true')
+    parser.add_option('--create-cluster', dest='create_cluster',  help='Create a cluster (requires --cluster and --file as well as previously uploaded Ambari Blueprint)', action='store_true')
+    parser.add_option('-f', '--file', dest='file', help='Ambari Blueprint or Cluster creation file to --get write to or --push send from', metavar='<file.json>')
+    parser.add_option('-d', '--dir', dest='dir', help="Ambari Blueprints storage directory if saving all blueprints (defaults to 'ambari_blueprints' directory adjacent to this tool)", metavar='<dir>')
+    parser.add_option('--list-blueprints', dest='list_blueprints', help='List available blueprints', action='store_true', default=False)
+    parser.add_option('--list-clusters', dest='list_clusters', help='List available clusters', action='store_true', default=False)
+    parser.add_option('--list-hosts', dest='list_hosts', help='List available hosts', action='store_true', default=False)
     parser.add_option('--keep-config', dest='keep_config', help='Keep configuration sections when saving', action='store_true', default=False)
     parser.add_option('-v', '--verbose', dest='verbose', help='Verbose mode', action='count', default=0)
 
@@ -221,11 +397,12 @@ def main():
     cluster = options.cluster if options.cluster else None
     verbose = options.verbose
 
-    # log.setLevel(logging.WARN)
-    log.setLevel(logging.INFO)
-    # log.info('verbose level: %s' % verbose)
-    if verbose:
+    log.setLevel(logging.WARN)
+    if verbose > 1:
         log.setLevel(logging.DEBUG)
+    elif verbose:
+        log.setLevel(logging.INFO)
+    # log.info('verbose level: %s' % verbose)
 
     try:
         validate_host(host)
@@ -234,6 +411,11 @@ def main():
         validate_password(password)
         if options.dir:
             validate_dirname(options.dir, 'blueprints')
+        if options.file:
+            if options.push:
+                validate_file(options.file, 'blueprint')
+            if options.create_cluster:
+                validate_file(options.file, 'cluster hosts mapping')
     except InvalidOptionException, e:
         usage(parser, e)
 
@@ -242,14 +424,66 @@ def main():
 
     if blueprint and cluster:
         usage(parser, '--blueprint/--cluster are mutually exclusive')
+    if options.list_blueprints + options.list_clusters + options.list_hosts > 1:
+        usage(parser, 'can only use one --list switch at a time')
+    if options.file and options.get and not (options.blueprint or options.cluster):
+        usage(parser, "cannot specify --file without --blueprint/--cluster as it's only used when getting or pushing a single blueprint")
+    elif options.file and not (options.push or options.create_cluster or options.blueprint):
+        usage(parser, "cannot specify --file without --blueprint/--create-cluster as it's only used when getting or pushing a single blueprint or creating a cluster based on the blueprint")
+    elif options.push and options.create_cluster:
+        usage(parser, "--push and --create-cluster are mutually exclusive")
 
-    a = AmbariBlueprint(host, port, user, password, ssl, options.dir, options.keep_config)
-    if options.blueprint:
-        a.save_blueprint(blueprint)
-    elif options.cluster:
-        a.save_cluster(cluster)
+    a = AmbariBlueprint(host, port, user, password, ssl, dir=options.dir, keep_config=options.keep_config )
+    if options.list_blueprints:
+        blueprints = a.get_blueprints()
+        print('\nBlueprints:\n')
+        if blueprints:
+            [ print(x) for x in blueprints ]
+        else:
+            print('<No Blueprints Found>')
+        print('\nClusters available to blueprint:\n')
+        clusters = a.get_clusters()
+        if clusters:
+            [ print(x) for x in clusters ]
+        else:
+            print('<No Clusters Found>')
+        print()
+        sys.exit(0)
+    elif options.list_clusters:
+        clusters = a.get_clusters()
+        print('\nClusters available to blueprint:\n')
+        if clusters:
+            [ print(x) for x in clusters ]
+        else:
+            print('<No Clusters Found>')
+        print()
+        sys.exit(0)
+    elif options.list_hosts:
+        hosts = a.get_hosts()
+        print('\nHosts:\n')
+        if hosts:
+            # seems to come out already sorted(hosts)
+            [ print(x) for x in hosts ]
+        else:
+            print('<No Hosts Found>')
+        sys.exit(0)
+    elif options.get:
+        if options.blueprint:
+            a.save_blueprint(blueprint, options.file)
+        elif options.cluster:
+            a.save_cluster(cluster, options.file)
+        else:
+            a.save_all()
+    elif options.push:
+        if not options.file:
+            usage(parser, '--file must be specified when pushing a blueprint to Ambari')
+        a.send_blueprint_file(options.file, blueprint)
+    elif options.create_cluster:
+        if not options.file:
+            usage(parser, '--file must be specified with a hostsmapping.json file when creating a new Ambari cluster')
+        a.create_cluster(cluster, options.file)
     else:
-        a.save_all()
+        usage(parser)
     log.info('Completed')
 
 if __name__ == '__main__':
