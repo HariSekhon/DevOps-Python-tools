@@ -31,6 +31,8 @@ make:
 
 	cd lib && make
 
+	# in case of Python 2.6
+	$(SUDO2) pip install json
 	# for ipython-notebook-pyspark.py
 	$(SUDO2) pip install jinja2
 	# Python >= 2.7 - won't build on 2.6
