@@ -31,8 +31,8 @@ make:
 
 	cd lib && make
 
-	# in case Python < 2.7
-	$(SUDO2) pip install json
+	# json module built-in to Python >= 2.6, backport not available via pypi
+	#$(SUDO2) pip install json
 
 	# for ipython-notebook-pyspark.py
 	$(SUDO2) pip install jinja2
