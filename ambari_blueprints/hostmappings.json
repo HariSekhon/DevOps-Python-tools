@@ -1,6 +1,6 @@
 {
-    "blueprint": "blueprint1",
-    "host-groups": [
+    "blueprint": "cluster-basic",
+    "host_groups": [
         {
             "name": "host_group_1",
             "hosts": [
