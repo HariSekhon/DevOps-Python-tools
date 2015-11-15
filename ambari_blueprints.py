@@ -61,8 +61,6 @@ except Exception, e:
     print('exception encountered during module import: %s' % e)
     sys.exit(3)
 
-# TODO: POST /blueprints/$name - register POST blueprint.json with Ambari
-# TODO: POST /clusters/$name - create cluster POST hostmapping.json which references blueprint name from blueprint.json
 # TODO: auto-store to git - see perl tools
 
 class AmbariBlueprintTool():
