@@ -65,7 +65,7 @@ except Exception, e:
 # TODO: POST /clusters/$name - create cluster POST hostmapping.json which references blueprint name from blueprint.json
 # TODO: auto-store to git - see perl tools
 
-class AmbariBlueprint():
+class AmbariBlueprintTool():
 
     def __init__(self, host, port, user, password, ssl=False, **kwargs):
         # must set X-Requested-By in newer versions of Ambari
@@ -76,9 +76,9 @@ class AmbariBlueprint():
         proto    = 'http'
         if ssl:
             proto = 'https'
-        self.host     = host
-        self.port     = port
-        self.user     = user
+        self.host = host
+        self.port = port
+        self.user = user
         self.keep_config = False
         if kwargs.has_key('keep_config'):
             self.keep_config = True
@@ -295,6 +295,14 @@ class AmbariBlueprint():
             log.critical(err)
             quit('CRITICAL', err)
         log.info("creating cluster '%s' using file '%s'" % (cluster, file))
+        if not isJson(file_data):
+            quit('CRITICAL', "invalid json found in file '%s'" % file)
+        # don't have access to a blueprint name to enforce reset here
+        # jsonData = json.loads(file_data)
+        # try:
+        #     jsonData['Blueprints']['blueprint_name'] = blueprint
+        # except KeyError, e:
+        #     quit('CRITICAL', 'failed to (re)set blueprint name in cluster/hostmapping data before creating cluster')
         response = self.send('clusters/%s' % cluster, file_data)
         vlog.info("Cluster creation submitted, see Ambari web UI to track progress")
         return response
@@ -433,7 +441,7 @@ def main():
     elif options.push and options.create_cluster:
         usage(parser, "--push and --create-cluster are mutually exclusive")
 
-    a = AmbariBlueprint(host, port, user, password, ssl, dir=options.dir, keep_config=options.keep_config )
+    a = AmbariBlueprintTool(host, port, user, password, ssl, dir=options.dir, keep_config=options.keep_config )
     if options.list_blueprints:
         blueprints = a.get_blueprints()
         print('\nBlueprints:\n')
