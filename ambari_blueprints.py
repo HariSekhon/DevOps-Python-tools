@@ -375,7 +375,7 @@ def main():
     parser.add_option('-s', '--ssl', dest='ssl', help='Use SSL connection', action='store_true', default=False)
     parser.add_option('-b', '--blueprint', dest='blueprint', help='Ambari blueprint name', metavar='<name>')
     parser.add_option('-c', '--cluster', dest='cluster', help='Ambari cluster to blueprint (case sensitive)', metavar='<name>')
-    parser.add_option('--get', dest='get', help='Get and store Ambari Blueprints locally in --dir', action='store_true')
+    parser.add_option('--get', dest='get', help='Get and store Ambari Blueprints locally in --dir or --file', action='store_true')
     parser.add_option('--push', dest='push',  help='Push a local Ambari blueprint to the Ambari server', action='store_true')
     parser.add_option('--create-cluster', dest='create_cluster',  help='Create a cluster (requires --cluster and --file as well as previously uploaded Ambari Blueprint)', action='store_true')
     parser.add_option('-f', '--file', dest='file', help='Ambari Blueprint or Cluster creation file to --get write to or --push send from', metavar='<file.json>')
