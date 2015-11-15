@@ -51,7 +51,7 @@ pip install jinja2 MySQL-python
 
 ### Jython for Hadoop Utils ###
 
-A couple of the Hadoop utilities listed below require Jython (as well as Hadoop to be installed and correctly configured or course)
+The 3 Hadoop utility programs listed below require Jython (as well as Hadoop to be installed and correctly configured or course)
 
 ```
 hadoop_hdfs_time_block_reads.jy
