@@ -153,12 +153,12 @@ class AmbariBlueprintTool():
     def list(self, url_suffix):
         self.url = self.url_base + '/' + url_suffix
         try:
-            data = self.get(url_suffix)
+            response = self.get(url_suffix)
         except URLError, e:
             err = 'failed to fetch list of Ambari Blueprints: %s' % e
-            log.critical(err)
+            # log.critical(err)
             quit('CRITICAL', err)
-        jsonData = json.load(data)
+        jsonData = json.load(response)
         if log.isEnabledFor(logging.DEBUG):
             log.debug("jsonData = " + jsonpp(jsonData))
         return jsonData
@@ -169,7 +169,7 @@ class AmbariBlueprintTool():
     def get_blueprint(self, blueprint):
         return self.fetch('blueprints/%s' % blueprint)
 
-    # throws URLError - catch in caller for more specific exception handling error reporting
+    # throws (URLError, BadStatusLine) - catch in caller for more specific exception handling error reporting
     def req(self, url_suffix, data=None):
         self.url = self.url_base + '/' + url_suffix
         if data:
@@ -179,9 +179,16 @@ class AmbariBlueprintTool():
         req = urllib2.Request(self.url) #, data, self.timeout)
         req.add_header('X-Requested-By', self.X_Requested_By)
         req.add_header("Authorization", "Basic %s" % self.base64authtok)
-        # XXX: losing error body with more specific error message here
-        data = urllib2.urlopen(req, data, self.timeout_per_req)
-        return data
+        # response = ''
+        # try:
+        response = urllib2.urlopen(req, data, self.timeout_per_req)
+        # except (URLError, BadStatusLine), e:
+        #     log.warn(e.read())
+        #     if response:
+        #         log.critical(response)
+        #     #re-throw, preserve stack
+        #     raise
+        return response
 
     def get(self, url_suffix):
         return self.req(url_suffix)
@@ -192,16 +199,16 @@ class AmbariBlueprintTool():
     def fetch(self, url_suffix):
         err = ''
         try:
-            data = self.get(url_suffix)
+            response = self.get(url_suffix)
         except URLError, e:
             err = "failed to fetch Ambari Blueprint from '%s': %s" % (self.url, e)
         # This happens with stale SSH tunnels
         except BadStatusLine, e:
             err = "failed to fetch Ambari Blueprint from '%s' due to BadStatusLine returned: %s" % (self.url, e)
         if err:
-            log.critical(err)
+            # log.critical(err)
             quit('CRITICAL', e)
-        jsonData = json.load(data)
+        jsonData = json.load(response)
         if log.isEnabledFor(logging.DEBUG):
             log.debug("blueprint = " + jsonpp(jsonData))
         try:
@@ -230,9 +237,9 @@ class AmbariBlueprintTool():
         err = ''
         conflict_err = " (is there an existing blueprint with the same --blueprint name or a blueprint with the same Blueprints -> blueprint_name field? Try changing --blueprint and/or the blueprint_name field in the blueprint file you're trying to --push)"
         try:
-            data = self.post(url_suffix, data)
+            response = self.post(url_suffix, data)
         except URLError, e:
-            err = "failed to POST Ambari Blueprint to '%s': %s - %s" % (self.url, e, e)
+            err = "failed to POST Ambari Blueprint to '%s': %s - %s" % (self.url, e, e.read())
             if 'Conflict' in str(e):
                 err += conflict_err
             # if data:
@@ -243,13 +250,13 @@ class AmbariBlueprintTool():
             if 'Conflict' in str(e):
                 err += conflict_err
         if err:
-            log.critical(err)
+            # log.critical(err)
             quit('CRITICAL', err)
         try:
-            jsonData = json.load(data)
+            jsonData = json.load(response)
         except ValueError, e:
             log.debug('no valid json returned by Ambari server: %s' % e)
-        if log.isEnabledFor(logging.DEBUG):
+        if log.isEnabledFor(logging.DEBUG) and 'jsonData' in locals():
             log.debug("response = " + jsonpp(jsonData))
         return True
 
@@ -261,7 +268,7 @@ class AmbariBlueprintTool():
             file_data = fh.read()
         except IOError, e:
             err = "failed to read Ambari Blueprint from file '%s': %s" % (file, e)
-            log.critical(err)
+            # log.critical(err)
             quit('CRITICAL', err)
         if not name:
             try:
@@ -281,7 +288,7 @@ class AmbariBlueprintTool():
         except ValueError, e:
             quit('CRITICAL', "invalid json found in file '%s': %s" % (file, name))
         except KeyError, e:
-            vlog.warn('failed to reset the Blueprint name: %s' % e)
+            log.warn('failed to reset the Blueprint name: %s' % e)
         return self.send_blueprint(name, data)
 
     def create_cluster(self, cluster, file):
@@ -292,7 +299,7 @@ class AmbariBlueprintTool():
             file_data = fh.read()
         except IOError, e:
             err = "failed to read Ambari cluster host mapping from file '%s': %s" % (file, e)
-            log.critical(err)
+            # log.critical(err)
             quit('CRITICAL', err)
         log.info("creating cluster '%s' using file '%s'" % (cluster, file))
         if not isJson(file_data):
@@ -304,7 +311,7 @@ class AmbariBlueprintTool():
         # except KeyError, e:
         #     quit('CRITICAL', 'failed to (re)set blueprint name in cluster/hostmapping data before creating cluster')
         response = self.send('clusters/%s' % cluster, file_data)
-        vlog.info("Cluster creation submitted, see Ambari web UI to track progress")
+        log.info("Cluster creation submitted, see Ambari web UI to track progress")
         return response
 
     def send_blueprint(self, name, data):
@@ -489,6 +496,7 @@ def main():
         if not options.file:
             usage(parser, '--file must be specified when pushing a blueprint to Ambari')
         a.send_blueprint_file(options.file, blueprint)
+        print("Blueprint file '%s' sent and registered with Ambari as '%s'" % (options.file, blueprint))
     elif options.create_cluster:
         if not options.file:
             usage(parser, '--file must be specified with a hostsmapping.json file when creating a new Ambari cluster')
