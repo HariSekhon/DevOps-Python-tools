@@ -24,7 +24,7 @@ Features:
 2. fetch a specific given blueprint
 3. blueprint an existing cluster (<== I like this one)
 3. strips out href that is not valid to re-submit
-4. strips out configuration settings values to make the blueprint generic, option to --keep-config
+4. strips out configuration settings values to make the blueprint more generic if specifying --strip-config
 5. push a given blueprint file to Ambari
 6. create a new cluster using a previously uploaded blueprint and a hostmapping file
 7. list available blueprints, clusters and hosts
@@ -38,7 +38,7 @@ Tested on Ambari 2.1.0 and Hortonworks HDP 2.2 / 2.3 clusters
 from __future__ import print_function
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.3'
+__version__ = '0.6.4'
 
 import base64
 from httplib import BadStatusLine
@@ -77,9 +77,9 @@ class AmbariBlueprintTool():
         self.host = host
         self.port = port
         self.user = user
-        self.keep_config = False
-        if kwargs.has_key('keep_config') and kwargs['keep_config']:
-            self.keep_config = True
+        self.strip_config = False
+        if kwargs.has_key('strip_config') and kwargs['strip_config']:
+            self.strip_config = True
         self.timeout_per_req = 30
         self.url_base = '%(proto)s://%(host)s:%(port)s/api/v1' % locals()
         # hack per req because otherwise needs to catch and then retry which is tedious
@@ -220,8 +220,8 @@ class AmbariBlueprintTool():
         # jsonData['config_recommendation_strategy'] = 'NEVER_APPLY' # default
         # jsonData['config_recommendation_strategy'] = 'ONLY_STACK_DEFAULTS_APPLY'
         # jsonData['config_recommendation_strategy'] = 'ALWAYS_APPLY'
-        if not self.keep_config:
-            log.debug('not keeping config section of blueprint')
+        if self.strip_config:
+            log.info('stripping out config sections of blueprints to make more generic')
             try:
                 del jsonData['configurations']
                 for hostgroup in jsonData['host_groups']:
@@ -397,7 +397,7 @@ def main():
     parser.add_option('--list-blueprints', dest='list_blueprints', help='List available blueprints', action='store_true', default=False)
     parser.add_option('--list-clusters', dest='list_clusters', help='List available clusters', action='store_true', default=False)
     parser.add_option('--list-hosts', dest='list_hosts', help='List available hosts', action='store_true', default=False)
-    parser.add_option('--keep-config', dest='keep_config', help='Keep configuration sections when saving', action='store_true', default=False)
+    parser.add_option('--strip-config', dest='strip_config', help="Strip configuration sections out to make more generic. Use with caution, more advanced configurations like HDFS HA require some configuration settings in order to validate the topology when submitting a blueprint, so you'd have to add those config keys back in (suggest via a fully config'd cluster blueprint)", action='store_true', default=False)
     parser.add_option('-v', '--verbose', dest='verbose', help='Verbose mode', action='count', default=0)
 
     host     = os.getenv('AMBARI_HOST')
@@ -455,7 +455,7 @@ def main():
     elif options.file and (options.push and not (options.create_cluster or options.blueprint)):
         usage(parser, "cannot specify --file without --blueprint/--create-cluster as it's only used when getting or pushing a single blueprint or creating a cluster based on the blueprint")
 
-    a = AmbariBlueprintTool(host, port, user, password, ssl, dir=options.dir, keep_config=options.keep_config )
+    a = AmbariBlueprintTool(host, port, user, password, ssl, dir=options.dir, strip_config=options.strip_config )
     if options.list_blueprints:
         blueprints = a.get_blueprints()
         print('\nBlueprints (%s found):\n' % len(blueprints))
@@ -506,6 +506,7 @@ def main():
         if not options.file:
             usage(parser, '--file must be specified with a hostsmapping.json file when creating a new Ambari cluster')
         a.create_cluster(cluster, options.file)
+        print("Ambari cluster '%s' creation job submitted, see '%s:%s' web UI for progress" % (cluster, host, port))
     else:
         usage(parser)
     log.info('Completed')
