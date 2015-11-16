@@ -19,11 +19,6 @@
             ]
         },
         {
-            "name": "DN",
-            "host_count": 7,
-            "host_predicate": "Hosts/os_type=centos7"
-        },
-        {
             "name": "HIVE",
             "hosts": [
                 {
@@ -40,10 +35,15 @@
             ]
         },
         {
+            "name": "DN",
+            "host_count": 7,
+            "host_predicate": "Hosts/os_type=centos7"
+        },
+        {
             "name": "AMBARI",
             "hosts": [
                 {
-                    "fqdn": "host7.internal"
+                    "fqdn": "host6.internal"
                 }
             ]
         }
