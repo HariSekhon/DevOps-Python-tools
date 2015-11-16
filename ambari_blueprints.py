@@ -78,7 +78,7 @@ class AmbariBlueprintTool():
         self.port = port
         self.user = user
         self.keep_config = False
-        if kwargs.has_key('keep_config'):
+        if kwargs.has_key('keep_config') and kwargs['keep_config']:
             self.keep_config = True
         self.timeout_per_req = 30
         self.url_base = '%(proto)s://%(host)s:%(port)s/api/v1' % locals()
@@ -97,12 +97,13 @@ class AmbariBlueprintTool():
         #                           password)
         # opener = urllib2.build_opener(auth_handler)
         # urllib2.install_opener(opener)
-        if kwargs.has_key('dir'):
+        self.blueprint_dir = os.path.join(os.path.dirname(sys.argv[0]), 'ambari_blueprints')
+        if kwargs.has_key('dir') and kwargs['dir']:
             self.blueprint_dir = kwargs['dir']
-        else:
-            self.blueprint_dir = os.path.join(os.path.dirname(sys.argv[0]), 'ambari_blueprints')
+        if not isDirname(self.blueprint_dir):
+            quit('UNKNOWN', 'invalid dir arg passed to AmbariBlueprintTool')
         try:
-            if not os.path.exists(self.blueprint_dir):
+            if not self.blueprint_dir or not os.path.exists(self.blueprint_dir):
                 log.info("creating blueprint data dir '%s'" % self.blueprint_dir)
                 os.mkdir(self.blueprint_dir)
             if not os.path.isdir(self.blueprint_dir):
@@ -343,7 +344,7 @@ class AmbariBlueprintTool():
         # blueprint_file = os.path.basename(name).lower().rstrip('.json') + '.json'
         # if not os.pathsep not in blueprint_file:
         #     blueprint_file = os.path.normpath(os.path.join(self.blueprint_dir, blueprint_file))
-        if os.path.splitext(path)[1] != 'json':
+        if os.path.splitext(path)[1] != '.json':
             path += '.json'
         try:
             log.info("writing blueprint '%s' to file '%s'" % (name, path))
@@ -427,15 +428,15 @@ def main():
         usage(parser, e)
 
     if args:
-        usage(parser)
+        usage(parser, 'additional args detected')
 
     if blueprint and cluster:
         usage(parser, '--blueprint/--cluster are mutually exclusive')
-    if options.list_blueprints + options.list_clusters + options.list_hosts > 1:
+    elif options.list_blueprints + options.list_clusters + options.list_hosts > 1:
         usage(parser, 'can only use one --list switch at a time')
-    if options.file and options.get and not (options.blueprint or options.cluster):
+    elif options.file and (options.get and not (options.blueprint or options.cluster) ):
         usage(parser, "cannot specify --file without --blueprint/--cluster as it's only used when getting or pushing a single blueprint")
-    elif options.file and not (options.push or options.create_cluster or options.blueprint):
+    elif options.file and (options.push or options.create_cluster or options.blueprint):
         usage(parser, "cannot specify --file without --blueprint/--create-cluster as it's only used when getting or pushing a single blueprint or creating a cluster based on the blueprint")
     elif options.push and options.create_cluster:
         usage(parser, "--push and --create-cluster are mutually exclusive")
