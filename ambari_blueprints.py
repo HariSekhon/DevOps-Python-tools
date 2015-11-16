@@ -38,7 +38,7 @@ Tested on Ambari 2.1.0 and Hortonworks HDP 2.2 / 2.3 clusters
 from __future__ import print_function
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.6.3'
 
 import base64
 from httplib import BadStatusLine
@@ -226,9 +226,14 @@ class AmbariBlueprintTool():
                 del jsonData['configurations']
                 for hostgroup in jsonData['host_groups']:
                     del hostgroup['configurations']
-                    hostgroup['components'] = list_sort_dicts_by_value(hostgroup['components'], 'name')
             except KeyError, e:
                 pass
+        try:
+            jsonData['host_groups'] = list_sort_dicts_by_value(jsonData['host_groups'], 'name')
+            for hostgroup in jsonData['host_groups']:
+                hostgroup['components'] = list_sort_dicts_by_value(hostgroup['components'], 'name')
+        except KeyError, e:
+            quit('CRITICAL', 'failed to sort blueprint: %s' % e)
         return jsonpp(jsonData)
 
     def send(self, url_suffix, data):
