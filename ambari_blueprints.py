@@ -432,34 +432,37 @@ def main():
 
     if blueprint and cluster:
         usage(parser, '--blueprint/--cluster are mutually exclusive')
+    elif options.push and options.create_cluster:
+        usage(parser, '--push and --create-cluster are mutually exclusive')
+    elif options.create_cluster and not options.cluster:
+        usage(parser, '--create-cluster requires specifying the name via --cluster')
     elif options.list_blueprints + options.list_clusters + options.list_hosts > 1:
         usage(parser, 'can only use one --list switch at a time')
     elif options.file and (options.get and not (options.blueprint or options.cluster) ):
         usage(parser, "cannot specify --file without --blueprint/--cluster as it's only used when getting or pushing a single blueprint")
-    elif options.file and (options.push or options.create_cluster or options.blueprint):
+    elif options.file and (options.push and not (options.create_cluster or options.blueprint)):
         usage(parser, "cannot specify --file without --blueprint/--create-cluster as it's only used when getting or pushing a single blueprint or creating a cluster based on the blueprint")
-    elif options.push and options.create_cluster:
-        usage(parser, "--push and --create-cluster are mutually exclusive")
 
     a = AmbariBlueprintTool(host, port, user, password, ssl, dir=options.dir, keep_config=options.keep_config )
     if options.list_blueprints:
         blueprints = a.get_blueprints()
-        print('\nBlueprints:\n')
+        print('\nBlueprints (%s found):\n' % len(blueprints))
         if blueprints:
             [ print(x) for x in blueprints ]
         else:
             print('<No Blueprints Found>')
-        print('\nClusters available to blueprint:\n')
         clusters = a.get_clusters()
+        print('\nClusters available to blueprint (%s found):\n' % len(clusters))
         if clusters:
             [ print(x) for x in clusters ]
         else:
             print('<No Clusters Found>')
         print()
+        print('%s total extractable blueprints' % str(len(blueprints) + len(clusters)))
         sys.exit(0)
     elif options.list_clusters:
         clusters = a.get_clusters()
-        print('\nClusters available to blueprint:\n')
+        print('\nClusters available to blueprint (%s found):\n' % len(clusters))
         if clusters:
             [ print(x) for x in clusters ]
         else:
@@ -468,7 +471,7 @@ def main():
         sys.exit(0)
     elif options.list_hosts:
         hosts = a.get_hosts()
-        print('\nHosts:\n')
+        print('\nHosts (%s found):\n' % len(hosts))
         if hosts:
             # seems to come out already sorted(hosts)
             [ print(x) for x in hosts ]
