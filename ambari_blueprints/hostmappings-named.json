@@ -1,5 +1,5 @@
 {
-    "blueprint": "cluster-basic",
+    "blueprint": "cluster-basic-named",
     "default_password": "test",
     "host_groups": [
         {
