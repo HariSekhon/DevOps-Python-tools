@@ -69,6 +69,10 @@ Then add the Jython untarred directory to the $PATH or specify the /path/to/jyth
 
 The ```-J-cp `hadoop classpath` ``` bit does the right thing in finding the Hadoop java classes required to use the Hadoop APIs.
 
+### Usage ###
+
+All programs come with a ```--help``` switch which includes a program description and the list of command line options.
+
 #### Configuration for Strict Domain / FQDN validation ####
 
 Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list is done via my [PyLib](https://github.com/harisekhon/pylib) library submodule - see there for details on configuring this to permit custom TLDs like ```.local``` or ```.intranet``` (both supported by default).
@@ -78,10 +82,6 @@ Strict validations include host/domain/FQDNs using TLDs which are populated from
 Run ```make update```. This will git pull and then git submodule update which is necessary to pick up corresponding library updates.
 
 If you update often and want to just quickly git pull + submodule update but skip rebuilding all those dependencies each time then run ```make update2``` (will miss new library dependencies - do full ```make update``` if you encounter issues).
-
-### Usage ###
-
-All programs come with a ```--help``` switch which includes a program description and the list of command line options.
 
 ### Contributions ###
 
