@@ -27,9 +27,25 @@
             ]
         },
         {
-            "name": "group-using-host-count",
-            "host_count": 9,
+            "name": "host_group_4",
+            "hosts": [
+                {
+                    "fqdn": "host4.internal"
+                }
+            ]
+        },
+        {
+            "name": "host_group_5",
+            "host_count": 7,
             "host_predicate": "Hosts/os_type=centos7"
+        },
+        {
+            "name": "host_group_6",
+            "hosts": [
+                {
+                    "fqdn": "host6.internal"
+                }
+            ]
         }
     ]
 }
