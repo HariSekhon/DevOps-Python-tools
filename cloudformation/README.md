@@ -1,6 +1,6 @@
-Hari Sekhon CloudFormation Sample
-=================================
+Hari Sekhon CloudFormation Templates
+====================================
 
-Sample CloudFormation template for creating a 12 node CentOS 7 cluster for Hadoop.
+These are for testing only and should not be blindly used for production.
 
-This is not a production template, it's for testing only - modify for production specs (would be expensive to run production specs on AWS).
+CloudFormation templates should be tailored by an appropriately qualified and experienced engineer for production use (it would be expensive to run production spec on AWS hence I tone down the specs a lot).
