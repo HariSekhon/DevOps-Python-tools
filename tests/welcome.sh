@@ -16,10 +16,8 @@
 set -eu
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-cd "$srcdir/..";
+cd "$srcdir";
 
 . tests/travis.sh
 
-cd "$srcdir"
-
-./welcome.py
+../welcome.py
