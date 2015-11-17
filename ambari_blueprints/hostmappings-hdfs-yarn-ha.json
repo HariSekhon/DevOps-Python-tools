@@ -1,0 +1,51 @@
+{
+    "blueprint": "cluster-hdfs-yarn-ha",
+    "default_password": "test",
+    "host_groups": [
+        {
+            "name": "MASTER1",
+            "hosts": [
+                {
+                    "fqdn": "host1.internal"
+                }
+            ]
+        },
+        {
+            "name": "MASTER2",
+            "hosts": [
+                {
+                    "fqdn": "host2.internal"
+                }
+            ]
+        },
+        {
+            "name": "MASTER3",
+            "hosts": [
+                {
+                    "fqdn": "host3.internal"
+                }
+            ]
+        },
+        {
+            "name": "METRICS",
+            "hosts": [
+                {
+                    "fqdn": "host4.internal"
+                }
+            ]
+        },
+        {
+            "name": "AMBARI",
+            "hosts": [
+                {
+                    "fqdn": "host5.internal"
+                }
+            ]
+        },
+        {
+            "name": "DN",
+            "host_count": 7,
+            "host_predicate": "Hosts/os_type=centos7"
+        }
+    ]
+}

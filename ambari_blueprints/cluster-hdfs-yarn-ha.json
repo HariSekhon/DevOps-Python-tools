@@ -7,7 +7,7 @@
       { "core-site": {
           "properties" : {
             "fs.defaultFS" : "hdfs://nameservice1",
-            "ha.zookeeper.quorum" : "%HOSTGROUP::NN1%:2181,%HOSTGROUP::NN2%:2181,%HOSTGROUP::QJM3%:2181"
+            "ha.zookeeper.quorum" : "%HOSTGROUP::MASTER1%:2181,%HOSTGROUP::MASTER2%:2181,%HOSTGROUP::MASTER3%:2181"
         }}
       },
       { "hdfs-site": {
@@ -16,20 +16,46 @@
             "dfs.ha.automatic-failover.enabled" : "true",
             "dfs.ha.fencing.methods" : "shell(/bin/true)",
             "dfs.ha.namenodes.nameservice1" : "nn1,nn2",
-            "dfs.namenode.http-address" : "%HOSTGROUP::NN1%:50070",
-            "dfs.namenode.http-address.nameservice1.nn1" : "%HOSTGROUP::NN1%:50070",
-            "dfs.namenode.http-address.nameservice1.nn2" : "%HOSTGROUP::NN2%:50070",
-            "dfs.namenode.https-address" : "%HOSTGROUP::NN1%:50470",
-            "dfs.namenode.https-address.nameservice1.nn1" : "%HOSTGROUP::NN1%:50470",
-            "dfs.namenode.https-address.nameservice1.nn2" : "%HOSTGROUP::NN2%:50470",
-            "dfs.namenode.rpc-address.nameservice1.nn1" : "%HOSTGROUP::NN1%:8020",
-            "dfs.namenode.rpc-address.nameservice1.nn2" : "%HOSTGROUP::NN2%:8020",
-            "dfs.namenode.shared.edits.dir" : "qjournal://%HOSTGROUP::NN1%:8485;%HOSTGROUP::NN2%:8485;%HOSTGROUP::QJM3%:8485/nameservice1",
+            "dfs.namenode.http-address" : "%HOSTGROUP::MASTER1%:50070",
+            "dfs.namenode.http-address.nameservice1.nn1" : "%HOSTGROUP::MASTER1%:50070",
+            "dfs.namenode.http-address.nameservice1.nn2" : "%HOSTGROUP::MASTER2%:50070",
+            "dfs.namenode.https-address" : "%HOSTGROUP::MASTER1%:50470",
+            "dfs.namenode.https-address.nameservice1.nn1" : "%HOSTGROUP::MASTER1%:50470",
+            "dfs.namenode.https-address.nameservice1.nn2" : "%HOSTGROUP::MASTER2%:50470",
+            "dfs.namenode.rpc-address.nameservice1.nn1" : "%HOSTGROUP::MASTER1%:8020",
+            "dfs.namenode.rpc-address.nameservice1.nn2" : "%HOSTGROUP::MASTER2%:8020",
+            "dfs.namenode.shared.edits.dir" : "qjournal://%HOSTGROUP::MASTER1%:8485;%HOSTGROUP::MASTER2%:8485;%HOSTGROUP::MASTER3%:8485/nameservice1",
             "dfs.nameservices" : "nameservice1"
-            }
           }
+        }
+      },
+      { "yarn-site" : {
+        "properties" : {
+          "hadoop.registry.rm.enabled" : "false",
+          "hadoop.registry.zk.quorum" : "%HOSTGROUP::MASTER3%:2181,%HOSTGROUP::MASTER2%:2181,%HOSTGROUP::MASTER1%:2181",
+          "yarn.log.server.url" : "http://%HOSTGROUP::MASTER2%:19888/jobhistory/logs",
+          "yarn.resourcemanager.address" : "%HOSTGROUP::MASTER2%:8050",
+          "yarn.resourcemanager.admin.address" : "%HOSTGROUP::MASTER2%:8141",
+          "yarn.resourcemanager.cluster-id" : "yarn-cluster",
+          "yarn.resourcemanager.ha.automatic-failover.zk-base-path" : "/yarn-leader-election",
+          "yarn.resourcemanager.ha.enabled" : "true",
+          "yarn.resourcemanager.ha.rm-ids" : "rm1,rm2",
+          "yarn.resourcemanager.hostname" : "%HOSTGROUP::MASTER2%",
+          "yarn.resourcemanager.hostname.rm1" : "%HOSTGROUP::MASTER1%",
+          "yarn.resourcemanager.hostname.rm2" : "%HOSTGROUP::MASTER2%",
+          "yarn.resourcemanager.recovery.enabled" : "true",
+          "yarn.resourcemanager.resource-tracker.address" : "%HOSTGROUP::MASTER2%:8025",
+          "yarn.resourcemanager.scheduler.address" : "%HOSTGROUP::MASTER2%:8030",
+          "yarn.resourcemanager.store.class" : "org.apache.hadoop.yarn.server.resourcemanager.recovery.ZKRMStateStore",
+          "yarn.resourcemanager.webapp.address" : "%HOSTGROUP::MASTER2%:8088",
+          "yarn.timeline-service.address" : "%HOSTGROUP::MASTER2%:10200",
+          "yarn.timeline-service.webapp.address" : "%HOSTGROUP::MASTER2%:8188",
+          "yarn.timeline-service.webapp.https.address" : "%HOSTGROUP::MASTER2%:8190",
+          "yarn.resourcemanager.zk-address" : "%HOSTGROUP::MASTER1%:2181,%HOSTGROUP::MASTER2%:2181,%HOSTGROUP::MASTER3%:2181"
+          }
+        }
       }
-    ],
+	],
     "host_groups": [
         {
             "cardinality": "1",
@@ -51,9 +77,6 @@
                 },
                 {
                     "name": "ACCUMULO_TSERVER"
-                },
-                {
-                    "name": "AMBARI_SERVER"
                 },
                 {
                     "name": "ATLAS_SERVER"
@@ -125,6 +148,9 @@
                     "name": "PIG"
                 },
                 {
+                    "name": "RESOURCEMANAGER"
+                },
+                {
                     "name": "SLIDER"
                 },
                 {
@@ -158,7 +184,7 @@
                     "name": "ZOOKEEPER_SERVER"
                 }
             ],
-            "name": "NN1"
+            "name": "MASTER1"
         },
         {
             "cardinality": "1",
@@ -260,172 +286,7 @@
                     "name": "ZOOKEEPER_SERVER"
                 }
             ],
-            "name": "NN2"
-        },
-        {
-            "cardinality": "1",
-            "components": [
-                {
-                    "name": "ACCUMULO_CLIENT"
-                },
-                {
-                    "name": "ACCUMULO_TSERVER"
-                },
-                {
-                    "name": "DATANODE"
-                },
-                {
-                    "name": "FALCON_CLIENT"
-                },
-                {
-                    "name": "FLUME_HANDLER"
-                },
-                {
-                    "name": "HBASE_CLIENT"
-                },
-                {
-                    "name": "HBASE_REGIONSERVER"
-                },
-                {
-                    "name": "HCAT"
-                },
-                {
-                    "name": "HDFS_CLIENT"
-                },
-                {
-                    "name": "HIVE_CLIENT"
-                },
-                {
-                    "name": "MAHOUT"
-                },
-                {
-                    "name": "MAPREDUCE2_CLIENT"
-                },
-                {
-                    "name": "METRICS_COLLECTOR"
-                },
-                {
-                    "name": "METRICS_MONITOR"
-                },
-                {
-                    "name": "NFS_GATEWAY"
-                },
-                {
-                    "name": "NODEMANAGER"
-                },
-                {
-                    "name": "OOZIE_CLIENT"
-                },
-                {
-                    "name": "PHOENIX_QUERY_SERVER"
-                },
-                {
-                    "name": "PIG"
-                },
-                {
-                    "name": "SLIDER"
-                },
-                {
-                    "name": "SPARK_CLIENT"
-                },
-                {
-                    "name": "SQOOP"
-                },
-                {
-                    "name": "SUPERVISOR"
-                },
-                {
-                    "name": "TEZ_CLIENT"
-                },
-                {
-                    "name": "YARN_CLIENT"
-                },
-                {
-                    "name": "ZOOKEEPER_CLIENT"
-                }
-            ],
-            "name": "QJM3"
-        },
-        {
-            "cardinality": "8",
-            "components": [
-                {
-                    "name": "ACCUMULO_CLIENT"
-                },
-                {
-                    "name": "ACCUMULO_TSERVER"
-                },
-                {
-                    "name": "DATANODE"
-                },
-                {
-                    "name": "FALCON_CLIENT"
-                },
-                {
-                    "name": "FLUME_HANDLER"
-                },
-                {
-                    "name": "HBASE_CLIENT"
-                },
-                {
-                    "name": "HBASE_REGIONSERVER"
-                },
-                {
-                    "name": "HCAT"
-                },
-                {
-                    "name": "HDFS_CLIENT"
-                },
-                {
-                    "name": "HIVE_CLIENT"
-                },
-                {
-                    "name": "MAHOUT"
-                },
-                {
-                    "name": "MAPREDUCE2_CLIENT"
-                },
-                {
-                    "name": "METRICS_MONITOR"
-                },
-                {
-                    "name": "NFS_GATEWAY"
-                },
-                {
-                    "name": "NODEMANAGER"
-                },
-                {
-                    "name": "OOZIE_CLIENT"
-                },
-                {
-                    "name": "PHOENIX_QUERY_SERVER"
-                },
-                {
-                    "name": "PIG"
-                },
-                {
-                    "name": "SLIDER"
-                },
-                {
-                    "name": "SPARK_CLIENT"
-                },
-                {
-                    "name": "SQOOP"
-                },
-                {
-                    "name": "SUPERVISOR"
-                },
-                {
-                    "name": "TEZ_CLIENT"
-                },
-                {
-                    "name": "YARN_CLIENT"
-                },
-                {
-                    "name": "ZOOKEEPER_CLIENT"
-                }
-            ],
-            "name": "DN"
+            "name": "MASTER2"
         },
         {
             "cardinality": "1",
@@ -533,7 +394,256 @@
                     "name": "ZOOKEEPER_SERVER"
                 }
             ],
-            "name": "HIVE"
+            "name": "MASTER3"
+        },
+        {
+            "cardinality": "1",
+            "components": [
+                {
+                    "name": "ACCUMULO_CLIENT"
+                },
+                {
+                    "name": "ACCUMULO_TSERVER"
+                },
+                {
+                    "name": "DATANODE"
+                },
+                {
+                    "name": "FALCON_CLIENT"
+                },
+                {
+                    "name": "FLUME_HANDLER"
+                },
+                {
+                    "name": "HBASE_CLIENT"
+                },
+                {
+                    "name": "HBASE_REGIONSERVER"
+                },
+                {
+                    "name": "HCAT"
+                },
+                {
+                    "name": "HDFS_CLIENT"
+                },
+                {
+                    "name": "HIVE_CLIENT"
+                },
+                {
+                    "name": "MAHOUT"
+                },
+                {
+                    "name": "MAPREDUCE2_CLIENT"
+                },
+                {
+                    "name": "METRICS_COLLECTOR"
+                },
+                {
+                    "name": "METRICS_MONITOR"
+                },
+                {
+                    "name": "NFS_GATEWAY"
+                },
+                {
+                    "name": "NODEMANAGER"
+                },
+                {
+                    "name": "OOZIE_CLIENT"
+                },
+                {
+                    "name": "PHOENIX_QUERY_SERVER"
+                },
+                {
+                    "name": "PIG"
+                },
+                {
+                    "name": "SLIDER"
+                },
+                {
+                    "name": "SPARK_CLIENT"
+                },
+                {
+                    "name": "SQOOP"
+                },
+                {
+                    "name": "SUPERVISOR"
+                },
+                {
+                    "name": "TEZ_CLIENT"
+                },
+                {
+                    "name": "YARN_CLIENT"
+                },
+                {
+                    "name": "ZOOKEEPER_CLIENT"
+                }
+            ],
+            "name": "METRICS"
+        },
+        {
+            "cardinality": "7",
+            "components": [
+                {
+                    "name": "ACCUMULO_CLIENT"
+                },
+                {
+                    "name": "ACCUMULO_TSERVER"
+                },
+                {
+                    "name": "DATANODE"
+                },
+                {
+                    "name": "FALCON_CLIENT"
+                },
+                {
+                    "name": "FLUME_HANDLER"
+                },
+                {
+                    "name": "HBASE_CLIENT"
+                },
+                {
+                    "name": "HBASE_REGIONSERVER"
+                },
+                {
+                    "name": "HCAT"
+                },
+                {
+                    "name": "HDFS_CLIENT"
+                },
+                {
+                    "name": "HIVE_CLIENT"
+                },
+                {
+                    "name": "MAHOUT"
+                },
+                {
+                    "name": "MAPREDUCE2_CLIENT"
+                },
+                {
+                    "name": "METRICS_MONITOR"
+                },
+                {
+                    "name": "NFS_GATEWAY"
+                },
+                {
+                    "name": "NODEMANAGER"
+                },
+                {
+                    "name": "OOZIE_CLIENT"
+                },
+                {
+                    "name": "PHOENIX_QUERY_SERVER"
+                },
+                {
+                    "name": "PIG"
+                },
+                {
+                    "name": "SLIDER"
+                },
+                {
+                    "name": "SPARK_CLIENT"
+                },
+                {
+                    "name": "SQOOP"
+                },
+                {
+                    "name": "SUPERVISOR"
+                },
+                {
+                    "name": "TEZ_CLIENT"
+                },
+                {
+                    "name": "YARN_CLIENT"
+                },
+                {
+                    "name": "ZOOKEEPER_CLIENT"
+                }
+            ],
+            "name": "DN"
+        },
+        {
+            "cardinality": "1",
+            "components": [
+                {
+                    "name": "ACCUMULO_CLIENT"
+                },
+                {
+                    "name": "ACCUMULO_TSERVER"
+                },
+                {
+                    "name": "AMBARI_SERVER"
+                },
+                {
+                    "name": "DATANODE"
+                },
+                {
+                    "name": "FALCON_CLIENT"
+                },
+                {
+                    "name": "FLUME_HANDLER"
+                },
+                {
+                    "name": "HBASE_CLIENT"
+                },
+                {
+                    "name": "HBASE_REGIONSERVER"
+                },
+                {
+                    "name": "HCAT"
+                },
+                {
+                    "name": "HDFS_CLIENT"
+                },
+                {
+                    "name": "HIVE_CLIENT"
+                },
+                {
+                    "name": "MAHOUT"
+                },
+                {
+                    "name": "MAPREDUCE2_CLIENT"
+                },
+                {
+                    "name": "METRICS_MONITOR"
+                },
+                {
+                    "name": "NFS_GATEWAY"
+                },
+                {
+                    "name": "NODEMANAGER"
+                },
+                {
+                    "name": "OOZIE_CLIENT"
+                },
+                {
+                    "name": "PHOENIX_QUERY_SERVER"
+                },
+                {
+                    "name": "PIG"
+                },
+                {
+                    "name": "SLIDER"
+                },
+                {
+                    "name": "SPARK_CLIENT"
+                },
+                {
+                    "name": "SQOOP"
+                },
+                {
+                    "name": "SUPERVISOR"
+                },
+                {
+                    "name": "TEZ_CLIENT"
+                },
+                {
+                    "name": "YARN_CLIENT"
+                },
+                {
+                    "name": "ZOOKEEPER_CLIENT"
+                }
+            ],
+            "name": "AMBARI"
         }
     ]
 }
