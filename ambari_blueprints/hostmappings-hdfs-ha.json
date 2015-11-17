@@ -1,0 +1,43 @@
+{
+    "blueprint": "cluster-ha-named",
+    "default_password": "test",
+    "host_groups": [
+        {
+            "name": "NN1",
+            "hosts": [
+                {
+                    "fqdn": "host1.internal"
+                }
+            ]
+        },
+        {
+            "name": "NN2",
+            "hosts": [
+                {
+                    "fqdn": "host2.internal"
+                }
+            ]
+        },
+        {
+            "name": "QJM3",
+            "hosts": [
+                {
+                    "fqdn": "host3.internal"
+                }
+            ]
+        },
+        {
+            "name": "HIVE",
+            "hosts": [
+                {
+                    "fqdn": "host4.internal"
+                }
+            ]
+        },
+        {
+            "name": "DN",
+            "host_count": 8,
+            "host_predicate": "Hosts/os_type=centos7"
+        }
+    ]
+}
