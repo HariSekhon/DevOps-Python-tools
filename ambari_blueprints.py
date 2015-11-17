@@ -25,20 +25,29 @@ Features:
 3. blueprint an existing cluster (<== I like this one)
 3. strips out href that is not valid to re-submit
 4. strips out configuration settings values to make the blueprint more generic if specifying --strip-config
-5. push a given blueprint file to Ambari
+5. push a given blueprint file to Ambari, resetting a blueprint's name field on the fly to avoid field conflicts between adjacent blueprints
 6. create a new cluster using a previously uploaded blueprint and a hostmapping file
 7. list available blueprints, clusters and hosts
 
 Ambari Blueprints are supported for Ambari 1.6.0 upwards.
 
-Tested on Ambari 2.1.0 and Hortonworks HDP 2.2 / 2.3 clusters
+Tested on Ambari 2.1.0 and 2.1.2.x and Hortonworks HDP 2.2 / 2.3 clusters
+
+Ambari Blueprints documentation
+
+https://cwiki.apache.org/confluence/display/AMBARI/Blueprints
+https://cwiki.apache.org/confluence/display/AMBARI/Blueprint+Support+for+HA+Clusters:
+
+For custom repos see:
+
+https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-Step4:SetupStackRepositories(Optional)
 
 """
 
 from __future__ import print_function
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.4'
+__version__ = '0.6.5'
 
 import base64
 from httplib import BadStatusLine
@@ -203,6 +212,7 @@ class AmbariBlueprintTool():
         except URLError, e:
             err = "failed to fetch Ambari Blueprint from '%s': %s" % (self.url, e)
         # This happens with stale SSH tunnels
+        # TODO: XXX: this doesn't seem to catch but it's such an intermittent issue it's hard to reproduce
         except BadStatusLine, e:
             err = "failed to fetch Ambari Blueprint from '%s' due to BadStatusLine returned: %s" % (self.url, e)
         if err:
@@ -296,7 +306,7 @@ class AmbariBlueprintTool():
             log.warn('failed to reset the Blueprint name: %s' % e)
         return self.send_blueprint(name, data)
 
-    def create_cluster(self, cluster, file):
+    def create_cluster(self, cluster, file, blueprint=''):
         # log.debug('create_cluster(%s, %s)' % (file, name))
         validate_file(file, 'cluster hosts mapping', nolog=True)
         try:
@@ -315,6 +325,14 @@ class AmbariBlueprintTool():
         #     jsonData['Blueprints']['blueprint_name'] = blueprint
         # except KeyError, e:
         #     quit('CRITICAL', 'failed to (re)set blueprint name in cluster/hostmapping data before creating cluster')
+        if blueprint:
+            try:
+                log.info("setting blueprint in cluster creation to '%s'" % blueprint)
+                jsonData = json.loads(file_data)
+                jsonData['blueprint'] = blueprint
+                file_data = json.dumps(jsonData)
+            except KeyError, e:
+                log.warn("failed to inject blueprint name '%s' in to cluster creation" % blueprint)
         response = self.send('clusters/%s' % cluster, file_data)
         log.info("Cluster creation submitted, see Ambari web UI to track progress")
         return response
@@ -325,7 +343,8 @@ class AmbariBlueprintTool():
         if name in blueprints:
             log.warn("blueprint with name '%s' already exists" % name)
         log.info("sending blueprint '%s'" % name)
-        log.debug("blueprint data = '%s'" % data)
+        if log.isEnabledFor(logging.DEBUG):
+            log.debug("blueprint data = '%s'" % data)
         # not exposing this to user via switches - shouldn't be using this right now
         # return self.send('blueprints/%s?validate_topology=false' % name, data)
         # quit('UNKNOWN', 'cluster creation not supported yet')
@@ -336,7 +355,10 @@ class AmbariBlueprintTool():
         if not path:
             path = os.path.normpath(os.path.join(self.blueprint_dir, blueprint))
         data = self.get_blueprint(blueprint)
-        # log.debug("saving blueprint = " + data)
+        # logged in save()
+        # log.info("saving blueprint '%s' to file '%s" % (blueprint, path))
+        if log.isEnabledFor(logging.DEBUG):
+            log.debug("blueprint '%s' content = '%s'" % (blueprint, data))
         self.save(blueprint, path, data)
 
     def save_cluster(self, cluster, path=''):
@@ -344,7 +366,10 @@ class AmbariBlueprintTool():
         if not path:
             path = os.path.normpath(os.path.join(self.blueprint_dir, cluster))
         data = self.get_cluster_blueprint(cluster)
-        log.debug("saving cluster blueprint = " + data)
+        # logged in save()
+        # log.info("saving cluster '%s' blueprint to file '%s'" % (cluster, path))
+        if log.isEnabledFor(logging.DEBUG):
+            log.debug("cluster '%s' blueprint content = '%s'" % (cluster, data))
         self.save(cluster, path, data)
 
     def save(self, name, path, data):
@@ -368,7 +393,7 @@ class AmbariBlueprintTool():
             quit('CRITICAL', "failed to write blueprint file to '%s': %s" % (path, e))
 
     def save_all(self):
-        # log.debug('save_all()')
+        log.info('finding all blueprints and clusters to blueprint')
         blueprints = self.get_blueprints()
         clusters   = self.get_clusters()
         if not blueprints and not clusters:
@@ -442,8 +467,8 @@ def main():
     if args:
         usage(parser, 'additional args detected')
 
-    if blueprint and cluster:
-        usage(parser, '--blueprint/--cluster are mutually exclusive')
+    if options.get and blueprint and cluster:
+        usage(parser, '--blueprint/--cluster are mutually exclusive when using --get')
     elif options.push and options.create_cluster:
         usage(parser, '--push and --create-cluster are mutually exclusive')
     elif options.create_cluster and not options.cluster:
@@ -505,7 +530,7 @@ def main():
     elif options.create_cluster:
         if not options.file:
             usage(parser, '--file must be specified with a hostsmapping.json file when creating a new Ambari cluster')
-        a.create_cluster(cluster, options.file)
+        a.create_cluster(cluster, options.file, options.blueprint)
         print("Ambari cluster '%s' creation job submitted, see '%s:%s' web UI for progress" % (cluster, host, port))
     else:
         usage(parser)
