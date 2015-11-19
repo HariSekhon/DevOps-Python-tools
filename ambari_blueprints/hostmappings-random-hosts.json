@@ -1,0 +1,35 @@
+{
+    "blueprint": "cluster-basic",
+    "default_password": "test",
+    "host_groups": [
+        {
+            "name": "host_group_6",
+            "hosts": [
+                {
+                    "fqdn": "host6.internal"
+                }
+            ]
+        },
+        {
+            "name": "host_group_1",
+            "host_count": 1
+        },
+        {
+            "name": "host_group_2",
+            "host_count": 1
+        },
+        {
+            "name": "host_group_3",
+            "host_count": 1
+        },
+        {
+            "name": "host_group_4",
+            "host_count": 1
+        },
+        {
+            "name": "host_group_5",
+            "host_count": 7,
+            "host_predicate": "Hosts/os_type=centos7"
+        }
+    ]
+}
