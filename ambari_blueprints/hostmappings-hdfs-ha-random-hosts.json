@@ -24,7 +24,7 @@
         },
         {
             "name": "DN",
-            "host_count": 8,
+            "host_count": 1000,
             "host_predicate": "Hosts/os_type=centos7"
         }
     ]
