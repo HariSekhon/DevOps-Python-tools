@@ -1,0 +1,97 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "MyCluster Description",
+  "Parameters": {
+    "MyInstanceType": {
+      "Default": "m4.2xlarge",
+      "Description": "Instance Type",
+      "Type": "String"
+    },
+    "MyAMI": {
+      "Default": "ami-33734044",
+      "Description": "AMI (CentOS 7 by default)",
+      "Type": "String"
+    },
+    "MySSHKeyPairName": {
+      "Default": "hari",
+      "Description": "SSH Key",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "MyAvailabilityZone": {
+      "Default": "eu-west-1a",
+      "Description": "Availability Zone",
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+    "MySecurityGroup": {
+      "Default": "sg-XXXXXXXX",
+      "Description": "Security Group ID",
+      "Type": "String"
+    },
+    "MyPlacementGroup": {
+      "Default": "MyExistingPlacementGroup",
+      "Description": "Placement Group",
+      "Type": "String"
+    },
+    "MyRootVolumeSize": {
+      "Default": 50,
+      "Description": "EBS Root Volume Size",
+      "Type": "Number"
+    },
+    "MyDataVolumeSize": {
+      "Default": 100,
+      "Description": "EBS Data Volume Size",
+      "Type": "Number"
+    },
+    "MyTag": {
+      "Default": "MyHadoopCluster1",
+      "Description": "Tag for convenience",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "instance01": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": { "Ref": "MyAMI" },
+        "InstanceType": { "Ref": "MyInstanceType" },
+        "KeyName": { "Ref" : "MySSHKeyPairName" },
+        "Monitoring": "false",
+        "PlacementGroupName": { "Ref": "MyPlacementGroup" },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "hadoop-node01"
+          },
+          {
+            "Key": "name",
+            "Value": { "Ref": "MyTag" }
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName" : "/dev/sda1",
+            "Ebs" : { "VolumeSize" : { "Ref": "MyRootVolumeSize" } }
+          },
+          {
+            "DeviceName" : "/dev/sdb",
+            "Ebs" : { "VolumeSize" : { "Ref": "MyDataVolumeSize" } }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": "subnet-XXXXXXXX",
+            "GroupSet": [ { "Ref": "MySecurityGroup" } ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    }
+  }
+}
