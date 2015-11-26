@@ -29,7 +29,7 @@ make:
 	git submodule init
 	git submodule update
 
-	cd lib && make
+	cd pylib && make
 
 	# json module built-in to Python >= 2.6, backport not available via pypi
 	#$(SUDO2) pip install json
