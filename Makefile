@@ -68,7 +68,7 @@ yum-packages:
 
 .PHONY: test
 test:
-	cd lib && make test
+	cd pylib && make test
 	tests/help.sh
 	for x in tests/*.sh; do [ "$$x" = "tests/help.sh" ] && continue; ./$$x || exit $$?; done
 
