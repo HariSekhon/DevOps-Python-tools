@@ -33,10 +33,12 @@ for SPARK_VERSION in 1.3.1 1.4.0; do
     tar="$dir.tgz"
     if ! [ -d "$dir" ]; then
         if ! [ -f "$tar" ]; then
+            echo "fetching $tar"
             # some systems don't have wget
             curl "http://d3kbcqa49mib13.cloudfront.net/$tar" > "$tar"
         fi
-        tar zxvf "$tar" || rm -f "$tar" "$dir"
+        echo "untarring $tar"
+        tar zxf "$tar" || rm -f "$tar" "$dir"
     fi
     echo
     export SPARK_HOME="$dir"
