@@ -15,7 +15,7 @@ Tested on Mac OS X and Linux
 """
 
 __author__  = 'Hari Sekhon'
-__version__ = '1.1.2'
+__version__ = '1.1.3'
 
 import os
 import random
@@ -23,15 +23,12 @@ import re
 import string
 import sys
 import time
-sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/lib')
+sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
 try:
-    from HariSekhonUtils import *
+    from harisekhon.utils import *
 except ImportError, e:
     print('module import failed: %s' % e)
-    sys.exit(3)
-except Exception, e:
-    print('exception encountered during module import: %s' % e)
-    sys.exit(3)
+    sys.exit(4)
 
 
 def construct_msg():

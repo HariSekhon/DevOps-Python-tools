@@ -24,7 +24,7 @@ Written to work across Python 2.x and Spark versions, especially Spark given tha
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 
 import glob
 import logging
@@ -32,28 +32,30 @@ import os
 import sys
 # using optparse rather than argparse for servers still on Python 2.6
 from optparse import OptionParser
-sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/lib')
+sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
 try:
-    from HariSekhonUtils import *
-    spark_home = os.getenv('SPARK_HOME', None)
-    if spark_home:
-        # doesn't contain py4j may as well just use the already unpacked version
-        #sys.path.append(os.path.join(spark_home, 'python/lib/pyspark.zip'))
-        sys.path.append(os.path.join(spark_home, 'python'))
-        # more abstract without version number but not available in spark bin download
-        #sys.path.append(os.path.join(spark_home, 'python/build'))
-        for x in glob.glob(os.path.join(spark_home, 'python/lib/py4j-*-src.zip')):
-            sys.path.append(x)
-    else:
-        warn("SPARK_HOME not set - probably won't find PySpark libs")
+    from harisekhon.utils import *
+except ImportError, e:
+    print('module import failed: %s' % e)
+    sys.exit(4)
+
+spark_home = os.getenv('SPARK_HOME', None)
+if spark_home:
+    # doesn't contain py4j may as well just use the already unpacked version
+    #sys.path.append(os.path.join(spark_home, 'python/lib/pyspark.zip'))
+    sys.path.append(os.path.join(spark_home, 'python'))
+    # more abstract without version number but not available in spark bin download
+    #sys.path.append(os.path.join(spark_home, 'python/build'))
+    for x in glob.glob(os.path.join(spark_home, 'python/lib/py4j-*-src.zip')):
+        sys.path.append(x)
+else:
+    warn("SPARK_HOME not set - probably won't find PySpark libs")
+try:
     from pyspark import SparkContext
     from pyspark import SparkConf
     from pyspark.sql import SQLContext
 except ImportError, e:
     print('module import failed: %s' % e)
-    sys.exit(3)
-except Exception, e:
-    print('exception encountered during module import: %s' % e)
     sys.exit(3)
 
 def main():

@@ -10,7 +10,7 @@
 #  vim:ts=4:sts=4:sw=4:et:filetype=python
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.8.6'
+__version__ = '0.8.7'
 
 import os
 import sys
@@ -18,10 +18,16 @@ import time
 import socket
 # Refusing to use either optparse or argparse since it's annoyingly non-portable across different versions of Python
 import getopt
-sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + "/lib")
-from HariSekhonUtils import *
-#import array # using jarray for byte arrays
+sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
+try:
+    from harisekhon.utils import *
+except ImportError, e:
+    print('module import failed: %s' % e)
+    sys.exit(4)
+
 jython_only()
+
+#import array # using jarray for byte arrays
 import jarray
 try:
     from java.nio import ByteBuffer

@@ -47,7 +47,7 @@ https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-Step4:S
 from __future__ import print_function
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.5'
+__version__ = '0.6.6'
 
 import base64
 from httplib import BadStatusLine
@@ -59,16 +59,14 @@ import sys
 from optparse import OptionParser
 import urllib2
 from urllib2 import URLError
-sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/lib')
+sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/pylib')
 try:
-    from HariSekhonUtils import *
-    # import HariSekhon import CLI
+    pass
+    from harisekhon.utils import *
+#    from harisekhon import CLI
 except ImportError, e:
     print('module import failed: %s' % e)
-    sys.exit(3)
-except Exception, e:
-    print('exception encountered during module import: %s' % e)
-    sys.exit(3)
+    sys.exit(4)
 
 # TODO: auto-store to git - see perl tools
 
@@ -87,7 +85,8 @@ class AmbariBlueprintTool():
         self.port = port
         self.user = user
         self.strip_config = False
-        if kwargs.has_key('strip_config') and kwargs['strip_config']:
+        # if kwargs.has_key('strip_config') and kwargs['strip_config']:
+        if 'strip_config' in kwargs and kwargs['strip_config']:
             self.strip_config = True
         self.timeout_per_req = 30
         self.url_base = '%(proto)s://%(host)s:%(port)s/api/v1' % locals()
@@ -106,8 +105,10 @@ class AmbariBlueprintTool():
         #                           password)
         # opener = urllib2.build_opener(auth_handler)
         # urllib2.install_opener(opener)
+        # same as below but more direct, but harder to read
+        # self.blueprint_dir = kwargs.get('dir', os.path.join(os.path.dirname(sys.argv[0]), 'ambari_blueprints'))
         self.blueprint_dir = os.path.join(os.path.dirname(sys.argv[0]), 'ambari_blueprints')
-        if kwargs.has_key('dir') and kwargs['dir']:
+        if 'dir' in kwargs and kwargs['dir']:
             self.blueprint_dir = kwargs['dir']
         if not isDirname(self.blueprint_dir):
             quit('UNKNOWN', 'invalid dir arg passed to AmbariBlueprintTool')
