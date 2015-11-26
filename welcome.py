@@ -3,7 +3,7 @@
 #  Author: Hari Sekhon
 #  Date: 2009-12-09 19:58:14 +0000 (Wed, 09 Dec 2009)
 #
-#  http://github.com/harisekhon/pytools
+#  https://github.com/harisekhon/pytools
 #
 #  License: see accompanying LICENSE file
 #
