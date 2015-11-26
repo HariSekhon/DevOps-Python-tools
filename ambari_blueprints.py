@@ -59,7 +59,7 @@ import sys
 from optparse import OptionParser
 import urllib2
 from urllib2 import URLError
-sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/pylib')
+sys.path.append(os.path.join(os.path.dirname(__file__)), '/pylib'))
 try:
     pass
     from harisekhon.utils import *
