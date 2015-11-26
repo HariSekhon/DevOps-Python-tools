@@ -22,7 +22,7 @@ echo "
 # ================== #
 "
 
-cd "$srcdir/.";
+cd "$srcdir";
 
 ./help.sh
 
