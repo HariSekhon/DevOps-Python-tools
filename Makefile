@@ -47,6 +47,9 @@ make:
 	# Impala
 	$(SUDO2) pip install impyla
 
+	@echo
+	@echo BUILD SUCCESSFUL
+
 .PHONY: apt-packages
 apt-packages:
 	$(SUDO) apt-get install -y gcc
