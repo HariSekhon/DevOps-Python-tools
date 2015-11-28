@@ -39,7 +39,7 @@ make:
 	$(SUDO2) pip install jinja2
 
 	# Python >= 2.7 - won't build on 2.6
-	$(SUDO2) pip install "ipython[notebook]"
+	$(SUDO2) pip install "ipython[notebook]" || :
 
 	# HiveServer2
 	$(SUDO2) pip install pyhs2
