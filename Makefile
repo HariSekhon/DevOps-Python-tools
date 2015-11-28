@@ -39,33 +39,33 @@ make:
 	$(SUDO2) pip install jinja2
 
 	# Python >= 2.7 - won't build on 2.6
-	$(SUDO2) pip install "ipython[notebook]" || :
+	$(SUDO2) pip install "ipython[notebook]"
 
 	# HiveServer2
-	$(SUDO2) pip install pyhs2 || :
+	$(SUDO2) pip install pyhs2
 
 	# Impala
-	$(SUDO2) pip install impyla || :
+	$(SUDO2) pip install impyla
 
 .PHONY: apt-packages
 apt-packages:
-	$(SUDO) apt-get install -y gcc || :
+	$(SUDO) apt-get install -y gcc
 	# needed to fetch the library submodule at end of build
-	$(SUDO) apt-get install -y git || :
-	$(SUDO) apt-get install -y ipython-notebook || :
-	dpkg -l python-setuptools python-dev &>/dev/null || $(SUDO) apt-get install -y python-setuptools python-dev || :
+	$(SUDO) apt-get install -y git
+	$(SUDO) apt-get install -y ipython-notebook
+	dpkg -l python-setuptools python-dev &>/dev/null || $(SUDO) apt-get install -y python-setuptools python-dev
 
 .PHONY: yum-packages
 yum-packages:
-	rpm -q gcc || $(SUDO) yum install -y gcc || :
+	rpm -q gcc || $(SUDO) yum install -y gcc
 	# needed to fetch the library submodule and CPAN modules
 	# python-pip requires EPEL, so try to get the correct EPEL rpm - for Make must escape the $3
-	rpm -ivh "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`awk '{print substr($$3, 0, 1); exit}' /etc/*release`.noarch.rpm" || :
-	rpm -q python-setuptools python-pip python-devel || $(SUDO) yum install -y python-setuptools python-pip python-devel || :
-	rpm -q ipython-notebook || $(SUDO) yum install -y ipython-notebook || :
+	rpm -ivh "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`awk '{print substr($$3, 0, 1); exit}' /etc/*release`.noarch.rpm"
+	rpm -q python-setuptools python-pip python-devel || $(SUDO) yum install -y python-setuptools python-pip python-devel
+	rpm -q ipython-notebook || $(SUDO) yum install -y ipython-notebook
 	# needed to build pyhs2
 	# libgsasl-devel saslwrapper-devel
-	rpm -q cyrus-sasl-devel || $(SUDO) yum install -y cyrus-sasl-devel || :
+	rpm -q cyrus-sasl-devel || $(SUDO) yum install -y cyrus-sasl-devel
 
 .PHONY: test
 test:
