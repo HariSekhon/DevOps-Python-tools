@@ -65,7 +65,7 @@ yum-packages:
 	# python-pip requires EPEL, so try to get the correct EPEL rpm - for Make must escape the $3
 	rpm -ivh "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`awk '{print substr($$3, 0, 1); exit}' /etc/*release`.noarch.rpm"
 	rpm -q python-setuptools python-pip python-devel || $(SUDO) yum install -y python-setuptools python-pip python-devel
-	rpm -q ipython-notebook || $(SUDO) yum install -y ipython-notebook
+	rpm -q ipython-notebook || $(SUDO) yum install -y ipython-notebook || :
 	# needed to build pyhs2
 	# libgsasl-devel saslwrapper-devel
 	rpm -q cyrus-sasl-devel || $(SUDO) yum install -y cyrus-sasl-devel
