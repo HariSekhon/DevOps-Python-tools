@@ -1,0 +1,713 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "MyCluster Description",
+  "Parameters": {
+    "MyInstanceType": {
+      "Default": "m4.2xlarge",
+      "Description": "Instance Type",
+      "Type": "String"
+    },
+    "MyAMI": {
+      "Default": "ami-33734044",
+      "Description": "AMI (CentOS 7 by default)",
+      "Type": "String"
+    },
+    "MySSHKeyPairName": {
+      "Default": "hari",
+      "Description": "SSH Key",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "MyAvailabilityZone": {
+      "Default": "eu-west-1a",
+      "Description": "Availability Zone",
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+    "MySecurityGroup": {
+      "Default": "sg-XXXXXXXX",
+      "Description": "Security Group ID",
+      "Type": "String"
+    },
+    "MyPlacementGroup": {
+      "Default": "MyExistingPlacementGroup",
+      "Description": "Placement Group",
+      "Type": "String"
+    },
+    "MyRootVolumeSize": {
+      "Default": 50,
+      "Description": "EBS Root Volume Size",
+      "Type": "Number"
+    },
+    "MyDataVolumeSize": {
+      "Default": 100,
+      "Description": "EBS Data Volume Size",
+      "Type": "Number"
+    },
+    "MyTag": {
+      "Default": "MyHadoopCluster1",
+      "Description": "Tag for convenience",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "instance01": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": { "Ref": "MyAMI" },
+        "InstanceType": { "Ref": "MyInstanceType" },
+        "KeyName": { "Ref" : "MySSHKeyPairName" },
+        "Monitoring": "false",
+        "PlacementGroupName": { "Ref": "MyPlacementGroup" },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "hadoop-node01"
+          },
+          {
+            "Key": "name",
+            "Value": { "Ref": "MyTag" }
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName" : "/dev/sda1",
+            "Ebs" : { "VolumeSize" : { "Ref": "MyRootVolumeSize" } }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device" : "/dev/sdb",
+            "VolumeId": { "Ref": "volumeInstance01Data" }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": "subnet-XXXXXXXX",
+            "GroupSet": [ { "Ref": "MySecurityGroup" } ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "instance02": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": { "Ref": "MyAMI" },
+        "InstanceType": { "Ref": "MyInstanceType" },
+        "KeyName": { "Ref" : "MySSHKeyPairName" },
+        "Monitoring": "false",
+        "PlacementGroupName": { "Ref": "MyPlacementGroup" },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "hadoop-node02"
+          },
+          {
+            "Key": "name",
+            "Value": { "Ref": "MyTag" }
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName" : "/dev/sda1",
+            "Ebs" : { "VolumeSize" : { "Ref": "MyRootVolumeSize" } }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device" : "/dev/sdb",
+            "VolumeId": { "Ref": "volumeInstance02Data" }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": "subnet-XXXXXXXX",
+            "GroupSet": [ { "Ref": "MySecurityGroup" } ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "instance03": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": { "Ref": "MyAMI" },
+        "InstanceType": { "Ref": "MyInstanceType" },
+        "KeyName": { "Ref" : "MySSHKeyPairName" },
+        "Monitoring": "false",
+        "PlacementGroupName": { "Ref": "MyPlacementGroup" },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "hadoop-node03"
+          },
+          {
+            "Key": "name",
+            "Value": { "Ref": "MyTag" }
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName" : "/dev/sda1",
+            "Ebs" : { "VolumeSize" : { "Ref": "MyRootVolumeSize" } }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device" : "/dev/sdb",
+            "VolumeId": { "Ref": "volumeInstance03Data" }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": "subnet-XXXXXXXX",
+            "GroupSet": [ { "Ref": "MySecurityGroup" } ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "instance04": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": { "Ref": "MyAMI" },
+        "InstanceType": { "Ref": "MyInstanceType" },
+        "KeyName": { "Ref" : "MySSHKeyPairName" },
+        "Monitoring": "false",
+        "PlacementGroupName": { "Ref": "MyPlacementGroup" },
+        "Tags": [
+          {
+            "Key": "name",
+            "Value": { "Ref": "MyTag" }
+          },
+          {
+            "Key": "Name",
+            "Value": "hadoop-node04"
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName" : "/dev/sda1",
+            "Ebs" : { "VolumeSize" : { "Ref": "MyRootVolumeSize" } }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device" : "/dev/sdb",
+            "VolumeId": { "Ref": "volumeInstance04Data" }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": "subnet-XXXXXXXX",
+            "GroupSet": [ { "Ref": "MySecurityGroup" } ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "instance05": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": { "Ref": "MyAMI" },
+        "InstanceType": { "Ref": "MyInstanceType" },
+        "KeyName": { "Ref" : "MySSHKeyPairName" },
+        "Monitoring": "false",
+        "PlacementGroupName": { "Ref": "MyPlacementGroup" },
+        "Tags": [
+          {
+            "Key": "name",
+            "Value": { "Ref": "MyTag" }
+          },
+          {
+            "Key": "Name",
+            "Value": "hadoop-node05"
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName" : "/dev/sda1",
+            "Ebs" : { "VolumeSize" : { "Ref": "MyRootVolumeSize" } }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device" : "/dev/sdb",
+            "VolumeId": { "Ref": "volumeInstance05Data" }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": "subnet-XXXXXXXX",
+            "GroupSet": [ { "Ref": "MySecurityGroup" } ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "instance06": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": { "Ref": "MyAMI" },
+        "InstanceType": { "Ref": "MyInstanceType" },
+        "KeyName": { "Ref" : "MySSHKeyPairName" },
+        "Monitoring": "false",
+        "PlacementGroupName": { "Ref": "MyPlacementGroup" },
+        "Tags": [
+          {
+            "Key": "name",
+            "Value": { "Ref": "MyTag" }
+          },
+          {
+            "Key": "Name",
+            "Value": "hadoop-node06"
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName" : "/dev/sda1",
+            "Ebs" : { "VolumeSize" : { "Ref": "MyRootVolumeSize" } }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device" : "/dev/sdb",
+            "VolumeId": { "Ref": "volumeInstance06Data" }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": "subnet-XXXXXXXX",
+            "GroupSet": [ { "Ref": "MySecurityGroup" } ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "instance07": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": { "Ref": "MyAMI" },
+        "InstanceType": { "Ref": "MyInstanceType" },
+        "KeyName": { "Ref" : "MySSHKeyPairName" },
+        "Monitoring": "false",
+        "PlacementGroupName": { "Ref": "MyPlacementGroup" },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "hadoop-node07"
+          },
+          {
+            "Key": "name",
+            "Value": { "Ref": "MyTag" }
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName" : "/dev/sda1",
+            "Ebs" : { "VolumeSize" : { "Ref": "MyRootVolumeSize" } }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device" : "/dev/sdb",
+            "VolumeId": { "Ref": "volumeInstance07Data" }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": "subnet-XXXXXXXX",
+            "GroupSet": [ { "Ref": "MySecurityGroup" } ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "instance08": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": { "Ref": "MyAMI" },
+        "InstanceType": { "Ref": "MyInstanceType" },
+        "KeyName": { "Ref" : "MySSHKeyPairName" },
+        "Monitoring": "false",
+        "PlacementGroupName": { "Ref": "MyPlacementGroup" },
+        "Tags": [
+          {
+            "Key": "name",
+            "Value": { "Ref": "MyTag" }
+          },
+          {
+            "Key": "Name",
+            "Value": "hadoop-node08"
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName" : "/dev/sda1",
+            "Ebs" : { "VolumeSize" : { "Ref": "MyRootVolumeSize" } }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device" : "/dev/sdb",
+            "VolumeId": { "Ref": "volumeInstance08Data" }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": "subnet-XXXXXXXX",
+            "GroupSet": [ { "Ref": "MySecurityGroup" } ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "instance09": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": { "Ref": "MyAMI" },
+        "InstanceType": { "Ref": "MyInstanceType" },
+        "KeyName": { "Ref" : "MySSHKeyPairName" },
+        "Monitoring": "false",
+        "PlacementGroupName": { "Ref": "MyPlacementGroup" },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "hadoop-node09"
+          },
+          {
+            "Key": "name",
+            "Value": { "Ref": "MyTag" }
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName" : "/dev/sda1",
+            "Ebs" : { "VolumeSize" : { "Ref": "MyRootVolumeSize" } }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device" : "/dev/sdb",
+            "VolumeId": { "Ref": "volumeInstance09Data" }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": "subnet-XXXXXXXX",
+            "GroupSet": [ { "Ref": "MySecurityGroup" } ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "instance10": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": { "Ref": "MyAMI" },
+        "InstanceType": { "Ref": "MyInstanceType" },
+        "KeyName": { "Ref" : "MySSHKeyPairName" },
+        "Monitoring": "false",
+        "PlacementGroupName": { "Ref": "MyPlacementGroup" },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "hadoop-node10"
+          },
+          {
+            "Key": "name",
+            "Value": { "Ref": "MyTag" }
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName" : "/dev/sda1",
+            "Ebs" : { "VolumeSize" : { "Ref": "MyRootVolumeSize" } }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device" : "/dev/sdb",
+            "VolumeId": { "Ref": "volumeInstance10Data" }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": "subnet-XXXXXXXX",
+            "GroupSet": [ { "Ref": "MySecurityGroup" } ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "instance11": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": { "Ref": "MyAMI" },
+        "InstanceType": { "Ref": "MyInstanceType" },
+        "KeyName": { "Ref" : "MySSHKeyPairName" },
+        "Monitoring": "false",
+        "PlacementGroupName": { "Ref": "MyPlacementGroup" },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "hadoop-node11"
+          },
+          {
+            "Key": "name",
+            "Value": { "Ref": "MyTag" }
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName" : "/dev/sda1",
+            "Ebs" : { "VolumeSize" : { "Ref": "MyRootVolumeSize" } }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device" : "/dev/sdb",
+            "VolumeId": { "Ref": "volumeInstance11Data" }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": "subnet-XXXXXXXX",
+            "GroupSet": [ { "Ref": "MySecurityGroup" } ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "instance12": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": { "Ref": "MyAMI" },
+        "InstanceType": { "Ref": "MyInstanceType" },
+        "KeyName": { "Ref" : "MySSHKeyPairName" },
+        "Monitoring": "false",
+        "PlacementGroupName": { "Ref": "MyPlacementGroup" },
+        "Tags": [
+          {
+            "Key": "name",
+            "Value": { "Ref": "MyTag" }
+          },
+          {
+            "Key": "Name",
+            "Value": "hadoop-node12"
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName" : "/dev/sda1",
+            "Ebs" : { "VolumeSize" : { "Ref": "MyRootVolumeSize" } }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device" : "/dev/sdb",
+            "VolumeId": { "Ref": "volumeInstance12Data" }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": "subnet-XXXXXXXX",
+            "GroupSet": [ { "Ref": "MySecurityGroup" } ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "volumeInstance01Data": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "Encrypted": true,
+        "Size": { "Ref": "MyDataVolumeSize" },
+        "VolumeType": "gp2"
+      }
+    },
+    "volumeInstance02Data": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "Encrypted": true,
+        "Size": { "Ref": "MyDataVolumeSize" },
+        "VolumeType": "gp2"
+      }
+    },
+    "volumeInstance03Data": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "Encrypted": true,
+        "Size": { "Ref": "MyDataVolumeSize" },
+        "VolumeType": "gp2"
+      }
+    },
+    "volumeInstance04Data": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "Encrypted": true,
+        "Size": { "Ref": "MyDataVolumeSize" },
+        "VolumeType": "gp2"
+      }
+    },
+    "volumeInstance05Data": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "Encrypted": true,
+        "Size": { "Ref": "MyDataVolumeSize" },
+        "VolumeType": "gp2"
+      }
+    },
+    "volumeInstance06Data": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "Encrypted": true,
+        "Size": { "Ref": "MyDataVolumeSize" },
+        "VolumeType": "gp2"
+      }
+    },
+    "volumeInstance07Data": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "Encrypted": true,
+        "Size": { "Ref": "MyDataVolumeSize" },
+        "VolumeType": "gp2"
+      }
+    },
+    "volumeInstance08Data": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "Encrypted": true,
+        "Size": { "Ref": "MyDataVolumeSize" },
+        "VolumeType": "gp2"
+      }
+    },
+    "volumeInstance09Data": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "Encrypted": true,
+        "Size": { "Ref": "MyDataVolumeSize" },
+        "VolumeType": "gp2"
+      }
+    },
+    "volumeInstance10Data": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "Encrypted": true,
+        "Size": { "Ref": "MyDataVolumeSize" },
+        "VolumeType": "gp2"
+      }
+    },
+    "volumeInstance11Data": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "Encrypted": true,
+        "Size": { "Ref": "MyDataVolumeSize" },
+        "VolumeType": "gp2"
+      }
+    },
+    "volumeInstance12Data": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": { "Ref": "MyAvailabilityZone" },
+        "Encrypted": true,
+        "Size": { "Ref": "MyDataVolumeSize" },
+        "VolumeType": "gp2"
+      }
+    }
+  }
+}
