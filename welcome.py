@@ -14,8 +14,10 @@ Prints a slick welcome message with last login time
 Tested on Mac OS X and Linux
 """
 
+from __future__ import print_function
+
 __author__  = 'Hari Sekhon'
-__version__ = '1.1.3'
+__version__ = '1.1.4'
 
 import os
 import random
@@ -27,7 +29,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
 try:
     from harisekhon.utils import *
 except ImportError, e:
-    print('module import failed: %s' % e)
+    # print('module import failed: %s' % e, file=sys.stderr)
+    print >> sys.stderr, 'module import failed: %s' % e
     sys.exit(4)
 
 
@@ -68,7 +71,7 @@ def construct_msg():
             # strip up to "Day Mon NN" ie "%a %b %e ..."
             (last, num_replacements) = re.subn('.*(\w{3}\s+\w{3}\s+\d+)', '\g<1>', last)
             if(not num_replacements):
-                print("failed to find the date format in the last log");
+                print("failed to find the date format in the last log")
                 sys.exit(2)
             last = re.sub(' *$', '', last)
             if(last_user == "ROOT"):
@@ -89,26 +92,30 @@ def print_welcome():
     msg = construct_msg()
     try:
         charmap = list(string.uppercase + string.lowercase + "@#$%^&*()")
-
-        print "",
+        # print "",
+        # print('', end='')
         for i in range(0,len(msg)):
             char = msg[i]
-            print "",
+            # print "",
+            print(' ', end='')
             j=0
             while 1:
                 if j > 3:
                     random_char = char
                 else:
                     random_char = random.choice(charmap)
-                print '\b\b%s' % random_char,
+                # going from print statement to func requires one less backspace otherwise it scrolls backwards
+                # print '\b\b%s' % random_char,
+                print('\b%s' % random_char, end='')
                 sys.stdout.flush()
-                #print '%s' % random_char,
                 if char == random_char:
                     break
                 j += 1
                 time.sleep(0.0085)
+        print()
     except KeyboardInterrupt:
-        print("\b\b\b\b%s" % msg[i:])
+        # print("\b\b\b\b%s" % msg[i:])
+        print("\b\b\b%s" % msg[i:])
 
 
 if __name__ == '__main__':
