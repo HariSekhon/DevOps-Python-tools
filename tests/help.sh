@@ -20,6 +20,8 @@ cd "$srcdir/..";
 
 . tests/travis.sh
 
+export SPARK_HOME="$(ls -d tests/spark-*-bin-hadoop* | head -n 1)"
+
 for x in $(echo *.pl *.py *.rb 2>/dev/null); do
     [[ "$x" =~ ^\* ]] && continue
     set +e
