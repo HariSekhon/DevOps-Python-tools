@@ -41,48 +41,48 @@ def construct_msg():
             if not user:
                 raise KeyError
         except KeyError:
-            user = "user"
+            user = 'user'
         if not isUser(user):
             print("invalid user '%s' determined from environment variable $USER, failed regex validation" % user)
             sys.exit(ERRORS['CRITICAL'])
-        if user == "root":
+        if user == 'root':
             user = user.upper()
-        elif len(user) < 4 or re.search('\d', user) or user == "user":
+        elif len(user) < 4 or re.search('\d', user) or user == 'user':
             # probably not a real name
             pass
         else:
             user = user.title()
-        msg = "Welcome %s - " % user
+        msg = 'Welcome %s - ' % user
         fh = os.popen("last -100")
         fh.readline()
         re_skip = re.compile('^(?:reboot|wtmp)|^\s*$')
-        last = ""
+        last = ''
         for line in fh:
             last = line.rstrip("\n")
             if(re_skip.match(last)):
-                last = ""
+                last = ''
                 continue
             break
         if(last):
-            msg += "last login was "
+            msg += 'last login was '
             last_user = re.sub('\s+.*$', '', last)
-            if last_user == "root":
-                last_user = "ROOT"
+            if last_user == 'root':
+                last_user = 'ROOT'
             # strip up to "Day Mon NN" ie "%a %b %e ..."
             (last, num_replacements) = re.subn('.*(\w{3}\s+\w{3}\s+\d+)', '\g<1>', last)
             if(not num_replacements):
-                print("failed to find the date format in the last log")
+                print('failed to find the date format in the last log')
                 sys.exit(2)
             last = re.sub(' *$', '', last)
-            if(last_user == "ROOT"):
-                msg += "ROOT"
+            if(last_user == 'ROOT'):
+                msg += 'ROOT'
             elif(last_user.lower() == user.lower()):
-                msg += "by you"
+                msg += 'by you'
             else:
-                msg += "by %s" % last_user
-            msg += " => %s" % last
+                msg += 'by %s' % last_user
+            msg += ' => %s' % last
         else:
-            msg += "no last login information available!"
+            msg += 'no last login information available!'
     except KeyboardInterrupt:
         pass
     return msg
@@ -91,7 +91,7 @@ def construct_msg():
 def print_welcome():
     msg = construct_msg()
     try:
-        charmap = list(string.uppercase + string.lowercase + "@#$%^&*()")
+        charmap = list(string.uppercase + string.lowercase + '@#$%^&*()')
         # print "",
         # print('', end='')
         for i in range(0,len(msg)):
@@ -115,7 +115,7 @@ def print_welcome():
         print()
     except KeyboardInterrupt:
         # print("\b\b\b\b%s" % msg[i:])
-        print("\b\b\b%s" % msg[i:])
+        print('\b\b\b%s' % msg[i:])
 
 
 if __name__ == '__main__':
