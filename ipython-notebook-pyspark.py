@@ -36,6 +36,8 @@ Uses Jinja2 template files co-located in the same directory as this program:
 Tested on Spark 1.0.x on Hortonworks 2.1 (Yarn + Standalone) and IBM BigInsights 2.1.2 (Standalone)
 """
 
+from __future__ import print_function
+
 __author__  = 'Hari Sekhon'
 __version__ = '0.2.7'
 
@@ -51,7 +53,7 @@ try:
     sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
     from harisekhon.utils import *
 except ImportError, e:
-    print('module import failed: %s' % e)
+    print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
 
 if not isPythonMinVersion(2.7):
@@ -66,8 +68,8 @@ Perhaps you need to 'pip install \"ipython[notebook]\"'
 Exception message: %s""" % e)
     if not isPythonMinVersion(2.7):
         printerr('Python < 2.7 - the supplied make auto build with this tool probably failed to install IPython because IPython requires Python >= 2.7')
-        sys.exit(ERRORS['UNKNOWN'])
-    sys.exit(ERRORS['CRITICAL'])
+        sys.exit(4)
+    sys.exit(4)
 
 # Mac now supported
 #try:
@@ -110,8 +112,8 @@ SPARK_HOME = os.getenv('SPARK_HOME', None)
 if SPARK_HOME:
     os.environ['PATH'] = "%s:%s/bin" % (os.getenv("PATH", ""), SPARK_HOME)
 else:
-    print "SPARK_HOME needs to be set (eg. export SPARK_HOME=/opt/spark)"
-    sys.exit(3)
+    print("SPARK_HOME needs to be set (eg. export SPARK_HOME=/opt/spark)")
+    sys.exit(4)
 
 # Workaround to assembly jar not providing pyspark on Yarn and PythonPath not being passed through normally
 #
@@ -136,7 +138,7 @@ else:
 
 # Set some sane likely defaults
 if not (os.getenv('HADOOP_CONF_DIR', None) or os.getenv('YARN_CONF_DIR', None)):
-    print "warning: YARN_CONF_DIR not set, temporarily setting /etc/hadoop/conf"
+    print("warning: YARN_CONF_DIR not set, temporarily setting /etc/hadoop/conf")
     os.environ['YARN_CONF_DIR'] = '/etc/hadoop/conf'
 
 if not os.getenv('PYSPARK_SUBMIT_ARGS', None):
@@ -174,7 +176,7 @@ password  = "1"
 password2 = "2"
 
 if getpass.getuser() == 'root':
-    print "please run this as your regular user account and not root!"
+    print("please run this as your regular user account and not root!")
     sys.exit(1)
 
 def get_password():
@@ -182,8 +184,8 @@ def get_password():
     global password2
     #password  = raw_input("Enter password to protect your personal IPython NoteBook\n\npassword: ")
     #password2 = raw_input("confirm password: ")
-    print "\nEnter a password to protect your personal IPython NoteBook (sha1 hashed and written to a config file)\n"
-    password = getpass.getpass()
+    print("\nEnter a password to protect your personal IPython NoteBook (sha1 hashed and written to a config file)\n")
+    password  = getpass.getpass()
     password2 = getpass.getpass("Confirm Password: ")
 
 try:
@@ -193,17 +195,17 @@ try:
     setup_py                = ipython_profile + "/startup/00-pyspark-setup.py"
 
     if not os.path.exists(ipython_profile):
-        print "creating new ipython notebook profile"
+        print("creating new ipython notebook profile")
         cmd = "ipython profile create %s" % ipython_profile_name
-        #print cmd
+        #print(cmd)
         os.system(cmd)
 
     if not os.path.exists(passwd_txt):
         get_password()
         while(password != password2):
-            print "passwords do not match!\n"
+            print("passwords do not match!\n")
             get_password()
-        print "writing new encrypted password"
+        print("writing new encrypted password")
         passwd_fh = open(passwd_txt, "w")
         passwd_fh.write(passwd(password))
         passwd_fh.close()
@@ -218,7 +220,7 @@ try:
     except:
         ipython_notebook_config_contents = ""
     if not os.path.exists(ipython_notebook_config) or passwd_txt not in ipython_notebook_config_contents or "c.NotebookApp.ip = '%s'" % ip not in ipython_notebook_config_contents:
-        print "writing new ipython notebook config"
+        print("writing new ipython notebook config")
         config = open(ipython_notebook_config, "w")
         config.write(template.render(passwd_txt = passwd_txt, ip = ip, name = os.path.basename(sys.argv[0]), date = time.ctime(), template_path = template_file ) )
         config.close()
@@ -226,8 +228,8 @@ try:
     # PYSPARK_SUBMIT_ARGS is reset to "" by pyspark wrapper script, call IPython Notebook drectly to avoid this :-/
     #cmd = "IPYTHON_OPTS='notebook --profile=%s' pyspark" % ipython_profile_name
     cmd = "ipython notebook --profile=%s" % ipython_profile_name
-    #print "PYSPARK_SUBMIT_ARGS=%s" % os.environ['PYSPARK_SUBMIT_ARGS']
-    #print cmd
+    #print("PYSPARK_SUBMIT_ARGS=%s" % os.environ['PYSPARK_SUBMIT_ARGS'])
+    #print(cmd)
     os.system(cmd)
 except KeyboardInterrupt:
     pass
