@@ -9,8 +9,10 @@
 #
 #  vim:ts=4:sts=4:sw=4:et:filetype=python
 
+from __future__ import print_function
+
 __author__  = 'Hari Sekhon'
-__version__ = '0.8.7'
+__version__ = '0.8.8'
 
 import os
 import sys
@@ -22,7 +24,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
 try:
     from harisekhon.utils import *
 except ImportError, e:
-    print('module import failed: %s' % e)
+    print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
 
 jython_only()
@@ -119,7 +121,7 @@ class HDFSBlockCounter:
         try:
             self.fqdn = socket.getfqdn()
             # time.strftime("%z") doesn't work in Jython
-            print >> sys.stderr, ">>  %s  Running on %s\n" % (time.strftime("%Y/%m/%d %H:%M:%S %Z"), self.fqdn)
+            print(">>  %s  Running on %s\n" % (time.strftime("%Y/%m/%d %H:%M:%S %Z"), self.fqdn), file=sys.stderr)
         except:
             printerr("Failed to get fqdn of local host, continuing anyway...\n\nError: %s\n" % get_jython_exception())
             self.fqdn = None
@@ -153,10 +155,10 @@ class HDFSBlockCounter:
 
         if not noheader:
             start_time = time.time()
-            print "=" * 80
-            print "Blocksize  Blocks  Replication       Size          Size   Small  Filename"
-            print "   (MB)              Factor         (bytes)        (MB)   file"
-            print "=" * 80
+            print("=" * 80)
+            print("Blocksize  Blocks  Replication       Size          Size   Small  Filename")
+            print("   (MB)              Factor         (bytes)        (MB)   file")
+            print("=" * 80)
         for filename in filelist:
             path = self.get_path(filename)
             if not path:
@@ -173,7 +175,7 @@ class HDFSBlockCounter:
             plural = "s"
             if self.files == 1:
                 plural = ""
-            print "\nFinished reading block counts from %s file%s in %.4f secs\n" % (self.files, plural, total_time)
+            print("\nFinished reading block counts from %s file%s in %.4f secs\n" % (self.files, plural, total_time))
 
 
     def recurse_path(self, filename, path):
@@ -221,15 +223,15 @@ class HDFSBlockCounter:
             repl       = filestatus.getReplication()
             num_blocks = int((size / blocksize)+1)
         except:
-            print "Failed to get file stats for HDFS file %s: %s" (filename, get_jython_exception())
+            print("Failed to get file stats for HDFS file %s: %s" (filename, get_jython_exception()))
             return 0
         if(size < blocksize):
             smallfile = "YES"
         else:
             smallfile = "NO"
 
-        #print "blocksize: %.0fMB  blocks: %d  replication factor: %d  bytes: %d (%.2fMB)  %s%s" % ((blocksize/(1024*1024)), num_blocks, repl, size, (size/(1024*1024)), filename, smallfile)
-        print "%-9.2f %7d %6d %17d %12.2f   %-3s    %s" % ((blocksize/(1024*1024)), num_blocks, repl, size, (size/(1024*1024)), smallfile, filename)
+        #print("blocksize: %.0fMB  blocks: %d  replication factor: %d  bytes: %d (%.2fMB)  %s%s" % ((blocksize/(1024*1024)), num_blocks, repl, size, (size/(1024*1024)), filename, smallfile))
+        print("%-9.2f %7d %6d %17d %12.2f   %-3s    %s" % ((blocksize/(1024*1024)), num_blocks, repl, size, (size/(1024*1024)), smallfile, filename))
         self.files += 1
         return 1
 

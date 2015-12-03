@@ -17,8 +17,10 @@
 #
 # watch memory usage with top like so:    top -p $(pgrep -f jython|tr '\n' ','|sed 's/,$//')
 
+from __future__ import print_function
+
 __author__  = 'Hari Sekhon'
-__version__ = '0.8.8'
+__version__ = '0.8.9'
 
 import os
 
@@ -89,7 +91,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
 try:
     from harisekhon.utils import *
 except ImportError, e:
-    print('module import failed: %s' % e)
+    print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
 
 jython_only()
@@ -128,7 +130,7 @@ def main():
     for o, a in opts:
         if o in ("-a", "--all-blocks"):
             all_blocks = True
-            print "--all not implemented yet"
+            print("--all not implemented yet")
             sys.exit(2)
         elif o in ("-m", "--multiple-blocks"):
             multiple_blocks = True
@@ -186,7 +188,7 @@ class HDFSBlockReader:
         try:
             self.fqdn = socket.getfqdn()
             # time.strftime("%z") doesn't work in Jython
-            print ">>  %s  Running on %s\n" % (time.strftime("%Y/%m/%d %H:%M:%S %Z"), self.fqdn)
+            print(">>  %s  Running on %s\n" % (time.strftime("%Y/%m/%d %H:%M:%S %Z"), self.fqdn))
         except:
             printerr("Failed to get fqdn of this local host, won't be able to tell you if we're reading from a local datanode\n\nError: %s\n" % get_jython_exception())
             self.fqdn = None
@@ -241,19 +243,19 @@ class HDFSBlockReader:
         plural = "s"
         if len(self.files_read) == 1:
             plural = ""
-        print "\nFinished reading blocks from %s file%s in %.4f secs\n" % (len(self.files_read), plural, total_time)
+        print("\nFinished reading blocks from %s file%s in %.4f secs\n" % (len(self.files_read), plural, total_time))
 
         if self.fqdn:
             if self.fqdn in self.datanodes_tested:
-                print "Local DataNode is %s\n" % self.fqdn
+                print("Local DataNode is %s\n" % self.fqdn)
             else:
-                print "No local DataNode reads\n"
+                print("No local DataNode reads\n")
         if self.nodes_failed_reads:
-            print "The following nodes FAILED to return blocks:\n"
+            print("The following nodes FAILED to return blocks:\n")
             for node in sorted(self.nodes_failed_reads):
-                print node
-            print ""
-        print "Summary - DataNodes by highest block read time descending:\n"
+                print(node)
+            print()
+        print("Summary - DataNodes by highest block read time descending:\n")
         slowest_times = {}
         # for datanode in self.highest_node_times.keys():
         for datanode in self.highest_node_times:
@@ -270,10 +272,10 @@ class HDFSBlockReader:
         # for time_taken in reversed(sorted(slowest_times.keys())):
         for time_taken in reversed(sorted(slowest_times)):
             for t in slowest_times[time_taken]:
-                print "datanode %s rack %s highest read time was for" % (t[0], t[1]),
+                print("datanode %s rack %s highest read time was for" % (t[0], t[1]), end='')
                 if self.multiple_files:
-                    print "file %s" % t[2],
-                print "block %d (offset %d, length %d) => %.4f secs" % (t[3], t[4], t[5], time_taken)
+                    print("file %s" % t[2], end='')
+                print("block %d (offset %d, length %d) => %.4f secs" % (t[3], t[4], t[5], time_taken))
 
         return slowest_times
 
@@ -284,7 +286,7 @@ class HDFSBlockReader:
         if self.fs.isFile(path):
             try:
                 if not self.multiple_files:
-                    print "Reading File %s\n" % filename
+                    print("Reading File %s\n" % filename)
                 self.fetchFileBlocksTimed(filename, path)
             except Exception, e:
                 printerr(e, 1)
@@ -330,7 +332,7 @@ class HDFSBlockReader:
             if not block_locations:
                 return
             for block in block_locations:
-                #print "block_locations " + block.toString()
+                #print("block_locations " + block.toString())
                 try:
                     self.block_offset = block.getOffset()
                     self.block_length = block.getLength()
@@ -349,7 +351,7 @@ class HDFSBlockReader:
         self.read_count += 1
         self.block_read_DNs = set()
         self.fh.seek(self.block_offset) # local node first otherwise NPE when trying seekToNewSource()
-        print "read %d %sblock %d (offset %d, length %d) from" % (self.read_count, self.fileoutput, self.block_num, self.block_offset, self.block_length),
+        print("read %d %sblock %d (offset %d, length %d) from" % (self.read_count, self.fileoutput, self.block_num, self.block_offset, self.block_length), end='')
         # XXX: force 0 byte read for API to select DN otherwise the API doesn't populate the DN info till after the read and we can't figure out what DN we are currently reading from
         bytes_read = self.fh.read(ByteBuffer.allocate(0))
         # would like to put this earlier to show which block reading in case you get stuck on one but it looks like the HDFS API only populates this after the read()
@@ -359,7 +361,7 @@ class HDFSBlockReader:
             return
         self.host  = self.dn.getHostName()
         self.rack  = self.dn.getNetworkLocation()
-        print "rack %s datanode %s => " % (self.rack, self.host),
+        print("rack %s datanode %s => " % (self.rack, self.host), end='')
         ## looks like this isn't populated until first read, check on second pass on seekToNewSource()
         #self.dn = self.fh.getCurrentDatanode()
         self.readBlockFromDN()
@@ -421,7 +423,7 @@ class HDFSBlockReader:
                 self.host  = self.dn.getHostName()
                 self.rack  = self.dn.getNetworkLocation()
                 self.nodes_failed_reads.add(self.host)
-                print "Error: failed to read %sblock %d (offset %d, length %d) from rack %s datanode %s: %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length, self.rack, self.host, get_jython_exception())
+                print("Error: failed to read %sblock %d (offset %d, length %d) from rack %s datanode %s: %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length, self.rack, self.host, get_jython_exception()))
             else:
                 raise IOError, get_jython_exception()
             return
@@ -441,10 +443,10 @@ class HDFSBlockReader:
         #isLocal = ""
         #if self.fqdn == self.host:
         #    isLocal = " (local)"
-        #print "read %d %sblock %d (offset %d, length %d) from rack %s datanode %s in %.4f secs" % (self.read_count, self.fileoutput, self.block_num, self.block_offset, self.block_length, rack, self.host, time_taken)
-        print "%.4f secs  (%.2f %s/s)" % (time_taken, throughput, units)
+        #print("read %d %sblock %d (offset %d, length %d) from rack %s datanode %s in %.4f secs" % (self.read_count, self.fileoutput, self.block_num, self.block_offset, self.block_length, rack, self.host, time_taken))
+        print("%.4f secs  (%.2f %s/s)" % (time_taken, throughput, units))
         # readFully doesn't return number of bytes read
-        #print "%s bytes read" % bytes_read
+        #print("%s bytes read" % bytes_read)
         #if bytes_read != self.block_length:
         #    printerr("WARNING: bytes read = %s  vs  block length = %s" % (bytes_read, self.block_length))
         # TODO: somehow broken listing first time

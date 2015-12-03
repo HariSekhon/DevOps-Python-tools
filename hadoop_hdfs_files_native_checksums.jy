@@ -9,8 +9,10 @@
 #
 #  vim:ts=4:sts=4:sw=4:et:filetype=python
 
+from __future__ import print_function
+
 __author__  = 'Hari Sekhon'
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 
 import os, sys
 # Refusing to use either optparse or argparse since it's annoyingly non-portable across different versions of Python
@@ -19,7 +21,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
 try:
     from harisekhon.utils import *
 except ImportError, e:
-    print('module import failed: %s' % e)
+    print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
 
 jython_only()
@@ -123,9 +125,9 @@ class HDFSChecksumReader:
         """ Recurses directories and calls print_checksum(filename) per file """
 
         if not noheader:
-            print "=" * 150
-            print "%-56s  %-25s  %-12s  %s" % ("Checksum", "Algorithm", "BlockSize", "Filename")
-            print "=" * 150
+            print("=" * 150)
+            print("%-56s  %-25s  %-12s  %s" % ("Checksum", "Algorithm", "BlockSize", "Filename"))
+            print("=" * 150)
         for filename in filelist:
             path = self.get_path(filename)
             if not path:
@@ -159,18 +161,19 @@ class HDFSChecksumReader:
         try:
             checksum = self.fs.getFileChecksum(path)
             if checksum:
-                print "%-56s  %-25s  %-12s  %s" % (
+                print("%-56s  %-25s  %-12s  %s" % (
                         StringUtils.byteToHexString(checksum.getBytes(), 0, checksum.getLength()),
                         checksum.getAlgorithmName(),
                         self.fs.getFileStatus(path).getBlockSize(),
                         filename)
+                      )
             else:
                 printerr("<NO CHECKSUM for file " + filename + ">", 1)
                 return 0
         except Exception, e:
             printerr(e, 1)
         except:
-            print ">>> " + get_jython_exception().split("\n")[0]
+            print(">>> " + get_jython_exception().split("\n")[0])
             return 0
         return 1
 
