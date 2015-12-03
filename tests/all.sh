@@ -24,8 +24,8 @@ echo "
 
 cd "$srcdir";
 
-./help.sh
-
 for script in $(find . -name 'test*.sh'); do
     ./$script
 done
+
+./help.sh
