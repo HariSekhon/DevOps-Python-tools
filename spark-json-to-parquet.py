@@ -55,8 +55,8 @@ try:
     from pyspark import SparkConf
     from pyspark.sql import SQLContext
 except ImportError, e:
-    print('module import failed: %s' % e)
-    sys.exit(3)
+    print('module import failed: %s' % e, file=sys.stderr)
+    sys.exit(4)
 
 def main():
     log = logging.getLogger(prog)
