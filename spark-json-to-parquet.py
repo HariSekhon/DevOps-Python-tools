@@ -36,7 +36,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
 try:
     from harisekhon.utils import *
 except ImportError, e:
-    print('module import failed: %s' % e)
+    print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
 
 spark_home = os.getenv('SPARK_HOME', None)
