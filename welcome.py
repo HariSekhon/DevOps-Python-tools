@@ -53,12 +53,12 @@ def construct_msg():
         else:
             user = user.title()
         msg = 'Welcome %s - ' % user
-        fh = os.popen("last -100")
+        fh = os.popen('last -100')
         fh.readline()
         re_skip = re.compile('^(?:reboot|wtmp)|^\s*$')
         last = ''
         for line in fh:
-            last = line.rstrip("\n")
+            last = line.rstrip('\n')
             if(re_skip.match(last)):
                 last = ''
                 continue
@@ -92,11 +92,11 @@ def print_welcome():
     msg = construct_msg()
     try:
         charmap = list(string.uppercase + string.lowercase + '@#$%^&*()')
-        # print "",
+        # print '',
         # print('', end='')
         for i in range(0,len(msg)):
             char = msg[i]
-            # print "",
+            # print '',
             print(' ', end='')
             j=0
             while 1:
@@ -114,7 +114,7 @@ def print_welcome():
                 time.sleep(0.0085)
         print()
     except KeyboardInterrupt:
-        # print("\b\b\b\b%s" % msg[i:])
+        # print('\b\b\b\b%s' % msg[i:])
         print('\b\b\b%s' % msg[i:])
 
 
