@@ -26,7 +26,7 @@ cd "$srcdir/..";
 
 . tests/travis.sh
 
-find . -iname '*.json' |
+find "${1:-.}" -iname '*.json' |
 grep -v '/spark-.*-bin-hadoop.*/' |
 # ignore multi-line json data file for spark testing
 grep -v 'tests/test.json' |
