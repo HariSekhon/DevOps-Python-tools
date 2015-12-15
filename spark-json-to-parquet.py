@@ -81,7 +81,11 @@ class SparkJsonToParquet(CLI):
         jsonFile   = self.options.jsonFile
         parquetDir = self.options.parquetDir
 
-        if self.args or not jsonFile or not parquetDir:
+        if not jsonFile:
+            self.usage('--json not defined')
+        if not parquetDir:
+            self.usage('--parquetDir not defined')
+        if self.args:
             self.usage()
 
         conf = SparkConf().setAppName('HS PySpark JSON => Parquet')
@@ -100,7 +104,4 @@ class SparkJsonToParquet(CLI):
             json.saveAsParquetFile(parquetDir)
 
 if __name__ == '__main__':
-    try:
-        SparkJsonToParquet().main()
-    except KeyboardInterrupt:
-        pass
+    SparkJsonToParquet().main()
