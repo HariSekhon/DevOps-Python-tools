@@ -21,12 +21,8 @@ cd "$srcdir/..";
 . ./tests/utils.sh
 
 for x in $(echo *.py 2>/dev/null); do
-    [[ "$x" =~ ^\* ]] && continue
+    isExcluded "$x" && continue
     set +e
-    commit="$(git log "$x" | head -n1 | grep 'commit')"
-    if [ -z "$commit" ]; then
-        continue
-    fi
     echo ./$x --help
     ./$x --help # >/dev/null
     status=$?
