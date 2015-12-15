@@ -24,3 +24,7 @@ if [ -n "${TRAVIS:-}" ]; then
 else
     sudo=""
 fi
+
+export SPARK_HOME="$(ls -d tests/spark-*-bin-hadoop* | head -n 1)"
+
+. "$srcdir/excluded.sh"
