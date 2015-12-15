@@ -21,4 +21,5 @@ cd "$srcdir/..";
 . ./tests/utils.sh
 
 for x in $(echo *.py 2>/dev/null); do
+    :
 done
