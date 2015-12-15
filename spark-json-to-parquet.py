@@ -24,7 +24,7 @@ Written to work across Python 2.x and Spark versions, especially Spark given tha
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.3.3'
+__version__ = '0.4.0'
 
 import glob
 import logging
@@ -32,9 +32,11 @@ import os
 import sys
 # using optparse rather than argparse for servers still on Python 2.6
 from optparse import OptionParser
-sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
+libdir = os.path.join(os.path.dirname(__file__), 'pylib')
+sys.path.append(libdir)
 try:
     from harisekhon.utils import *
+    from harisekhon import CLI
 except ImportError, e:
     print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
@@ -56,43 +58,49 @@ try:
     from pyspark.sql import SQLContext
 except ImportError, e:
     print('module import failed: %s' % e, file=sys.stderr)
-    sys.exit(4)
+    sys.exit(ERRORS['UNKNOWN'])
 
-def main():
-    log = logging.getLogger(prog)
-    log.setLevel(logging.INFO)
-    # bit hackish and hard to keep aligned with docstring changes, not using this
-    # usage = '\r\b\r\b\r' + __doc__ + "usage: %prog -j file.json -p directory.parquet"
-    # parser = OptionParser(usage=usage, version='%prog ' + __version__)
-    parser = OptionParser(version='%prog ' + __version__)
-    parser.add_option('-j', '--json', dest='jsonFile', help='JSON input file/dir', metavar='<file/dir>')
-    parser.add_option('-p', '--parquetDir', dest='parquetDir', help='Parquet output dir', metavar='<dir>')
+class SparkJsonToParquet(CLI):
 
-    (options, args) = parser.parse_args()
+    def __init__(self):
+        # Python 2.x
+        super(SparkJsonToParquet, self).__init__()
+        # Python 3.x
+        # super().__init__()
+        logging.config.fileConfig(os.path.join(libdir, 'resources', 'logging.conf'))
+        log = logging.getLogger(self.__class__.__name__)
 
-    jsonFile   = options.jsonFile
-    parquetDir = options.parquetDir
+    # @override
+    def add_options(self):
+        self.parser.add_option('-j', '--json',       dest='jsonFile',   help='JSON input file/dir ($JSON)',
+                               metavar='<file/dir>', default=getenv('JSON'))
+        self.parser.add_option('-p', '--parquetDir', dest='parquetDir', help='Parquet output dir ($PARQUETDIR)',
+                               metavar='<dir>',      default=getenv('PARQUETDIR'))
 
-    if args or not jsonFile or not parquetDir:
-        usage(parser)
+    def run(self):
+        jsonFile   = self.options.jsonFile
+        parquetDir = self.options.parquetDir
 
-    conf = SparkConf().setAppName('HS PySpark JSON => Parquet')
-    sc = SparkContext(conf=conf)
-    sqlContext = SQLContext(sc)
-    spark_version = sc.version
-    log.info('Spark version detected as %s' % spark_version)
-    if not isVersionLax(spark_version):
-        die("Spark version couldn't be determined. " + support_msg('pytools'))
-    if isMinVersion(spark_version, 1.4):
-        json = sqlContext.read.json(jsonFile)
-        json.write.parquet(parquetDir)
-    else:
-        log.warn('running legacy code for Spark <= 1.3')
-        json = sqlContext.jsonFile(jsonFile)
-        json.saveAsParquetFile(parquetDir)
+        if self.args or not jsonFile or not parquetDir:
+            self.usage()
+
+        conf = SparkConf().setAppName('HS PySpark JSON => Parquet')
+        sc = SparkContext(conf=conf)
+        sqlContext = SQLContext(sc)
+        spark_version = sc.version
+        log.info('Spark version detected as %s' % spark_version)
+        if not isVersionLax(spark_version):
+            die("Spark version couldn't be determined. " + support_msg('pytools'))
+        if isMinVersion(spark_version, 1.4):
+            json = sqlContext.read.json(jsonFile)
+            json.write.parquet(parquetDir)
+        else:
+            log.warn('running legacy code for Spark <= 1.3')
+            json = sqlContext.jsonFile(jsonFile)
+            json.saveAsParquetFile(parquetDir)
 
 if __name__ == '__main__':
     try:
-        main()
+        SparkJsonToParquet().main()
     except KeyboardInterrupt:
         pass
