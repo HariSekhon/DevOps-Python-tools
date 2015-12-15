@@ -24,6 +24,8 @@ echo "
 
 cd "$srcdir";
 
+./syntax.sh
+
 for script in $(find . -name 'test*.sh'); do
     ./$script
 done

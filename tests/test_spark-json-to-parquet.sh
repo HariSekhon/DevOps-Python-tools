@@ -24,7 +24,7 @@ echo "
 
 cd "$srcdir/..";
 
-. tests/travis.sh
+. ./tests/utils.sh
 
 cd "$srcdir"
 

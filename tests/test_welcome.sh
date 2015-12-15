@@ -18,6 +18,6 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
-. tests/travis.sh
+. ./tests/utils.sh
 
 ./welcome.py

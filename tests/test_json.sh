@@ -24,7 +24,7 @@ echo "
 
 cd "$srcdir/..";
 
-. tests/travis.sh
+. ./tests/utils.sh
 
 find "${1:-.}" -iname '*.json' |
 grep -v '/spark-.*-bin-hadoop.*/' |
