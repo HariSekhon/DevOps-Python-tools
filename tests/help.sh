@@ -18,25 +18,19 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
-. tests/travis.sh
+. ./tests/utils.sh
 
-export SPARK_HOME="$(ls -d tests/spark-*-bin-hadoop* | head -n 1)"
-
-for x in $(echo *.pl *.py *.rb 2>/dev/null); do
+for x in $(echo *.py 2>/dev/null); do
     [[ "$x" =~ ^\* ]] && continue
     set +e
     commit="$(git log "$x" | head -n1 | grep 'commit')"
     if [ -z "$commit" ]; then
         continue
     fi
-    optional_cmd=""
-    if [[ $x =~ .*\.pl$ ]]; then
-        optional_cmd="$perl -T $I_lib"
-    fi
-    echo $optional_cmd ./$x --help
-    $optional_cmd ./$x --help # >/dev/null
+    echo ./$x --help
+    ./$x --help # >/dev/null
     status=$?
     set -e
-    [ $status = 3 -o $status = 0 ] || { echo "status code for $x --help was $status not expected 3"; exit 1; }
+    [ $status = 3 -o $status = 0 ] || { echo "status code for $x --help was $status not expected 0 or 3"; exit 1; }
 done
 echo "All Python programs found exited with expected code 0/3 for --help"
