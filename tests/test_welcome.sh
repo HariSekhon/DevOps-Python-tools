@@ -20,4 +20,4 @@ cd "$srcdir/..";
 
 . ./tests/utils.sh
 
-./welcome.py
+./welcome.py $@
