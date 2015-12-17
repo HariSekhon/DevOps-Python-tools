@@ -26,6 +26,12 @@ cd "$srcdir/..";
 
 . ./tests/utils.sh
 
+until [ $# -lt 1 ]; do
+    case $1 in
+        -*) shift
+    esac
+done
+
 find "${1:-.}" -iname '*.json' |
 grep -v '/spark-.*-bin-hadoop.*/' |
 # ignore multi-line json data file for spark testing
