@@ -40,7 +40,10 @@ try:
 except ImportError, e:
     print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
-import_pyspark()
+pyspark_path()
+from pyspark import SparkContext
+from pyspark import SparkConf
+from pyspark.sql import SQLContext
 
 class SparkJsonToParquet(CLI):
 
