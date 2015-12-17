@@ -15,6 +15,23 @@ http://www.linkedin.com/in/harisekhon
 
 ##### Make sure you run ```make update``` if updating and not just ```git pull``` as you will often need the latest library submodule and possibly new upstream libraries. #####
 
+### Quick Setup ###
+
+The 'make' command will initialize my library submodule:
+
+```
+git clone https://github.com/harisekhon/pytools
+cd pytools
+make
+```
+Some Hadoop tools with require Jython, see [Jython for Hadoop Utils](https://github.com/harisekhon/pytools#jython-for-hadoop-utils) for details.
+
+### Usage ###
+
+All programs come with a ```--help``` switch which includes a program description and the list of command line options.
+
+Some common options support $ENVIRONMENT_VARIABLES which are mentioned in the --help descriptions in brackets eg. ($HOST)
+
 ### PyTools ###
 
 - ```ambari_blueprints.py``` - Ambari Blueprint tool using Ambari API to find and fetch all blueprints or a specific blueprint to local json files, blueprint an existing cluster, or create a new cluster using a blueprint. See adjacent ```ambari_blueprints``` directory for some blueprint templates
@@ -27,17 +44,7 @@ http://www.linkedin.com/in/harisekhon
 - ```spark-json-to-parquet.py``` - PySpark JSON => Parquet converter
 - ```welcome.py``` - cool spinning welcome message (there is a slightly better perl version in the [Tools](https://github.com/harisekhon/tools) repo)
 
-### Setup ###
-
-The 'make' command will initialize my library submodule:
-
-```
-git clone https://github.com/harisekhon/pytools
-cd pytools
-make
-```
-
-#### OR: Manual Setup ####
+#### Manual Setup ####
 
 Enter the pytools directory and run git submodule init and git submodule update to fetch my library repo:
 
@@ -69,10 +76,6 @@ Then add the Jython untarred directory to the $PATH or specify the /path/to/jyth
 
 The ```-J-cp `hadoop classpath` ``` bit does the right thing in finding the Hadoop java classes required to use the Hadoop APIs.
 
-### Usage ###
-
-All programs come with a ```--help``` switch which includes a program description and the list of command line options.
-
 #### Configuration for Strict Domain / FQDN validation ####
 
 Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list is done via my [PyLib](https://github.com/harisekhon/pylib) library submodule - see there for details on configuring this to permit custom TLDs like ```.local``` or ```.intranet``` (both supported by default).
@@ -93,6 +96,6 @@ Patches, improvements and even general feedback are welcome in the form of GitHu
 
 [The Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) - 220+ programs for Nagios monitoring your Hadoop & NoSQL clusters. Covers every Hadoop vendor's management API and every major NoSQL technology (HBase, Cassandra, MongoDB, Elasticsearch, Solr, Riak, Redis etc.) as well as traditional Linux and infrastructure.
 
-[My Python library repo](https://github.com/harisekhon/lib) - leveraged in this repo as a submodule
+[PyLib](https://github.com/harisekhon/pylib) - my personal python library leveraged in this repo as a submodule
 
-[Spark => Elasticsearch](https://github.com/harisekhon/spark-to-elasticsearch) - Scala application to index from Spark to Elasticsearch. Used to index data in Hadoop clusters or local data via Spark standalone. This started as a Scala Spark port of ```pig-text-to-elasticsearch.pig``` from this repo.
+[Spark Apps eg. Spark => Elasticsearch](https://github.com/harisekhon/spark-to-elasticsearch) - Scala application to index from Spark to Elasticsearch. Used to index data in Hadoop clusters or local data via Spark standalone. This started as a Scala Spark port of ```pig-text-to-elasticsearch.pig``` from this repo.
