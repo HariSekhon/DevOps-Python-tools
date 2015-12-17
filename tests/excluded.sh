@@ -20,8 +20,10 @@
 set -eu
 
 isExcluded(){
-    local prog="$1" 
+    local prog="$1"
     [[ "$prog" =~ ^\* ]] && return 0
+    #[[ $prog =~ ipython-notebook ]] && return 0
+    #[[ $prog =~ ambari_blueprints.py ]] && return 0
     commit="$(git log "$prog" | head -n1 | grep 'commit')"
     if [ -z "$commit" ]; then
         return 0
