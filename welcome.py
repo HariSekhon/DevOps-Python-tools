@@ -123,7 +123,7 @@ class Welcome(CLI):
             print('\b\b\b%s' % msg[i:])
 
     def add_options(self):
-        self.parser = OptionParser(usage=self.usagemsg_full, version=self.version)
+        self.parser = OptionParser(usage=self.usagemsg, version=self.version)
 
     def run(self):
         if self.args:
