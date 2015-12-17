@@ -20,6 +20,9 @@ cd "$srcdir/..";
 
 . ./tests/utils.sh
 
-for x in $(echo *.py 2>/dev/null); do
-    :
+for x in $(echo *.py *.jy 2>/dev/null); do
+#    if which pychecker &>/dev/null; then
+#        echo "pychecker $x"
+#        pychecker $x
+#    fi
 done
