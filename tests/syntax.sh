@@ -21,11 +21,10 @@ cd "$srcdir/..";
 . ./tests/utils.sh
 
 for x in $(echo *.py *.jy 2>/dev/null); do
-#    for y in pyflakes pychecker; do
-    for y in pyflakes; do
+    for y in pyflakes pychecker pylint; do
         if which $y &>/dev/null; then
             echo "$y $x"
-            $y $x
+            $y $x :
         fi
    done
     :
