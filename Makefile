@@ -75,6 +75,11 @@ test:
 	cd pylib && make test
 	tests/all.sh
 
+.PHONY: test2
+test2:
+	cd pylib && make test2
+	tests/all.sh
+
 .PHONY: install
 install:
 	@echo "No installation needed, just add '$(PWD)' to your \$$PATH"
