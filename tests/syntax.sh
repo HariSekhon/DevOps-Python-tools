@@ -21,9 +21,12 @@ cd "$srcdir/..";
 . ./tests/utils.sh
 
 for x in $(echo *.py *.jy 2>/dev/null); do
-#    if which pychecker &>/dev/null; then
-#        echo "pychecker $x"
-#        pychecker $x
-#    fi
+#    for y in pyflakes pychecker; do
+    for y in pyflakes; do
+        if which $y &>/dev/null; then
+            echo "$y $x"
+            $y $x
+        fi
+   done
     :
 done
