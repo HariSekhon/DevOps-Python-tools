@@ -25,4 +25,5 @@ for x in $(echo *.py *.jy 2>/dev/null); do
 #        echo "pychecker $x"
 #        pychecker $x
 #    fi
+    :
 done
