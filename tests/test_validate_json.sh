@@ -32,12 +32,30 @@ until [ $# -lt 1 ]; do
     esac
 done
 
+rm broken.json
 ./validate_json.py $(
 find "${1:-.}" -iname '*.json' |
 grep -v '/spark-.*-bin-hadoop.*/' |
 # ignore multi-line json data file for spark testing
 grep -v 'tests/test.json'
 )
+
+echo "Now trying intentional JSON fail:"
+echo blah > broken.json
+set +e
+./validate_json.py broken.json
+result=$?
+set -e
+rm broken.json
+if [ $result = 2 ]; then
+    echo "SUCCESSFULLY detected broken json, returned exit code $result"
+#elif [ $result != 0 ]; then
+#    echo "returned unexpected non-zero exit code $result for broken json"
+#    exit 1
+else
+    echo "FAILED, return exit code $result"
+    exit 1
+fi
 
 echo
 echo
