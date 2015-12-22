@@ -122,8 +122,9 @@ class Welcome(CLI):
             # print('\b\b\b\b%s' % msg[i:])
             print('\b\b\b%s' % msg[i:])
 
-    def add_options(self):
-        self.parser = OptionParser(usage=self.usagemsg, version=self.version)
+    # Don't do this it'll double print since CLI.usage() is now adding usagemsg header
+    # def add_options(self):
+    #     self.parser = OptionParser(usage=self.usagemsg, version=self.version)
 
     def run(self):
         if self.args:
