@@ -16,7 +16,7 @@
 """
 JSON Validator Tool
 
-Does a simple validation of each filed passed as an argument to this script.
+Does a simple validation of each file passed as an argument to this script.
 """
 
 
