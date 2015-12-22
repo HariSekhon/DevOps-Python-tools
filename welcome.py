@@ -32,8 +32,7 @@ try:
     from harisekhon.utils import *
     from harisekhon import CLI
 except ImportError, e:
-    # print('module import failed: %s' % e, file=sys.stderr)
-    print >> sys.stderr, 'module import failed: %s' % e
+    print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
 
 
