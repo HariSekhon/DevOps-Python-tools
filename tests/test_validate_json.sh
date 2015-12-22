@@ -32,7 +32,7 @@ until [ $# -lt 1 ]; do
     esac
 done
 
-validate_json.py $(
+./validate_json.py $(
 find "${1:-.}" -iname '*.json' |
 grep -v '/spark-.*-bin-hadoop.*/' |
 # ignore multi-line json data file for spark testing
