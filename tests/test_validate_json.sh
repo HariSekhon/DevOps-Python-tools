@@ -53,7 +53,7 @@ if [ $result = 2 ]; then
 #    echo "returned unexpected non-zero exit code $result for broken json"
 #    exit 1
 else
-    echo "FAILED, return exit code $result"
+    echo "FAILED, returned unexpected exit code $result"
     exit 1
 fi
 
