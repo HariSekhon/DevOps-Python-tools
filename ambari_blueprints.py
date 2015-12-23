@@ -460,7 +460,7 @@ class AmbariBlueprintTool(CLI):
         self.parser.add_option('--strip-config', dest='strip_config', help="Strip configuration sections out to make more generic. Use with caution, more advanced configurations like HDFS HA require some configuration settings in order to validate the topology when submitting a blueprint, so you'd have to add those config keys back in (suggest via a fully config'd cluster blueprint)", action='store_true', default=False)
 
     def process_args(self):
-        options, args = self.parse_args()
+        options, args = self.options, self.args
 
         log.setLevel(logging.WARN)
         if options.verbose > 1:
