@@ -14,16 +14,21 @@
 #
 
 """
+
 JSON Validator Tool
 
 Does a simple validation of each file passed as an argument to this script.
-"""
 
+First tries each file contents as a whole json document, if that fails validation or catches a memory error, then
+it assumes the file contains multi-record format with one json document per line and tries an independent validation of
+each line.
+
+"""
 
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 import os
 import sys
@@ -38,17 +43,51 @@ except ImportError, e:
 
 class JsonValidatorTool(CLI):
 
+    def check_multiline_json(self):
+            self.f.seek(0)
+            for line in self.f:
+                if not isJson(line):
+                    if isJson(line.replace("'", '"')):
+                        die(self.invalid_json_msg_single_quotes)
+                    else:
+                        die(self.invalid_json_msg)
+            print('%s (multi-record format)' % self.valid_json_msg)
+            return True
+
+    def check_json(self, content):
+        if isJson(content):
+            print(self.valid_json_msg)
+        elif isJson(content.replace("'", '"')):
+            die(self.invalid_json_msg_single_quotes)
+        elif self.check_multiline_json():
+            pass
+        else:
+            die(self.invalid_json_msg)
+
     def run(self):
         if not self.args:
             self.usage()
         for filename in self.args:
             validate_file(filename)
-        for filename in self.args:
-            with open(filename) as f:
-                if isJson(f.read()):
-                    print('%s => JSON OK' % filename)
-                else:
-                    die('%s => INVALID JSON' % filename)
+        for self.filename in self.args:
+            self.valid_json_msg   = '%s => JSON OK'      % self.filename
+            self.invalid_json_msg = '%s => JSON INVALID' % self.filename
+            self.invalid_json_msg_single_quotes = '%s (found single quotes not double quotes)' % self.invalid_json_msg
+            mem_err = "file '%s', assuming Big Data multi-record json and re-trying validation line-by-line" % self.filename
+            with open(self.filename) as self.f:
+                content = None
+                # most JSON files are fine to slurp like this
+                # Big Data JSON files are json multi-record, will throw exception after running out of RAM and then be handled line by line
+                try:
+                    content = self.f.read()
+                    try:
+                        self.check_json(content)
+                    except MemoryError:
+                        print("memory error validating contents from %s" % mem_err)
+                        self.check_multiline_json()
+                except MemoryError:
+                    print("memory error reading %s" % mem_err)
+                    self.check_multiline_json()
 
 
 if __name__ == '__main__':
