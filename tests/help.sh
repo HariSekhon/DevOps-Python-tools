@@ -27,6 +27,9 @@ for x in $(echo *.py 2>/dev/null); do
     ./$x --help # >/dev/null
     status=$?
     set -e
-    [ $status = 3 -o $status = 0 ] || { echo "status code for $x --help was $status not expected 0 or 3"; exit 1; }
+    if [ $status = 0 ]; then
+        [[ $x =~ ambari_blueprints ]] && continue
+    fi
+    [ $status = 3 ] || { echo "status code for $x --help was $status not expected 3"; exit 1; }
 done
 echo "All Python programs found exited with expected code 0/3 for --help"
