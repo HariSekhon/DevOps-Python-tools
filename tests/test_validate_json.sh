@@ -32,8 +32,8 @@ until [ $# -lt 1 ]; do
     esac
 done
 
-rm broken.json
-./validate_json.py $(
+rm broken.json &>/dev/null || :
+./validate_json.py -t 1 -vvv $(
 find "${1:-.}" -iname '*.json' |
 grep -v '/spark-.*-bin-hadoop.*/' |
 # ignore multi-line json data file for spark testing
