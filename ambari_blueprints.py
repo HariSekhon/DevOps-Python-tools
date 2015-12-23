@@ -47,7 +47,7 @@ https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-Step4:S
 from __future__ import print_function
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.6'
+__version__ = '0.7.0'
 
 import base64
 from httplib import BadStatusLine
@@ -63,16 +63,16 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
 try:
     pass
     from harisekhon.utils import *
-#    from harisekhon import CLI
+    from harisekhon import CLI
 except ImportError, e:
     print('module import failed: %s' % e)
     sys.exit(4)
 
 # TODO: auto-store to git - see perl tools
 
-class AmbariBlueprintTool():
+class AmbariBlueprintTool(CLI):
 
-    def __init__(self, host, port, user, password, ssl=False, **kwargs):
+    def setup(self, host, port, user, password, ssl=False, **kwargs):
         # must set X-Requested-By in newer versions of Ambari
         # log.info("contacting Ambari as '%s'" % self.user)
         self.X_Requested_By = os.getenv('USER', user)
@@ -405,140 +405,139 @@ class AmbariBlueprintTool():
             self.save_cluster(cluster)
 
 
-def main():
-    parser = OptionParser()
-    parser.add_option('-H', '--host', dest='host', help='Ambari Host ($AMBARI_HOST)', metavar='<host>')
-    parser.add_option('-P', '--port', dest='port', help='Ambari Port ($AMBARI_PORT, default: 8080)', metavar='8080')
-    parser.add_option('-u', '--user', dest='user', help='Ambari login user ($AMBARI_USER, default: admin)', metavar='<user>')
-    parser.add_option('-p', '--password', dest='password', help='Ambari login password ($AMBARI_PASSWORD)', metavar='<password>')
-    # TODO: certificate validation not tested yet
-    parser.add_option('-s', '--ssl', dest='ssl', help='Use SSL connection', action='store_true', default=False)
-    parser.add_option('-b', '--blueprint', dest='blueprint', help='Ambari blueprint name', metavar='<name>')
-    parser.add_option('-c', '--cluster', dest='cluster', help='Ambari cluster to blueprint (case sensitive)', metavar='<name>')
-    parser.add_option('--get', dest='get', help='Get and store Ambari Blueprints locally in --dir or --file', action='store_true')
-    parser.add_option('--push', dest='push',  help='Push a local Ambari blueprint to the Ambari server', action='store_true')
-    parser.add_option('--create-cluster', dest='create_cluster',  help='Create a cluster (requires --cluster and --file as well as previously uploaded Ambari Blueprint)', action='store_true')
-    parser.add_option('-f', '--file', dest='file', help='Ambari Blueprint or Cluster creation file to --get write to or --push send from', metavar='<file.json>')
-    parser.add_option('-d', '--dir', dest='dir', help="Ambari Blueprints storage directory if saving all blueprints (defaults to 'ambari_blueprints' directory adjacent to this tool)", metavar='<dir>')
-    parser.add_option('--list-blueprints', dest='list_blueprints', help='List available blueprints', action='store_true', default=False)
-    parser.add_option('--list-clusters', dest='list_clusters', help='List available clusters', action='store_true', default=False)
-    parser.add_option('--list-hosts', dest='list_hosts', help='List available hosts', action='store_true', default=False)
-    parser.add_option('--strip-config', dest='strip_config', help="Strip configuration sections out to make more generic. Use with caution, more advanced configurations like HDFS HA require some configuration settings in order to validate the topology when submitting a blueprint, so you'd have to add those config keys back in (suggest via a fully config'd cluster blueprint)", action='store_true', default=False)
-    parser.add_option('-v', '--verbose', dest='verbose', help='Verbose mode', action='count', default=0)
-
-    host     = os.getenv('AMBARI_HOST')
-    port     = os.getenv('AMBARI_PORT', 8080)
-    user     = os.getenv('AMBARI_USER', 'admin')
-    password = os.getenv('AMBARI_PASSWORD')
-    ssl      = False
-
-    (options, args) = parser.parse_args()
-
-    host = options.host if options.host else host
-    port = options.port if options.port else port
-    user = options.user if options.user else user
-    password = options.password if options.password else password
-    ssl = options.ssl if options.ssl else ssl
-    blueprint = options.blueprint if options.blueprint else None
-    cluster = options.cluster if options.cluster else None
-    verbose = options.verbose
-
-    log.setLevel(logging.WARN)
-    if verbose > 1:
-        log.setLevel(logging.DEBUG)
-    elif verbose:
-        log.setLevel(logging.INFO)
-    # log.info('verbose level: %s' % verbose)
-
-    try:
-        validate_host(host)
-        validate_port(port)
-        validate_user(user)
-        validate_password(password)
-        if options.dir:
-            validate_dirname(options.dir, 'blueprints')
-        if options.file:
-            if options.push:
-                validate_file(options.file, 'blueprint')
-            if options.create_cluster:
-                validate_file(options.file, 'cluster hosts mapping')
-    except InvalidOptionException, e:
-        usage(parser, e)
-
-    if args:
-        usage(parser, 'additional args detected')
-
-    if options.get and blueprint and cluster:
-        usage(parser, '--blueprint/--cluster are mutually exclusive when using --get')
-    elif options.push and options.create_cluster:
-        usage(parser, '--push and --create-cluster are mutually exclusive')
-    elif options.create_cluster and not options.cluster:
-        usage(parser, '--create-cluster requires specifying the name via --cluster')
-    elif options.list_blueprints + options.list_clusters + options.list_hosts > 1:
-        usage(parser, 'can only use one --list switch at a time')
-    elif options.file and (options.get and not (options.blueprint or options.cluster) ):
-        usage(parser, "cannot specify --file without --blueprint/--cluster as it's only used when getting or pushing a single blueprint")
-    elif options.file and (options.push and not (options.create_cluster or options.blueprint)):
-        usage(parser, "cannot specify --file without --blueprint/--create-cluster as it's only used when getting or pushing a single blueprint or creating a cluster based on the blueprint")
-
-    a = AmbariBlueprintTool(host, port, user, password, ssl, dir=options.dir, strip_config=options.strip_config )
-    if options.list_blueprints:
-        blueprints = a.get_blueprints()
+    def print_blueprints(self):
+        blueprints = self.get_blueprints()
         print('\nBlueprints (%s found):\n' % len(blueprints))
         if blueprints:
-            [ print(x) for x in blueprints ]
+            [print(x) for x in blueprints]
         else:
             print('<No Blueprints Found>')
-        clusters = a.get_clusters()
+        clusters = self.get_clusters()
         print('\nClusters available to blueprint (%s found):\n' % len(clusters))
         if clusters:
-            [ print(x) for x in clusters ]
+            [print(x) for x in clusters]
         else:
             print('<No Clusters Found>')
         print()
         print('%s total extractable blueprints' % str(len(blueprints) + len(clusters)))
         sys.exit(0)
-    elif options.list_clusters:
+
+    def print_clusters(self):
         clusters = a.get_clusters()
         print('\nClusters available to blueprint (%s found):\n' % len(clusters))
         if clusters:
-            [ print(x) for x in clusters ]
+            [print(x) for x in clusters]
         else:
             print('<No Clusters Found>')
         print()
         sys.exit(0)
-    elif options.list_hosts:
+
+    def print_hosts(self):
         hosts = a.get_hosts()
         print('\nHosts (%s found):\n' % len(hosts))
         if hosts:
             # seems to come out already sorted(hosts)
-            [ print(x) for x in hosts ]
+            [print(x) for x in hosts]
         else:
             print('<No Hosts Found>')
         sys.exit(0)
-    elif options.get:
-        if options.blueprint:
-            a.save_blueprint(blueprint, options.file)
-        elif options.cluster:
-            a.save_cluster(cluster, options.file)
+
+    def add_options(self):
+        self.add_hostoption(name='Ambari', default_host='localhost', default_port=8080)
+        self.add_useroption(name='Ambari', default_user='admin')
+        # TODO: certificate validation not tested yet
+        self.parser.add_option('-s', '--ssl', dest='ssl', help='Use SSL connection', action='store_true', default=False)
+        self.parser.add_option('-b', '--blueprint', dest='blueprint', help='Ambari blueprint name', metavar='<name>')
+        self.parser.add_option('-c', '--cluster', dest='cluster', help='Ambari cluster to blueprint (case sensitive)', metavar='<name>')
+        self.parser.add_option('--get', dest='get', help='Get and store Ambari Blueprints locally in --dir or --file', action='store_true')
+        self.parser.add_option('--push', dest='push',  help='Push a local Ambari blueprint to the Ambari server', action='store_true')
+        self.parser.add_option('--create-cluster', dest='create_cluster',  help='Create a cluster (requires --cluster and --file as well as previously uploaded Ambari Blueprint)', action='store_true')
+        self.parser.add_option('-f', '--file', dest='file', help='Ambari Blueprint or Cluster creation file to --get write to or --push send from', metavar='<file.json>')
+        self.parser.add_option('-d', '--dir', dest='dir', help="Ambari Blueprints storage directory if saving all blueprints (defaults to 'ambari_blueprints' directory adjacent to this tool)", metavar='<dir>')
+        self.parser.add_option('--list-blueprints', dest='list_blueprints', help='List available blueprints', action='store_true', default=False)
+        self.parser.add_option('--list-clusters', dest='list_clusters', help='List available clusters', action='store_true', default=False)
+        self.parser.add_option('--list-hosts', dest='list_hosts', help='List available hosts', action='store_true', default=False)
+        self.parser.add_option('--strip-config', dest='strip_config', help="Strip configuration sections out to make more generic. Use with caution, more advanced configurations like HDFS HA require some configuration settings in order to validate the topology when submitting a blueprint, so you'd have to add those config keys back in (suggest via a fully config'd cluster blueprint)", action='store_true', default=False)
+
+    def process_args(self):
+        options, args = self.parse_args()
+
+        log.setLevel(logging.WARN)
+        if options.verbose > 1:
+            log.setLevel(logging.DEBUG)
+        elif options.verbose:
+            log.setLevel(logging.INFO)
+        # log.info('verbose level: %s' % options.verbose)
+
+        try:
+            validate_host(options.host)
+            validate_port(options.port)
+            validate_user(options.user)
+            validate_password(options.password)
+            if options.dir:
+                validate_dirname(options.dir, 'blueprints')
+            if options.file:
+                if options.push:
+                    validate_file(options.file, 'blueprint')
+                if options.create_cluster:
+                    validate_file(options.file, 'cluster hosts mapping')
+        except InvalidOptionException, e:
+            self.usage(e)
+
+        if self.args:
+            self.usage('additional args detected')
+
+        if options.get and options.blueprint and options.cluster:
+            usage(parser, '--blueprint/--cluster are mutually exclusive when using --get')
+        elif options.push and options.create_cluster:
+            usage(parser, '--push and --create-cluster are mutually exclusive')
+        elif options.create_cluster and not options.cluster:
+            usage(parser, '--create-cluster requires specifying the name via --cluster')
+        elif options.list_blueprints + options.list_clusters + options.list_hosts > 1:
+            usage(parser, 'can only use one --list switch at a time')
+        elif options.file and (options.get and not (options.blueprint or options.cluster) ):
+            usage(parser, "cannot specify --file without --blueprint/--cluster as it's only used when getting or pushing a single blueprint")
+        elif options.file and (options.push and not (options.create_cluster or options.blueprint)):
+            usage(parser, "cannot specify --file without --blueprint/--create-cluster as it's only used when getting or pushing a single blueprint or creating a cluster based on the blueprint")
+        return options, args
+
+
+    def run(self):
+        options, args = self.process_args()
+        self.setup(options.host,
+                   options.port,
+                   options.user,
+                   options.password,
+                   options.ssl,
+                   dir=options.dir,
+                   strip_config=options.strip_config)
+        if options.list_blueprints:
+            self.print_blueprints()
+        elif options.list_clusters:
+            self.print_clusters()
+        elif options.list_hosts:
+            self.print_hosts()
+        elif options.get:
+            if options.blueprint:
+                self.save_blueprint(options.blueprint, options.file)
+            elif options.cluster:
+                self.save_cluster(options.cluster, options.file)
+            else:
+                self.save_all()
+        elif options.push:
+            if not options.file:
+                self.usage('--file must be specified when pushing a blueprint to Ambari')
+            self.send_blueprint_file(options.file, options.blueprint)
+            print("Blueprint file '%s' sent and registered with Ambari as '%s'" % (options.file, options.blueprint))
+        elif options.create_cluster:
+            if not options.file:
+                self.usage('--file must be specified with a hostsmapping.json file when creating a new Ambari cluster')
+            self.create_cluster(cluster, options.file, options.blueprint)
+            print("Ambari cluster '%s' creation job submitted, see '%s:%s' web UI for progress"
+                                                                        % (options.cluster, options.host, options.port))
         else:
-            a.save_all()
-    elif options.push:
-        if not options.file:
-            usage(parser, '--file must be specified when pushing a blueprint to Ambari')
-        a.send_blueprint_file(options.file, blueprint)
-        print("Blueprint file '%s' sent and registered with Ambari as '%s'" % (options.file, blueprint))
-    elif options.create_cluster:
-        if not options.file:
-            usage(parser, '--file must be specified with a hostsmapping.json file when creating a new Ambari cluster')
-        a.create_cluster(cluster, options.file, options.blueprint)
-        print("Ambari cluster '%s' creation job submitted, see '%s:%s' web UI for progress" % (cluster, host, port))
-    else:
-        usage(parser)
-    log.info('Completed')
+            self.usage('no options specified, try --get --cluster myCluster')
+        log.info('Completed')
 
 if __name__ == '__main__':
-    try:
-        main()
-    except KeyboardInterrupt:
-        pass
+    AmbariBlueprintTool().main()
