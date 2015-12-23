@@ -33,7 +33,7 @@ until [ $# -lt 1 ]; do
 done
 
 rm broken.json &>/dev/null || :
-./validate_json.py -t 1 -vvv $(
+./validate_json.py -vvv $(
 find "${1:-.}" -iname '*.json' |
 grep -v '/spark-.*-bin-hadoop.*/'
 )
