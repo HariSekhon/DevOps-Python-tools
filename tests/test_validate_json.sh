@@ -35,27 +35,33 @@ done
 rm broken.json &>/dev/null || :
 ./validate_json.py -t 1 -vvv $(
 find "${1:-.}" -iname '*.json' |
-grep -v '/spark-.*-bin-hadoop.*/' |
-# ignore multi-line json data file for spark testing
-grep -v 'tests/test.json'
+grep -v '/spark-.*-bin-hadoop.*/'
 )
 
-echo "Now trying intentional JSON fail:"
+echo "Now trying non-json files to detect successful failure:"
+check_broken(){
+    f="$1"
+    set +e
+    ./validate_json.py "$f"
+    result=$?
+    set -e
+    if [ $result = 2 ]; then
+        echo "successfully detected broken json in '$f', returned exit code $result"
+    #elif [ $result != 0 ]; then
+    #    echo "returned unexpected non-zero exit code $result for broken json in '$f'"
+    #    exit 1
+    else
+        echo "FAILED, returned unexpected exit code $result for broken json in '$f'"
+        exit 1
+    fi
+}
 echo blah > broken.json
-set +e
-./validate_json.py broken.json
-result=$?
-set -e
+check_broken broken.json
 rm broken.json
-if [ $result = 2 ]; then
-    echo "SUCCESSFULLY detected broken json, returned exit code $result"
-#elif [ $result != 0 ]; then
-#    echo "returned unexpected non-zero exit code $result for broken json"
-#    exit 1
-else
-    echo "FAILED, returned unexpected exit code $result"
-    exit 1
-fi
+check_broken README.md
+echo "======="
+echo "SUCCESS"
+echo "======="
 
 echo
 echo
