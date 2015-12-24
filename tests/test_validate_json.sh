@@ -64,6 +64,7 @@ check_broken broken.json
 rm broken.json
 echo "{ 'name': 'hari' }" > single_quote.json
 check_broken single_quote.json
+echo "checking specifically single quote detection"
 set +o pipefail
 ./validate_json.py single_quote.json 2>&1 | grep --color 'JSON INVALID.*found single quotes not double quotes' || { echo "Failed to find single quote message in output"; exit 1; }
 set -o pipefail
