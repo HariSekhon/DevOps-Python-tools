@@ -37,16 +37,19 @@ find "${1:-.}" -iname '*.yaml' |
 grep -v '/spark-.*-bin-hadoop.*/' |
 grep -v 'broken'
 ) tests/test.json
+echo
 
 echo "checking yaml file without an extension"
 cp -iv "$(find "${1:-.}" -iname '*.yaml' | grep -v '/spark-.*-bin-hadoop.*/' | head -n1)" no_extension_testfile
 ./validate_yaml.py -vvv -t 1 no_extension_testfile
 rm no_extension_testfile
+echo
 
 echo "testing stdin"
 ./validate_yaml.py - < tests/test.yaml
 ./validate_yaml.py < tests/test.yaml
 ./validate_yaml.py tests/test.yaml - < tests/test.yaml
+echo
 
 echo "Now trying non-yaml files to detect successful failure:"
 check_broken(){
@@ -57,6 +60,7 @@ check_broken(){
     set -e
     if [ $result = 2 ]; then
         echo "successfully detected broken yaml in '$f', returned exit code $result"
+        echo
     #elif [ $result != 0 ]; then
     #    echo "returned unexpected non-zero exit code $result for broken yaml in '$f'"
     #    exit 1
