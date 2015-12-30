@@ -35,7 +35,8 @@ done
 rm broken.json single_quote.json missing_end_quote.json no_extension_testfile &>/dev/null || :
 ./validate_json.py -vvv $(
 find "${1:-.}" -iname '*.json' |
-grep -v '/spark-.*-bin-hadoop.*/'
+grep -v '/spark-.*-bin-hadoop.*/' |
+grep -v 'broken'
 )
 echo "checking json file without an extension"
 cp -iv "$(find "${1:-.}" -iname '*.json' | grep -v '/spark-.*-bin-hadoop.*/' | head -n1)" no_extension_testfile
@@ -73,6 +74,10 @@ echo '{ "name": "hari" ' > missing_end_quote.json
 check_broken missing_end_quote.json
 rm missing_end_quote.json
 check_broken README.md
+cat tests/test.json >> tests/multi-broken.json
+cat tests/test.json >> tests/multi-broken.json
+check_broken tests/multi-broken.json
+rm tests/multi-broken.json
 echo "======="
 echo "SUCCESS"
 echo "======="
