@@ -32,7 +32,6 @@ __version__ = '0.2'
 
 import os
 import sys
-# using optparse rather than argparse for servers still on Python 2.6
 sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/pylib')
 try:
     from harisekhon.utils import *
