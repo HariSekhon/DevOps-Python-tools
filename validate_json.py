@@ -49,6 +49,10 @@ class JsonValidatorTool(CLI):
                     if isJson(line.replace("'", '"')):
                         die(self.invalid_json_msg_single_quotes)
                     else:
+                        # pointless since doesn't return which part of the file is broken unlike the yaml.parser.ParserError
+                        # TODO: replace with a getter
+                        # if self.options.verbose > 2:
+                            # json.loads(line)
                         die(self.invalid_json_msg)
             print('%s (multi-record format)' % self.valid_json_msg)
             return True
@@ -61,6 +65,10 @@ class JsonValidatorTool(CLI):
         elif self.check_multiline_json():
             pass
         else:
+            # pointless since doesn't return which part of the file is broken unlike the yaml.parser.ParserError
+            # TODO: replace with a getter
+            # if self.options.verbose > 2:
+            #     json.load(content)
             die(self.invalid_json_msg)
 
     def run(self):
