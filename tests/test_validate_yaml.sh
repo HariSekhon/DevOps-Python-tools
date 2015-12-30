@@ -58,6 +58,9 @@ check_broken(){
 check_broken tests/multirecord.json
 check_broken tests/test_broken_tabs.yaml
 check_broken README.md
+cat tests/test.yaml >> tests/multi.yaml
+cat tests/test.yaml >> tests/multi.yaml
+check_broken tests/multi.yaml
 echo "======="
 echo "SUCCESS"
 echo "======="
