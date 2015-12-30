@@ -36,7 +36,7 @@ rm broken.json single_quote.json missing_end_quote.json no_extension_testfile &>
 ./validate_json.py -vvv $(
 find "${1:-.}" -iname '*.json' |
 grep -v '/spark-.*-bin-hadoop.*/' |
-grep -v 'broken'
+grep -v -e 'broken' -e 'error' -e ' '
 )
 echo
 
