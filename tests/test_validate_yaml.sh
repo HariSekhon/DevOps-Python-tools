@@ -38,6 +38,10 @@ grep -v '/spark-.*-bin-hadoop.*/' |
 grep -v 'broken'
 ) tests/test.json
 
+echo "testing stdin"
+./validate_yaml.py - < tests/test.yaml
+./validate_yaml.py < tests/test.yaml
+
 echo "Now trying non-yaml files to detect successful failure:"
 check_broken(){
     f="$1"
