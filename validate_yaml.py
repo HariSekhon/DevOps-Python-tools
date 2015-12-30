@@ -42,22 +42,18 @@ except ImportError, e:
 
 class YamlValidatorTool(CLI):
 
-    # def check_multiline_yaml(self):
-    #         self.f.seek(0)
-    #         for line in self.f:
-    #             if not isJson(line):
-    #                 if isJson(line.replace("'", '"')):
-    #                     die(self.invalid_yaml_msg_single_quotes)
-    #                 else:
-    #                     die(self.invalid_yaml_msg)
-    #         print('%s (multi-record format)' % self.valid_yaml_msg)
-    #         return True
+    def check_multiline_yaml(self):
+            self.f.seek(0)
+            for line in self.f:
+                if not isYaml(line):
+                    die(self.invalid_yaml_msg)
+            print('%s (multi-record format)' % self.valid_yaml_msg)
+            return True
 
     def check_yaml(self, content):
         if isYaml(content):
             print(self.valid_yaml_msg)
-        # elif isYaml(content.replace("'", '"')):
-        #     die(self.invalid_yaml_msg_single_quotes)
+        # multi-record yaml like in Big Data isn't really used like with JSON
         # elif self.check_multiline_yaml():
         #     pass
         else:
