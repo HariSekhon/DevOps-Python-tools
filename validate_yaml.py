@@ -71,7 +71,7 @@ class YamlValidatorTool(CLI):
             if filename == '-':
                 continue
             validate_file(filename)
-        for self.filename in self.args:
+        for filename in self.args:
             if filename == '-':
                 filename = '<STDIN>'
             self.valid_yaml_msg   = '%s => YAML OK'      % filename
@@ -79,7 +79,7 @@ class YamlValidatorTool(CLI):
             if filename == '<STDIN>':
                 self.check_yaml(sys.stdin.read())
             else:
-                with open(self.filename) as self.f:
+                with open(filename) as self.f:
                     self.check_yaml(self.f.read())
 
 
