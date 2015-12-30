@@ -47,17 +47,18 @@ except ImportError, e:
 class JsonValidatorTool(CLI):
 
     def add_options(self):
-        self.parser.add_option('-m', '--multi-line', action='store_true',
-                               help='Test explicitly for multi-line JSON, must use if reading large multi-line json ' \
-                                  + 'from standard input to prevent out of memory error')
+        self.parser.add_option('-m', '--multi-record', action='store_true',
+                               help='Test explicitly for multi-record JSON data, where each line is a separate json ' \
+                                  + 'document separated by newlines. Must use if reading multi-record json format ' \
+                                  + 'on standard input')
 
-    def check_multiline_json(self):
+    def check_mutlirecord_json(self):
             for line in self.f:
                 if not isJson(line):
                     if isJson(line.replace("'", '"')):
-                        die(self.invalid_json_msg_single_quotes)
+                        die('%s (multi-record format)' % self.invalid_json_msg_single_quotes)
                     else:
-                        die(self.invalid_json_msg)
+                        return False
             print('%s (multi-record format)' % self.valid_json_msg)
             return True
 
@@ -69,12 +70,15 @@ class JsonValidatorTool(CLI):
         else:
             if self.f is not sys.stdin:
                 self.f.seek(0)
-                if self.check_multiline_json():
+                if self.check_mutlirecord_json():
                     return True
             # pointless since it would simply return 'ValueError: No JSON object could be decoded'
             # TODO: replace with a getter
             # if self.options.verbose > 2:
-            #     json.loads(content)
+                # try:
+                #     json.loads(content)
+                # except Exception, e:
+                #     print(e)
             die(self.invalid_json_msg)
 
     def run(self):
@@ -93,14 +97,15 @@ class JsonValidatorTool(CLI):
             mem_err = "file '%s', assuming Big Data multi-record json and re-trying validation line-by-line" % filename
             if filename == '<STDIN>':
                 self.f = sys.stdin
-                if self.options.multi_line:
-                    self.check_multiline_json()
+                if self.options.multi_record:
+                    if not self.check_mutlirecord_json():
+                        die(self.invalid_json_msg)
                 else:
                     self.check_json(sys.stdin.read())
             else:
                 with open(filename) as self.f:
-                    if self.options.multi_line:
-                        self.check_multiline_json()
+                    if self.options.multi_record:
+                        self.check_mutlirecord_json()
                     else:
                         # most JSON files are fine to slurp like this
                         # Big Data JSON files are json multi-record, will throw exception after running out of RAM and then be handled line by line
@@ -111,11 +116,11 @@ class JsonValidatorTool(CLI):
                             except MemoryError:
                                 print("memory error validating contents from %s" % mem_err)
                                 f.seek(0)
-                                self.check_multiline_json()
+                                self.check_mutlirecord_json()
                         except MemoryError:
                             print("memory error reading %s" % mem_err)
                             f.seek(0)
-                            self.check_multiline_json()
+                            self.check_mutlirecord_json()
 
 
 if __name__ == '__main__':
