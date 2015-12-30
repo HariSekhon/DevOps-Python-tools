@@ -53,7 +53,7 @@ class YamlValidatorTool(CLI):
     def check_yaml(self, content):
         if isYaml(content):
             print(self.valid_yaml_msg)
-        # multi-record yaml like in Big Data isn't really used like with JSON
+        # multi-record yaml like JSON in Big Data isn't really used
         # elif self.check_multiline_yaml():
         #     pass
         else:
