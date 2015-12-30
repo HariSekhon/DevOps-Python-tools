@@ -38,42 +38,72 @@ find "${1:-.}" -iname '*.json' |
 grep -v '/spark-.*-bin-hadoop.*/' |
 grep -v 'broken'
 )
+echo
+
 echo "checking json file without an extension"
 cp -iv "$(find "${1:-.}" -iname '*.json' | grep -v '/spark-.*-bin-hadoop.*/' | head -n1)" no_extension_testfile
 ./validate_json.py -vvv -t 1 no_extension_testfile
 rm no_extension_testfile
+echo
+
+echo "testing stdin"
+./validate_json.py - < tests/test.json
+./validate_json.py < tests/test.json
+./validate_json.py tests/test.json - < tests/test.json
+./validate_json.py -m - < tests/multirecord.json
+echo
 
 echo "Now trying broken / non-json files to test failure detection:"
 check_broken(){
-    f="$1"
+    filename="$1"
     set +e
-    ./validate_json.py "$f"
+    ./validate_json.py "$filename" ${@:2}
     result=$?
     set -e
     if [ $result = 2 ]; then
-        echo "successfully detected broken json in '$f', returned exit code $result"
+        echo "successfully detected broken json in '$filename', returned exit code $result"
+        echo
     #elif [ $result != 0 ]; then
-    #    echo "returned unexpected non-zero exit code $result for broken json in '$f'"
+    #    echo "returned unexpected non-zero exit code $result for broken json in '$filename'"
     #    exit 1
     else
-        echo "FAILED, returned unexpected exit code $result for broken json in '$f'"
+        echo "FAILED, returned unexpected exit code $result for broken json in '$filename'"
         exit 1
     fi
 }
+
+set +e
+./validate_json.py - -m < tests/test.json
+result=$?
+set -e
+if [ $result = 2 ]; then
+    echo "successfully detected breakage for --multi-line stdin vs normal json"
+    echo
+else
+    echo "FAILED to detect --multi-line std vs normal json"
+    exit 1
+fi
+
 echo blah > broken.json
 check_broken broken.json
 rm broken.json
+
 echo "{ 'name': 'hari' }" > single_quote.json
 check_broken single_quote.json
+
 echo "checking specifically single quote detection"
 set +o pipefail
 ./validate_json.py single_quote.json 2>&1 | grep --color 'JSON INVALID.*found single quotes not double quotes' || { echo "Failed to find single quote message in output"; exit 1; }
 set -o pipefail
 rm single_quote.json
+echo
+
 echo '{ "name": "hari" ' > missing_end_quote.json
 check_broken missing_end_quote.json
 rm missing_end_quote.json
+
 check_broken README.md
+
 cat tests/test.json >> tests/multi-broken.json
 cat tests/test.json >> tests/multi-broken.json
 check_broken tests/multi-broken.json
