@@ -26,28 +26,28 @@ endif
 make:
 	if [ -x /usr/bin/apt-get ]; then make apt-packages; fi
 	if [ -x /usr/bin/yum ];     then make yum-packages; fi
-
+	
 	git submodule init
 	git submodule update
-
+	
 	cd pylib && make
-
+	
 	# json module built-in to Python >= 2.6, backport not available via pypi
 	#$(SUDO2) pip install json
-
+	
+	pip install -r requirements.txt
 	# for ipython-notebook-pyspark.py
 	#$(SUDO2) pip install jinja2
 	# HiveServer2
 	#$(SUDO2) pip install pyhs2
 	# Impala
 	#$(SUDO2) pip install impyla
-	pip install -r requirements.txt
-
+	
 	# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
 	$(SUDO2) pip install "ipython[notebook]" || :
-
+	
 	@echo
-	@echo BUILD SUCCESSFUL
+	@echo PyTools BUILD SUCCESSFUL
 
 .PHONY: apt-packages
 apt-packages:
