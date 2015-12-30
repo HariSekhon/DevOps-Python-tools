@@ -35,7 +35,7 @@ done
 find "${1:-.}" -iname '*.json' |
 grep -v '/spark-.*-bin-hadoop.*/' |
 # ignore multi-line json data file for spark testing
-grep -v 'tests/test.json' |
+grep -v 'tests/multirecord.json' |
 while read jsonFile; do
     echo "testing json file: $jsonFile"
     python -mjson.tool < "$jsonFile" > /dev/null

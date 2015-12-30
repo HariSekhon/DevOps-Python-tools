@@ -55,7 +55,7 @@ check_broken(){
         exit 1
     fi
 }
-check_broken tests/test.json
+check_broken tests/multirecord.json
 check_broken tests/test_broken_tabs.yaml
 check_broken README.md
 echo "======="
