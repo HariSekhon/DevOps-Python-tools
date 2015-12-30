@@ -75,10 +75,10 @@ class JsonValidatorTool(CLI):
             # pointless since it would simply return 'ValueError: No JSON object could be decoded'
             # TODO: replace with a getter
             # if self.options.verbose > 2:
-                # try:
-                #     json.loads(content)
-                # except Exception, e:
-                #     print(e)
+            #     try:
+            #         json.loads(content)
+            #     except Exception, e:
+            #         print(e)
             die(self.invalid_json_msg)
 
     def run(self):
