@@ -32,6 +32,7 @@ __version__ = '0.3'
 
 import os
 import sys
+import traceback
 import yaml
 sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/pylib')
 try:
@@ -44,13 +45,13 @@ except ImportError, e:
 
 class YamlValidatorTool(CLI):
 
-    def check_multiline_yaml(self):
-            self.f.seek(0)
-            for line in self.f:
-                if not isYaml(line):
-                    die(self.invalid_yaml_msg)
-            print('%s (multi-record format)' % self.valid_yaml_msg)
-            return True
+    # def check_multiline_yaml(self):
+    #         self.f.seek(0)
+    #         for line in self.f:
+    #             if not isYaml(line):
+    #                 die(self.invalid_yaml_msg)
+    #         print('%s (multi-record format)' % self.valid_yaml_msg)
+    #         return True
 
     def check_yaml(self, content):
         if isYaml(content):
@@ -61,7 +62,10 @@ class YamlValidatorTool(CLI):
         else:
             # TODO: change this to use a getter
             if self.options.verbose > 2:
-                yaml.load(content)
+                try:
+                    yaml.load(content)
+                except yaml.YAMLError, e:
+                    print(e)
             die(self.invalid_yaml_msg)
 
     def run(self):
