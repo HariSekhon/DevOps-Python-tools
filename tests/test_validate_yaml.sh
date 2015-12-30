@@ -53,19 +53,19 @@ echo
 
 echo "Now trying non-yaml files to detect successful failure:"
 check_broken(){
-    f="$1"
+    filename="$1"
     set +e
-    ./validate_yaml.py -vvv -t 1 "$f"
+    ./validate_yaml.py -vvv -t 1 "$filename" ${@:2}
     result=$?
     set -e
     if [ $result = 2 ]; then
-        echo "successfully detected broken yaml in '$f', returned exit code $result"
+        echo "successfully detected broken yaml in '$filename', returned exit code $result"
         echo
     #elif [ $result != 0 ]; then
-    #    echo "returned unexpected non-zero exit code $result for broken yaml in '$f'"
+    #    echo "returned unexpected non-zero exit code $result for broken yaml in '$filename'"
     #    exit 1
     else
-        echo "FAILED, returned unexpected exit code $result for broken yaml in '$f'"
+        echo "FAILED, returned unexpected exit code $result for broken yaml in '$filename'"
         exit 1
     fi
 }
