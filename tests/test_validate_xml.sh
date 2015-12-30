@@ -53,19 +53,19 @@ echo
 
 echo "Now trying non-xml files to detect successful failure:"
 check_broken(){
-    f="$1"
+    filename="$1"
     set +e
-    ./validate_xml.py "$f"
+    ./validate_xml.py -vvv "$filename" ${@:2}
     result=$?
     set -e
     if [ $result = 2 ]; then
-        echo "successfully detected broken xml in '$f', returned exit code $result"
+        echo "successfully detected broken xml in '$filename', returned exit code $result"
         echo
     #elif [ $result != 0 ]; then
-    #    echo "returned unexpected non-zero exit code $result for broken xml in '$f'"
+    #    echo "returned unexpected non-zero exit code $result for broken xml in '$filename'"
     #    exit 1
     else
-        echo "FAILED, returned unexpected exit code $result for broken xml in '$f'"
+        echo "FAILED, returned unexpected exit code $result for broken xml in '$filename'"
         exit 1
     fi
 }
