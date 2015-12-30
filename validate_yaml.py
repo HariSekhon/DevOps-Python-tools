@@ -56,8 +56,8 @@ class YamlValidatorTool(CLI):
     def check_yaml(self, content):
         if isYaml(content):
             print(self.valid_yaml_msg)
-        elif isYaml(content.replace("'", '"')):
-            die(self.invalid_yaml_msg_single_quotes)
+        # elif isYaml(content.replace("'", '"')):
+        #     die(self.invalid_yaml_msg_single_quotes)
         # elif self.check_multiline_yaml():
         #     pass
         else:
@@ -74,7 +74,7 @@ class YamlValidatorTool(CLI):
         for self.filename in self.args:
             self.valid_yaml_msg   = '%s => YAML OK'      % self.filename
             self.invalid_yaml_msg = '%s => YAML INVALID' % self.filename
-            self.invalid_yaml_msg_single_quotes = '%s (found single quotes not double quotes)' % self.invalid_yaml_msg
+            # self.invalid_yaml_msg_single_quotes = '%s (found single quotes not double quotes)' % self.invalid_yaml_msg
             # mem_err = "file '%s', assuming Big Data multi-record yaml and re-trying validation line-by-line" % self.filename
             with open(self.filename) as self.f:
                 # content = None
