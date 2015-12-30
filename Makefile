@@ -36,16 +36,15 @@ make:
 	#$(SUDO2) pip install json
 
 	# for ipython-notebook-pyspark.py
-	$(SUDO2) pip install jinja2
-
-	# Python >= 2.7 - won't build on 2.6
-	$(SUDO2) pip install "ipython[notebook]" || :
-
+	#$(SUDO2) pip install jinja2
 	# HiveServer2
-	$(SUDO2) pip install pyhs2
-
+	#$(SUDO2) pip install pyhs2
 	# Impala
-	$(SUDO2) pip install impyla
+	#$(SUDO2) pip install impyla
+	pip install -r requirements.txt
+
+	# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
+	$(SUDO2) pip install "ipython[notebook]" || :
 
 	@echo
 	@echo BUILD SUCCESSFUL
