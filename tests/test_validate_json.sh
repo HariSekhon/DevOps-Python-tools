@@ -80,7 +80,7 @@ if [ $result = 2 ]; then
     echo "successfully detected breakage for --multi-line stdin vs normal json"
     echo
 else
-    echo "FAILED to detect --multi-line std vs normal json"
+    echo "FAILED to detect breakage when feeding normal multi-line json doc to stdin with --multi-line (expecting one json doc per line)"
     exit 1
 fi
 
