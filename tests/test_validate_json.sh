@@ -32,13 +32,17 @@ until [ $# -lt 1 ]; do
     esac
 done
 
-rm broken.json &>/dev/null || :
+rm broken.json single_quote.json missing_end_quote.json no_extension_testfile &>/dev/null || :
 ./validate_json.py -vvv $(
 find "${1:-.}" -iname '*.json' |
 grep -v '/spark-.*-bin-hadoop.*/'
 )
+echo "checking json file without an extension"
+cp -iv "$(find "${1:-.}" -iname '*.json' | grep -v '/spark-.*-bin-hadoop.*/' | head -n1)" no_extension_testfile
+./validate_json.py -vvv -t 1 no_extension_testfile
+rm no_extension_testfile
 
-echo "Now trying non-json files to detect successful failure:"
+echo "Now trying broken / non-json files to test failure detection:"
 check_broken(){
     f="$1"
     set +e
@@ -58,6 +62,16 @@ check_broken(){
 echo blah > broken.json
 check_broken broken.json
 rm broken.json
+echo "{ 'name': 'hari' }" > single_quote.json
+check_broken single_quote.json
+echo "checking specifically single quote detection"
+set +o pipefail
+./validate_json.py single_quote.json 2>&1 | grep --color 'JSON INVALID.*found single quotes not double quotes' || { echo "Failed to find single quote message in output"; exit 1; }
+set -o pipefail
+rm single_quote.json
+echo '{ "name": "hari" ' > missing_end_quote.json
+check_broken missing_end_quote.json
+rm missing_end_quote.json
 check_broken README.md
 echo "======="
 echo "SUCCESS"
