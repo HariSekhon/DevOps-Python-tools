@@ -36,7 +36,7 @@ done
 find "${1:-.}" -iname '*.yaml' |
 grep -v '/spark-.*-bin-hadoop.*/' |
 grep -v 'broken'
-)
+) tests/test.json
 
 echo "Now trying non-yaml files to detect successful failure:"
 check_broken(){
