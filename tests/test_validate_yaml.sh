@@ -55,7 +55,7 @@ echo "Now trying non-yaml files to detect successful failure:"
 check_broken(){
     f="$1"
     set +e
-    ./validate_yaml.py "$f"
+    ./validate_yaml.py -vvv -t 1 "$f"
     result=$?
     set -e
     if [ $result = 2 ]; then
