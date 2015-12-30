@@ -19,14 +19,16 @@ YAML Validator Tool
 
 Does a simple validation of each file passed as an argument to this script.
 
+Works like a standard unix filter program - if no files are passed as arguments or '-' is passed then reads from standard input
+
 """
 
-# Forked from validate_yaml.py
+# Forked from validate_json.py
 
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.3'
 
 import os
 import sys
@@ -64,29 +66,21 @@ class YamlValidatorTool(CLI):
 
     def run(self):
         if not self.args:
-            self.usage()
+            self.args.append('-')
         for filename in self.args:
+            if filename == '-':
+                continue
             validate_file(filename)
         for self.filename in self.args:
-            self.valid_yaml_msg   = '%s => YAML OK'      % self.filename
-            self.invalid_yaml_msg = '%s => YAML INVALID' % self.filename
-            # self.invalid_yaml_msg_single_quotes = '%s (found single quotes not double quotes)' % self.invalid_yaml_msg
-            # mem_err = "file '%s', assuming Big Data multi-record yaml and re-trying validation line-by-line" % self.filename
-            with open(self.filename) as self.f:
-                # content = None
-                # most JSON files are fine to slurp like this
-                # Big Data JSON files are yaml multi-record, will throw exception after running out of RAM and then be handled line by line
-                # try:
-                #     content = self.f.read()
-                #     try:
-                #         self.check_yaml(content)
-                #     except MemoryError:
-                #         print("memory error validating contents from %s" % mem_err)
-                #         self.check_multiline_yaml()
-                # except MemoryError:
-                #     print("memory error reading %s" % mem_err)
-                #     self.check_multiline_yaml()
-                self.check_yaml(self.f.read())
+            if filename == '-':
+                filename = '<STDIN>'
+            self.valid_yaml_msg   = '%s => YAML OK'      % filename
+            self.invalid_yaml_msg = '%s => YAML INVALID' % filename
+            if filename == '<STDIN>':
+                self.check_yaml(sys.stdin.read())
+            else:
+                with open(self.filename) as self.f:
+                    self.check_yaml(self.f.read())
 
 
 if __name__ == '__main__':
