@@ -34,7 +34,8 @@ done
 
 ./validate_yaml.py -vvv $(
 find "${1:-.}" -iname '*.yaml' |
-grep -v '/spark-.*-bin-hadoop.*/'
+grep -v '/spark-.*-bin-hadoop.*/' |
+grep -v 'broken'
 )
 
 echo "Now trying non-yaml files to detect successful failure:"
@@ -55,6 +56,7 @@ check_broken(){
     fi
 }
 check_broken tests/test.json
+check_broken tests/test_broken_tabs.yaml
 check_broken README.md
 echo "======="
 echo "SUCCESS"
