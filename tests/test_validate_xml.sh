@@ -40,7 +40,7 @@ grep -v -e 'broken' -e 'error' -e ' '
 echo
 
 echo "checking xml file without an extension"
-cp -iv "$(find "${1:-.}" -iname '*.xml' | grep -v '/spark-.*-bin-hadoop.*/' | head -n1)" no_extension_testfile
+cp -iv "$(find "${1:-.}" -iname '*.xml' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" no_extension_testfile
 ./validate_xml.py -vvv -t 1 no_extension_testfile
 rm no_extension_testfile
 echo
