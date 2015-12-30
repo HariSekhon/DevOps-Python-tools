@@ -35,7 +35,7 @@ done
 ./validate_yaml.py -vvv $(
 find "${1:-.}" -iname '*.yaml' |
 grep -v '/spark-.*-bin-hadoop.*/' |
-grep -v 'broken'
+grep -v -e 'broken' -e 'error' -e ' '
 ) tests/test.json
 echo
 
