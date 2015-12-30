@@ -33,7 +33,6 @@ __version__ = '0.3'
 import os
 import sys
 import traceback
-import xml.etree.ElementTree as ET
 sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/pylib')
 try:
     from harisekhon.utils import *
@@ -53,7 +52,8 @@ class XmlValidatorTool(CLI):
             if self.options.verbose > 2:
                 try:
                     ET.fromstring(content)
-                except ET.ParseError, e:
+                # Python 2.7 throws xml.etree.ElementTree.ParseError, but Python 2.6 throws xml.parsers.expat.ExpatError
+                except Exception, e:
                     print(e)
             die(self.invalid_xml_msg)
 
