@@ -1,4 +1,4 @@
-Hari Sekhon PyTools [![Build Status](https://travis-ci.org/harisekhon/pytools.svg?branch=master)](https://travis-ci.org/harisekhon/pytools)
+Hari Sekhon PyTools [![Build Status](https://travis-ci.org/HariSekhon/pytools.svg?branch=master)](https://travis-ci.org/HariSekhon/pytools)
 ================================
 
 ### Hadoop, Spark / PySpark, Ambari, IPython, Pig and Linux Tools ###
