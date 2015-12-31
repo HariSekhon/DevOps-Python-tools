@@ -81,6 +81,20 @@ class JsonValidatorTool(CLI):
             #         print(e)
             die(self.invalid_json_msg)
 
+    # looks like this does a .read() anyway, not buying any efficiency enhancement
+    #
+    #  usage:
+    # self.check_json_fp(self.f)
+    # must reset afterwards, otherwise next check will result in Invalid JSON due to blank
+    # self.f.seek(0)
+    #
+    # def check_json_fp(self, fp):
+    #     try:
+    #         json.load(fp)
+    #         return True
+    #     except ValueError:
+    #         die(self.invalid_json_msg)
+
     def run(self):
         if not self.args:
             self.args.append('-')
