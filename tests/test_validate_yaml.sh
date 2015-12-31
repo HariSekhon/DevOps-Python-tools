@@ -36,7 +36,7 @@ done
 find "${1:-.}" -iname '*.yaml' |
 grep -v '/spark-.*-bin-hadoop.*/' |
 grep -v -e 'broken' -e 'error' -e ' '
-) tests/test.json
+) tests/test.json # json is an official subset, "inline-style"
 echo
 
 echo "checking yaml file without an extension"
