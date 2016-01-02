@@ -26,7 +26,7 @@ cd "$srcdir";
 
 ./compile.sh
 
-./syntax.sh
+#./syntax.sh
 
 for script in $(find . -name 'test*.sh'); do
     ./$script -vvv
