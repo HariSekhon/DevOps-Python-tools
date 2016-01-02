@@ -17,7 +17,7 @@
 
 XML Validator Tool
 
-Validation each file passed as an argument
+Validates each file passed as an argument
 
 Directories are recursed, checking all files ending in a .xml suffix.
 
