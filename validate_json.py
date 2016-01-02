@@ -107,11 +107,12 @@ class JsonValidatorTool(CLI):
             if arg == '-':
                 continue
             if not os.path.exists(arg):
-                die("'%s' not found" % arg)
+                print("'%s' not found" % arg)
+                sys.exit(ERRORS['WARNING'])
             if os.path.isfile(arg):
-                vlog_option(arg, 'file')
+                vlog_option('file', arg)
             elif os.path.isdir(arg):
-                vlog_option(arg, 'dir')
+                vlog_option('directory', arg)
             else:
                 die("path '%s' could not be determined as either a file or directory" % arg)
         for arg in self.args:
