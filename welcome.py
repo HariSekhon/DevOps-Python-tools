@@ -16,7 +16,7 @@ Tested on Mac OS X and Linux
 
 from __future__ import print_function
 
-__author__  = 'Hari Sekhon'
+__author__ = 'Hari Sekhon'
 __version__ = '1.2.0'
 
 import os
@@ -25,7 +25,6 @@ import re
 import string
 import sys
 import time
-from optparse import OptionParser
 libdir = os.path.join(os.path.dirname(__file__), 'pylib')
 sys.path.append(libdir)
 try:
@@ -91,18 +90,17 @@ class Welcome(CLI):
             pass
         return msg
 
-
     def print_welcome(self):
         msg = self.construct_msg()
         try:
             charmap = list(string.uppercase + string.lowercase + '@#$%^&*()')
             # print '',
             # print('', end='')
-            for i in range(0,len(msg)):
+            for i in range(0, len(msg)):
                 char = msg[i]
                 # print '',
                 print(' ', end='')
-                j=0
+                j = 0
                 while 1:
                     if j > 3:
                         random_char = char
