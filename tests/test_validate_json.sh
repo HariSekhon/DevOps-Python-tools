@@ -64,31 +64,33 @@ echo
 echo "Now trying broken / non-json files to test failure detection:"
 check_broken(){
     filename="$1"
+    expected_exitcode="${2:-2}"
     set +e
-    ./validate_json.py "$filename" ${@:2}
-    result=$?
+    ./validate_json.py "$filename" ${@:3}
+    exitcode=$?
     set -e
-    if [ $result = 2 ]; then
-        echo "successfully detected broken json in '$filename', returned exit code $result"
+    if [ $exitcode = $expected_exitcode ]; then
+        echo "successfully detected broken json in '$filename', returned exit code $exitcode"
         echo
-    #elif [ $result != 0 ]; then
-    #    echo "returned unexpected non-zero exit code $result for broken json in '$filename'"
+    #elif [ $exitcode != 0 ]; then
+    #    echo "returned unexpected non-zero exit code $exitcode for broken json in '$filename'"
     #    exit 1
     else
-        echo "FAILED, returned unexpected exit code $result for broken json in '$filename'"
+        echo "FAILED, returned unexpected exit code $exitcode for broken json in '$filename'"
         exit 1
     fi
 }
 
+echo "checking normal json file breakage using --multi-record switch"
 set +e
 ./validate_json.py - -m < "$data_dir/test.json"
-result=$?
+exitcode=$?
 set -e
-if [ $result = 2 ]; then
+if [ $exitcode = 2 ]; then
     echo "successfully detected breakage for --multi-line stdin vs normal json"
     echo
 else
-    echo "FAILED to detect breakage when feeding normal multi-line json doc to stdin with --multi-line (expecting one json doc per line)"
+    echo "FAILED to detect breakage when feeding normal multi-line json doc to stdin with --multi-line (expecting one json doc per line), returned unexpected exit code $exitcode"
     exit 1
 fi
 
@@ -112,7 +114,13 @@ check_broken README.md
 cat "$data_dir/test.json" >> "$broken_dir/multi-broken.json"
 cat "$data_dir/test.json" >> "$broken_dir/multi-broken.json"
 check_broken "$broken_dir/multi-broken.json"
-rm -fr "$broken_dir" || :
+rm -fr "$broken_dir"
+echo
+
+echo "checking for non-existent file"
+check_broken nonexistentfile 1
+echo
+
 echo "======="
 echo "SUCCESS"
 echo "======="
