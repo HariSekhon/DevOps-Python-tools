@@ -21,10 +21,16 @@ cd "$srcdir/..";
 . ./tests/utils.sh
 
 for x in $(echo *.py *.jy 2>/dev/null); do
+    if which flake8 &> /dev/null; then
+        echo "flake8 $x"
+        flake8 --max-line-length=120 --statistics $x
+        echo; hr; echo
+    fi
     for y in pyflakes pychecker pylint; do
         if which $y &>/dev/null; then
             echo "$y $x"
-            $y $x :
+            $y $x
+            echo; hr; echo
         fi
    done
     :
