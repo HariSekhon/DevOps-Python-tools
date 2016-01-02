@@ -55,8 +55,6 @@ import json
 import logging
 import os
 import sys
-# using optparse rather than argparse for servers still on Python 2.6
-from optparse import OptionParser
 import urllib2
 from urllib2 import URLError
 sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
