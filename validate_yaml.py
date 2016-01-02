@@ -41,7 +41,7 @@ sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/pylib')
 try:
     from harisekhon.utils import *
     from harisekhon import CLI
-except ImportError, e:
+except ImportError as e:
     print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
 
@@ -69,7 +69,7 @@ class YamlValidatorTool(CLI):
             if self.options.verbose > 2:
                 try:
                     yaml.load(content)
-                except yaml.YAMLError, e:
+                except yaml.YAMLError as e:
                     print(e)
             die(self.invalid_yaml_msg)
 

@@ -40,7 +40,7 @@ sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/pylib')
 try:
     from harisekhon.utils import *
     from harisekhon import CLI
-except ImportError, e:
+except ImportError as e:
     print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
 
@@ -58,7 +58,7 @@ class XmlValidatorTool(CLI):
                 try:
                     ET.fromstring(content)
                 # Python 2.7 throws xml.etree.ElementTree.ParseError, but Python 2.6 throws xml.parsers.expat.ExpatError
-                except Exception, e:
+                except Exception as e:
                     print(e)
             die(self.invalid_xml_msg)
 
