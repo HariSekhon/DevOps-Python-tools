@@ -32,12 +32,11 @@ until [ $# -lt 1 ]; do
     esac
 done
 
-find "${1:-.}" -iname '*.json' |
-grep -v '/spark-.*-bin-hadoop.*/' |
 # ignore multi-line json data file for spark testing
-grep -v 'tests/multirecord.json' |
-grep -v -e 'broken' -e 'error' |
-while read jsonFile; do
+for jsonFile in $(find "${1:-.}" -iname '*.json' |
+                  grep -v '/spark-.*-bin-hadoop.*/' |
+                  grep -v 'multirecord.json' |
+                  grep -v -e 'broken' -e 'error'); do
     echo "testing json file: $jsonFile"
     python -mjson.tool < "$jsonFile" > /dev/null
 done
