@@ -17,7 +17,9 @@
 
 JSON Validator Tool
 
-Does a simple validation of each file passed as an argument to this script.
+Validates each file passed as an argument
+
+Directories are recursed, checking all files ending in a .json suffix.
 
 First tries each file contents as a whole json document, if that fails validation or catches a memory error, then
 it assumes the file contains multi-record format with one json document per line and tries an independent validation of
@@ -47,7 +49,7 @@ except ImportError, e:
 
 class JsonValidatorTool(CLI):
 
-    JSON_SUFFIX = re.compile('.*\.json', re.I)
+    RE_JSON_SUFFIX = re.compile('.*\.json', re.I)
 
     def add_options(self):
         self.parser.add_option('-m', '--multi-record', action='store_true',
@@ -123,7 +125,7 @@ class JsonValidatorTool(CLI):
                 subpath = os.path.join(path, item)
                 if os.path.isdir(subpath):
                     self.check_path(subpath)
-                if not self.JSON_SUFFIX.match(item):
+                if not self.RE_JSON_SUFFIX.match(item):
                     continue
                 self.check_file(subpath)
         else:
