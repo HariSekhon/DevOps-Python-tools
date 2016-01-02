@@ -94,9 +94,11 @@ cat "$data_dir/test.yaml" >> "$broken_dir/multi-broken.yaml"
 check_broken "$broken_dir/multi-broken.yaml"
 rm -fr "$broken_dir"
 echo
+
 echo "checking for non-existent file"
-set +e
-./validate_yaml.py nonexistentfile 1
+check_broken nonexistentfile 1
+echo
+
 echo "======="
 echo "SUCCESS"
 echo "======="
