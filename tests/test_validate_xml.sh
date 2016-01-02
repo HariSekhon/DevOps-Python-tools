@@ -63,18 +63,19 @@ echo
 echo "Now trying non-xml files to detect successful failure:"
 check_broken(){
     filename="$1"
+    expected_exitcode="${2:-2}"
     set +e
-    ./validate_xml.py -vvv "$filename" ${@:2}
-    result=$?
+    ./validate_xml.py -vvv "$filename" ${@:3}
+    exitcode=$?
     set -e
-    if [ $result = 2 ]; then
-        echo "successfully detected broken xml in '$filename', returned exit code $result"
+    if [ $exitcode = $expected_exitcode ]; then
+        echo "successfully detected broken xml in '$filename', returned exit code $exitcode"
         echo
-    #elif [ $result != 0 ]; then
-    #    echo "returned unexpected non-zero exit code $result for broken xml in '$filename'"
+    #elif [ $exitcode != 0 ]; then
+    #    echo "returned unexpected non-zero exit code $exitcode for broken xml in '$filename'"
     #    exit 1
     else
-        echo "FAILED, returned unexpected exit code $result for broken xml in '$filename'"
+        echo "FAILED, returned unexpected exit code $exitcode for broken xml in '$filename'"
         exit 1
     fi
 }
@@ -90,6 +91,10 @@ cat "$data_dir/simple.xml" >> "$broken_dir/multi-broken.xml"
 cat "$data_dir/simple.xml" >> "$broken_dir/multi-broken.xml"
 check_broken "$broken_dir/multi-broken.xml"
 rm -fr "$broken_dir"
+echo
+
+echo "checking for non-existent file"
+check_broken nonexistentfile 1
 echo
 
 echo "======="
