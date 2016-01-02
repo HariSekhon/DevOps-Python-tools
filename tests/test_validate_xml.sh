@@ -32,6 +32,11 @@ until [ $# -lt 1 ]; do
     esac
 done
 
+data_dir="tests/data"
+broken_dir="tests/broken_xml"
+
+rm -fr "$broken_dir" || :
+mkdir "$broken_dir"
 ./validate_xml.py -vvv $(
 find "${1:-.}" -iname '*.xml' |
 grep -v '/spark-.*-bin-hadoop.*/' |
@@ -40,15 +45,14 @@ grep -v -e 'broken' -e 'error' -e ' '
 echo
 
 echo "checking xml file without an extension"
-cp -iv "$(find "${1:-.}" -iname '*.xml' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" no_extension_testfile
-./validate_xml.py -vvv -t 1 no_extension_testfile
-rm no_extension_testfile
+cp -iv "$(find "${1:-.}" -iname '*.xml' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
+./validate_xml.py -vvv -t 1 "$broken_dir/no_extension_testfile"
 echo
 
 echo "testing stdin"
-./validate_xml.py - < tests/simple.xml
-./validate_xml.py < tests/simple.xml
-./validate_xml.py tests/simple.xml - < tests/simple.xml
+./validate_xml.py - < "$data_dir/simple.xml"
+./validate_xml.py < "$data_dir/simple.xml"
+./validate_xml.py "$data_dir/simple.xml" - < "$data_dir/simple.xml"
 echo
 
 echo "Now trying non-xml files to detect successful failure:"
@@ -69,13 +73,15 @@ check_broken(){
         exit 1
     fi
 }
-check_broken tests/test.yaml
-check_broken tests/test.json
+check_broken "$data_dir/test.yaml"
+check_broken "$data_dir/test.json"
 check_broken README.md
-cat tests/simple.xml >> tests/multi-broken.xml
-cat tests/simple.xml >> tests/multi-broken.xml
-check_broken tests/multi-broken.xml
-rm tests/multi-broken.xml
+cat "$data_dir/simple.xml" >> "$broken_dir/multi-broken.xml"
+cat "$data_dir/simple.xml" >> "$broken_dir/multi-broken.xml"
+check_broken "$broken_dir/multi-broken.xml"
+rm -fr "$broken_dir"
+echo
+
 echo "======="
 echo "SUCCESS"
 echo "======="
