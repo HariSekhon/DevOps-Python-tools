@@ -17,7 +17,9 @@
 
 YAML Validator Tool
 
-Does a simple validation of each file passed as an argument to this script.
+Validates each file passed as an argument
+
+Directories are recursed, checking all files ending in a .yaml suffix.
 
 Works like a standard unix filter program - if no files are passed as arguments or '-' is passed then reads from standard input
 
@@ -28,7 +30,7 @@ Works like a standard unix filter program - if no files are passed as arguments 
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.4'
 
 import os
 import sys
@@ -44,6 +46,8 @@ except ImportError, e:
 
 
 class YamlValidatorTool(CLI):
+
+    RE_YAML_SUFFIX = re.compile('.*\.yaml', re.I)
 
     # def check_multiline_yaml(self):
     #         self.f.seek(0)
@@ -71,20 +75,45 @@ class YamlValidatorTool(CLI):
     def run(self):
         if not self.args:
             self.args.append('-')
-        for filename in self.args:
-            if filename == '-':
+        for arg in self.args:
+            if arg == '-':
                 continue
-            validate_file(filename)
-        for filename in self.args:
-            if filename == '-':
-                filename = '<STDIN>'
-            self.valid_yaml_msg   = '%s => YAML OK'      % filename
-            self.invalid_yaml_msg = '%s => YAML INVALID' % filename
-            if filename == '<STDIN>':
-                self.check_yaml(sys.stdin.read())
+            if not os.path.exists(arg):
+                print("'%s' not found" % arg)
+                sys.exit(ERRORS['WARNING'])
+            if os.path.isfile(arg):
+                vlog_option('file', arg)
+            elif os.path.isdir(arg):
+                vlog_option('directory', arg)
             else:
-                with open(filename) as self.f:
-                    self.check_yaml(self.f.read())
+                die("path '%s' could not be determined as either a file or directory" % arg)
+        for arg in self.args:
+            self.check_path(arg)
+
+    def check_path(self, path):
+        if path == '-' or os.path.isfile(path):
+            self.check_file(path)
+        elif os.path.isdir(path):
+            for item in os.listdir(path):
+                subpath = os.path.join(path, item)
+                if os.path.isdir(subpath):
+                    self.check_path(subpath)
+                if not self.RE_YAML_SUFFIX.match(item):
+                    continue
+                self.check_file(subpath)
+        else:
+            die("failed to determine if path '%s' is file or directory" % path)
+
+    def check_file(self, filename):
+        if filename == '-':
+            filename = '<STDIN>'
+        self.valid_yaml_msg   = '%s => YAML OK'      % filename
+        self.invalid_yaml_msg = '%s => YAML INVALID' % filename
+        if filename == '<STDIN>':
+            self.check_yaml(sys.stdin.read())
+        else:
+            with open(filename) as self.f:
+                self.check_yaml(self.f.read())
 
 
 if __name__ == '__main__':
