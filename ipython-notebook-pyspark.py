@@ -52,7 +52,7 @@ try:
     from jinja2 import Template
     sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
     from harisekhon.utils import *
-except ImportError, e:
+except ImportError as e:
     print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
 
@@ -60,7 +60,7 @@ if not isPythonMinVersion(2.7):
     warn('Python < 2.7 - IPython may not be available on this version of Python (supplied auto-build will likely have failed for this module)\n')
 try:
     from IPython.lib import passwd
-except ImportError, e:
+except ImportError as e:
     printerr("""failed to import from IPython.lib
 
 Perhaps you need to 'pip install \"ipython[notebook]\"'
@@ -209,11 +209,11 @@ try:
         passwd_fh = open(passwd_txt, "w")
         passwd_fh.write(passwd(password))
         passwd_fh.close()
-        os.chmod(passwd_txt, 0600)
+        os.chmod(passwd_txt, 0o600)
     
     #if not os.path.exists(setup_py):
     shutil.copy(pyspark_startup_src, setup_py)
-    os.chmod(setup_py, 0600)
+    os.chmod(setup_py, 0o600)
     
     try:
         ipython_notebook_config_contents = open(ipython_notebook_config).read()
@@ -224,7 +224,7 @@ try:
         config = open(ipython_notebook_config, "w")
         config.write(template.render(passwd_txt = passwd_txt, ip = ip, name = os.path.basename(sys.argv[0]), date = time.ctime(), template_path = template_file ) )
         config.close()
-        os.chmod(ipython_notebook_config, 0600)
+        os.chmod(ipython_notebook_config, 0o600)
     # PYSPARK_SUBMIT_ARGS is reset to "" by pyspark wrapper script, call IPython Notebook drectly to avoid this :-/
     #cmd = "IPYTHON_OPTS='notebook --profile=%s' pyspark" % ipython_profile_name
     cmd = "ipython notebook --profile=%s" % ipython_profile_name
