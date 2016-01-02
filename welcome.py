@@ -17,7 +17,7 @@ Tested on Mac OS X and Linux
 from __future__ import print_function
 
 __author__ = 'Hari Sekhon'
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 
 import os
 import random
