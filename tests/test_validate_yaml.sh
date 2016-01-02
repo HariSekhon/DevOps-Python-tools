@@ -32,23 +32,28 @@ until [ $# -lt 1 ]; do
     esac
 done
 
+data_dir="tests/data"
+broken_dir="tests/yaml_broken"
+
+rm -fr "$broken_dir" || :
+mkdir "$broken_dir"
 ./validate_yaml.py -vvv $(
 find "${1:-.}" -iname '*.yaml' |
 grep -v '/spark-.*-bin-hadoop.*/' |
 grep -v -e 'broken' -e 'error' -e ' '
-) tests/test.json # json is an official subset, "inline-style"
+) "$data_dir/test.json" # json is an official subset, "inline-style"
 echo
 
 echo "checking yaml file without an extension"
-cp -iv "$(find "${1:-.}" -iname '*.yaml' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" no_extension_testfile
-./validate_yaml.py -vvv -t 1 no_extension_testfile
-rm no_extension_testfile
+cp -iv "$(find "${1:-.}" -iname '*.yaml' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
+./validate_yaml.py -vvv -t 1 "$broken_dir/no_extension_testfile"
 echo
 
 echo "testing stdin"
-./validate_yaml.py - < tests/test.yaml
-./validate_yaml.py < tests/test.yaml
-./validate_yaml.py tests/test.yaml - < tests/test.yaml
+./validate_yaml.py - < "$data_dir/test.yaml"
+./validate_yaml.py < "$data_dir/test.yaml"
+echo "testing stdin mixed with filename"
+./validate_yaml.py "$data_dir/test.yaml" - < "$data_dir/test.yaml"
 echo
 
 echo "Now trying non-yaml files to detect successful failure:"
@@ -69,13 +74,13 @@ check_broken(){
         exit 1
     fi
 }
-check_broken tests/multirecord.json
-check_broken tests/test_broken_tabs.yaml
+check_broken "$data_dir/multirecord.json"
+check_broken "$data_dir/test_broken_tabs.yaml"
 check_broken README.md
-cat tests/test.yaml >> tests/multi-broken.yaml
-cat tests/test.yaml >> tests/multi-broken.yaml
-check_broken tests/multi-broken.yaml
-rm tests/multi-broken.yaml
+cat "$data_dir/test.yaml" >> "$broken_dir/multi-broken.yaml"
+cat "$data_dir/test.yaml" >> "$broken_dir/multi-broken.yaml"
+check_broken "$broken_dir/multi-broken.yaml"
+rm -fr "$broken_dir"
 echo "======="
 echo "SUCCESS"
 echo "======="
