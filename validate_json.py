@@ -32,9 +32,10 @@ stream to test for multi-line on a second pass).
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.4'
 
 import os
+import re
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/pylib')
 try:
@@ -45,6 +46,8 @@ except ImportError, e:
     sys.exit(4)
 
 class JsonValidatorTool(CLI):
+
+    JSON_SUFFIX = re.compile('.*\.json', re.I)
 
     def add_options(self):
         self.parser.add_option('-m', '--multi-record', action='store_true',
@@ -98,11 +101,35 @@ class JsonValidatorTool(CLI):
     def run(self):
         if not self.args:
             self.args.append('-')
-        for filename in self.args:
-            if filename == '-':
+        for arg in self.args:
+            if arg == '-':
                 continue
-            validate_file(filename)
-        for filename in self.args:
+            if not os.path.exists(arg):
+                die("'%s' not found" % arg)
+            if os.path.isfile(arg):
+                vlog_option(arg, 'file')
+            elif os.path.isdir(arg):
+                vlog_option(arg, 'dir')
+            else:
+                die("path '%s' could not be determined as either a file or directory" % arg)
+        for arg in self.args:
+            self.check_path(arg)
+
+    def check_path(self, path):
+        if path == '-' or os.path.isfile(path):
+            self.check_file(path)
+        elif os.path.isdir(path):
+            for item in os.listdir(path):
+                subpath = os.path.join(path, item)
+                if os.path.isdir(subpath):
+                    self.check_path(subpath)
+                if not self.JSON_SUFFIX.match(item):
+                    continue
+                self.check_file(subpath)
+        else:
+            die("failed to determine if path '%s' is file or directory" % path)
+
+    def check_file(self, filename):
             if filename == '-':
                 filename = '<STDIN>'
             self.valid_json_msg   = '%s => JSON OK'      % filename
