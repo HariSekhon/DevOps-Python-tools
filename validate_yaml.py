@@ -30,7 +30,7 @@ Works like a standard unix filter program - if no files are passed as arguments 
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.4.1'
 
 import os
 import re
