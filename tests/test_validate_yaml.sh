@@ -44,6 +44,11 @@ grep -v -e 'broken' -e 'error' -e ' '
 ) "$data_dir/test.json" # json is an official subset, "inline-style"
 echo
 
+echo
+echo "checking directory recursion (mixed with explicit file given)"
+./validate_yaml.py -vvv "$data_dir/test.yaml" .
+echo
+
 echo "checking yaml file without an extension"
 cp -iv "$(find "${1:-.}" -iname '*.yaml' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
 ./validate_yaml.py -vvv -t 1 "$broken_dir/no_extension_testfile"
@@ -59,28 +64,39 @@ echo
 echo "Now trying non-yaml files to detect successful failure:"
 check_broken(){
     filename="$1"
+    expected_exitcode="${2:-2}"
     set +e
-    ./validate_yaml.py -vvv -t 1 "$filename" ${@:2}
-    result=$?
+    ./validate_yaml.py -vvv -t 1 "$filename" ${@:3}
+    exitcode=$?
     set -e
-    if [ $result = 2 ]; then
-        echo "successfully detected broken yaml in '$filename', returned exit code $result"
+    if [ $exitcode = $expected_exitcode ]; then
+        echo "successfully detected broken yaml in '$filename', returned exit code $exitcode"
         echo
-    #elif [ $result != 0 ]; then
-    #    echo "returned unexpected non-zero exit code $result for broken yaml in '$filename'"
+    #elif [ $exitcode != 0 ]; then
+    #    echo "returned unexpected non-zero exit code $exitcode for broken yaml in '$filename'"
     #    exit 1
     else
-        echo "FAILED, returned unexpected exit code $result for broken yaml in '$filename'"
+        echo "FAILED, returned unexpected exit code $exitcode for broken yaml in '$filename'"
         exit 1
     fi
 }
 check_broken "$data_dir/multirecord.json"
-check_broken "$data_dir/test_broken_tabs.yaml"
+cat > "$broken_dir/broken_tabs.yaml" <<EOF
+---
+name:	Hari Sekhon
+age:	21
+...
+EOF
+check_broken "$broken_dir/broken_tabs.yaml"
 check_broken README.md
 cat "$data_dir/test.yaml" >> "$broken_dir/multi-broken.yaml"
 cat "$data_dir/test.yaml" >> "$broken_dir/multi-broken.yaml"
 check_broken "$broken_dir/multi-broken.yaml"
 rm -fr "$broken_dir"
+echo
+echo "checking for non-existent file"
+set +e
+./validate_yaml.py nonexistentfile 1
 echo "======="
 echo "SUCCESS"
 echo "======="
