@@ -49,6 +49,12 @@ echo "checking directory recursion (mixed with explicit file given)"
 ./validate_xml.py -vvv "$data_dir/simple.xml" .
 echo
 
+echo "checking symlink handling"
+ln -sfv "simple.xml" "$data_dir/testlink.xml"
+./validate_xml.py "$data_dir/testlink.xml"
+rm "$data_dir/testlink.xml"
+echo
+
 echo "checking xml file without an extension"
 cp -iv "$(find "${1:-.}" -iname '*.xml' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
 ./validate_xml.py -vvv -t 1 "$broken_dir/no_extension_testfile"
