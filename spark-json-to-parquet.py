@@ -24,7 +24,7 @@ Written to work across Python 2.x and Spark versions, especially Spark given tha
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 
 import glob
 import logging
