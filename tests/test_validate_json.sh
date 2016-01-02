@@ -32,25 +32,33 @@ until [ $# -lt 1 ]; do
     esac
 done
 
-rm broken.json single_quote.json missing_end_quote.json no_extension_testfile &>/dev/null || :
+data_dir="tests/data"
+broken_dir="$data_dir/broken_json_data"
+
+rm -fr "$broken_dir" || :
+mkdir "$broken_dir"
 ./validate_json.py -vvv $(
 find "${1:-.}" -iname '*.json' |
 grep -v '/spark-.*-bin-hadoop.*/' |
 grep -v -e 'broken' -e 'error' -e ' '
 )
 echo
+echo "checking directory recursion (mixed with explicit file given)"
+./validate_json.py -vvv "$data_dir/test.json" .
+echo
 
 echo "checking json file without an extension"
-cp -iv "$(find "${1:-.}" -iname '*.json' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" no_extension_testfile
-./validate_json.py -vvv -t 1 no_extension_testfile
-rm no_extension_testfile
+cp -iv "$(find "${1:-.}" -iname '*.json' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
+./validate_json.py -vvv -t 1 "$broken_dir/no_extension_testfile"
 echo
 
 echo "testing stdin"
-./validate_json.py - < tests/test.json
-./validate_json.py < tests/test.json
-./validate_json.py tests/test.json - < tests/test.json
-./validate_json.py -m - < tests/multirecord.json
+./validate_json.py - < "$data_dir/test.json"
+./validate_json.py < "$data_dir/test.json"
+echo "testing stdin and file mix"
+./validate_json.py "$data_dir/test.json" - < "$data_dir/test.json"
+echo "testing stdin with multi-record"
+./validate_json.py -m - < "$data_dir/multirecord.json"
 echo
 
 echo "Now trying broken / non-json files to test failure detection:"
@@ -73,7 +81,7 @@ check_broken(){
 }
 
 set +e
-./validate_json.py - -m < tests/test.json
+./validate_json.py - -m < "$data_dir/test.json"
 result=$?
 set -e
 if [ $result = 2 ]; then
@@ -84,30 +92,27 @@ else
     exit 1
 fi
 
-echo blah > broken.json
-check_broken broken.json
-rm broken.json
+echo blah > "$broken_dir/blah.json"
+check_broken "$broken_dir/blah.json"
 
-echo "{ 'name': 'hari' }" > single_quote.json
-check_broken single_quote.json
+echo "{ 'name': 'hari' }" > "$broken_dir/single_quote.json"
+check_broken "$broken_dir/single_quote.json"
 
 echo "checking specifically single quote detection"
 set +o pipefail
-./validate_json.py single_quote.json 2>&1 | grep --color 'JSON INVALID.*found single quotes not double quotes' || { echo "Failed to find single quote message in output"; exit 1; }
+./validate_json.py "$broken_dir/single_quote.json" 2>&1 | grep --color 'JSON INVALID.*found single quotes not double quotes' || { echo "Failed to find single quote message in output"; exit 1; }
 set -o pipefail
-rm single_quote.json
 echo
 
-echo '{ "name": "hari" ' > missing_end_quote.json
-check_broken missing_end_quote.json
-rm missing_end_quote.json
+echo '{ "name": "hari" ' > "$broken_dir/missing_end_quote.json"
+check_broken "$broken_dir/missing_end_quote.json"
 
 check_broken README.md
 
-cat tests/test.json >> tests/multi-broken.json
-cat tests/test.json >> tests/multi-broken.json
-check_broken tests/multi-broken.json
-rm tests/multi-broken.json
+cat "$data_dir/test.json" >> "$broken_dir/multi-broken.json"
+cat "$data_dir/test.json" >> "$broken_dir/multi-broken.json"
+check_broken "$broken_dir/multi-broken.json"
+rm -fr "$broken_dir" || :
 echo "======="
 echo "SUCCESS"
 echo "======="
