@@ -31,7 +31,7 @@ sys.path.append(libdir)
 try:
     from harisekhon.utils import *
     from harisekhon import CLI
-except ImportError, e:
+except ImportError as e:
     print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
 
