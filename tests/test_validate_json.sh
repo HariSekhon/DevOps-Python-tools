@@ -61,6 +61,12 @@ echo "testing stdin with multi-record"
 ./validate_json.py -m - < "$data_dir/multirecord.json"
 echo
 
+echo "checking symlink handling"
+ln -sfv "test.json" "$data_dir/testlink.json"
+./validate_json.py "$data_dir/testlink.json"
+rm "$data_dir/testlink.json"
+echo
+
 echo "Now trying broken / non-json files to test failure detection:"
 check_broken(){
     filename="$1"
