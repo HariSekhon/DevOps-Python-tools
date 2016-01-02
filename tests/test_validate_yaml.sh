@@ -49,6 +49,12 @@ echo "checking directory recursion (mixed with explicit file given)"
 ./validate_yaml.py -vvv "$data_dir/test.yaml" .
 echo
 
+echo "checking symlink handling"
+ln -sfv "test.yaml" "$data_dir/testlink.yaml"
+./validate_yaml.py "$data_dir/testlink.yaml"
+rm "$data_dir/testlink.yaml"
+echo
+
 echo "checking yaml file without an extension"
 cp -iv "$(find "${1:-.}" -iname '*.yaml' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
 ./validate_yaml.py -vvv -t 1 "$broken_dir/no_extension_testfile"
