@@ -33,6 +33,7 @@ __author__  = 'Hari Sekhon'
 __version__ = '0.4'
 
 import os
+import re
 import sys
 import traceback
 import yaml
