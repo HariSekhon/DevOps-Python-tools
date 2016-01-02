@@ -44,6 +44,11 @@ grep -v -e 'broken' -e 'error' -e ' '
 )
 echo
 
+echo
+echo "checking directory recursion (mixed with explicit file given)"
+./validate_xml.py -vvv "$data_dir/simple.xml" .
+echo
+
 echo "checking xml file without an extension"
 cp -iv "$(find "${1:-.}" -iname '*.xml' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
 ./validate_xml.py -vvv -t 1 "$broken_dir/no_extension_testfile"
@@ -73,6 +78,11 @@ check_broken(){
         exit 1
     fi
 }
+# still works without the XML header
+#sed -n '2,$p' "$data_dir/simple.xml" > "$broken_dir/simple.xml"
+# break one from tag
+sed -n 's/from/blah/; 2,$p' "$data_dir/simple.xml" > "$broken_dir/simple.xml"
+check_broken "$broken_dir/simple.xml"
 check_broken "$data_dir/test.yaml"
 check_broken "$data_dir/test.json"
 check_broken README.md
