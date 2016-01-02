@@ -34,7 +34,7 @@ stream to test for multi-line on a second pass).
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.4.1'
 
 import os
 import re
