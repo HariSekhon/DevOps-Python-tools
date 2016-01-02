@@ -39,7 +39,7 @@ Tested on Spark 1.0.x on Hortonworks 2.1 (Yarn + Standalone) and IBM BigInsights
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.2.7'
+__version__ = '0.2.8'
 
 import getpass
 import glob
