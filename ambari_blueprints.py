@@ -186,9 +186,24 @@ class AmbariBlueprintTool(CLI):
         r = None
         headers = { 'X-Requested-By': self.X_Requested_By }
         if data:
+            log.debug('POSTing data:\n\n%s' % data)
             r = requests.post(self.url, auth=(self.user, self.password), headers=headers, data=data)
         else:
             r = requests.get(self.url, auth=(self.user, self.password), headers=headers)
+        if log.isEnabledFor(logging.DEBUG):
+            log.debug('headers:\n%s' % '\n'.join(['%(k)s:%(v)s' % locals() for (k, v) in r.headers.items()]))
+            log.debug('status code: %s' % r.status_code)
+            log.debug('body:\n%s' % r.text)
+        if r.status_code != 200:
+            try:
+                if r.json()['message']:
+                    raise requests.exceptions.RequestException('%s %s: %s' % (r.status_code, r.reason, r.json()['message']))
+            # raised by ['message'] field not existing
+            except KeyError:
+                pass
+            # raised by .json() No JSON object could be decoded
+            except ValueError:
+                pass
         r.raise_for_status()
         return r.text
 
