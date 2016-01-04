@@ -35,7 +35,7 @@ Tested on Ambari 2.1.0 and 2.1.2.x and Hortonworks HDP 2.2 / 2.3 clusters
 
 Example:
     # on source cluster
-    ./ambari_blueprints.py --get --blueprint myBlueprint --file myBlueprint.json --strip-config
+    ./ambari_blueprints.py --get --cluster myOriginalCluster --file myBlueprint.json --strip-config
 
     # on target cluster
     ./ambari_blueprints.py --push --blueprint myBlueprint --file myBlueprint.json
