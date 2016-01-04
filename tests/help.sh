@@ -27,6 +27,7 @@ for x in $(echo *.py 2>/dev/null); do
     ./$x --help # >/dev/null
     status=$?
     set -e
+    echo; hr
     if [ $status = 0 ]; then
         [[ $x =~ ambari_blueprints ]] && continue
     fi
