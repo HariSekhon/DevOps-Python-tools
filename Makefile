@@ -93,3 +93,7 @@ update:
 update2:
 	git pull
 	git submodule update --init
+
+.PHONY: clean
+clean:
+	@rm *.pyc *.jyc 2>/dev/null || :
