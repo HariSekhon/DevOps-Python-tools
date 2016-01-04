@@ -327,7 +327,6 @@ class AmbariBlueprintTool(CLI):
             log.debug("blueprint data = '%s'" % data)
         # not exposing this to user via switches - shouldn't be using this right now
         # return self.send('blueprints/%s?validate_topology=false' % name, data)
-        # quit('UNKNOWN', 'cluster creation not supported yet')
         return self.send('blueprints/%s' % name, data)
 
     def save_blueprint(self, blueprint, path=''):
