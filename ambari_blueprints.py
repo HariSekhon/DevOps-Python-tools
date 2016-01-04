@@ -157,7 +157,7 @@ class AmbariBlueprintTool(CLI):
         self.url = self.url_base + '/' + url_suffix
         try:
             response = self.get(url_suffix)
-        except requests.exceptions.HTTPError as e:
+        except requests.exceptions.RequestException as e:
             err = 'failed to fetch list of Ambari Blueprints: %s' % e
             # log.critical(err)
             quit('CRITICAL', err)
@@ -202,7 +202,7 @@ class AmbariBlueprintTool(CLI):
         err = ''
         try:
             response = self.get(url_suffix)
-        except requests.exceptions.HTTPError as e:
+        except requests.exceptions.RequestException as e:
             err = "failed to fetch Ambari Blueprint from '%s': %s" % (self.url, e)
             # log.critical(err)
             quit('CRITICAL', e)
@@ -241,7 +241,7 @@ class AmbariBlueprintTool(CLI):
         conflict_err = " (is there an existing blueprint with the same --blueprint name or a blueprint with the same Blueprints -> blueprint_name field? Try changing --blueprint and/or the blueprint_name field in the blueprint file you're trying to --push)"
         try:
             response = self.post(url_suffix, data)
-        except requests.exceptions.HTTPError as e:
+        except requests.exceptions.RequestException as e:
             err = "failed to POST Ambari Blueprint to '%s': %s" % (self.url, e)
             if 'Conflict' in str(e):
                 err += conflict_err
