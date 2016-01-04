@@ -28,6 +28,8 @@ cd "$srcdir";
 
 #./syntax.sh
 
+#./python3.sh
+
 for script in $(find . -name 'test*.sh'); do
     ./$script -vvv
 done
