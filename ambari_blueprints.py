@@ -181,6 +181,10 @@ class AmbariBlueprintTool(CLI):
             err = 'failed to fetch list of Ambari Blueprints: %s' % e
             # log.critical(err)
             quit('CRITICAL', err)
+        except BadStatusLine as e:
+            err = 'failed to fetch list of Ambari Blueprints: %s' % e
+            # log.critical(err)
+            quit('CRITICAL', err)
         jsonData = json.load(response)
         if log.isEnabledFor(logging.DEBUG):
             log.debug("jsonData = " + jsonpp(jsonData))
