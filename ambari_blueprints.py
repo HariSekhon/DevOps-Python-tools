@@ -39,7 +39,10 @@ Example:
 
     # on target cluster
     ./ambari_blueprints.py --push --blueprint myBlueprint --file myBlueprint.json
-    ./ambari_blueprints.py --create-cluster --cluster myTestCluster --file hostmappings.json
+    ./ambari_blueprints.py --create-cluster --cluster myTestCluster --blueprint myBlueprint --file hostmappings.json
+
+Specifying --blueprint is optional for --create-cluster if blueprint is specified in the hostmappings file. If given
+--blueprint it overrides field in the hostmappings for convenience than having to re-edit host templates
 
 See the adjacent ambari_blueprints directory for sample templates.
 
