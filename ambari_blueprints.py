@@ -33,6 +33,16 @@ Ambari Blueprints are supported for Ambari 1.6.0 upwards.
 
 Tested on Ambari 2.1.0 and 2.1.2.x and Hortonworks HDP 2.2 / 2.3 clusters
 
+Example:
+    # on source cluster
+    ./ambari_blueprints.py --get --blueprint myBlueprint --file myBlueprint.json --strip-config
+
+    # on target cluster
+    ./ambari_blueprints.py --push --blueprint myBlueprint --file myBlueprint.json
+    ./ambari_blueprints.py --create-cluster --cluster myTestCluster --file hostmappings.json
+
+See the adjacent ambari_blueprint directory for sample templates.
+
 Ambari Blueprints documentation
 
 https://cwiki.apache.org/confluence/display/AMBARI/Blueprints
@@ -47,13 +57,15 @@ https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-Step4:S
 from __future__ import print_function
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 
 import base64
 from httplib import BadStatusLine
 import json
 import logging
 import os
+# req method doesn't warrant re-write to use this
+# import requests
 import sys
 import urllib2
 from urllib2 import URLError
@@ -68,12 +80,15 @@ except ImportError, e:
 
 # TODO: auto-store to git - see perl tools
 
+
 class AmbariBlueprintTool(CLI):
 
     def setup(self, host, port, user, password, ssl=False, **kwargs):
         # must set X-Requested-By in newer versions of Ambari
         # log.info("contacting Ambari as '%s'" % self.user)
-        self.X_Requested_By = os.getenv('USER', user)
+        self.X_Requested_By = user
+        if user == 'admin':
+            self.X_Requested_By = os.getenv('USER', user)
         if not isHost(host) or not isPort(port) or not isUser(user) or not password:
             raise InvalidOptionException('invalid options passed to AmbariBlueprint()')
         proto    = 'http'
@@ -130,7 +145,7 @@ class AmbariBlueprintTool(CLI):
     def get_clusters(self):
         log.debug('get_clusters()')
         jsonData = self.list('clusters')
-        return [ self.parse_cluster_name(item) for item in jsonData['items'] ]
+        return [self.parse_cluster_name(item) for item in jsonData['items']]
 
     def parse_blueprint_name(self, item):
         if isStr(item):
@@ -143,7 +158,7 @@ class AmbariBlueprintTool(CLI):
     def get_blueprints(self):
         # log.debug('get_blueprints()')
         jsonData = self.list('blueprints')
-        return [ self.parse_blueprint_name(item) for item in jsonData['items'] ]
+        return [self.parse_blueprint_name(item) for item in jsonData['items']]
 
     def parse_host_name(self, item):
         if isStr(item):
@@ -402,7 +417,6 @@ class AmbariBlueprintTool(CLI):
         for cluster in clusters:
             self.save_cluster(cluster)
 
-
     def print_blueprints(self):
         blueprints = self.get_blueprints()
         print('\nBlueprints (%s found):\n' % len(blueprints))
@@ -421,7 +435,7 @@ class AmbariBlueprintTool(CLI):
         sys.exit(0)
 
     def print_clusters(self):
-        clusters = a.get_clusters()
+        clusters = self.get_clusters()
         print('\nClusters available to blueprint (%s found):\n' % len(clusters))
         if clusters:
             [print(x) for x in clusters]
@@ -431,7 +445,7 @@ class AmbariBlueprintTool(CLI):
         sys.exit(0)
 
     def print_hosts(self):
-        hosts = a.get_hosts()
+        hosts = self.get_hosts()
         print('\nHosts (%s found):\n' % len(hosts))
         if hosts:
             # seems to come out already sorted(hosts)
@@ -444,7 +458,7 @@ class AmbariBlueprintTool(CLI):
         self.add_hostoption(name='Ambari', default_host='localhost', default_port=8080)
         self.add_useroption(name='Ambari', default_user='admin')
         # TODO: certificate validation not tested yet
-        self.parser.add_option('-s', '--ssl', dest='ssl', help='Use SSL connection', action='store_true', default=False)
+        self.parser.add_option('-s', '--ssl', dest='ssl', help='Use SSL connection (not tested yet)', action='store_true', default=False)
         self.parser.add_option('-b', '--blueprint', dest='blueprint', help='Ambari blueprint name', metavar='<name>')
         self.parser.add_option('-c', '--cluster', dest='cluster', help='Ambari cluster to blueprint (case sensitive)', metavar='<name>')
         self.parser.add_option('--get', dest='get', help='Get and store Ambari Blueprints locally in --dir or --file', action='store_true')
@@ -486,19 +500,18 @@ class AmbariBlueprintTool(CLI):
             self.usage('additional args detected')
 
         if options.get and options.blueprint and options.cluster:
-            usage(parser, '--blueprint/--cluster are mutually exclusive when using --get')
+            self.usage('--blueprint/--cluster are mutually exclusive when using --get')
         elif options.push and options.create_cluster:
-            usage(parser, '--push and --create-cluster are mutually exclusive')
+            self.usage('--push and --create-cluster are mutually exclusive')
         elif options.create_cluster and not options.cluster:
-            usage(parser, '--create-cluster requires specifying the name via --cluster')
+            self.usage('--create-cluster requires specifying the name via --cluster')
         elif options.list_blueprints + options.list_clusters + options.list_hosts > 1:
-            usage(parser, 'can only use one --list switch at a time')
+            self.usage('can only use one --list switch at a time')
         elif options.file and (options.get and not (options.blueprint or options.cluster) ):
-            usage(parser, "cannot specify --file without --blueprint/--cluster as it's only used when getting or pushing a single blueprint")
+            self.usage("cannot specify --file without --blueprint/--cluster as it's only used when getting or pushing a single blueprint")
         elif options.file and (options.push and not (options.create_cluster or options.blueprint)):
-            usage(parser, "cannot specify --file without --blueprint/--create-cluster as it's only used when getting or pushing a single blueprint or creating a cluster based on the blueprint")
+            self.usage("cannot specify --file without --blueprint/--create-cluster as it's only used when getting or pushing a single blueprint or creating a cluster based on the blueprint")
         return options, args
-
 
     def run(self):
         options, args = self.process_args()
@@ -530,7 +543,7 @@ class AmbariBlueprintTool(CLI):
         elif options.create_cluster:
             if not options.file:
                 self.usage('--file must be specified with a hostsmapping.json file when creating a new Ambari cluster')
-            self.create_cluster(cluster, options.file, options.blueprint)
+            self.create_cluster(options.cluster, options.file, options.blueprint)
             print("Ambari cluster '%s' creation job submitted, see '%s:%s' web UI for progress"
                                                                         % (options.cluster, options.host, options.port))
         else:
