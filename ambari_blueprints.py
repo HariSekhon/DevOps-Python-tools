@@ -196,8 +196,9 @@ class AmbariBlueprintTool(CLI):
             log.debug('body:\n%s' % r.text)
         if r.status_code != 200:
             try:
-                if r.json()['message']:
-                    raise requests.exceptions.RequestException('%s %s: %s' % (r.status_code, r.reason, r.json()['message']))
+                message = r.json()['message']
+                if message and message != r.reason:
+                    raise requests.exceptions.RequestException('%s %s: %s' % (r.status_code, r.reason, message))
             # raised by ['message'] field not existing
             except KeyError:
                 pass
@@ -435,6 +436,7 @@ class AmbariBlueprintTool(CLI):
         sys.exit(0)
 
     def add_options(self):
+        self.set_timeout_default(30)
         self.add_hostoption(name='Ambari', default_host='localhost', default_port=8080)
         self.add_useroption(name='Ambari', default_user='admin')
         # TODO: certificate validation not tested yet
