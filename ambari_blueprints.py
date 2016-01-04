@@ -41,7 +41,7 @@ Example:
     ./ambari_blueprints.py --push --blueprint myBlueprint --file myBlueprint.json
     ./ambari_blueprints.py --create-cluster --cluster myTestCluster --file hostmappings.json
 
-See the adjacent ambari_blueprint directory for sample templates.
+See the adjacent ambari_blueprints directory for sample templates.
 
 Ambari Blueprints documentation
 
