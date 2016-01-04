@@ -96,4 +96,4 @@ update2:
 
 .PHONY: clean
 clean:
-	@rm *.pyc *.jyc 2>/dev/null || :
+	@find . -iname '*.pyc' -o -iname '*.jyc' | xargs rm -v
