@@ -81,10 +81,10 @@ class AmbariBlueprintTool(CLI):
 
     def setup(self, host, port, user, password, ssl=False, **kwargs):
         # must set X-Requested-By in newer versions of Ambari
-        # log.info("contacting Ambari as '%s'" % self.user)
         self.X_Requested_By = user
         if user == 'admin':
             self.X_Requested_By = os.getenv('USER', user)
+        #log.info("contacting Ambari as '%s'" % self.user)
         if not isHost(host) or not isPort(port) or not isUser(user) or not password:
             raise InvalidOptionException('invalid options passed to AmbariBlueprint()')
         proto    = 'http'
@@ -100,7 +100,6 @@ class AmbariBlueprintTool(CLI):
             self.strip_config = True
         self.timeout_per_req = 30
         self.url_base = '%(proto)s://%(host)s:%(port)s/api/v1' % locals()
-        # self.blueprint_dir = kwargs.get('dir', os.path.join(os.path.dirname(sys.argv[0]), 'ambari_blueprints'))
         self.blueprint_dir = os.path.join(os.path.dirname(sys.argv[0]), 'ambari_blueprints')
         if 'dir' in kwargs and kwargs['dir']:
             self.blueprint_dir = kwargs['dir']
