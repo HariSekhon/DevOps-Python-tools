@@ -23,11 +23,11 @@ Features:
 1. find and fetch all Ambari Blueprints and/or Blueprint existing clusters
 2. fetch a specific given blueprint
 3. blueprint an existing cluster (<== I like this one)
-3. strips out href that is not valid to re-submit
-4. strips out configuration settings values to make the blueprint more generic if specifying --strip-config
-5. push a given blueprint file to Ambari, resetting a blueprint's name field on the fly to avoid field conflicts between adjacent blueprints
-6. create a new cluster using a previously uploaded blueprint and a hostmapping file
-7. list available blueprints, clusters and hosts
+4. strips out href that is not valid to re-submit
+5. strips out configuration settings values to make the blueprint more generic if specifying --strip-config
+6. push a given blueprint file to Ambari, resetting a blueprint's name field on the fly to avoid field conflicts between adjacent blueprints
+7. create a new cluster using a previously uploaded blueprint and a hostmapping file
+8. list available blueprints, clusters and hosts
 
 Ambari Blueprints are supported for Ambari 1.6.0 upwards.
 
