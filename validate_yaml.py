@@ -30,7 +30,7 @@ Works like a standard unix filter program - if no files are passed as arguments 
 from __future__ import print_function
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.4.1'
+__version__ = '0.4.2'
 
 import os
 import re
@@ -48,7 +48,7 @@ except ImportError as e:
 
 class YamlValidatorTool(CLI):
 
-    RE_YAML_SUFFIX = re.compile('.*\.yaml', re.I)
+    RE_YAML_SUFFIX = re.compile('.*\.ya?ml', re.I)
 
     # def check_multiline_yaml(self):
     #         self.f.seek(0)
