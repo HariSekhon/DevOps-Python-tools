@@ -43,7 +43,7 @@ Some common options support $ENVIRONMENT_VARIABLES which are mentioned in the --
 - ```ipython-notebook-pyspark.py``` - per-user authenticated IPython Notebook + PySpark integration to allow each user to auto-create their own password protected IPython Notebook running Spark
 - ```spark-json-to-parquet.py``` - PySpark JSON => Parquet converter
 - ```validate_json.py``` - validate JSON files, stdin or all .json files found in given directories. Supports both normal json files as well as json-doc-per-line files such as MongoDB or Hadoop json data files.
-- ```validate_xml.py / validate_yaml.py``` - validate XML or YAML files, stdin or all .xml / .yaml / .yml files found in given directories.
+- ```validate_xml.py / validate_yaml.py``` - validate XML / YAML files, stdin or all .xml / .yaml / .yml files found in given directories.
 - ```welcome.py``` - cool spinning welcome message (there is a slightly better perl version in the [Tools](https://github.com/harisekhon/tools) repo)
 
 #### Manual Setup ####
