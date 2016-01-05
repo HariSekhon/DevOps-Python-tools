@@ -48,6 +48,7 @@
           "yarn.resourcemanager.scheduler.address" : "%HOSTGROUP::MASTER2%:8030",
           "yarn.resourcemanager.store.class" : "org.apache.hadoop.yarn.server.resourcemanager.recovery.ZKRMStateStore",
           "yarn.resourcemanager.webapp.address" : "%HOSTGROUP::MASTER2%:8088",
+          "yarn.resourcemanager.webapp.https.address" : "%HOSTGROUP::MASTER2%:8088",
           "yarn.timeline-service.address" : "%HOSTGROUP::MASTER2%:10200",
           "yarn.timeline-service.webapp.address" : "%HOSTGROUP::MASTER2%:8188",
           "yarn.timeline-service.webapp.https.address" : "%HOSTGROUP::MASTER2%:8190",
