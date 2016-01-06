@@ -73,7 +73,7 @@ import requests
 sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
 try:
     # import harisekhon.utils
-    from harisekhon.utils import log, InvalidOptionException, quit, die
+    from harisekhon.utils import log, InvalidOptionException, qquit, die
     from harisekhon.utils import validate_file, validate_dirname, validate_host, validate_port, validate_user, \
         validate_password
     from harisekhon.utils import isStr, isHost, isPort, isUser, isDirname, isJson, jsonpp, list_sort_dicts_by_value
@@ -122,7 +122,7 @@ class AmbariBlueprintTool(CLI):
         if 'dir' in kwargs and kwargs['dir']:
             self.blueprint_dir = kwargs['dir']
         if not isDirname(self.blueprint_dir):
-            quit('UNKNOWN', 'invalid dir arg passed to AmbariBlueprintTool')
+            qquit('UNKNOWN', 'invalid dir arg passed to AmbariBlueprintTool')
         try:
             if not self.blueprint_dir or not os.path.exists(self.blueprint_dir):
                 log.info("creating blueprint data dir '%s'" % self.blueprint_dir)
@@ -138,7 +138,7 @@ class AmbariBlueprintTool(CLI):
         try:
             return item['Clusters']['cluster_name']
         except KeyError as _:
-            quit('CRITICAL', 'failed to parse Ambari cluster name: %s' % _)
+            qquit('CRITICAL', 'failed to parse Ambari cluster name: %s' % _)
 
     def get_clusters(self):
         log.debug('get_clusters()')
@@ -151,7 +151,7 @@ class AmbariBlueprintTool(CLI):
         try:
             return item['Blueprints']['blueprint_name']
         except KeyError as _:
-            quit('CRITICAL', 'failed to parse Ambari blueprint name: %s' % _)
+            qquit('CRITICAL', 'failed to parse Ambari blueprint name: %s' % _)
 
     def get_blueprints(self):
         # log.debug('get_blueprints()')
@@ -164,7 +164,7 @@ class AmbariBlueprintTool(CLI):
         try:
             return item['Hosts']['host_name']
         except KeyError as _:
-            quit('CRITICAL', 'failed to parse Ambari host name: %s' % _)
+            qquit('CRITICAL', 'failed to parse Ambari host name: %s' % _)
 
     def get_hosts(self):
         log.debug('get_hosts()')
@@ -178,7 +178,7 @@ class AmbariBlueprintTool(CLI):
         except requests.exceptions.RequestException as _:
             err = 'failed to fetch list of Ambari Blueprints: %s' % _
             # log.critical(err)
-            quit('CRITICAL', err)
+            qquit('CRITICAL', err)
         json_data = json.loads(response)
         if log.isEnabledFor(logging.DEBUG):
             log.debug("json_data = " + jsonpp(json_data))
@@ -241,7 +241,7 @@ class AmbariBlueprintTool(CLI):
         except requests.exceptions.RequestException as _:
             err = "failed to fetch Ambari Blueprint from '%s': %s" % (self.url, _)
             # log.critical(err)
-            quit('CRITICAL', err)
+            qquit('CRITICAL', err)
         json_data = json.loads(response)
         if log.isEnabledFor(logging.DEBUG):
             log.debug("blueprint = " + jsonpp(json_data))
@@ -268,7 +268,7 @@ class AmbariBlueprintTool(CLI):
             for hostgroup in json_data['host_groups']:
                 hostgroup['components'] = list_sort_dicts_by_value(hostgroup['components'], 'name')
         except KeyError as _:
-            quit('CRITICAL', 'failed to sort blueprint: %s' % _)
+            qquit('CRITICAL', 'failed to sort blueprint: %s' % _)
         return jsonpp(json_data)
 
     def send(self, url_suffix, data):
@@ -283,7 +283,7 @@ class AmbariBlueprintTool(CLI):
             if 'Conflict' in str(_):
                 err += conflict_err
             # log.critical(err)
-            quit('CRITICAL', err)
+            qquit('CRITICAL', err)
         try:
             json_data = json.loads(response)
         except ValueError as _:
@@ -301,7 +301,7 @@ class AmbariBlueprintTool(CLI):
         except IOError as _:
             err = "failed to read Ambari Blueprint from file '%s': %s" % (file, _)
             # log.critical(err)
-            quit('CRITICAL', err)
+            qquit('CRITICAL', err)
         if not name:
             try:
                 name = self.parse_blueprint_name(file_data)
@@ -318,7 +318,7 @@ class AmbariBlueprintTool(CLI):
             data = json.dumps(json_data)
             log.info("reset blueprint field name to '%s'" % name)
         except ValueError as _:
-            quit('CRITICAL', "invalid json found in file '%s': %s" % (file, name))
+            qquit('CRITICAL', "invalid json found in file '%s': %s" % (file, name))
         except KeyError as _:
             log.warn('failed to reset the Blueprint name: %s' % _)
         return self.send_blueprint(name, data)
@@ -332,16 +332,16 @@ class AmbariBlueprintTool(CLI):
         except IOError as _:
             err = "failed to read Ambari cluster host mapping from file '%s': %s" % (filename, _)
             # log.critical(err)
-            quit('CRITICAL', err)
+            qquit('CRITICAL', err)
         log.info("creating cluster '%s' using file '%s'" % (cluster, filename))
         if not isJson(file_data):
-            quit('CRITICAL', "invalid json found in file '%s'" % filename)
+            qquit('CRITICAL', "invalid json found in file '%s'" % filename)
         # don't have access to a blueprint name to enforce reset here
         # json_data = json.loads(file_data)
         # try:
         #     json_data['Blueprints']['blueprint_name'] = blueprint
         # except KeyError, e:
-        #     quit('CRITICAL', 'failed to (re)set blueprint name in cluster/hostmapping data before creating cluster')
+        #     qquit('CRITICAL', 'failed to (re)set blueprint name in cluster/hostmapping data before creating cluster')
         if blueprint:
             try:
                 log.info("setting blueprint in cluster creation to '%s'" % blueprint)
@@ -393,7 +393,7 @@ class AmbariBlueprintTool(CLI):
         if data is None:
             err = "blueprint '%s' returned None" % name
             log.critical(err)
-            quit('CRITICAL', err)
+            qquit('CRITICAL', err)
         # blueprint_file = os.path.basename(name).lower().rstrip('.json') + '.json'
         # if not os.pathsep not in blueprint_file:
         #     blueprint_file = os.path.normpath(os.path.join(self.blueprint_dir, blueprint_file))
@@ -406,14 +406,14 @@ class AmbariBlueprintTool(CLI):
             _.close()
             print("Saved blueprint '%s' to file '%s'" % (name, path))
         except IOError as _:
-            quit('CRITICAL', "failed to write blueprint file to '%s': %s" % (path, _))
+            qquit('CRITICAL', "failed to write blueprint file to '%s': %s" % (path, _))
 
     def save_all(self):
         log.info('finding all blueprints and clusters to blueprint')
         blueprints = self.get_blueprints()
         clusters = self.get_clusters()
         if not blueprints and not clusters:
-            quit('UNKNOWN', 'no Ambari Blueprints or Clusters found on server')
+            qquit('UNKNOWN', 'no Ambari Blueprints or Clusters found on server')
         for blueprint in blueprints:
             self.save_blueprint(blueprint)
         for cluster in clusters:
