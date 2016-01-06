@@ -65,7 +65,7 @@ from __future__ import unicode_literals
 __author__ = 'Hari Sekhon'
 __version__ = '0.9.0'
 
-import base64
+# import base64
 import json
 import logging
 import os
