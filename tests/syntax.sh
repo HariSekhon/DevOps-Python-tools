@@ -27,12 +27,11 @@ for x in $(echo *.py *.jy 2>/dev/null); do
         flake8 --max-line-length=120 --statistics $x
         echo; hr; echo
     fi
-    for y in pyflakes pychecker pylint; do
+    for y in pyflakes pychecker; do
         if which $y &>/dev/null; then
             echo "$y $x"
             $y $x
             echo; hr; echo
         fi
    done
-    :
 done
