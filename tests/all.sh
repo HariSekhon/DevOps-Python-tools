@@ -27,6 +27,7 @@ cd "$srcdir";
 ./compile.sh
 
 #./syntax.sh
+#./pylint.sh
 
 #./python3.sh
 
