@@ -24,7 +24,8 @@ for x in $(echo *.py *.jy 2>/dev/null); do
     isExcluded "$x" && continue
     if which pylint &>/dev/null; then
         echo "pylint -E $x"
+        echo
         pylint -E $x
-        echo; hr; echo
+        hr; echo
     fi
 done
