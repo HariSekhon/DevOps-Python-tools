@@ -36,10 +36,13 @@ Uses Jinja2 template files co-located in the same directory as this program:
 Tested on Spark 1.0.x on Hortonworks 2.1 (Yarn + Standalone) and IBM BigInsights 2.1.2 (Standalone)
 """
 
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
+from __future__ import unicode_literals
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.2.8'
+__version__ = '0.3.0'
 
 import getpass
 import glob

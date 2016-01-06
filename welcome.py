@@ -14,10 +14,13 @@ Prints a slick welcome message with last login time
 Tested on Mac OS X and Linux
 """
 
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
+from __future__ import unicode_literals
 
 __author__ = 'Hari Sekhon'
-__version__ = '1.2.1'
+__version__ = '1.3.0'
 
 import os
 import random

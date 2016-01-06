@@ -27,10 +27,13 @@ Works like a standard unix filter program - if no files are passed as arguments 
 
 # Forked from validate_json.py
 
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
+from __future__ import unicode_literals
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.4.2'
+__version__ = '0.5.0'
 
 import os
 import re
