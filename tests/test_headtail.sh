@@ -35,19 +35,32 @@ done
 data_dir="tests/data"
 broken_dir="$data_dir/broken_json_data"
 
-if [ "$(./headtail.py tests/data/plant_catalog.xml | cksum)" = "1228592176 939" ]; then
-    echo "headtail default success"
-else
-    echo "headtail default FAILED"
-    exit 1
-fi
+testfile="$data_dir/plant_catalog.xml"
 
-if [ "$(./headtail.py tests/data/plant_catalog.xml -n 20 | cksum)" = "2465317856 1705" ]; then
-    echo "headtail -n 20 success"
-else
-    echo "headtail -n 20 FAILED"
-    exit 1
-fi
+check(){
+    result="$1"
+    expected="$2"
+    msg="$3"
+    echo -n "checking headtail $msg  =>  "
+    if [ "$result" = "$expected" ]; then
+        echo "success"
+    else
+        echo "FAILED, expected '$expected', got '$result'"
+        exit 1
+    fi
+}
+
+check "$(./headtail.py "$testfile" | cksum)" "1228592176 939" "file"
+
+check "$(cat "$testfile" | ./headtail.py - | cksum)" "1228592176 939" "-"
+
+check "$(cat "$testfile" | ./headtail.py | cksum)" "1228592176 939" "noarg"
+
+check "$(./headtail.py "$testfile" -n 20 | cksum)" "2465317856 1705" "file -n 20"
+
+check "$(cat "$testfile" | ./headtail.py - "$testfile" -n 20 | cksum)" "1730569196 3410" "mixed - file -n 20"
+
+check "$(cat "$testfile" | ./headtail.py - "$testfile" - -n 20 | cksum)" "110081398 3438" "mixed - file - -n 20"
 
 echo
 echo "======="
