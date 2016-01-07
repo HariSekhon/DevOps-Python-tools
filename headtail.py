@@ -82,7 +82,6 @@ class HeadTail(CLI):
     def headtail(self, content):
         lines = content.split(os.linesep)
         print(os.linesep.join(lines[:self.num_lines]))
-        print(lines[:self.num_lines])
         print(self.sep)
         print(os.linesep.join(lines[-self.num_lines:]))
 
