@@ -31,8 +31,8 @@ import sys
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import *      # pylint: disable=wrong-import-position,wildcard-import
-    from harisekhon import CLI          # pylint: disable=wrong-import-position
+    from harisekhon.utils import die, ERRORS, vlog_option       # pylint: disable=wrong-import-position
+    from harisekhon import CLI                                  # pylint: disable=wrong-import-position
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
     sys.exit(4)
@@ -76,8 +76,8 @@ class HeadTail(CLI):
             if filename == '-':
                 self.headtail(sys.stdin.read())
             else:
-                with open(filename) as self.f:
-                    self.headtail(self.f.read())
+                with open(filename) as _:
+                    self.headtail(_.read())
 
     def headtail(self, content):
         lines = content.split(os.linesep)
