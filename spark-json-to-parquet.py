@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#  pylint: disable=invalid-name
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
@@ -8,7 +9,8 @@
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
-#  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback to help improve or steer this or other code I publish
+#  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback
+#  to help improve or steer this or other code I publish
 #
 #  http://www.linkedin.com/in/harisekhon
 #
@@ -26,68 +28,69 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-__author__  = 'Hari Sekhon'
-__version__ = '0.5.0'
-
-import glob
-import logging
 import os
 import sys
 libdir = os.path.join(os.path.dirname(__file__), 'pylib')
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import *
-    from harisekhon import CLI
-except ImportError as e:
-    print('module import failed: %s' % e, file=sys.stderr)
+    from harisekhon.utils import log, isMinVersion, support_msg, isVersionLax, die, getenv, pyspark_path # pylint: disable=wrong-import-position
+    from harisekhon import CLI # pylint: disable=wrong-import-position
+except ImportError as _:
+    print('module import failed: %s' % _, file=sys.stderr)
     sys.exit(4)
 pyspark_path()
-from pyspark import SparkContext
-from pyspark import SparkConf
-from pyspark.sql import SQLContext
+from pyspark import SparkContext    # pylint: disable=wrong-import-position,import-error
+from pyspark import SparkConf       # pylint: disable=wrong-import-position,import-error
+from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,import-error
+
+__author__ = 'Hari Sekhon'
+__version__ = '0.6.0'
 
 class SparkJsonToParquet(CLI):
 
-    def __init__(self):
+    # def __init__(self):
         # Python 2.x
-        super(SparkJsonToParquet, self).__init__()
+        # super(SparkJsonToParquet, self).__init__()
         # Python 3.x
         # super().__init__()
-        logging.config.fileConfig(os.path.join(libdir, 'resources', 'logging.conf'))
-        log = logging.getLogger(self.__class__.__name__)
+        # logging.config.fileConfig(os.path.join(libdir, 'resources', 'logging.conf'))
+        # log = logging.getLogger(self.__class__.__name__)
 
     # @override
     def add_options(self):
-        self.parser.add_option('-j', '--json',       dest='jsonFile',   help='JSON input file/dir ($JSON)',
-                               metavar='<file/dir>', default=getenv('JSON'))
-        self.parser.add_option('-p', '--parquetDir', dest='parquetDir', help='Parquet output dir ($PARQUETDIR)',
-                               metavar='<dir>',      default=getenv('PARQUETDIR'))
+        self.set_timeout_default(86400)
+        self.parser.add_option('-j', '--json', metavar='<file/dir>',
+                               help='JSON input file/dir ($JSON)',
+                               default=getenv('JSON'))
+        self.parser.add_option('-p', '--parquet-dir', metavar='<dir>',
+                               help='Parquet output dir ($PARQUETDIR)',
+                               default=getenv('PARQUETDIR'))
 
     def run(self):
-        jsonFile   = self.options.jsonFile
-        parquetDir = self.options.parquetDir
+        json_file = self.options.json
+        parquet_dir = self.options.parquet_dir
 
-        if not jsonFile:
+        if not json_file:
             self.usage('--json not defined')
-        if not parquetDir:
-            self.usage('--parquetDir not defined')
+        if not parquet_dir:
+            self.usage('--parquet_dir not defined')
         if self.args:
             self.usage()
 
         conf = SparkConf().setAppName('HS PySpark JSON => Parquet')
-        sc = SparkContext(conf=conf)
-        sqlContext = SQLContext(sc)
+        sc = SparkContext(conf=conf) # pylint: disable=invalid-name
+        sqlContext = SQLContext(sc)  # pylint: disable=invalid-name
         spark_version = sc.version
         log.info('Spark version detected as %s' % spark_version)
         if not isVersionLax(spark_version):
             die("Spark version couldn't be determined. " + support_msg('pytools'))
         if isMinVersion(spark_version, 1.4):
-            json = sqlContext.read.json(jsonFile)
-            json.write.parquet(parquetDir)
+            json = sqlContext.read.json(json_file)
+            json.write.parquet(parquet_dir)
         else:
             log.warn('running legacy code for Spark <= 1.3')
-            json = sqlContext.jsonFile(jsonFile)
-            json.saveAsParquetFile(parquetDir)
+            json = sqlContext.jsonFile(json_file)
+            json.saveAsParquetFile(parquet_dir)
 
 if __name__ == '__main__':
     SparkJsonToParquet().main()
