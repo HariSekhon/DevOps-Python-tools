@@ -28,7 +28,7 @@ import re
 import string
 import sys
 import time
-libdir = os.path.join(os.path.dirname(__file__), 'pylib')
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     from harisekhon.utils import *
