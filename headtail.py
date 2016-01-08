@@ -57,7 +57,9 @@ class HeadTail(CLI):
                                type=int,
                                default=self.num_lines,
                                help='Number of lines to show (default: 10)')
-        self.parser.add_option('-q', '--quiet', action='store_true', default=False,
+        self.parser.add_option('-q', '--quiet',
+                               action='store_true',
+                               default=False,
                                help="Don't print separators in output")
 
     def run(self):
