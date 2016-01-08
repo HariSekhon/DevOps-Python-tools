@@ -53,7 +53,8 @@ import sys
 import time
 try:
     from jinja2 import Template
-    sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
+    libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
+    sys.path.append(libdir)
     from harisekhon.utils import *
 except ImportError as e:
     print('module import failed: %s' % e, file=sys.stderr)
