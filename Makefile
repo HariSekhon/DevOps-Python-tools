@@ -35,6 +35,8 @@ make:
 	# json module built-in to Python >= 2.6, backport not available via pypi
 	#$(SUDO2) pip install json
 	
+	# for impyla
+	pip install --upgrade setuptools
 	pip install -r requirements.txt
 	# for ipython-notebook-pyspark.py
 	#$(SUDO2) pip install jinja2
@@ -59,10 +61,11 @@ apt-packages:
 
 .PHONY: yum-packages
 yum-packages:
-	rpm -q gcc || $(SUDO) yum install -y gcc
+	rpm -q gcc gcc-c++ || $(SUDO) yum install -y gcc gcc-c++
+	rpm -q git || $(SUDO) yum install -y git
 	# needed to fetch the library submodule and CPAN modules
 	# python-pip requires EPEL, so try to get the correct EPEL rpm - for Make must escape the $3
-	rpm -ivh "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`awk '{print substr($$3, 0, 1); exit}' /etc/*release`.noarch.rpm"
+	rpm -q epel-release || yum install -y epel-release || rpm -ivh "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`awk '{print substr($$3, 0, 1); exit}' /etc/*release`.noarch.rpm"
 	rpm -q python-setuptools python-pip python-devel || $(SUDO) yum install -y python-setuptools python-pip python-devel
 	rpm -q ipython-notebook || $(SUDO) yum install -y ipython-notebook || :
 	# needed to build pyhs2
