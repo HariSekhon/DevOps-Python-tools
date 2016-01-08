@@ -17,7 +17,7 @@
 """
 
 Tool to show the first and last N lines. Works like a standard unix filter program for all files passed as arguments
-or if no files are given the it applies to standard input.
+or if no files are given then it applies to standard input.
 
 """
 
