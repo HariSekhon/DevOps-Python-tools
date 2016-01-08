@@ -8,7 +8,8 @@
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
-#  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback to help improve or steer this or other code I publish
+#  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback
+#  to help improve or steer this or other code I publish
 #
 #  http://www.linkedin.com/in/harisekhon
 #
@@ -19,11 +20,11 @@ JSON Validator Tool
 
 Validates each file passed as an argument
 
-Directories are recursed, checking all files ending in a .json suffix.
+Directories if given are detected and recursed, checking all files in the directory tree ending in a .json suffix.
 
 First tries each file contents as a whole json document, if that fails validation or catches a memory error, then
-it assumes the file contains multi-record format with one json document per line and tries an independent validation of
-each line.
+it assumes the file contains Big Data / MongoDB data with one json document per line and tries independent
+validation of each line as a separate json document.
 
 Works like a standard unix filter program - if no files are passed as arguments or '-' is passed then reads from
 standard input (--multi-line must be specified explicitly if feeding to stdin as can't rewind the standard input
@@ -36,23 +37,33 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-__author__  = 'Hari Sekhon'
-__version__ = '0.5.0'
-
 import os
 import re
 import sys
-sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/pylib')
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
+sys.path.append(libdir)
 try:
-    from harisekhon.utils import *
-    from harisekhon import CLI
-except ImportError as e:
-    print('module import failed: %s' % e, file=sys.stderr)
+    from harisekhon.utils import isJson, die, ERRORS, vlog_option   # pylint: disable=wrong-import-position
+    from harisekhon import CLI                                      # pylint: disable=wrong-import-position
+except ImportError as _:
+    print('module import failed: %s' % _, file=sys.stderr)
     sys.exit(4)
+
+__author__ = 'Hari Sekhon'
+__version__ = '0.6.0'
 
 class JsonValidatorTool(CLI):
 
-    RE_JSON_SUFFIX = re.compile('.*\.json', re.I)
+    def __init__(self):
+        # Python 2.x
+        super(JsonValidatorTool, self).__init__()
+        # Python 3.x
+        # super().__init__()
+        self.iostream = None
+        self.re_json_suffix = re.compile(r'.*\.json', re.I)
+        self.valid_json_msg = '<unknown> => JSON OK'
+        self.invalid_json_msg = '<unknown> => JSON INVALID'
+        self.invalid_json_msg_single_quotes = '%s (found single quotes not double quotes)' % self.invalid_json_msg
 
     def add_options(self):
         self.parser.add_option('-m', '--multi-record', action='store_true',
@@ -61,14 +72,14 @@ class JsonValidatorTool(CLI):
                                   + 'on standard input')
 
     def check_mutlirecord_json(self):
-            for line in self.f:
-                if not isJson(line):
-                    if isJson(line.replace("'", '"')):
-                        die('%s (multi-record format)' % self.invalid_json_msg_single_quotes)
-                    else:
-                        return False
-            print('%s (multi-record format)' % self.valid_json_msg)
-            return True
+        for line in self.iostream:
+            if not isJson(line):
+                if isJson(line.replace("'", '"')):
+                    die('%s (multi-record format)' % self.invalid_json_msg_single_quotes)
+                else:
+                    return False
+        print('%s (multi-record format)' % self.valid_json_msg)
+        return True
 
     def check_json(self, content):
         if isJson(content):
@@ -76,13 +87,12 @@ class JsonValidatorTool(CLI):
         elif isJson(content.replace("'", '"')):
             die(self.invalid_json_msg_single_quotes)
         else:
-            if self.f is not sys.stdin:
-                self.f.seek(0)
+            if self.iostream is not sys.stdin:
+                self.iostream.seek(0)
                 if self.check_mutlirecord_json():
                     return True
             # pointless since it would simply return 'ValueError: No JSON object could be decoded'
-            # TODO: replace with a getter
-            # if self.options.verbose > 2:
+            # if self.get_verbose() > 2:
             #     try:
             #         json.loads(content)
             #     except Exception, e:
@@ -92,9 +102,9 @@ class JsonValidatorTool(CLI):
     # looks like this does a .read() anyway, not buying any efficiency enhancement
     #
     #  usage:
-    # self.check_json_fp(self.f)
+    # self.check_json_fp(self.iostream)
     # must reset afterwards, otherwise next check will result in Invalid JSON due to blank
-    # self.f.seek(0)
+    # self.iostream.seek(0)
     #
     # def check_json_fp(self, fp):
     #     try:
@@ -129,45 +139,47 @@ class JsonValidatorTool(CLI):
                 subpath = os.path.join(path, item)
                 if os.path.isdir(subpath):
                     self.check_path(subpath)
-                if not self.RE_JSON_SUFFIX.match(item):
+                if not self.re_json_suffix.match(item):
                     continue
                 self.check_file(subpath)
         else:
             die("failed to determine if path '%s' is file or directory" % path)
 
     def check_file(self, filename):
-            if filename == '-':
-                filename = '<STDIN>'
-            self.valid_json_msg   = '%s => JSON OK'      % filename
-            self.invalid_json_msg = '%s => JSON INVALID' % filename
-            self.invalid_json_msg_single_quotes = '%s (found single quotes not double quotes)' % self.invalid_json_msg
-            mem_err = "file '%s', assuming Big Data multi-record json and re-trying validation line-by-line" % filename
-            if filename == '<STDIN>':
-                self.f = sys.stdin
-                if self.options.multi_record:
-                    if not self.check_mutlirecord_json():
-                        die(self.invalid_json_msg)
-                else:
-                    self.check_json(sys.stdin.read())
+        if filename == '-':
+            filename = '<STDIN>'
+        self.valid_json_msg = '%s => JSON OK' % filename
+        self.invalid_json_msg = '%s => JSON INVALID' % filename
+        self.invalid_json_msg_single_quotes = '%s (found single quotes not double quotes)' % self.invalid_json_msg
+        mem_err = "file '%s', assuming Big Data multi-record json and re-trying validation line-by-line" % filename
+        if filename == '<STDIN>':
+            self.iostream = sys.stdin
+            if self.options.multi_record:
+                if not self.check_mutlirecord_json():
+                    die(self.invalid_json_msg)
             else:
-                with open(filename) as self.f:
-                    if self.options.multi_record:
-                        self.check_mutlirecord_json()
-                    else:
-                        # most JSON files are fine to slurp like this
-                        # Big Data JSON files are json multi-record, will throw exception after running out of RAM and then be handled line by line
+                self.check_json(sys.stdin.read())
+        else:
+            with open(filename) as self.iostream:
+                if self.options.multi_record:
+                    self.check_mutlirecord_json()
+                else:
+                    # most JSON files are fine to slurp like this
+                    # Big Data / MongoDB JSON data files are json multi-record and can be large
+                    # may throw exception after running out of RAM in which case try handling line-by-line
+                    # (json document-per-line)
+                    try:
+                        content = self.iostream.read()
                         try:
-                            content = self.f.read()
-                            try:
-                                self.check_json(content)
-                            except MemoryError:
-                                print("memory error validating contents from %s" % mem_err)
-                                f.seek(0)
-                                self.check_mutlirecord_json()
+                            self.check_json(content)
                         except MemoryError:
-                            print("memory error reading %s" % mem_err)
-                            f.seek(0)
+                            print("memory error validating contents from %s" % mem_err)
+                            self.iostream.seek(0)
                             self.check_mutlirecord_json()
+                    except MemoryError:
+                        print("memory error reading %s" % mem_err)
+                        self.iostream.seek(0)
+                        self.check_mutlirecord_json()
 
 
 if __name__ == '__main__':
