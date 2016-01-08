@@ -23,7 +23,9 @@ import time
 import socket
 # Refusing to use either optparse or argparse since it's annoyingly non-portable across different versions of Python
 import getopt
-sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
+sys.path.append(libdir)
+sys.path.append(libdir)
 try:
     from harisekhon.utils import *
 except ImportError, e:

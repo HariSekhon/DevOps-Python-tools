@@ -86,6 +86,7 @@ Implications:
 """ % (os.path.basename(__file__), __version__, os.path.basename(__file__))
 #-a --all-blocks         Fetch all copies of all blocks from all datanodes (--one-block-per-DN shortcuts this) [Not implemented yet]
 
+# Refusing to use either optparse or argparse since it's annoyingly non-portable across different versions of Python
 import getopt
 import socket
 import sys
