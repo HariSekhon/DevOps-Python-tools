@@ -48,16 +48,23 @@ class HeadTail(CLI):
         # Python 3.x
         # super().__init__()
         self.num_lines = 10
-        self.sep = '=' * 20
+        self.sep = '...'
+        self.docsep = '=' * 80
+        self.quiet = False
 
     def add_options(self):
         self.parser.add_option('-n', '--num', metavar='number_of_lines',
                                type=int,
                                default=self.num_lines,
                                help='Number of lines to show (default: 10)')
+        self.parser.add_option('-q', '--quiet', action='store_true', default=False,
+                               help="Don't print separators in output")
 
     def run(self):
         self.num_lines = self.options.num
+        vlog_option('number of lines', self.num_lines)
+        self.quiet = self.options.quiet
+        vlog_option('quiet', self.quiet)
         if not self.args:
             self.args.append('-')
         for arg in self.args:
@@ -78,12 +85,15 @@ class HeadTail(CLI):
             else:
                 with open(filename) as _:
                     self.headtail(_.read())
+            if not self.quiet and len(self.args) > 1:
+                print(self.docsep)
 
     def headtail(self, content):
         lines = content.split(os.linesep)
         print(os.linesep.join(lines[:self.num_lines]))
-        print(self.sep)
-        print(os.linesep.join(lines[-self.num_lines:]))
+        if not self.quiet:
+            print(self.sep)
+        print(os.linesep.join(lines[-self.num_lines:]).rstrip(os.linesep))
 
 
 if __name__ == '__main__':
