@@ -29,20 +29,20 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-__author__  = 'Hari Sekhon'
-__version__ = '0.2'
-
 import hashlib
 import os
 import platform
 import random
 import socket
 import string
-import sys
 import time
 import uuid
 
-# using pipe separator because it's common for hostnames host components to have dashes in them, this makes it easier to distinguish the components of the returned chararrays
+__author__ = 'Hari Sekhon'
+__version__ = '0.3'
+
+# using pipe separator because it's common for hostname's host components to have dashes in them
+# this makes it easier to distinguish the components of the returned chararrays
 sep = '|'
 alnum_charset = string.ascii_letters + string.digits
 
@@ -58,52 +58,53 @@ if not hostname:
 
 ############
 # shamelessly borrowed from the Pig UDF manual's Jython section :)
-@outputSchemaFunction('squareSchema')
+@outputSchemaFunction('squareSchema') # pylint: disable=undefined-variable
 def square(num):
-    return ((num)*(num))
-@schemaFunction('squareSchema')
-def squareSchema(input):
+    return (num) * (num)
+
+@schemaFunction('squareSchema') # pylint: disable=undefined-variable
+def squareSchema(input): # pylint: disable=invalid-name,redefined-builtin
     return input
 
-@outputSchema('percent:double')
+@outputSchema('percent:double') # pylint: disable=undefined-variable
 def percent(num, total):
     return num * 100 / total
 ############
 
-@outputSchema('time_hostname:chararray')
+@outputSchema('time_hostname:chararray') # pylint: disable=undefined-variable
 def time_hostname():
     # time precision here is a trade off between space and uniqueness, I find 4 decimal places isn't unique but 6 is
     return '%.6f' % time.time() + sep + hostname
 
-@outputSchema('time_hostname_pid:chararray')
+@outputSchema('time_hostname_pid:chararray') # pylint: disable=undefined-variable
 def time_hostname_pid():
     return time_hostname() + sep + pid
 
-@outputSchema('random_alnum:chararray')
+@outputSchema('random_alnum:chararray') # pylint: disable=undefined-variable
 def random_alnum(size):
     return ''.join(random.choice(alnum_charset) for x in range(size))
 
-@outputSchema('random_uuid:chararray')
+@outputSchema('random_uuid:chararray') # pylint: disable=undefined-variable
 def random_uuid(size):
     return time_hostname_pid() + random_alnum(size)
 
-@outputSchema('md5:chararray')
-def md5(myString):
-    return hashlib.md5(myString).hexdigest()
+@outputSchema('md5:chararray') # pylint: disable=undefined-variable
+def md5(my_string):
+    return hashlib.md5(my_string).hexdigest()
 
-@outputSchema('md5_uuid:chararray')
-def md5_uuid(myString):
-    return time_hostname_pid() + sep + md5(myString)
+@outputSchema('md5_uuid:chararray') # pylint: disable=undefined-variable
+def md5_uuid(my_string):
+    return time_hostname_pid() + sep + md5(my_string)
 
-@outputSchema('sha1:chararray')
-def sha1(myString):
-    return hashlib.sha1(myString).hexdigest()
+@outputSchema('sha1:chararray') # pylint: disable=undefined-variable
+def sha1(my_string):
+    return hashlib.sha1(my_string).hexdigest()
 
-@outputSchema('sha1_uuid:chararray')
-def sha1_uuid(myString):
-    return time_hostname_pid() + sep + sha1(myString)
+@outputSchema('sha1_uuid:chararray') # pylint: disable=undefined-variable
+def sha1_uuid(my_string):
+    return time_hostname_pid() + sep + sha1(my_string)
 
 # uuid module doesn't seem to have uuid4() in Python 2.6, but does on Python 2.7
-@outputSchema('uuid4:chararray')
+@outputSchema('uuid4:chararray') # pylint: disable=undefined-variable
 def uuid4():
     return uuid.uuid4().get_hex()
