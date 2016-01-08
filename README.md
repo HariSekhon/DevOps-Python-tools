@@ -39,7 +39,7 @@ Some common options support $ENVIRONMENT_VARIABLES which are mentioned in the --
 - ```hadoop_hdfs_files_native_checksums.jy``` - fetches native HDFS checksums for quicker file comparisons (about 100x faster than doing hdfs dfs -cat | md5sum)
 - ```hadoop_hdfs_files_stats.jy``` - fetches HDFS file stats
 - ```pig-text-to-elasticsearch.pig``` / ```pig-text-to-solr.pig``` - bulk indexes unstructured files in Hadoop to Elasticsearch or Solr/SolrCloud clusters
-- ```pig-udfs.jy``` - Pig Jython UDFs for Hadoop
+- ```pig_udfs.jy``` - Pig Jython UDFs for Hadoop
 - ```ipython-notebook-pyspark.py``` - per-user authenticated IPython Notebook + PySpark integration to allow each user to auto-create their own password protected IPython Notebook running Spark
 - ```spark-json-to-parquet.py``` - PySpark JSON => Parquet converter
 - ```validate_json.py``` - validate JSON files, stdin or all ```.json``` files found in given directories. Supports both normal json files as well as json-doc-per-line files such as MongoDB or Hadoop json data files
