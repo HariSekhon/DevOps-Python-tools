@@ -17,10 +17,7 @@ Tested on Mac OS X and Linux
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
-
-__author__ = 'Hari Sekhon'
-__version__ = '1.3.0'
+# from __future__ import unicode_literals
 
 import os
 import random
@@ -31,70 +28,79 @@ import time
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import *
-    from harisekhon import CLI
-except ImportError as e:
-    print('module import failed: %s' % e, file=sys.stderr)
+    from harisekhon.utils import ERRORS, isUser     # pylint: disable=wrong-import-position
+    from harisekhon import CLI                      # pylint: disable=wrong-import-position
+except ImportError as _:
+    print('module import failed: %s' % _, file=sys.stderr)
     sys.exit(4)
 
+__author__ = 'Hari Sekhon'
+__version__ = '1.4.0'
 
 class Welcome(CLI):
 
-    def construct_msg(self):
-        try:
-            try:
-                user = os.environ['USER'].strip()
-                if not user:
-                    raise KeyError
-            except KeyError:
-                user = 'user'
-            if not isUser(user):
-                print("invalid user '%s' determined from environment variable $USER, failed regex validation" % user)
-                sys.exit(ERRORS['CRITICAL'])
-            if user == 'root':
-                user = user.upper()
-            elif len(user) < 4 or re.search('\d', user) or user == 'user':
-                # probably not a real name
-                pass
-            else:
-                user = user.title()
-            msg = 'Welcome %s - ' % user
-            fh = os.popen('last -100')
-            fh.readline()
-            re_skip = re.compile('^(?:reboot|wtmp)|^\s*$')
-            last = ''
-            for line in fh:
-                last = line.rstrip('\n')
-                if(re_skip.match(last)):
-                    last = ''
-                    continue
-                break
-            if(last):
-                msg += 'last login was '
-                last_user = re.sub('\s+.*$', '', last)
-                if last_user == 'root':
-                    last_user = 'ROOT'
-                # strip up to "Day Mon NN" ie "%a %b %e ..."
-                (last, num_replacements) = re.subn('.*(\w{3}\s+\w{3}\s+\d+)', '\g<1>', last)
-                if(not num_replacements):
-                    print('failed to find the date format in the last log')
-                    sys.exit(2)
-                last = re.sub(' *$', '', last)
-                if(last_user == 'ROOT'):
-                    msg += 'ROOT'
-                elif(last_user.lower() == user.lower()):
-                    msg += 'by you'
-                else:
-                    msg += 'by %s' % last_user
-                msg += ' => %s' % last
-            else:
-                msg += 'no last login information available!'
-        except KeyboardInterrupt:
+    def __init__(self):
+        # Python 2.x
+        super(Welcome, self).__init__()
+        # Python 3.x
+        # super().__init__()
+        self.quick = False
+
+    def case_user(self, user): # pylint: disable=no-self-use
+        if user == 'root':
+            user = user.upper()
+        elif len(user) < 4 or re.search(r'\d', user):
+            # probably not a real name
             pass
+        else:
+            user = user.title()
+        return user
+
+    def construct_msg(self): # pylint: disable=no-self-use
+        user = os.getenv('USER', '').strip()
+        if not isUser(user):
+            print("invalid user '%s' determined from environment variable $USER, failed regex validation" % user)
+            sys.exit(ERRORS['CRITICAL'])
+        user = self.case_user(user)
+        msg = 'Welcome %s - ' % user
+        _ = os.popen('last -100')
+        _.readline()
+        re_skip = re.compile(r'^(?:reboot|wtmp)|^\s*$')
+        last = ''
+        for line in _:
+            last = line.rstrip('\n')
+            if re_skip.match(last):
+                last = ''
+                continue
+            break
+        _.close()
+        if last:
+            msg += 'last login was '
+            last_user = re.sub(r'\s+.*$', '', last)
+            if last_user == 'root':
+                last_user = 'ROOT'
+            # strip up to "Day Mon NN" ie "%a %b %e ..."
+            (last, num_replacements) = re.subn(r'.*(\w{3}\s+\w{3}\s+\d+)', r'\g<1>', last)
+            if not num_replacements:
+                print('failed to find the date format in the last log')
+                sys.exit(ERRORS['CRITICAL'])
+            last = re.sub(' *$', '', last)
+            if last_user == 'ROOT':
+                msg += 'ROOT'
+            elif last_user.lower() == user.lower():
+                msg += 'by you'
+            else:
+                msg += 'by %s' % last_user
+            msg += ' => %s' % last
+        else:
+            msg += 'no last login information available!'
         return msg
 
-    def print_welcome(self):
+    def print_welcome(self):  # pylint: disable=no-self-use
         msg = self.construct_msg()
+        if self.quick:
+            print(msg)
+            return
         try:
             charmap = list(string.uppercase + string.lowercase + '@#$%^&*()')
             # print '',
@@ -122,11 +128,13 @@ class Welcome(CLI):
             # print('\b\b\b\b%s' % msg[i:])
             print('\b\b\b%s' % msg[i:])
 
-    # Don't do this it'll double print since CLI.usage() is now adding usagemsg header
-    # def add_options(self):
-    #     self.parser = OptionParser(usage=self.usagemsg, version=self.version)
+    def add_options(self):
+        self.parser.add_option('-q', '--quick', action='store_true', default=False,
+                               help='Print instantly without fancy scrolling effect, saves 2-3 seconds ' +\
+                                    '(you can also Control-C to make output complete instantly)')
 
     def run(self):
+        self.quick = self.options.quick
         if self.args:
             self.usage()
         self.print_welcome()
