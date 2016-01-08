@@ -8,7 +8,8 @@
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
-#  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback to help improve or steer this or other code I publish
+#  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback
+#  to help improve or steer this or other code I publish
 #
 #  http://www.linkedin.com/in/harisekhon
 #
@@ -21,7 +22,8 @@ Validates each file passed as an argument
 
 Directories are recursed, checking all files ending in a .yaml suffix.
 
-Works like a standard unix filter program - if no files are passed as arguments or '-' is passed then reads from standard input
+Works like a standard unix filter program - if no files are passed as arguments or '-' is given then reads
+from standard input
 
 """
 
@@ -32,26 +34,33 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-__author__  = 'Hari Sekhon'
-__version__ = '0.5.0'
-
 import os
 import re
 import sys
-import traceback
 import yaml
-sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/pylib')
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
+sys.path.append(libdir)
 try:
-    from harisekhon.utils import *
-    from harisekhon import CLI
-except ImportError as e:
-    print('module import failed: %s' % e, file=sys.stderr)
+    from harisekhon.utils import die, ERRORS, isYaml, vlog_option   # pylint: disable=wrong-import-position
+    from harisekhon import CLI                                      # pylint: disable=wrong-import-position
+except ImportError as _:
+    print('module import failed: %s' % _, file=sys.stderr)
     sys.exit(4)
 
+__author__ = 'Hari Sekhon'
+__version__ = '0.6.0'
 
 class YamlValidatorTool(CLI):
 
-    RE_YAML_SUFFIX = re.compile('.*\.ya?ml', re.I)
+    def __init__(self):
+        # Python 2.x
+        super(YamlValidatorTool, self).__init__()
+        # Python 3.x
+        # super().__init__()
+        self.iostream = None
+        self.re_yaml_suffix = re.compile(r'.*\.ya?ml', re.I)
+        self.valid_yaml_msg = '<unknown> => YAML OK'
+        self.invalid_yaml_msg = '<unknown> => YAML INVALID'
 
     # def check_multiline_yaml(self):
     #         self.f.seek(0)
@@ -68,12 +77,11 @@ class YamlValidatorTool(CLI):
         # elif self.check_multiline_yaml():
         #     pass
         else:
-            # TODO: change this to use a getter
-            if self.options.verbose > 2:
+            if self.get_verbose() > 2:
                 try:
                     yaml.load(content)
-                except yaml.YAMLError as e:
-                    print(e)
+                except yaml.YAMLError as _:
+                    print(_)
             die(self.invalid_yaml_msg)
 
     def run(self):
@@ -102,7 +110,7 @@ class YamlValidatorTool(CLI):
                 subpath = os.path.join(path, item)
                 if os.path.isdir(subpath):
                     self.check_path(subpath)
-                if not self.RE_YAML_SUFFIX.match(item):
+                if not self.re_yaml_suffix.match(item):
                     continue
                 self.check_file(subpath)
         else:
@@ -111,13 +119,13 @@ class YamlValidatorTool(CLI):
     def check_file(self, filename):
         if filename == '-':
             filename = '<STDIN>'
-        self.valid_yaml_msg   = '%s => YAML OK'      % filename
+        self.valid_yaml_msg = '%s => YAML OK' % filename
         self.invalid_yaml_msg = '%s => YAML INVALID' % filename
         if filename == '<STDIN>':
             self.check_yaml(sys.stdin.read())
         else:
-            with open(filename) as self.f:
-                self.check_yaml(self.f.read())
+            with open(filename) as self.iostream:
+                self.check_yaml(self.iostream.read())
 
 
 if __name__ == '__main__':
