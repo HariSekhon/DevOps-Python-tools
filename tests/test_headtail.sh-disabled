@@ -47,7 +47,7 @@ check(){
     if [ "$result" = "$expected" ]; then
         echo "success"
     else
-        echo "FAILED, expected '$expected', got '$result'"
+        echo "FAILED, expected checksum '$expected', got checksum '$result'"
         echo
         echo "full output: "
         echo
@@ -58,17 +58,17 @@ check(){
     fi
 }
 
-check "./headtail.py $testfile" "1183193560 562" "file"
+check "./headtail.py $testfile" "789101572 545" "file"
 
-check "cat $testfile | ./headtail.py -" "1183193560 562" "-"
+check "cat $testfile | ./headtail.py -" "789101572 545" "-"
 
-check "cat $testfile | ./headtail.py" "1183193560 562" "noarg"
+check "cat $testfile | ./headtail.py" "789101572 545" "noarg"
 
-check "./headtail.py $testfile -n 20" "2302276519 1041" "file -n 20"
+check "./headtail.py $testfile -n 20" "741605952 1024" "file -n 20"
 
-check "cat $testfile | ./headtail.py - $testfile -n 20" "1730569196 3410" "mixed - file -n 20"
+check "cat $testfile | ./headtail.py - $testfile -n 20" "3412825758 2210" "mixed - file -n 20"
 
-check "cat $testfile | ./headtail.py - $testfile - -n 20" "110081398 3438" "mixed - file - -n 20"
+check "cat $testfile | ./headtail.py - $testfile - -n 20" "2618879084 2297" "mixed - file - -n 20"
 
 echo
 echo "======="
