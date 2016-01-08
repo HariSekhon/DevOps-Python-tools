@@ -17,7 +17,7 @@ Written on Python 2.6 and tested on Pig 0.14 on Tez via Hortonworks HDP 2.2
 
 call from pig:
 
-REGISTER 'pig-udfs.jy' using jython as hari;
+REGISTER 'pig_udfs.jy' using jython as hari;
 hari.md5('test')
 
 For tonnes more functions that may be useful see the git submodule PyLib
