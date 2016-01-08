@@ -70,7 +70,8 @@ import logging
 import os
 import sys
 import requests
-sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
+sys.path.append(libdir)
 try:
     # import harisekhon.utils
     from harisekhon.utils import log, InvalidOptionException, qquit, die
