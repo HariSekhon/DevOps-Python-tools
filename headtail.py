@@ -53,6 +53,7 @@ class HeadTail(CLI):
         self.quiet = False
 
     def add_options(self):
+        #self.set_timeout_default(300)
         self.parser.add_option('-n', '--num', metavar='number_of_lines',
                                type=int,
                                default=self.num_lines,
