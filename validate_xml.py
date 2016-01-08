@@ -8,7 +8,8 @@
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
-#  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback to help improve or steer this or other code I publish
+#  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback
+#  to help improve or steer this or other code I publish
 #
 #  http://www.linkedin.com/in/harisekhon
 #
@@ -21,7 +22,8 @@ Validates each file passed as an argument
 
 Directories are recursed, checking all files ending in a .xml suffix.
 
-Works like a standard unix filter program - if no files are passed as arguments or '-' is passed then reads from standard input
+Works like a standard unix filter program - if no files are passed as arguments or '-' is given then reads
+from standard input
 
 """
 
@@ -32,37 +34,45 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-__author__  = 'Hari Sekhon'
-__version__ = '0.5.0'
 
 import os
 import re
 import sys
-import traceback
-sys.path.append(os.path.dirname(os.path.abspath(sys.argv[0])) + '/pylib')
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
+sys.path.append(libdir)
 try:
-    from harisekhon.utils import *
-    from harisekhon import CLI
-except ImportError as e:
-    print('module import failed: %s' % e, file=sys.stderr)
+    from harisekhon.utils import die, ERRORS, isXml, vlog_option    # pylint: disable=wrong-import-position
+    from harisekhon import CLI                                      # pylint: disable=wrong-import-position
+except ImportError as _:
+    print('module import failed: %s' % _, file=sys.stderr)
     sys.exit(4)
 
+__author__ = 'Hari Sekhon'
+__version__ = '0.6.0'
 
 class XmlValidatorTool(CLI):
 
-    RE_XML_SUFFIX = re.compile('.*\.xml', re.I)
+    def __init__(self):
+        # Python 2.x
+        super(XmlValidatorTool, self).__init__()
+        # Python 3.x
+        # super().__init__()
+        self.iostream = None
+        self.re_xml_suffix = re.compile(r'.*\.xml', re.I)
+        self.valid_xml_msg = '<unknown> => XML OK'
+        self.invalid_xml_msg = '<unknown> => XML INVALID'
 
     def check_xml(self, content):
         if isXml(content):
             print(self.valid_xml_msg)
         else:
-            # TODO: change this to use a getter
-            if self.options.verbose > 2:
+            if self.get_verbose() > 2:
                 try:
                     ET.fromstring(content)
                 # Python 2.7 throws xml.etree.ElementTree.ParseError, but Python 2.6 throws xml.parsers.expat.ExpatError
-                except Exception as e:
-                    print(e)
+                # have to catch generic Exception to be able to handle both
+                except Exception as _: # pylint: disable=broad-except
+                    print(_)
             die(self.invalid_xml_msg)
 
     def run(self):
@@ -91,7 +101,7 @@ class XmlValidatorTool(CLI):
                 subpath = os.path.join(path, item)
                 if os.path.isdir(subpath):
                     self.check_path(subpath)
-                if not self.RE_XML_SUFFIX.match(item):
+                if not self.re_xml_suffix.match(item):
                     continue
                 self.check_file(subpath)
         else:
@@ -100,13 +110,13 @@ class XmlValidatorTool(CLI):
     def check_file(self, filename):
         if filename == '-':
             filename = '<STDIN>'
-        self.valid_xml_msg   = '%s => XML OK'      % filename
+        self.valid_xml_msg = '%s => XML OK' % filename
         self.invalid_xml_msg = '%s => XML INVALID' % filename
         if filename == '<STDIN>':
             self.check_xml(sys.stdin.read())
         else:
-            with open(filename) as self.f:
-                self.check_xml(self.f.read())
+            with open(filename) as self.iostream:
+                self.check_xml(self.iostream.read())
 
 
 if __name__ == '__main__':
