@@ -53,6 +53,7 @@ make:
 
 .PHONY: apt-packages
 apt-packages:
+	$(SUDO) apt-get update
 	$(SUDO) apt-get install -y gcc
 	# needed to fetch the library submodule at end of build
 	$(SUDO) apt-get install -y git
