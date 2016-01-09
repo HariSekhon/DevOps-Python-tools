@@ -24,6 +24,8 @@ echo "
 
 cd "$srcdir";
 
+./whitespace.sh
+
 ./compile.sh
 
 #./syntax.sh
