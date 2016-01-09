@@ -224,7 +224,6 @@ class HDFSBlockReader:
     def fetchFilelistBlocksTimed(self, filelist):
         """ Recurses directories and calls fetchFileBlocksTimed(file) per file """
 
-        
         #if(len(filelist) > 1 or (self.get_path(filelist[0]) and self.fs.isDirectory(self.get_path(filelist[0])))):
         if(len(filelist) > 1 or self.fs.isDirectory(self.get_path(filelist[0]))):
             # even if there is only one file under the whole directory tree since it's now different to the specified arg we should print it

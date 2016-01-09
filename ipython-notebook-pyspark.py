@@ -106,7 +106,7 @@ dir = os.path.abspath(os.path.dirname(sys.argv[0]))
 default_master = "yarn_client"
 
 master = os.getenv('MASTER', default_master)
-    
+
 # defaults resources to use if not setting PYSPARK_SUBMIT_ARGS
 num_executors   = 5
 executor_cores  = 5
@@ -214,11 +214,11 @@ try:
         passwd_fh.write(passwd(password))
         passwd_fh.close()
         os.chmod(passwd_txt, 0o600)
-    
+
     #if not os.path.exists(setup_py):
     shutil.copy(pyspark_startup_src, setup_py)
     os.chmod(setup_py, 0o600)
-    
+
     try:
         ipython_notebook_config_contents = open(ipython_notebook_config).read()
     except:
