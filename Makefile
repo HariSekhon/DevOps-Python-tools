@@ -47,7 +47,6 @@ make:
 	
 	# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
 	$(SUDO2) pip install "ipython[notebook]" || :
-	
 	@echo
 	@echo PyTools BUILD SUCCESSFUL
 
