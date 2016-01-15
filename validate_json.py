@@ -71,7 +71,7 @@ class JsonValidatorTool(CLI):
                                   + 'document separated by newlines. Must use if reading multi-record json format ' \
                                   + 'on standard input')
 
-    def check_mutlirecord_json(self):
+    def check_multirecord_json(self):
         for line in self.iostream:
             if not isJson(line):
                 if isJson(line.replace("'", '"')):
@@ -89,7 +89,7 @@ class JsonValidatorTool(CLI):
         else:
             if self.iostream is not sys.stdin:
                 self.iostream.seek(0)
-                if self.check_mutlirecord_json():
+                if self.check_multirecord_json():
                     return True
             # pointless since it would simply return 'ValueError: No JSON object could be decoded'
             # if self.get_verbose() > 2:
@@ -155,14 +155,14 @@ class JsonValidatorTool(CLI):
         if filename == '<STDIN>':
             self.iostream = sys.stdin
             if self.options.multi_record:
-                if not self.check_mutlirecord_json():
+                if not self.check_multirecord_json():
                     die(self.invalid_json_msg)
             else:
                 self.check_json(sys.stdin.read())
         else:
             with open(filename) as self.iostream:
                 if self.options.multi_record:
-                    self.check_mutlirecord_json()
+                    self.check_multirecord_json()
                 else:
                     # most JSON files are fine to slurp like this
                     # Big Data / MongoDB JSON data files are json multi-record and can be large
@@ -175,11 +175,11 @@ class JsonValidatorTool(CLI):
                         except MemoryError:
                             print("memory error validating contents from %s" % mem_err)
                             self.iostream.seek(0)
-                            self.check_mutlirecord_json()
+                            self.check_multirecord_json()
                     except MemoryError:
                         print("memory error reading %s" % mem_err)
                         self.iostream.seek(0)
-                        self.check_mutlirecord_json()
+                        self.check_multirecord_json()
 
 
 if __name__ == '__main__':
