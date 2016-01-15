@@ -30,7 +30,7 @@ Some Hadoop tools with require Jython, see [Jython for Hadoop Utils](https://git
 
 All programs come with a ```--help``` switch which includes a program description and the list of command line options.
 
-Some common options support $ENVIRONMENT_VARIABLES which are mentioned in the --help descriptions in brackets eg. ($HOST or more specific ones with higher precedence like $AMBARI_HOST).
+Some common options also support optional $ENVIRONMENT_VARIABLES for convenience which are mentioned in the --help descriptions in brackets eg. $HOST or more specific ones with higher precedence like $AMBARI_HOST.
 
 ### PyTools ###
 
