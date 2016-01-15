@@ -101,7 +101,7 @@ class AmbariBlueprintTool(CLI):
         self.url_base = None
         self.x_requested_by = self.user
 
-    def setup(self, host, port, user, password, ssl=False, **kwargs):
+    def connection(self, host, port, user, password, ssl=False, **kwargs):
         # must set X-Requested-By in newer versions of Ambari
         self.x_requested_by = user
         if user == 'admin':
@@ -536,7 +536,7 @@ class AmbariBlueprintTool(CLI):
 
     def run(self):
         options = self.process_args()[0]
-        self.setup(options.host,
+        self.connection(options.host,
                    options.port,
                    options.user,
                    options.password,
