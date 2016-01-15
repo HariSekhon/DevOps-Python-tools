@@ -48,7 +48,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.0'
+__version__ = '0.6.1'
 
 class XmlValidatorTool(CLI):
 
@@ -58,7 +58,7 @@ class XmlValidatorTool(CLI):
         # Python 3.x
         # super().__init__()
         self.iostream = None
-        self.re_xml_suffix = re.compile(r'.*\.xml', re.I)
+        self.re_xml_suffix = re.compile(r'.*\.xml$', re.I)
         self.valid_xml_msg = '<unknown> => XML OK'
         self.invalid_xml_msg = '<unknown> => XML INVALID'
 

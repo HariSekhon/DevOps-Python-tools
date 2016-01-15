@@ -48,7 +48,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.0'
+__version__ = '0.6.1'
 
 class YamlValidatorTool(CLI):
 
@@ -58,7 +58,7 @@ class YamlValidatorTool(CLI):
         # Python 3.x
         # super().__init__()
         self.iostream = None
-        self.re_yaml_suffix = re.compile(r'.*\.ya?ml', re.I)
+        self.re_yaml_suffix = re.compile(r'.*\.ya?ml$', re.I)
         self.valid_yaml_msg = '<unknown> => YAML OK'
         self.invalid_yaml_msg = '<unknown> => YAML INVALID'
 

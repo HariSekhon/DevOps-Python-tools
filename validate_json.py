@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.0'
+__version__ = '0.6.1'
 
 class JsonValidatorTool(CLI):
 
@@ -60,7 +60,7 @@ class JsonValidatorTool(CLI):
         # Python 3.x
         # super().__init__()
         self.iostream = None
-        self.re_json_suffix = re.compile(r'.*\.json', re.I)
+        self.re_json_suffix = re.compile(r'.*\.json$', re.I)
         self.valid_json_msg = '<unknown> => JSON OK'
         self.invalid_json_msg = '<unknown> => JSON INVALID'
         self.invalid_json_msg_single_quotes = '%s (found single quotes not double quotes)' % self.invalid_json_msg
