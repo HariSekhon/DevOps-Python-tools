@@ -57,13 +57,11 @@ class SerfEventHandler(CLI):
 
     # override this if subclassing
     def handle_event(self):
-        if self.event not in self.events:
-            log.warn("SERF_EVENT environment variable passed unrecognized event type '%s'" % self.event)
-        if self.event == 'query' and os.getenv('SERF_QUERY_NAME', None) in ['uptime', 'load']:
+        if self.event == 'query' and os.getenv('SERF_QUERY_NAME') in ['uptime', 'load']:
             print(os.popen('uptime').read(), end='')
         for line in sys.stdin:
             # do something with the data
-            log.debug('data: %s' % line)
+            log.debug('data: %s' % line.strip())
 
     def run(self):
         if self.args:
@@ -78,6 +76,8 @@ class SerfEventHandler(CLI):
         self.event = os.getenv('SERF_EVENT', None)
         if self.event is None:
             log.warn('SERF_EVENT environment variable was None!!')
+        elif self.event not in self.events:
+            log.warn("SERF_EVENT environment variable passed unrecognized event type '%s'" % self.event)
         self.handle_event()
 
 
