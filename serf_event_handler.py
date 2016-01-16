@@ -18,10 +18,12 @@
 
 Serf Handler to return query information or handle specific events
 
-Optionally allows enabling command pass through of any user query or event.
+Optionally allows enabling command pass through of any user query or event
 
 Checks first arg against $PATH and if matching executable is found, then executes the full command and returns the
 result from standard output. Careful to ensure you've set up security before enabling --cmd!
+
+Framework for new custom handlers, simply inherit SerfEventHandler and override add_options() and handle_event() methods
 
 Docs:
 
@@ -116,7 +118,7 @@ class SerfEventHandler(CLI):
             for (key, value) in os.environ.iteritems(): # pylint: disable=unused-variable
                 if serf_regex.search(key):
                     log.debug('%(key)s=%(value)s' % locals())
-        if self.options.cmd:
+        if 'cmd' in dir(self.options) and self.options.cmd:
             self.enable_commands()
         self.handle_event()
 
