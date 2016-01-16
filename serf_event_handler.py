@@ -58,7 +58,9 @@ class SerfEventHandler(CLI):
         self.event = None
         self.query_name = None
         self.command = None
-        self.set_timeout_default(None)
+        # "expected to exit within a reasonable amount of time" according to docs, this seems like a reasonable
+        # safeguard and is configurable on the command line via --timeout <secs>
+        self.set_timeout_default(30)
 
     # override this if subclassing
     def handle_event(self):
