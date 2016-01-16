@@ -18,6 +18,9 @@
 
 Serf Handler to return query information or handle specific events
 
+For user queries checks first arg against $PATH and if matching executable is found, executes and returns the result
+from standard output of the full command. Careful to ensure you've set up security before using this!
+
 https://www.serfdom.io/intro/getting-started/event-handlers.html
 
 https://www.serfdom.io/docs/commands/event.html
@@ -38,7 +41,7 @@ import sys
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import log # pylint: disable=wrong-import-position
+    from harisekhon.utils import log, which, FileNotFoundException # pylint: disable=wrong-import-position
     from harisekhon import CLI # pylint: disable=wrong-import-position
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -57,8 +60,14 @@ class SerfEventHandler(CLI):
 
     # override this if subclassing
     def handle_event(self):
-        if self.event == 'query' and os.getenv('SERF_QUERY_NAME') in ['uptime', 'load']:
-            print(os.popen('uptime').read(), end='')
+        if self.event == 'query':
+            query_name = os.getenv('SERF_QUERY_NAME')
+            # if the query is found in the path then execute the command
+            try:
+                if which(query_name.split()[0]):
+                    print(os.popen(query_name).read(), end='')
+            except FileNotFoundException as _:
+                print(_)
         for line in sys.stdin:
             # do something with the data
             log.debug('data: %s' % line.strip())
