@@ -41,7 +41,7 @@ import sys
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import log, which, FileNotFoundException # pylint: disable=wrong-import-position
+    from harisekhon.utils import isStr, log, which, FileNotFoundException # pylint: disable=wrong-import-position
     from harisekhon import CLI # pylint: disable=wrong-import-position
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -56,18 +56,14 @@ class SerfEventHandler(CLI):
         super(SerfEventHandler, self).__init__()
         self.events = ['member-join', 'member-leave', 'member-failed', 'member-update', 'member-reap', 'user', 'query']
         self.event = None
+        self.query_name = None
+        self.command = None
         self.set_timeout_default(None)
 
     # override this if subclassing
     def handle_event(self):
-        if self.event == 'query':
-            query_name = os.getenv('SERF_QUERY_NAME')
-            # if the query is found in the path then execute the command
-            try:
-                if which(query_name.split()[0]):
-                    print(os.popen(query_name).read(), end='')
-            except FileNotFoundException as _:
-                print(_)
+        if isStr(self.command):
+            print(os.popen(self.command).read(), end='')
         for line in sys.stdin:
             # do something with the data
             log.debug('data: %s' % line.strip())
@@ -76,7 +72,7 @@ class SerfEventHandler(CLI):
         if self.args:
             self.usage()
         if log.isEnabledFor(logging.DEBUG):
-            # this trips the 1024 byte limit and queries fail to respond
+            # this trips the 1024 byte limit and queries fail to respond so only filter and show *SERF* env vars
             # log.debug(envs2str())
             serf_regex = re.compile('SERF', re.I)
             for (key, value) in os.environ.iteritems(): # pylint: disable=unused-variable
@@ -87,6 +83,14 @@ class SerfEventHandler(CLI):
             log.warn('SERF_EVENT environment variable was None!!')
         elif self.event not in self.events:
             log.warn("SERF_EVENT environment variable passed unrecognized event type '%s'" % self.event)
+        if self.event == 'query':
+            self.query_name = os.getenv('SERF_QUERY_NAME')
+            try:
+                # if the first part of the query is found in $PATH then assume it's a command that was passed
+                if which(self.query_name.split()[0]):
+                    self.command = self.query_name
+            except FileNotFoundException as _:
+                log.debug(_)
         self.handle_event()
 
 
