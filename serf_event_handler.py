@@ -54,13 +54,29 @@ class SerfEventHandler(CLI):
 
     def __init__(self):
         super(SerfEventHandler, self).__init__()
+        self.set_timeout_default(30)
         self.events = ['member-join', 'member-leave', 'member-failed', 'member-update', 'member-reap', 'user', 'query']
-        self.event = None
-        self.query_name = None
+        self.node = os.getenv('SERF_SELF_NAME', '')
+        self.role = os.getenv('SERF_SELF_ROLE', None)
+        self.event = os.getenv('SERF_EVENT', None)
+        self.query_name = os.getenv('SERF_QUERY_NAME', None)
+        self.user_event = os.getenv('SERF_USER_EVENT', None)
+        # self.user_ltime = os.getenv('SERF_USER_LTIME', 0)
+        # self.query_ltime = os.getenv('SERF_QUERY_LTIME', 0)
         self.command = None
         # "expected to exit within a reasonable amount of time" according to docs, this seems like a reasonable
         # safeguard and is configurable on the command line via --timeout <secs>
-        self.set_timeout_default(30)
+        if self.event is None:
+            log.warn('SERF_EVENT environment variable was None!!')
+        elif self.event not in self.events:
+            log.warn("SERF_EVENT environment variable passed unrecognized event type '%s'" % self.event)
+        if self.event == 'query':
+            try:
+                # if the first part of the query is found in $PATH then assume it's a command that was passed
+                if which(self.query_name.split()[0]):
+                    self.command = self.query_name
+            except FileNotFoundException as _:
+                log.debug(_)
 
     # override this if subclassing
     def handle_event(self):
@@ -80,19 +96,6 @@ class SerfEventHandler(CLI):
             for (key, value) in os.environ.iteritems(): # pylint: disable=unused-variable
                 if serf_regex.search(key):
                     log.debug('%(key)s=%(value)s' % locals())
-        self.event = os.getenv('SERF_EVENT', None)
-        if self.event is None:
-            log.warn('SERF_EVENT environment variable was None!!')
-        elif self.event not in self.events:
-            log.warn("SERF_EVENT environment variable passed unrecognized event type '%s'" % self.event)
-        if self.event == 'query':
-            self.query_name = os.getenv('SERF_QUERY_NAME')
-            try:
-                # if the first part of the query is found in $PATH then assume it's a command that was passed
-                if which(self.query_name.split()[0]):
-                    self.command = self.query_name
-            except FileNotFoundException as _:
-                log.debug(_)
         self.handle_event()
 
 
