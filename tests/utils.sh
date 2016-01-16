@@ -16,7 +16,7 @@
 set -eu
 
 hr(){
-    echo "===================="
+    echo "================================================================================"
 }
 
 if [ -n "${TRAVIS:-}" ]; then
@@ -29,13 +29,4 @@ export SPARK_HOME="$(ls -d tests/spark-*-bin-hadoop* | head -n 1)"
 
 . "$srcdir/excluded.sh"
 
-check(){
-    cmd=$1
-    msg=$2
-    if eval $cmd; then
-        echo "SUCCESS: $msg"
-    else
-        echo "FAILED: $msg"
-        exit 1
-    fi
-}
+. "$srcdir/check.sh"
