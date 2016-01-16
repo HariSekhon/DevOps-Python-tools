@@ -20,6 +20,8 @@ Serf Handler to return query information or handle specific events
 
 https://www.serfdom.io/intro/getting-started/event-handlers.html
 
+https://www.serfdom.io/docs/commands/event.html
+
 Tested on HashiCorp's Serf 0.7.0
 
 """
@@ -51,15 +53,12 @@ class SerfEventHandler(CLI):
         super(SerfEventHandler, self).__init__()
         self.events = ['member-join', 'member-leave', 'member-failed', 'member-update', 'member-reap', 'user', 'query']
         self.event = None
-
-    def add_options(self):
         self.set_timeout_default(None)
 
     # override this if subclassing
-    def handle_event(self): #
-        # custom event names are being passed
-        # if serf_event not in self.events:
-        #     log.warn("SERF_EVENT environment variable passed unrecognized event type '%s'" % serf_event)
+    def handle_event(self):
+        if self.event not in self.events:
+            log.warn("SERF_EVENT environment variable passed unrecognized event type '%s'" % self.event)
         if self.event == 'query' and os.getenv('SERF_QUERY_NAME', None) in ['uptime', 'load']:
             print(os.popen('uptime').read(), end='')
         for line in sys.stdin:
@@ -69,14 +68,14 @@ class SerfEventHandler(CLI):
     def run(self):
         if self.args:
             self.usage()
-        self.event = os.getenv('SERF_EVENT', None)
         if log.isEnabledFor(logging.DEBUG):
             # this trips the 1024 byte limit and queries fail to respond
             # log.debug(envs2str())
-            serf_regex = re.compile('serf', re.I)
+            serf_regex = re.compile('SERF', re.I)
             for (key, value) in os.environ.iteritems(): # pylint: disable=unused-variable
                 if serf_regex.search(key):
                     log.debug('%(key)s=%(value)s' % locals())
+        self.event = os.getenv('SERF_EVENT', None)
         if self.event is None:
             log.warn('SERF_EVENT environment variable was None!!')
         self.handle_event()
