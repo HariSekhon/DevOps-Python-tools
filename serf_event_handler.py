@@ -18,10 +18,18 @@
 
 Serf Handler to return query information or handle specific events
 
-For user queries checks first arg against $PATH and if matching executable is found, executes and returns the result
-from standard output of the full command. Careful to ensure you've set up security before using this!
+Optionally allows enabling command pass through of any user query or event.
+
+Checks first arg against $PATH and if matching executable is found, then executes the full command and returns the
+result from standard output. Careful to ensure you've set up security before enabling --cmd!
+
+Docs:
 
 https://www.serfdom.io/intro/getting-started/event-handlers.html
+
+https://www.serfdom.io/docs/agent/event-handlers.html
+
+Call custom events:
 
 https://www.serfdom.io/docs/commands/event.html
 
@@ -70,13 +78,25 @@ class SerfEventHandler(CLI):
             log.warn('SERF_EVENT environment variable was None!!')
         elif self.event not in self.events:
             log.warn("SERF_EVENT environment variable passed unrecognized event type '%s'" % self.event)
-        if self.event == 'query':
+
+    def add_options(self):
+        self.parser.add_option('-c', '--cmd', action='store_true', help='Allow any query or event to run a command' + \
+                               ' if the first arg is found in $PATH')
+
+    def enable_commands(self):
+        if self.event in ['query', 'event']:
+            cmd = None
+            if self.event == 'query':
+                cmd = self.query_name
+            elif self.event == 'user':
+                cmd = self.user_event
             try:
                 # if the first part of the query is found in $PATH then assume it's a command that was passed
-                if which(self.query_name.split()[0]):
-                    self.command = self.query_name
+                if which(cmd.split()[0]):
+                    self.command = cmd
             except FileNotFoundException as _:
                 log.debug(_)
+
 
     # override this if subclassing
     def handle_event(self):
@@ -96,6 +116,8 @@ class SerfEventHandler(CLI):
             for (key, value) in os.environ.iteritems(): # pylint: disable=unused-variable
                 if serf_regex.search(key):
                     log.debug('%(key)s=%(value)s' % locals())
+        if self.options.cmd:
+            self.enable_commands()
         self.handle_event()
 
 
