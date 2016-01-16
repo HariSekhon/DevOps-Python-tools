@@ -98,7 +98,6 @@ class SerfEventHandler(CLI):
             except FileNotFoundException as _:
                 log.debug(_)
 
-
     # override this if subclassing
     def handle_event(self):
         if isStr(self.command):
