@@ -53,11 +53,10 @@ make:
 .PHONY: apt-packages
 apt-packages:
 	$(SUDO) apt-get update
-	$(SUDO) apt-get install -y gcc
+	$(SUDO) apt-get install -y build-essential
 	# needed to fetch the library submodule at end of build
 	$(SUDO) apt-get install -y git
 	$(SUDO) apt-get install -y ipython-notebook || :
-	$(SUDO) apt-get install -y python-setuptools
 	$(SUDO) apt-get install -y python-pip
 	$(SUDO) apt-get install -y python-dev
 
