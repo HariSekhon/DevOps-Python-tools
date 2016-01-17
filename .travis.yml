@@ -16,6 +16,8 @@ python:
   - "pypy"
 #  - "pypy3"
 
+sudo: true
+
 notifications:
   email: false
 
