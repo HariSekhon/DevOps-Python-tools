@@ -57,7 +57,7 @@ apt-packages:
 	# needed to fetch the library submodule at end of build
 	$(SUDO) apt-get install -y git
 	$(SUDO) apt-get install -y ipython-notebook || :
-	dpkg -l python-setuptools python-dev &>/dev/null || $(SUDO) apt-get install -y python-setuptools python-dev
+	dpkg -l python-setuptools python-pip python-dev &>/dev/null || $(SUDO) apt-get install -y python-setuptools python-pip python-dev
 
 .PHONY: yum-packages
 yum-packages:
