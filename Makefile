@@ -56,12 +56,14 @@ apt-packages:
 	$(SUDO) apt-get install -y build-essential
 	# needed to fetch the library submodule at end of build
 	$(SUDO) apt-get install -y git
-	$(SUDO) apt-get install -y python-pip
 	$(SUDO) apt-get install -y python-dev
+	$(SUDO) apt-get install -y python-setuptools
+	$(SUDO) apt-get install -y python-pip
 	$(SUDO) apt-get install -y ipython-notebook || :
 
 .PHONY: yum-packages
 yum-packages:
+	rpm -q git     || $(SUDO) yum install -y git
 	rpm -q wget    || $(SUDO) yum install -y wget
 	rpm -q gcc     || $(SUDO) yum install -y gcc
 	rpm -q gcc-c++ || $(SUDO) yum install -y gcc-c++
@@ -69,11 +71,13 @@ yum-packages:
 	# needed to fetch the library submodule and CPAN modules
 	# python-pip requires EPEL, so try to get the correct EPEL rpm
 	rpm -q epel-release || yum install -y epel-release || { wget -O /tmp/epel.rpm "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`grep -o '[[:digit:]]' /etc/*release | head -n1`.noarch.rpm" && $(SUDO) rpm -ivh /tmp/epel.rpm && rm -f /tmp/epel.rpm; }
-	rpm -q python-setuptools python-pip python-devel || $(SUDO) yum install -y python-setuptools python-pip python-devel
-	rpm -q ipython-notebook || $(SUDO) yum install -y ipython-notebook || :
+	rpm -q python-setuptools || $(SUDO) yum install -y python-setuptools
+	rpm -q python-pip        || $(SUDO) yum install -y python-pip
+	rpm -q python-devel      || $(SUDO) yum install -y python-devel
+	rpm -q ipython-notebook  || $(SUDO) yum install -y ipython-notebook || :
 	# needed to build pyhs2
 	# libgsasl-devel saslwrapper-devel
-	rpm -q cyrus-sasl-devel || $(SUDO) yum install -y cyrus-sasl-devel
+	rpm -q cyrus-sasl-devel  || $(SUDO) yum install -y cyrus-sasl-devel
 
 .PHONY: test
 test:
