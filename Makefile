@@ -56,6 +56,7 @@ apt-packages:
 	$(SUDO) apt-get install -y build-essential
 	# needed to fetch the library submodule at end of build
 	$(SUDO) apt-get install -y git
+	$(SUDO) apt-get install -y wget
 	$(SUDO) apt-get install -y python-dev
 	$(SUDO) apt-get install -y python-setuptools
 	$(SUDO) apt-get install -y python-pip
