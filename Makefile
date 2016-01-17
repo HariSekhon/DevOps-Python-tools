@@ -56,9 +56,9 @@ apt-packages:
 	$(SUDO) apt-get install -y build-essential
 	# needed to fetch the library submodule at end of build
 	$(SUDO) apt-get install -y git
-	$(SUDO) apt-get install -y ipython-notebook || :
 	$(SUDO) apt-get install -y python-pip
 	$(SUDO) apt-get install -y python-dev
+	$(SUDO) apt-get install -y ipython-notebook || :
 
 .PHONY: yum-packages
 yum-packages:
