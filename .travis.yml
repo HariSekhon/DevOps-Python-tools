@@ -16,6 +16,9 @@ python:
   - "pypy"
 #  - "pypy3"
 
+notifications:
+  email: false
+
 install:
   - make
 
