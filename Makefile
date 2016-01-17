@@ -62,7 +62,9 @@ apt-packages:
 
 .PHONY: yum-packages
 yum-packages:
-	rpm -q gcc gcc-c++ || $(SUDO) yum install -y gcc gcc-c++
+	rpm -q wget    || $(SUDO) yum install -y wget
+	rpm -q gcc     || $(SUDO) yum install -y gcc
+	rpm -q gcc-c++ || $(SUDO) yum install -y gcc-c++
 	rpm -q git || $(SUDO) yum install -y git
 	# needed to fetch the library submodule and CPAN modules
 	# python-pip requires EPEL, so try to get the correct EPEL rpm
