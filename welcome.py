@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 # from __future__ import unicode_literals
 
+import getpass
 import os
 import random
 import re
@@ -35,7 +36,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '1.4.0'
+__version__ = '1.4.1'
 
 class Welcome(CLI):
 
@@ -57,9 +58,11 @@ class Welcome(CLI):
         return user
 
     def construct_msg(self): # pylint: disable=no-self-use
-        user = os.getenv('USER', '').strip()
+        # user = os.getenv('USER', '').strip()
+        user = getpass.getuser()
         if not isUser(user):
-            print("invalid user '%s' determined from environment variable $USER, failed regex validation" % user)
+            # print("invalid user '%s' determined from environment variable $USER, failed regex validation" % user)
+            print("invalid user '%s' returned by getpass.getuser(), failed regex validation" % user)
             sys.exit(ERRORS['CRITICAL'])
         user = self.case_user(user)
         msg = 'Welcome %s - ' % user
