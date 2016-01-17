@@ -28,7 +28,7 @@ make:
 	if [ -x /usr/bin/yum ];     then make yum-packages; fi
 	
 	git submodule init
-	git submodule update
+	git submodule update --remote --recursive
 	
 	cd pylib && make
 	
@@ -99,7 +99,7 @@ update2:
 .PHONY: update-no-recompile
 update-no-recompile:
 	git pull
-	git submodule update --init
+	git submodule update --init --remote --recursive
 
 .PHONY: clean
 clean:
