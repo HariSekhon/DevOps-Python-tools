@@ -59,7 +59,7 @@ apt-packages:
 	$(SUDO) apt-get install -y python-dev
 	$(SUDO) apt-get install -y python-setuptools
 	$(SUDO) apt-get install -y python-pip
-	$(SUDO) apt-get install -y ipython-notebook || :
+	#$(SUDO) apt-get install -y ipython-notebook || :
 
 .PHONY: yum-packages
 yum-packages:
