@@ -13,6 +13,6 @@ Ambari Blueprints are very raw and there are lots of things that can go wrong wi
 
 Some features will not work in different versions of Ambari < 2.1.0 (HA, host predicates/counts) or require extra configuration eg. for various services HA deployments. You must read all the Ambari documentation thoroughly.
 
-##### I am not supporting these Blueprints, please do not raise issues for this part of the repo. #####
+##### I am not supporting these Blueprints, please do not raise issues for this part of the repo unless you're submitting fixes/improvements as I likely won't have the time or infrastructure to debug it for you. #####
 
 This is only for my own usage and reference for modification to my clients needs while consulting.
