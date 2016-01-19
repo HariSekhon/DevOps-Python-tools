@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.7.0'
 
 class JsonValidatorTool(CLI):
 
@@ -64,28 +64,43 @@ class JsonValidatorTool(CLI):
         self.valid_json_msg = '<unknown> => JSON OK'
         self.invalid_json_msg = '<unknown> => JSON INVALID'
         self.invalid_json_msg_single_quotes = '%s (found single quotes not double quotes)' % self.invalid_json_msg
+        self.failed = False
 
     def add_options(self):
         self.parser.add_option('-m', '--multi-record', action='store_true',
                                help='Test explicitly for multi-record JSON data, where each line is a separate json ' \
                                   + 'document separated by newlines. Must use if reading multi-record json format ' \
                                   + 'on standard input')
+        self.parser.add_option('-p', '--print', action='store_true',
+                               help='Print the JSON document(s) if valid, else print nothing (useful for shell ' +
+                               'pipelines). Exit codes are still 0 for success, or %s for failure'
+                               % ERRORS['CRITICAL'])
 
     def check_multirecord_json(self):
         for line in self.iostream:
-            if not isJson(line):
-                if isJson(line.replace("'", '"')):
+            if isJson(line):
+                if self.options.print:
+                    print(line, end='')
+            else:
+                self.failed = True
+                if not self.options.print and isJson(line.replace("'", '"')):
                     die('%s (multi-record format)' % self.invalid_json_msg_single_quotes)
                 else:
                     return False
-        print('%s (multi-record format)' % self.valid_json_msg)
+        if not self.options.print:
+            print('%s (multi-record format)' % self.valid_json_msg)
         return True
 
     def check_json(self, content):
         if isJson(content):
-            print(self.valid_json_msg)
+            if self.options.print:
+                print(content, end='')
+            else:
+                print(self.valid_json_msg)
         elif isJson(content.replace("'", '"')):
-            die(self.invalid_json_msg_single_quotes)
+            self.failed = True
+            if not self.options.print:
+                die(self.invalid_json_msg_single_quotes)
         else:
             if self.iostream is not sys.stdin:
                 self.iostream.seek(0)
@@ -97,7 +112,9 @@ class JsonValidatorTool(CLI):
             #         json.loads(content)
             #     except Exception, e:
             #         print(e)
-            die(self.invalid_json_msg)
+            self.failed = True
+            if not self.options.print:
+                die(self.invalid_json_msg)
 
     # looks like this does a .read() anyway, not buying any efficiency enhancement
     #
@@ -130,6 +147,8 @@ class JsonValidatorTool(CLI):
                 die("path '%s' could not be determined as either a file or directory" % arg)
         for arg in self.args:
             self.check_path(arg)
+        if self.failed:
+            sys.exit(ERRORS['CRITICAL'])
 
     def check_path(self, path):
         if path == '-' or os.path.isfile(path):
@@ -156,7 +175,9 @@ class JsonValidatorTool(CLI):
             self.iostream = sys.stdin
             if self.options.multi_record:
                 if not self.check_multirecord_json():
-                    die(self.invalid_json_msg)
+                    self.failed = True
+                    if not self.options.print:
+                        die(self.invalid_json_msg)
             else:
                 self.check_json(sys.stdin.read())
         else:
