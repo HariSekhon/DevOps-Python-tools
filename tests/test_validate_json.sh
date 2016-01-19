@@ -112,6 +112,15 @@ set +o pipefail
 set -o pipefail
 echo
 
+# TODO: add failure print silent mode exit code and stdout/stderr
+echo "testing print mode"
+[ "$(./validate_json.py -p "$data_dir/test.json" | cksum)" = "$(cksum < "$data_dir/test.json")" ] || { echo "print test failed!"; exit 1; }
+echo "successfully passed out test json to stdout"
+echo "testing print mode with multi-record"
+[ "$(./validate_json.py -mp "$data_dir/multirecord.json" | cksum)" = "$(cksum < "$data_dir/multirecord.json")" ] || { echo "print multi-record test failed!"; exit 1; }
+echo "successfully passed out multi-record json to stdout"
+echo
+
 echo '{ "name": "hari" ' > "$broken_dir/missing_end_quote.json"
 check_broken "$broken_dir/missing_end_quote.json"
 
