@@ -44,7 +44,6 @@ grep -v -e 'broken' -e 'error' -e ' '
 )
 echo
 
-echo
 echo "checking directory recursion (mixed with explicit file given)"
 ./validate_xml.py -vvv "$data_dir/simple.xml" .
 echo
@@ -64,6 +63,11 @@ echo "testing stdin"
 ./validate_xml.py - < "$data_dir/simple.xml"
 ./validate_xml.py < "$data_dir/simple.xml"
 ./validate_xml.py "$data_dir/simple.xml" - < "$data_dir/simple.xml"
+echo
+
+echo "testing print mode"
+[ "$(./validate_xml.py -p "$data_dir/simple.xml" | cksum)" = "$(cksum < "$data_dir/simple.xml")" ] || { echo "print test failed!"; exit 1; }
+echo "successfully passed out test xml to stdout"
 echo
 
 echo "Now trying non-xml files to detect successful failure:"
