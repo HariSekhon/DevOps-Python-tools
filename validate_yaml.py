@@ -48,7 +48,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.7.0'
 
 class YamlValidatorTool(CLI):
 
@@ -61,6 +61,7 @@ class YamlValidatorTool(CLI):
         self.re_yaml_suffix = re.compile(r'.*\.ya?ml$', re.I)
         self.valid_yaml_msg = '<unknown> => YAML OK'
         self.invalid_yaml_msg = '<unknown> => YAML INVALID'
+        self.failed = False
 
     # def check_multiline_yaml(self):
     #         self.f.seek(0)
@@ -72,17 +73,28 @@ class YamlValidatorTool(CLI):
 
     def check_yaml(self, content):
         if isYaml(content):
-            print(self.valid_yaml_msg)
+            if self.options.print:
+                print(content, end='')
+            else:
+                print(self.valid_yaml_msg)
         # multi-record yaml like JSON in Big Data isn't really used
         # elif self.check_multiline_yaml():
         #     pass
         else:
-            if self.get_verbose() > 2:
-                try:
-                    yaml.load(content)
-                except yaml.YAMLError as _:
-                    print(_)
-            die(self.invalid_yaml_msg)
+            self.failed = True
+            if not self.options.print:
+                if self.get_verbose() > 2:
+                    try:
+                        yaml.load(content)
+                    except yaml.YAMLError as _:
+                        print(_)
+                die(self.invalid_yaml_msg)
+
+    def add_options(self):
+        self.parser.add_option('-p', '--print', action='store_true',
+                               help='Print the YAML document(s) if valid, else print nothing (useful for shell ' +
+                               'pipelines). Exit codes are still 0 for success, or %s for failure'
+                               % ERRORS['CRITICAL'])
 
     def run(self):
         if not self.args:
@@ -101,6 +113,8 @@ class YamlValidatorTool(CLI):
                 die("path '%s' could not be determined as either a file or directory" % arg)
         for arg in self.args:
             self.check_path(arg)
+        if self.failed:
+            sys.exit(ERRORS['CRITICAL'])
 
     def check_path(self, path):
         if path == '-' or os.path.isfile(path):
