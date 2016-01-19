@@ -67,6 +67,11 @@ echo "testing stdin mixed with filename"
 ./validate_yaml.py "$data_dir/test.yaml" - < "$data_dir/test.yaml"
 echo
 
+echo "testing print mode"
+[ "$(./validate_yaml.py -p "$data_dir/test.yaml" | cksum)" = "$(cksum < "$data_dir/test.yaml")" ] || { echo "print test failed!"; exit 1; }
+echo "successfully passed out test yaml to stdout"
+echo
+
 echo "Now trying non-yaml files to detect successful failure:"
 check_broken(){
     filename="$1"
