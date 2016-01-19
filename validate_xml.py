@@ -48,7 +48,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.7.0'
 
 class XmlValidatorTool(CLI):
 
@@ -61,19 +61,33 @@ class XmlValidatorTool(CLI):
         self.re_xml_suffix = re.compile(r'.*\.xml$', re.I)
         self.valid_xml_msg = '<unknown> => XML OK'
         self.invalid_xml_msg = '<unknown> => XML INVALID'
+        self.failed = False
 
     def check_xml(self, content):
         if isXml(content):
-            print(self.valid_xml_msg)
+            if self.options.print:
+                print(content, end='')
+            else:
+                print(self.valid_xml_msg)
         else:
-            if self.get_verbose() > 2:
-                try:
-                    ET.fromstring(content)
-                # Python 2.7 throws xml.etree.ElementTree.ParseError, but Python 2.6 throws xml.parsers.expat.ExpatError
-                # have to catch generic Exception to be able to handle both
-                except Exception as _: # pylint: disable=broad-except
-                    print(_)
-            die(self.invalid_xml_msg)
+            self.failed = True
+            if not self.options.print:
+                if self.get_verbose() > 2:
+                    try:
+                        ET.fromstring(content)
+                    # Python 2.7 throws xml.etree.ElementTree.ParseError, but
+                    # Python 2.6 throws xml.parsers.expat.ExpatError
+                    # have to catch generic Exception to be able to handle both
+                    except Exception as _:  # pylint: disable=broad-except
+                        if not self.options.print:
+                            print(_)
+                die(self.invalid_xml_msg)
+
+    def add_options(self):
+        self.parser.add_option('-p', '--print', action='store_true',
+                               help='Print the XML document(s) if valid, else print nothing (useful for shell ' +
+                               'pipelines). Exit codes are still 0 for success, or %s for failure'
+                               % ERRORS['CRITICAL'])
 
     def run(self):
         if not self.args:
@@ -92,6 +106,8 @@ class XmlValidatorTool(CLI):
                 die("path '%s' could not be determined as either a file or directory" % arg)
         for arg in self.args:
             self.check_path(arg)
+        if self.failed:
+            sys.exit(ERRORS['CRITICAL'])
 
     def check_path(self, path):
         if path == '-' or os.path.isfile(path):
