@@ -69,6 +69,9 @@ class SparkJsonToParquet(CLI):
     def run(self):
         json_file = self.options.json
         parquet_dir = self.options.parquet_dir
+        # let Spark fail if csv/parquet aren't available
+        # can't check paths exist as want to remain generically portable
+        # to HDFS, local filesystm or any other uri scheme Spark supports
 
         if not json_file:
             self.usage('--json not defined')
