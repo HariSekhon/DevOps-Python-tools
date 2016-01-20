@@ -42,7 +42,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 
 import getpass
 import glob
@@ -59,6 +59,7 @@ try:
 except ImportError as e:
     print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
+pyspark_path()
 
 if not isPythonMinVersion(2.7):
     warn('Python < 2.7 - IPython may not be available on this version of Python (supplied auto-build will likely have failed for this module)\n')
