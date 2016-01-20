@@ -42,7 +42,7 @@ try:
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
     sys.exit(4)
-os.environ['PYSPARK_SUBMIT_ARGS'] = '%s --packages com.databricks:spark-csv_2.10:1.3.0' \
+os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.databricks:spark-csv_2.10:1.3.0 %s' \
                                     % os.getenv('PYSPARK_SUBMIT_ARGS', '')
 pyspark_path()
 from pyspark import SparkContext    # pylint: disable=wrong-import-position,import-error
