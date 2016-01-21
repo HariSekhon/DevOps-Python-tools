@@ -41,8 +41,11 @@ Some common options also support optional environment variables for convenience 
 - ```pig-text-to-elasticsearch.pig``` / ```pig-text-to-solr.pig``` - bulk indexes unstructured files in Hadoop to Elasticsearch or Solr/SolrCloud clusters
 - ```pig_udfs.jy``` - Pig Jython UDFs for Hadoop
 - ```ipython-notebook-pyspark.py``` - per-user authenticated IPython Notebook + PySpark integration to allow each user to auto-create their own password protected IPython Notebook running Spark
+- ```spark-avro-to-parquet.py``` - PySpark Avro => Parquet converter
 - ```spark-json-to-parquet.py``` - PySpark JSON => Parquet converter
-- ```spark-csv-to-parquet.py``` - PySpark CSV => Parquet converter
+- ```spark-json-to-avro.py``` - PySpark CSV => Avro converter, supports both inferred and explicit schemas
+- ```spark-csv-to-parquet.py``` - PySpark CSV => Parquet converter, supports both inferred and explicit schemas
+- ```spark-csv-to-avro.py``` - PySpark JSON => Avro converter
 - ```validate_json.py``` - validate JSON files, stdin or all ```.json``` files found in given directories. Supports both normal json files as well as json-doc-per-line files such as MongoDB or Hadoop json data files
 - ```validate_xml.py``` - validate XML files, stdin or all ```.xml``` files found in given directories
 - ```validate_yaml.py``` - validate YAML files, stdin or all ```.yaml``` / ```.yml``` files found in given directories
