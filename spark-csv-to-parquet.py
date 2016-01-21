@@ -25,6 +25,8 @@ If CSV --has-headers then all fields are assumed to be 'string' unless explicitl
 
 Written to work across Python 2.x and Spark versions, especially Spark given that the Spark API changed after 1.3
 
+Tested on Spark 1.3.1, 1.4.0
+
 """
 
 from __future__ import absolute_import
@@ -87,9 +89,9 @@ class SparkCSVToParquet(CLI):
         self.parser.add_option('-e', '--has-header', action='store_true',
                                help='CSV has header. Infers schema if --schema is not given in which case all ' +
                                "types are assumed to be 'string'. Must specify --schema to override this")
-        self.parser.add_option('-s', '--schema',
-                               help="Schema for CSV. Format is '<name>:<type>,<name2>:<type>...' where type " +
-                               "defaults to 'string', possible types are: %s" % ', '.join(sorted(self.types_mapping)))
+        self.parser.add_option('-s', '--schema', metavar='name:type,name2:type2,...',
+                               help="Schema for CSV. Types default to 'string'. Possible types are: %s" \
+                                    % ', '.join(sorted(self.types_mapping)))
 
     def parse_args(self):
         self.no_args()
@@ -139,7 +141,7 @@ class SparkCSVToParquet(CLI):
                 return StructField(name, data_class, True)
             # see https://github.com/databricks/spark-csv#python-api
             self.schema = StructType([create_struct(_) for _ in schema.split(',')])
-            log.info('generated schema')
+            log.info('generated CSV => Spark schema')
 
         conf = SparkConf().setAppName('HS PySpark CSV => Parquet')
         sc = SparkContext(conf=conf) # pylint: disable=invalid-name
