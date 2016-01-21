@@ -95,9 +95,8 @@ class AvroValidatorTool(CLI):
                 subpath = os.path.join(path, item)
                 if os.path.isdir(subpath):
                     self.check_path(subpath)
-                if not self.re_avro_suffix.match(item):
-                    continue
-                self.check_file(subpath)
+                elif self.re_avro_suffix.match(item):
+                    self.check_file(subpath)
         else:
             die("failed to determine if path '%s' is file or directory" % path)
 
@@ -109,8 +108,11 @@ class AvroValidatorTool(CLI):
         if filename == '<STDIN>':
             self.check_avro(sys.stdin)
         else:
-            with open(filename) as avrohandle:
-                self.check_avro(avrohandle)
+            try:
+                with open(filename) as avrohandle:
+                    self.check_avro(avrohandle)
+            except IOError as _:
+                die("ERROR: %s" % _)
 
 
 if __name__ == '__main__':
