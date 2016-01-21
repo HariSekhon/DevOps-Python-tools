@@ -67,19 +67,21 @@ class SparkJsonToParquet(CLI):
                                help='Parquet output dir ($PARQUETDIR)',
                                default=getenv('PARQUETDIR'))
 
+    def parse_args(self):
+        self.no_args()
+        if not self.options.json:
+            self.usage('--json not defined')
+        if not self.options.parquet_dir:
+            self.usage('--parquet-dir not defined')
+
     def run(self):
         json_file = self.options.json
         parquet_dir = self.options.parquet_dir
         # let Spark fail if csv/parquet aren't available
         # can't check paths exist as want to remain generically portable
         # to HDFS, local filesystm or any other uri scheme Spark supports
-
-        if not json_file:
-            self.usage('--json not defined')
-        if not parquet_dir:
-            self.usage('--parquet_dir not defined')
-        if self.args:
-            self.usage()
+        log.info("Json Source: %s" % json_file)
+        log.info("Parquet Destination: %s" % parquet_dir)
 
         conf = SparkConf().setAppName('HS PySpark JSON => Parquet')
         sc = SparkContext(conf=conf) # pylint: disable=invalid-name
@@ -89,12 +91,12 @@ class SparkJsonToParquet(CLI):
         if not isVersionLax(spark_version):
             die("Spark version couldn't be determined. " + support_msg('pytools'))
         if isMinVersion(spark_version, 1.4):
-            json = sqlContext.read.json(json_file)
-            json.write.parquet(parquet_dir)
+            df = sqlContext.read.json(json_file)
+            df.write.parquet(parquet_dir)
         else:
             log.warn('running legacy code for Spark <= 1.3')
-            json = sqlContext.jsonFile(json_file)
-            json.saveAsParquetFile(parquet_dir)
+            df = sqlContext.jsonFile(json_file)
+            df.saveAsParquetFile(parquet_dir)
 
 if __name__ == '__main__':
     SparkJsonToParquet().main()
