@@ -9,5 +9,6 @@ solr-env.sh
 .DS_Store
 tests/spark-*-bin-hadoop2.6*
 tests/test-spark-*-bin-hadoop2.6.parquet
+parquet-tools-*-bin.zip
 *.pyc
 *.jyc
