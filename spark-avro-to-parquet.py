@@ -79,7 +79,7 @@ class SparkAvroToParquet(CLI):
         if not self.options.avro:
             self.usage('--avro not defined')
         if not self.options.parquet_dir:
-            self.usage('--parquet_dir not defined')
+            self.usage('--parquet-dir not defined')
 
     def run(self):
         avro_file = self.options.avro
