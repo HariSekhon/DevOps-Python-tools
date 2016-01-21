@@ -46,6 +46,7 @@ Some common options also support optional environment variables for convenience 
 - ```spark-json-to-avro.py``` - PySpark CSV => Avro converter, supports both inferred and explicit schemas
 - ```spark-csv-to-parquet.py``` - PySpark CSV => Parquet converter, supports both inferred and explicit schemas
 - ```spark-csv-to-avro.py``` - PySpark JSON => Avro converter
+- ```validate_avro.py``` - validate Avro files, stdin or all ```.avro``` files found in given directories
 - ```validate_json.py``` - validate JSON files, stdin or all ```.json``` files found in given directories. Supports both normal json files as well as json-doc-per-line files such as MongoDB or Hadoop json data files
 - ```validate_xml.py``` - validate XML files, stdin or all ```.xml``` files found in given directories
 - ```validate_yaml.py``` - validate YAML files, stdin or all ```.yaml``` / ```.yml``` files found in given directories
