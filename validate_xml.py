@@ -48,7 +48,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 
 class XmlValidatorTool(CLI):
 
@@ -117,9 +117,8 @@ class XmlValidatorTool(CLI):
                 subpath = os.path.join(path, item)
                 if os.path.isdir(subpath):
                     self.check_path(subpath)
-                if not self.re_xml_suffix.match(item):
-                    continue
-                self.check_file(subpath)
+                elif self.re_xml_suffix.match(item):
+                    self.check_file(subpath)
         else:
             die("failed to determine if path '%s' is file or directory" % path)
 
@@ -131,8 +130,11 @@ class XmlValidatorTool(CLI):
         if filename == '<STDIN>':
             self.check_xml(sys.stdin.read())
         else:
-            with open(filename) as self.iostream:
-                self.check_xml(self.iostream.read())
+            try:
+                with open(filename) as self.iostream:
+                    self.check_xml(self.iostream.read())
+            except IOError as _:
+                die("ERROR: %s" % _)
 
 
 if __name__ == '__main__':
