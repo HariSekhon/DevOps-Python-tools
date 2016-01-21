@@ -102,7 +102,7 @@ class SparkCSVToAvro(CLI):
         if not self.options.csv:
             self.usage('--csv not defined')
         if not self.options.avro_dir:
-            self.usage('--avro_dir not defined')
+            self.usage('--avro-dir not defined')
         if not (self.options.has_header or self.options.schema):
             self.usage('must specify either --has-header or --schema')
         # no longer mutually exclusive now this support schema override
