@@ -58,6 +58,7 @@ class SparkJsonToParquet(CLI):
 
     # @override
     def add_options(self):
+        self.set_verbose_default(2)
         self.set_timeout_default(86400)
         self.parser.add_option('-j', '--json', metavar='<file/dir>',
                                help='JSON input file/dir ($JSON)',
