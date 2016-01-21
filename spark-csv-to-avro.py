@@ -170,7 +170,8 @@ class SparkCSVToAvro(CLI):
                      .options(header=header_str)\
                      .load(csv_file, schema=self.schema)
         else:
-            die('Spark <= 1.3 is not supported, sorry! I may change this on request but prefer people just upgrade')
+            die('Spark <= 1.3 is not supported due to avro dependency, sorry! ' + \
+                'I may change this on request but prefer people just upgrade')
             # log.warn('running legacy code for Spark <= 1.3')
             # if has_header and not schema:
             #     log.info('inferring schema from CSV headers')
