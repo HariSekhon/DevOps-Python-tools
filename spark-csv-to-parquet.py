@@ -98,7 +98,7 @@ class SparkCSVToParquet(CLI):
         if not self.options.csv:
             self.usage('--csv not defined')
         if not self.options.parquet_dir:
-            self.usage('--parquet_dir not defined')
+            self.usage('--parquet-dir not defined')
         if not (self.options.has_header or self.options.schema):
             self.usage('must specify either --has-header or --schema')
         # no longer mutually exclusive now this support schema override
