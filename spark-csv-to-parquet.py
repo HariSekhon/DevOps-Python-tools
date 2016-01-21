@@ -150,33 +150,33 @@ class SparkCSVToParquet(CLI):
         if not isVersionLax(spark_version):
             die("Spark version couldn't be determined. " + support_msg('pytools'))
 
-        csv = None
+        df = None
         if isMinVersion(spark_version, 1.4):
             if has_header and not schema:
                 log.info('inferring schema from CSV headers')
-                csv = sqlContext.read.format('com.databricks.spark.csv')\
-                    .options(header=header_str, inferschema='true')\
-                    .load(csv_file)
+                df = sqlContext.read.format('com.databricks.spark.csv')\
+                     .options(header=header_str, inferschema='true')\
+                     .load(csv_file)
             else:
                 log.info('using explicitly defined schema')
-                csv = sqlContext.read\
-                    .format('com.databricks.spark.csv')\
-                    .options(header=header_str)\
-                    .load(csv_file, schema=self.schema)
-            csv.write.parquet(parquet_dir)
+                df = sqlContext.read\
+                     .format('com.databricks.spark.csv')\
+                     .options(header=header_str)\
+                     .load(csv_file, schema=self.schema)
+            df.write.parquet(parquet_dir)
         else:
             log.warn('running legacy code for Spark <= 1.3')
             if has_header and not schema:
                 log.info('inferring schema from CSV headers')
-                csv = sqlContext.load(source="com.databricks.spark.csv", path=csv_file,
-                                      header=header_str, inferSchema='true')
+                df = sqlContext.load(source="com.databricks.spark.csv", path=csv_file,
+                                     header=header_str, inferSchema='true')
             elif self.schema:
                 log.info('using explicitly defined schema')
-                csv = sqlContext.load(source="com.databricks.spark.csv", path=csv_file,
-                                      header=header_str, schema=self.schema)
+                df = sqlContext.load(source="com.databricks.spark.csv", path=csv_file,
+                                     header=header_str, schema=self.schema)
             else:
                 die('no header and no schema, caught late')
-            csv.saveAsParquetFile(parquet_dir)
+            df.saveAsParquetFile(parquet_dir)
 
 if __name__ == '__main__':
     SparkCSVToParquet().main()
