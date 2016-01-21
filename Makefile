@@ -22,6 +22,8 @@ else
 	SUDO = sudo
 endif
 
+PARQUET_VERSION=1.5.0
+
 .PHONY: build
 build:
 	if [ -x /usr/bin/apt-get ]; then make apt-packages; fi
@@ -31,6 +33,8 @@ build:
 	git submodule update --remote --recursive
 	
 	cd pylib && make
+	
+	wget -O parquet-tools-$(PARQUET_VERSION)-bin.zip http://search.maven.org/remotecontent?filepath=com/twitter/parquet-tools/$(PARQUET_VERSION)/parquet-tools-$(PARQUET_VERSION)-bin.zip && unzip parquet-tools-$(PARQUET_VERSION)-bin.zip
 	
 	# json module built-in to Python >= 2.6, backport not available via pypi
 	#$(SUDO2) pip install json
@@ -57,6 +61,7 @@ apt-packages:
 	# needed to fetch the library submodule at end of build
 	$(SUDO) apt-get install -y git
 	$(SUDO) apt-get install -y wget
+	$(SUDO) apt-get install -y unzip
 	$(SUDO) apt-get install -y python-dev
 	$(SUDO) apt-get install -y python-setuptools
 	$(SUDO) apt-get install -y python-pip
@@ -72,7 +77,8 @@ yum-packages:
 	rpm -q wget    || $(SUDO) yum install -y wget
 	rpm -q gcc     || $(SUDO) yum install -y gcc
 	rpm -q gcc-c++ || $(SUDO) yum install -y gcc-c++
-	rpm -q git || $(SUDO) yum install -y git
+	rpm -q git     || $(SUDO) yum install -y git
+	rpm -q unzip   || $(SUDO) yum install -y unzip
 	# needed to fetch the library submodule and CPAN modules
 	# python-pip requires EPEL, so try to get the correct EPEL rpm
 	rpm -q epel-release || yum install -y epel-release || { wget -O /tmp/epel.rpm "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`grep -o '[[:digit:]]' /etc/*release | head -n1`.noarch.rpm" && $(SUDO) rpm -ivh /tmp/epel.rpm && rm -f /tmp/epel.rpm; }
@@ -117,3 +123,4 @@ update-no-recompile:
 clean:
 	# the xargs option to ignore blank input doesn't work on Mac
 	@find . -maxdepth 3 -iname '*.pyc' -o -iname '*.jyc' | xargs rm -fv || :
+	@rm parquet-tools-$(PARQUET_VERSION)-bin.zip
