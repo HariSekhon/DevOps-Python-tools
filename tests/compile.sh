@@ -20,8 +20,15 @@ cd "$srcdir/..";
 
 . ./tests/utils.sh
 
+hr
+echo "Compiling all Python files"
+hr
+echo
+
 for x in $(find . -iname '*.py' -o -iname '*.jy'); do
     isExcluded "$x" && continue
     echo "compiling $x"
     python -m py_compile $x
 done
+echo
+echo
