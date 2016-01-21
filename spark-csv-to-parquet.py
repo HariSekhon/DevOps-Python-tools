@@ -30,7 +30,7 @@ Written to work across Python 2.x and Spark versions, especially Spark given tha
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
+# from __future__ import unicode_literals
 
 import os
 import sys
@@ -48,11 +48,11 @@ pyspark_path()
 from pyspark import SparkContext    # pylint: disable=wrong-import-position,import-error
 from pyspark import SparkConf       # pylint: disable=wrong-import-position,import-error
 from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,import-error
-#from pyspark.sql.types import *     # pylint: disable=wrong-import-position,import-error
+from pyspark.sql.types import *     # pylint: disable=wrong-import-position,import-error,wildcard-import
 from pyspark.sql.types import StructType, StructField  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.0'
+__version__ = '0.7.0'
 
 class SparkCSVToParquet(CLI):
 
@@ -69,13 +69,14 @@ class SparkCSVToParquet(CLI):
         from pyspark.sql import types # pylint: disable=wrong-import-position,import-error
         for _ in dir(types):
             if _.endswith('Type'):
-                self.types_mapping[_.rstrip('Types').lower()] = _
+                self.types_mapping[_[:-4].lower()] = _
         if 'integer' in self.types_mapping:
             # because I like typing int better than integer
             self.types_mapping['int'] = self.types_mapping['integer']
 
     # @override
     def add_options(self):
+        self.set_verbose_default(2)
         self.set_timeout_default(86400)
         self.parser.add_option('-c', '--csv', metavar='<file/dir>',
                                help='CSV input file/dir ($CSV)',
@@ -87,8 +88,8 @@ class SparkCSVToParquet(CLI):
                                help='CSV has header (infers schema if --schema is not given in which case all ' +
                                "types are assumed to be 'string'. Must specify --schema to override this")
         self.parser.add_option('-s', '--schema',
-                               help="Schema for CSV. Format is '<name>:<type>,<name2>:<type>...' where " +
-                               "possible type defaults to 'string' types are: %s" % ''.join(sorted(self.types_mapping)))
+                               help="Schema for CSV. Format is '<name>:<type>,<name2>:<type>...' where type " +
+                               "defaults to 'string', possible types are: %s" % ''.join(sorted(self.types_mapping)))
 
     def parse_args(self):
         self.no_args()
@@ -98,35 +99,32 @@ class SparkCSVToParquet(CLI):
             self.usage('--parquet_dir not defined')
         if not (self.options.has_header or self.options.schema):
             self.usage('must specify either --has-header or --schema')
-        if self.options.has_header and self.options.schema:
-            self.usage('--has-header and --schema are mutually exclusive')
+        # no longer mutually exclusive now this support schema override
+        # if self.options.has_header and self.options.schema:
+        #     self.usage('--has-header and --schema are mutually exclusive')
 
     def run(self):
         csv_file = self.options.csv
         parquet_dir = self.options.parquet_dir
         has_header = self.options.has_header
+        # I don't know why the Spark guys made this a string instead of a bool
+        header_str = 'false'
+        if has_header:
+            header_str = 'true'
         schema = self.options.schema
         # let Spark fail if csv/parquet aren't available
         # can't check paths exist as want to remain generically portable
         # to HDFS, local filesystm or any other uri scheme Spark supports
 
-        conf = SparkConf().setAppName('HS PySpark CSV => Parquet')
-        sc = SparkContext(conf=conf) # pylint: disable=invalid-name
-        sqlContext = SQLContext(sc)  # pylint: disable=invalid-name
-        spark_version = sc.version
-        log.info('Spark version detected as %s' % spark_version)
-
-        if not isVersionLax(spark_version):
-            die("Spark version couldn't be determined. " + support_msg('pytools'))
-
         if schema:
             def get_type(arg):
+                arg = str(arg).lower()
                 if arg not in self.types_mapping:
                     self.usage("invalid type '%s' defined in --schema, must be one of: %s"
-                               % (arg, sorted(self.types_mapping.keys())))
+                               % (arg, ', '.join(sorted(self.types_mapping.keys()))))
                 # return self.types_mapping[arg]
-                module = __import__('pyspark.sql.types')
-                class_ = getattr(module, arg)
+                module = __import__('pyspark.sql.types', globals(), locals(), ['types'], -1)
+                class_ = getattr(module, self.types_mapping[arg])
                 _ = class_()
                 return _
 
@@ -139,28 +137,41 @@ class SparkCSVToParquet(CLI):
                 return StructField(name, data_class, True)
             # see https://github.com/databricks/spark-csv#python-api
             self.schema = StructType([create_struct(_) for _ in schema.split(',')])
+            log.info('generated schema')
+
+        conf = SparkConf().setAppName('HS PySpark CSV => Parquet')
+        sc = SparkContext(conf=conf) # pylint: disable=invalid-name
+        sqlContext = SQLContext(sc)  # pylint: disable=invalid-name
+        spark_version = sc.version
+        log.info('Spark version detected as %s' % spark_version)
+
+        if not isVersionLax(spark_version):
+            die("Spark version couldn't be determined. " + support_msg('pytools'))
 
         csv = None
-        # TODO: set header to strings 'true'/'false' from bools
         if isMinVersion(spark_version, 1.4):
             if has_header and not schema:
+                log.info('inferring schema from CSV headers')
                 csv = sqlContext.read.format('com.databricks.spark.csv')\
-                    .options(header='true', inferschema='true')\
+                    .options(header=header_str, inferschema='true')\
                     .load(csv_file)
             else:
+                log.info('using explicitly defined schema')
                 csv = sqlContext.read\
                     .format('com.databricks.spark.csv')\
-                    .options(header='true')\
+                    .options(header=header_str)\
                     .load(csv_file, schema=self.schema)
             csv.write.parquet(parquet_dir)
         else:
             log.warn('running legacy code for Spark <= 1.3')
             if has_header and not schema:
+                log.info('inferring schema from CSV headers')
                 csv = sqlContext.load(source="com.databricks.spark.csv", path=csv_file,
-                                      header='true', inferSchema='true')
+                                      header=header_str, inferSchema='true')
             elif self.schema:
+                log.info('using explicitly defined schema')
                 csv = sqlContext.load(source="com.databricks.spark.csv", path=csv_file,
-                                      header='true', schema=self.schema)
+                                      header=header_str, schema=self.schema)
             else:
                 die('no header and no schema, caught late')
             csv.saveAsParquetFile(parquet_dir)
