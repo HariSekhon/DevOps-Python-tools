@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 
 class JsonValidatorTool(CLI):
 
@@ -158,9 +158,8 @@ class JsonValidatorTool(CLI):
                 subpath = os.path.join(path, item)
                 if os.path.isdir(subpath):
                     self.check_path(subpath)
-                if not self.re_json_suffix.match(item):
-                    continue
-                self.check_file(subpath)
+                elif self.re_json_suffix.match(item):
+                    self.check_file(subpath)
         else:
             die("failed to determine if path '%s' is file or directory" % path)
 
@@ -181,26 +180,29 @@ class JsonValidatorTool(CLI):
             else:
                 self.check_json(sys.stdin.read())
         else:
-            with open(filename) as self.iostream:
-                if self.options.multi_record:
-                    self.check_multirecord_json()
-                else:
-                    # most JSON files are fine to slurp like this
-                    # Big Data / MongoDB JSON data files are json multi-record and can be large
-                    # may throw exception after running out of RAM in which case try handling line-by-line
-                    # (json document-per-line)
-                    try:
-                        content = self.iostream.read()
+            try:
+                with open(filename) as self.iostream:
+                    if self.options.multi_record:
+                        self.check_multirecord_json()
+                    else:
+                        # most JSON files are fine to slurp like this
+                        # Big Data / MongoDB JSON data files are json multi-record and can be large
+                        # may throw exception after running out of RAM in which case try handling line-by-line
+                        # (json document-per-line)
                         try:
-                            self.check_json(content)
+                            content = self.iostream.read()
+                            try:
+                                self.check_json(content)
+                            except MemoryError:
+                                print("memory error validating contents from %s" % mem_err)
+                                self.iostream.seek(0)
+                                self.check_multirecord_json()
                         except MemoryError:
-                            print("memory error validating contents from %s" % mem_err)
+                            print("memory error reading %s" % mem_err)
                             self.iostream.seek(0)
                             self.check_multirecord_json()
-                    except MemoryError:
-                        print("memory error reading %s" % mem_err)
-                        self.iostream.seek(0)
-                        self.check_multirecord_json()
+            except IOError as _:
+                die("ERROR: %s" % _)
 
 
 if __name__ == '__main__':
