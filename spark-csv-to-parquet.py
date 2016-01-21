@@ -80,7 +80,7 @@ class SparkCSVToParquet(CLI):
         self.set_timeout_default(86400)
         self.parser.add_option('-c', '--csv', metavar='<file/dir>',
                                help='CSV input file/dir ($CSV)',
-                               default=getenv('csv'))
+                               default=getenv('CSV'))
         self.parser.add_option('-p', '--parquet-dir', metavar='<dir>',
                                help='Parquet output dir ($PARQUETDIR)',
                                default=getenv('PARQUETDIR'))
