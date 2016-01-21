@@ -115,6 +115,8 @@ class SparkCSVToParquet(CLI):
         # let Spark fail if csv/parquet aren't available
         # can't check paths exist as want to remain generically portable
         # to HDFS, local filesystm or any other uri scheme Spark supports
+        log.info("CSV Source: %s" % csv_file)
+        log.info("Parquet Destination: %s" % parquet_dir)
 
         if schema:
             def get_type(arg):
