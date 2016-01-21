@@ -85,11 +85,11 @@ class SparkCSVToParquet(CLI):
                                help='Parquet output dir ($PARQUETDIR)',
                                default=getenv('PARQUETDIR'))
         self.parser.add_option('-e', '--has-header', action='store_true',
-                               help='CSV has header (infers schema if --schema is not given in which case all ' +
+                               help='CSV has header. Infers schema if --schema is not given in which case all ' +
                                "types are assumed to be 'string'. Must specify --schema to override this")
         self.parser.add_option('-s', '--schema',
                                help="Schema for CSV. Format is '<name>:<type>,<name2>:<type>...' where type " +
-                               "defaults to 'string', possible types are: %s" % ''.join(sorted(self.types_mapping)))
+                               "defaults to 'string', possible types are: %s" % ', '.join(sorted(self.types_mapping)))
 
     def parse_args(self):
         self.no_args()
