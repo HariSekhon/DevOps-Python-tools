@@ -9,6 +9,7 @@ solr-env.sh
 *.swp
 .idea
 .DS_Store
-tests/spark-*-bin-hadoop2.6*
-tests/test-spark-*-bin-hadoop2.6.parquet
+tests/spark-*-bin-hadoop*
+tests/test-spark-*-bin-hadoop*.parquet
+parquet-tools-*
 parquet-tools-*-bin.zip
