@@ -51,7 +51,7 @@ import sys
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import isStr, log, which, FileNotFoundException # pylint: disable=wrong-import-position
+    from harisekhon.utils import isStr, log, which # pylint: disable=wrong-import-position
     from harisekhon import CLI # pylint: disable=wrong-import-position
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
