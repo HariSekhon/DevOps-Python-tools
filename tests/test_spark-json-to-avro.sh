@@ -52,7 +52,7 @@ for SPARK_VERSION in 1.4.0 1.6.0; do
     #spark-submit --packages com.databricks:spark-csv_2.10:1.3.0 ../spark-csv-to-avro.py -c data/test.csv -a "test-$dir.avro" --has-header $@ &&
     # resolved, was due to Spark 1.4+ requiring pyspark-shell for PYSPARK_SUBMIT_ARGS
 
-    rm -fr "test-header-$dir.avro"
+    rm -fr "test-$dir.avro"
     ../spark-json-to-avro.py -j data/multirecord.json -a "test-$dir.avro" $@ &&
         echo "SUCCEEDED with header with Spark $SPARK_VERSION" ||
         { echo "FAILED with header with Spark $SPARK_VERSION"; exit 1; }
