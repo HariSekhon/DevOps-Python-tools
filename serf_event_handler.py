@@ -93,12 +93,9 @@ class SerfEventHandler(CLI):
                 cmd = self.query_name
             elif self.event == 'user':
                 cmd = self.user_event
-            try:
-                # if the first part of the query is found in $PATH then assume it's a command that was passed
-                if which(cmd.split()[0]):
-                    self.command = cmd
-            except FileNotFoundException as _:
-                log.debug(_)
+            # if the first part of the query is found in $PATH then assume it's a command that was passed
+            if which(cmd.split()[0]):
+                self.command = cmd
 
     # override this if subclassing
     def handle_event(self):
