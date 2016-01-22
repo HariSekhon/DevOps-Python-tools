@@ -51,7 +51,7 @@ Some common options also support optional environment variables for convenience 
 - ```validate_parquet.py``` - validate Parquet files, stdin or all ```.parquet``` files found in given directories
 - ```validate_xml.py``` - validate XML files, stdin or all ```.xml``` files found in given directories
 - ```validate_yaml.py``` - validate YAML files, stdin or all ```.yaml``` / ```.yml``` files found in given directories
-- ```welcome.py``` - cool spinning welcome message (there is a slightly better perl version in the [Tools](https://github.com/harisekhon/tools) repo)
+- ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user (there also a perl version in my [Tools](https://github.com/harisekhon/tools) repo)
 
 #### Manual Setup ####
 
