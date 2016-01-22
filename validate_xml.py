@@ -55,7 +55,6 @@ class XmlValidatorTool(CLI):
         super(XmlValidatorTool, self).__init__()
         # Python 3.x
         # super().__init__()
-        self.iostream = None
         self.re_xml_suffix = re.compile(r'.*\.xml$', re.I)
         self.valid_xml_msg = '<unknown> => XML OK'
         self.invalid_xml_msg = '<unknown> => XML INVALID'
@@ -129,8 +128,8 @@ class XmlValidatorTool(CLI):
             self.check_xml(sys.stdin.read())
         else:
             try:
-                with open(filename) as self.iostream:
-                    self.check_xml(self.iostream.read())
+                with open(filename) as iostream:
+                    self.check_xml(iostream.read())
             except IOError as _:
                 die("ERROR: %s" % _)
 
