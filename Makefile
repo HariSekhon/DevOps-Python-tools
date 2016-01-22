@@ -65,6 +65,8 @@ apt-packages:
 	$(SUDO) apt-get install -y python-dev
 	$(SUDO) apt-get install -y python-setuptools
 	$(SUDO) apt-get install -y python-pip
+	# needed to build python-snappy for avro module
+	$(SUDO) apt-get install -y libsnappy-dev
 	# IPython Notebook fails and leave apt broken
 	# The following packages have unmet dependencies:
 	#  python-zmq : Depends: libzmq1 but it is not going to be installed
@@ -89,6 +91,8 @@ yum-packages:
 	# needed to build pyhs2
 	# libgsasl-devel saslwrapper-devel
 	rpm -q cyrus-sasl-devel  || $(SUDO) yum install -y cyrus-sasl-devel
+	# needed to build python-snappy for avro module
+	rpm -q snappy-devel 	 || $(SUDO) yum install -y snappy-devel
 
 .PHONY: test
 test:
