@@ -55,7 +55,6 @@ class YamlValidatorTool(CLI):
         super(YamlValidatorTool, self).__init__()
         # Python 3.x
         # super().__init__()
-        self.iostream = None
         self.re_yaml_suffix = re.compile(r'.*\.ya?ml$', re.I)
         self.valid_yaml_msg = '<unknown> => YAML OK'
         self.invalid_yaml_msg = '<unknown> => YAML INVALID'
@@ -136,8 +135,8 @@ class YamlValidatorTool(CLI):
             self.check_yaml(sys.stdin.read())
         else:
             try:
-                with open(filename) as self.iostream:
-                    self.check_yaml(self.iostream.read())
+                with open(filename) as iostream:
+                    self.check_yaml(iostream.read())
             except IOError as _:
                 die("ERROR: %s" % _)
 
