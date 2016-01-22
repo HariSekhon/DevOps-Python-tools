@@ -17,9 +17,9 @@ set -euo pipefail
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "
-# ======================== #
+# =========================== #
 # Testing validate_parquet.py
-# ======================== #
+# =========================== #
 "
 
 cd "$srcdir/..";
@@ -59,7 +59,7 @@ rm "$data_dir/testlink.parquet"
 echo
 
 echo "checking parquet file without an extension"
-cp -iv "$(find "${1:-.}" -iname '*.parquet' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
+cp -iv "$(find "${1:-.}" -type f -iname '*.parquet' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
 ./validate_parquet.py -vvv -t 5 "$broken_dir/no_extension_testfile"
 echo
 
