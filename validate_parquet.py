@@ -23,12 +23,13 @@ Validates each file passed as an argument
 Directories are recursed, checking all files ending in a .parquet suffix.
 
 Works like a standard unix filter program - if no files are passed as arguments or '-' is given then reads
-from standard input
+from standard input.
 
-This is a bit of a hack since there is no good Python module for Parquet it requires parquet-cat from parquet-tools
-to either be in the path or adjacent to this program (it's downloaded as part of the automated 'make' build). Things
-like passing data through stdin requires writing out to a tempfile and then reading it back in parquet tools, which
-is non-ideal in terms of performance.
+There is no good comprehensive Python Parquet module so it must use parquet-cat from parquet-tools.
+
+Parquet-tools must be either in the $PATH or adjacent to this program (it's downloaded as part of the automated
+'make' build). Things like passing data through stdin requires writing out to a tempfile (which is auto-cleaned up
+afterwards) and then reading it back in parquet tools, which is non-ideal in terms of performance.
 
 """
 
@@ -49,7 +50,7 @@ import tempfile
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import die, ERRORS, vlog_option, log  # pylint: disable=wrong-import-position
+    from harisekhon.utils import die, ERRORS, vlog_option, log,which  # pylint: disable=wrong-import-position
     from harisekhon import CLI                                  # pylint: disable=wrong-import-position
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -69,7 +70,7 @@ class ParquetValidatorTool(CLI):
         self.re_parquet_suffix = re.compile(r'.*\.parquet$', re.I)
         self.valid_parquet_msg = '<unknown> => Parquet OK'
         self.invalid_parquet_msg = '<unknown> => Parquet INVALID'
-        for _ in glob.glob(os.path.join(os.path.dirname(__file__), 'parquet-tools-*-bin')):
+        for _ in glob.glob(os.path.join(os.path.dirname(__file__), 'parquet-tools-*')):
             log.debug('adding %s to $PATH' % _)
             os.environ['PATH'] += ':' + os.path.abspath(_)
 
@@ -77,6 +78,8 @@ class ParquetValidatorTool(CLI):
         stderr = subprocess.PIPE
         if self.get_verbose() > 2:
             stderr = None
+        if not which('parquet-cat'):
+            die('parquet-cat not found in $PATH')
         if subprocess.call(['parquet-cat', filename], stdout=subprocess.PIPE, stderr=stderr, shell=False) == 0:
             print(self.valid_parquet_msg)
         else:
