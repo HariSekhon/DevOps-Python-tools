@@ -59,7 +59,7 @@ rm "$data_dir/testlink.avro"
 echo
 
 echo "checking avro file without an extension"
-cp -iv "$(find "${1:-.}" -iname '*.avro' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
+cp -iv "$(find "${1:-.}" -type f -iname '*.avro' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
 ./validate_avro.py -vvv -t 1 "$broken_dir/no_extension_testfile"
 echo
 
