@@ -48,6 +48,7 @@ Some common options also support optional environment variables for convenience 
 - ```spark-csv-to-avro.py``` - PySpark JSON => Avro converter
 - ```validate_avro.py``` - validate Avro files, stdin or all ```.avro``` files found in given directories
 - ```validate_json.py``` - validate JSON files, stdin or all ```.json``` files found in given directories. Supports both normal json files as well as json-doc-per-line files such as MongoDB or Hadoop json data files
+- ```validate_parquet.py``` - validate Parquet files, stdin or all ```.parquet``` files found in given directories
 - ```validate_xml.py``` - validate XML files, stdin or all ```.xml``` files found in given directories
 - ```validate_yaml.py``` - validate YAML files, stdin or all ```.yaml``` / ```.yml``` files found in given directories
 - ```welcome.py``` - cool spinning welcome message (there is a slightly better perl version in the [Tools](https://github.com/harisekhon/tools) repo)
