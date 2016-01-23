@@ -47,7 +47,7 @@ for SPARK_VERSION in 1.3.1 1.4.0; do
     echo
     export SPARK_HOME="$dir"
     rm -fr "test-$dir.parquet"
-    ../spark-json-to-parquet.py -j data/multirecord.json -p "test-$dir.parquet" $@ &&
+    ../spark_json_to_parquet.py -j data/multirecord.json -p "test-$dir.parquet" $@ &&
         echo "SUCCEEDED with Spark $SPARK_VERSION" ||
         { echo "FAILED test with Spark $SPARK_VERSION"; exit 1; }
 done
