@@ -50,14 +50,14 @@ import tempfile
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import die, ERRORS, vlog_option, log,which  # pylint: disable=wrong-import-position
-    from harisekhon import CLI                                  # pylint: disable=wrong-import-position
+    from harisekhon.utils import die, ERRORS, vlog_option, log, which, uniq_list_ordered  # pylint: disable=wrong-import-position
+    from harisekhon import CLI                                                            # pylint: disable=wrong-import-position
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 class ParquetValidatorTool(CLI):
 
@@ -88,7 +88,8 @@ class ParquetValidatorTool(CLI):
     def run(self):
         if not self.args:
             self.args.append('-')
-        for arg in self.args:
+        args = uniq_list_ordered(self.args)
+        for arg in args:
             if arg == '-':
                 continue
             if not os.path.exists(arg):
@@ -100,7 +101,7 @@ class ParquetValidatorTool(CLI):
                 vlog_option('directory', arg)
             else:
                 die("path '%s' could not be determined as either a file or directory" % arg)
-        for arg in self.args:
+        for arg in args:
             self.check_path(arg)
 
     def check_path(self, path):
