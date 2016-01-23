@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#  pylint: disable=invalid-name
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
@@ -99,6 +98,7 @@ class SparkAvroToParquet(CLI):
         if not isVersionLax(spark_version):
             die("Spark version couldn't be determined. " + support_msg('pytools'))
 
+        #  pylint: disable=invalid-name
         if isMinVersion(spark_version, 1.4):
             # this doesn't work in Spark <= 1.3 - github docs don't mention the older .method() for reading avro
             df = sqlContext.read.format('com.databricks.spark.avro').load(avro_file)
