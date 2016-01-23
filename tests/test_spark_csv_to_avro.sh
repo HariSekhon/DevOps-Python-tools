@@ -48,27 +48,27 @@ for SPARK_VERSION in 1.4.0 1.6.0; do
     fi
     echo
     export SPARK_HOME="$dir"
-    # this works for both Spark 1.3.1 and 1.4.0 but calling from within spark-csv-to-avro.py doesn't like it
-    #spark-submit --packages com.databricks:spark-csv_2.10:1.3.0 ../spark-csv-to-avro.py -c data/test.csv -a "test-$dir.avro" --has-header $@ &&
+    # this works for both Spark 1.3.1 and 1.4.0 but calling from within spark_csv_to_avro.py doesn't like it
+    #spark-submit --packages com.databricks:spark-csv_2.10:1.3.0 ../spark_csv_to_avro.py -c data/test.csv -a "test-$dir.avro" --has-header $@ &&
     # resolved, was due to Spark 1.4+ requiring pyspark-shell for PYSPARK_SUBMIT_ARGS
 
     rm -fr "test-header-$dir.avro"
-    ../spark-csv-to-avro.py -c data/test_header.csv --has-header -a "test-header-$dir.avro" $@ &&
+    ../spark_csv_to_avro.py -c data/test_header.csv --has-header -a "test-header-$dir.avro" $@ &&
         echo "SUCCEEDED with header with Spark $SPARK_VERSION" ||
         { echo "FAILED with header with Spark $SPARK_VERSION"; exit 1; }
 
     rm -fr "test-header-schemaoverride-$dir.avro"
-    ../spark-csv-to-avro.py -c data/test_header.csv -a "test-header-schemaoverride-$dir.avro" --has-header -s Year:String,Make,Model,Length:float $@ &&
+    ../spark_csv_to_avro.py -c data/test_header.csv -a "test-header-schemaoverride-$dir.avro" --has-header -s Year:String,Make,Model,Length:float $@ &&
         echo "SUCCEEDED with header and schema override with Spark $SPARK_VERSION" ||
         { echo "FAILED with header and schema override with Spark $SPARK_VERSION"; exit 1; }
 
     rm -fr "test-noheader-$dir.avro"
-    ../spark-csv-to-avro.py -c data/test.csv -s Year:String,Make,Model,Length -a "test-noheader-$dir.avro" $@ &&
+    ../spark_csv_to_avro.py -c data/test.csv -s Year:String,Make,Model,Length -a "test-noheader-$dir.avro" $@ &&
         echo "SUCCEEDED with no header with Spark $SPARK_VERSION" ||
         { echo "FAILED with no header with Spark $SPARK_VERSION"; exit 1; }
 
     rm -fr "test-noheader-types-$dir.avro"
-    ../spark-csv-to-avro.py -c data/test.csv -s Year:String,Make,Model,Length:float -a "test-noheader-types-$dir.avro" $@ &&
+    ../spark_csv_to_avro.py -c data/test.csv -s Year:String,Make,Model,Length:float -a "test-noheader-types-$dir.avro" $@ &&
         echo "SUCCEEDED with no header and float type with Spark $SPARK_VERSION" ||
         { echo "FAILED with no header and float type with Spark $SPARK_VERSION"; exit 1; }
 
