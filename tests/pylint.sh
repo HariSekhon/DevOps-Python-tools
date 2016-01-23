@@ -14,7 +14,7 @@
 #
 
 set -eu
-[ -n "${TRAVIS:-}" ] && set -x
+[ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";

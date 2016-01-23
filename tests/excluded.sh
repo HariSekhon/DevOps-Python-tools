@@ -18,7 +18,7 @@
 # split from utils.sh as this is specific to this repo
 
 set -eu
-[ -n "${TRAVIS:-}" ] && set -x
+[ -n "${DEBUG:-}" ] && set -x
 
 isExcluded(){
     local prog="$1"

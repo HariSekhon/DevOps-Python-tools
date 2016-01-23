@@ -14,7 +14,7 @@
 #
 
 set -euo pipefail
-[ -n "${TRAVIS:-}" ] && set -x
+[ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "
@@ -36,7 +36,7 @@ cd "$srcdir";
 
 ../bash-tools/python-compile.sh
 
-for script in $(find . -name 'test*.sh'); do
+for script in $(find . -iname 'test*.sh' | sort); do
     ./$script -vvv
 done
 
