@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#  pylint: disable=invalid-name
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
