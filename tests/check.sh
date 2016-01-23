@@ -14,6 +14,7 @@
 #
 
 set -euo pipefail
+[ -n "${TRAVIS:-}" ] && set -x
 
 check(){
     cmd=$1

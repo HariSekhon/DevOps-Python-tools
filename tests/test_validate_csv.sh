@@ -14,6 +14,7 @@
 #
 
 set -euo pipefail
+[ -n "${TRAVIS:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "
