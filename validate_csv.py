@@ -30,6 +30,9 @@ to check. CSV/TSV has higher variation with delimiters, quote characters etc. If
 specified it'll try to infer the structure but I've had to add a few heuristics to invalidate files which otherwise
 pass python csv module's inference including json and yaml files which we don't accept.
 
+Explicitly using the --delimiter="," and --quotechar='"' options will disable the inference which is handy if it's
+allowing through non-csv files, you don't want to accept other delimited files such as TSV files etc.
+
 This may be fine for simple purposes but for a better validation tool with more options see:
 
 https://pythonhosted.org/chkcsv/
