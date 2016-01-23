@@ -36,7 +36,9 @@ cd "$srcdir";
 
 ../bash-tools/python-compile.sh
 
-for script in $(find . -iname 'test*.sh' | sort); do
+scripts="$(find . -iname 'test*.sh' | sort)"
+
+for script in $scripts; do
     ./$script -vvv
 done
 
