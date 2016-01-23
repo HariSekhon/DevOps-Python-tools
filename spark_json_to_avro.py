@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#  pylint: disable=invalid-name
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
@@ -49,8 +48,6 @@ pyspark_path()
 from pyspark import SparkContext    # pylint: disable=wrong-import-position,import-error
 from pyspark import SparkConf       # pylint: disable=wrong-import-position,import-error
 from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,import-error
-from pyspark.sql.types import *     # pylint: disable=wrong-import-position,import-error,wildcard-import
-from pyspark.sql.types import StructType, StructField  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
 __version__ = '0.7.0'
@@ -102,6 +99,7 @@ class SparkJSONToAvro(CLI):
         if not isVersionLax(spark_version):
             die("Spark version couldn't be determined. " + support_msg('pytools'))
 
+        #  pylint: disable=invalid-name
         df = None
         if isMinVersion(spark_version, 1.4):
             df = sqlContext.read.json(json_file)
