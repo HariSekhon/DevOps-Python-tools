@@ -36,11 +36,7 @@ cd "$srcdir";
 
 ../bash-tools/python-compile.sh
 
-scripts="$(find . -iname 'test*.sh' | sort -f)"
-
-for script in $scripts; do
-    ./$script -vvv
-done
+../bash-tools/run_tests.sh
 
 # do help afterwards for Spark to be downloaded, and then help will find and use downloaded spark for SPARK_HOME
 ./help.sh
