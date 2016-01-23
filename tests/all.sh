@@ -24,14 +24,16 @@ echo "
 
 cd "$srcdir";
 
-./whitespace.sh
+. utils.sh
 
-./compile.sh
+./whitespace.sh
 
 #./syntax.sh
 #./pylint.sh
 
 #./python3.sh
+
+../bash-tools/python-compile.sh
 
 for script in $(find . -name 'test*.sh'); do
     ./$script -vvv
