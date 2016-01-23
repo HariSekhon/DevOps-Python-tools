@@ -46,27 +46,27 @@ for SPARK_VERSION in 1.3.1 1.4.0; do
     fi
     echo
     export SPARK_HOME="$dir"
-    # this works for both Spark 1.3.1 and 1.4.0 but calling from within spark-csv-to-parquet.py doesn't like it
-    #spark-submit --packages com.databricks:spark-csv_2.10:1.3.0 ../spark-csv-to-parquet.py -c data/test.csv -p "test-$dir.parquet" --has-header $@ &&
+    # this works for both Spark 1.3.1 and 1.4.0 but calling from within spark_csv_to_parquet.py doesn't like it
+    #spark-submit --packages com.databricks:spark-csv_2.10:1.3.0 ../spark_csv_to_parquet.py -c data/test.csv -p "test-$dir.parquet" --has-header $@ &&
     # resolved, was due to Spark 1.4+ requiring pyspark-shell for PYSPARK_SUBMIT_ARGS
 
     rm -fr "test-header-$dir.parquet"
-    ../spark-csv-to-parquet.py -c data/test_header.csv --has-header -p "test-header-$dir.parquet" $@ &&
+    ../spark_csv_to_parquet.py -c data/test_header.csv --has-header -p "test-header-$dir.parquet" $@ &&
         echo "SUCCEEDED with header with Spark $SPARK_VERSION" ||
         { echo "FAILED with header with Spark $SPARK_VERSION"; exit 1; }
 
     rm -fr "test-header-schemaoverride-$dir.parquet"
-    ../spark-csv-to-parquet.py -c data/test_header.csv -p "test-header-schemaoverride-$dir.parquet" --has-header -s Year:String,Make,Model,Length:float $@ &&
+    ../spark_csv_to_parquet.py -c data/test_header.csv -p "test-header-schemaoverride-$dir.parquet" --has-header -s Year:String,Make,Model,Length:float $@ &&
         echo "SUCCEEDED with header and schema override with Spark $SPARK_VERSION" ||
         { echo "FAILED with header and schema override with Spark $SPARK_VERSION"; exit 1; }
 
     rm -fr "test-noheader-$dir.parquet"
-    ../spark-csv-to-parquet.py -c data/test.csv -s Year:String,Make,Model,Length -p "test-noheader-$dir.parquet" $@ &&
+    ../spark_csv_to_parquet.py -c data/test.csv -s Year:String,Make,Model,Length -p "test-noheader-$dir.parquet" $@ &&
         echo "SUCCEEDED with no header with Spark $SPARK_VERSION" ||
         { echo "FAILED with no header with Spark $SPARK_VERSION"; exit 1; }
 
     rm -fr "test-noheader-types-$dir.parquet"
-    ../spark-csv-to-parquet.py -c data/test.csv -s Year:String,Make,Model,Length:float -p "test-noheader-types-$dir.parquet" $@ &&
+    ../spark_csv_to_parquet.py -c data/test.csv -s Year:String,Make,Model,Length:float -p "test-noheader-types-$dir.parquet" $@ &&
         echo "SUCCEEDED with no header and float type with Spark $SPARK_VERSION" ||
         { echo "FAILED with no header and float type with Spark $SPARK_VERSION"; exit 1; }
 
