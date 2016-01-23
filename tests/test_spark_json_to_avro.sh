@@ -53,7 +53,7 @@ for SPARK_VERSION in 1.4.0 1.6.0; do
     # resolved, was due to Spark 1.4+ requiring pyspark-shell for PYSPARK_SUBMIT_ARGS
 
     rm -fr "test-$dir.avro"
-    ../spark-json-to-avro.py -j data/multirecord.json -a "test-$dir.avro" $@ &&
+    ../spark_json_to_avro.py -j data/multirecord.json -a "test-$dir.avro" $@ &&
         echo "SUCCEEDED with header with Spark $SPARK_VERSION" ||
         { echo "FAILED with header with Spark $SPARK_VERSION"; exit 1; }
 
