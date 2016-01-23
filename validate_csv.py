@@ -30,7 +30,7 @@ to check. CSV/TSV has higher variation with delimiters, quote characters etc. If
 specified it'll try to infer the structure but I've had to add a few heuristics to invalidate files which otherwise
 pass python csv module's inference including json and yaml files which we don't accept.
 
-Explicitly using the --delimiter="," and --quotechar='"' options will disable the inference which is handy if it's
+Explicitly using the --delimiter option will disable the inference which is handy if it's
 allowing through non-csv files, you don't want to accept other delimited files such as TSV files etc.
 
 This may be fine for simple purposes but for a better validation tool with more options see:
@@ -52,7 +52,7 @@ import sys
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import die, ERRORS, vlog_option, uniq_list_ordered, log, isAlNum  # pylint: disable=wrong-import-position
+    from harisekhon.utils import die, ERRORS, vlog_option, uniq_list_ordered, log, isChars  # pylint: disable=wrong-import-position
     from harisekhon import CLI  # pylint: disable=wrong-import-position
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -85,7 +85,6 @@ class CsvValidatorTool(CLI):
         try:
             if self.delimiter is not None:
                 try:
-                    print('using delimiter: %s' % self.delimiter)
                     csvreader = csv.reader(filehandle, delimiter=self.delimiter, quotechar=self.quotechar)
                 except TypeError as _:
                     self.usage(_)
@@ -114,8 +113,8 @@ class CsvValidatorTool(CLI):
                     return False
                 # extra protection along the same lines as anti-json:
                 # the first char of field should be alphanumeric, not syntax
-                # if not isChar(_[0][0], 'A-Za-z0-9'):
-                if not isAlNum(_[0][0]):
+                # however instead of isAlnum allow quotes for quoted CSVs to pass validation
+                if not isChars(_[0][0], 'A-Za-z0-9\'"'):
                     return False
         except csv.Error  as _:
             if self.get_verbose() > 2:
