@@ -46,11 +46,7 @@ Some common options also support optional environment variables for convenience 
 - ```spark-json-to-avro.py``` - PySpark CSV => Avro converter, supports both inferred and explicit schemas
 - ```spark-csv-to-parquet.py``` - PySpark CSV => Parquet converter, supports both inferred and explicit schemas
 - ```spark-csv-to-avro.py``` - PySpark JSON => Avro converter
-- ```validate_avro.py``` - validate Avro files, stdin or all ```.avro``` files found in given directories
-- ```validate_json.py``` - validate JSON files, stdin or all ```.json``` files found in given directories. Supports both normal json files as well as json-doc-per-line files such as MongoDB or Hadoop json data files
-- ```validate_parquet.py``` - validate Parquet files, stdin or all ```.parquet``` files found in given directories
-- ```validate_xml.py``` - validate XML files, stdin or all ```.xml``` files found in given directories
-- ```validate_yaml.py``` - validate YAML files, stdin or all ```.yaml``` / ```.yml``` files found in given directories
+- ```validate_*.py``` - validate files, directory trees and/or standard input streams for the following file types: Avro, CSV, JSON, Parquet, XML, YAML. Directories are recursed, testing any files with relevant matching extensions (```.avro```, ```.csv```, ```.json```, ```.parquet```, ```.xml```, ```.yml```/```.yaml```). ```validate_json.py``` supports both normal json files as well as json-doc-per-line files such as MongoDB or Hadoop json data files
 - ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user (there also a perl version in my [Tools](https://github.com/harisekhon/tools) repo)
 
 #### Manual Setup ####
