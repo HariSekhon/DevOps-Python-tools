@@ -90,11 +90,11 @@ class SparkJsonToParquet(CLI):
         if not isVersionLax(spark_version):
             die("Spark version couldn't be determined. " + support_msg('pytools'))
         if isMinVersion(spark_version, 1.4):
-            df = sqlContext.read.json(json_file)
+            df = sqlContext.read.json(json_file) # pylint: disable=invalid-name
             df.write.parquet(parquet_dir)
         else:
             log.warn('running legacy code for Spark <= 1.3')
-            df = sqlContext.jsonFile(json_file)
+            df = sqlContext.jsonFile(json_file) # pylint: disable=invalid-name
             df.saveAsParquetFile(parquet_dir)
 
 if __name__ == '__main__':
