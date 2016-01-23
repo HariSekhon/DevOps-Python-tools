@@ -52,6 +52,8 @@ build:
 	# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
 	$(SUDO2) pip install "ipython[notebook]" || :
 	@echo
+	bash-tools/python-compile.sh
+	@echo
 	@echo 'BUILD SUCCESSFUL (pytools)'
 
 .PHONY: apt-packages
@@ -125,6 +127,8 @@ update-no-recompile:
 
 .PHONY: clean
 clean:
-	# the xargs option to ignore blank input doesn't work on Mac
-	@find . -maxdepth 3 -iname '*.pyc' -o -iname '*.jyc' | xargs rm -fv || :
-	@rm parquet-tools-$(PARQUET_VERSION)-bin.zip
+	@# the xargs option to ignore blank input doesn't work on Mac
+	@find . -maxdepth 3 -iname '*.py[co]' -o -iname '*.jy[co]' | xargs rm -f
+	@find . -type d -ipath '*/tests/*' -iname 'test-*spark*.avro' | xargs rm -rf
+	@find . -type d -ipath '*/tests/*' -iname 'test-*spark*.parquet' | xargs rm -rf
+	@rm -f parquet-tools-$(PARQUET_VERSION)-bin.zip
