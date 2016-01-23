@@ -18,6 +18,9 @@ python:
 
 sudo: required
 
+env:
+  - DEBUG=1
+
 notifications:
   email: false
 
