@@ -42,10 +42,10 @@ Some common options also support optional environment variables for convenience 
 - ```pig_udfs.jy``` - Pig Jython UDFs for Hadoop
 - ```ipython-notebook-pyspark.py``` - per-user authenticated IPython Notebook + PySpark integration to allow each user to auto-create their own password protected IPython Notebook running Spark
 - ```spark_avro_to_parquet.py``` - PySpark Avro => Parquet converter
-- ```spark_json_to_parquet.py``` - PySpark JSON => Parquet converter
-- ```spark_json_to_avro.py``` - PySpark CSV => Avro converter, supports both inferred and explicit schemas
+- ```spark_csv_to_avro.py``` - PySpark CSV => Avro converter, supports both inferred and explicit schemas
 - ```spark_csv_to_parquet.py``` - PySpark CSV => Parquet converter, supports both inferred and explicit schemas
-- ```spark_csv_to_avro.py``` - PySpark JSON => Avro converter
+- ```spark_json_to_avro.py``` - PySpark JSON => Avro converter
+- ```spark_json_to_parquet.py``` - PySpark JSON => Parquet converter
 - ```validate_*.py``` - validate files, directory trees and/or standard input streams for the following file types: Avro, CSV, JSON, Parquet, XML, YAML. Directories are recursed, testing any files with relevant matching extensions (```.avro```, ```.csv```, ```.json```, ```.parquet```, ```.xml```, ```.yml```/```.yaml```). ```validate_json.py``` supports both normal json files as well as json-doc-per-line files such as MongoDB or Hadoop json data files
 - ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user (there also a perl version in my [Tools](https://github.com/harisekhon/tools) repo)
 
