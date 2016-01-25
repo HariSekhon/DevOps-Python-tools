@@ -30,7 +30,7 @@ build:
 	if [ -x /usr/bin/yum ];     then make yum-packages; fi
 	
 	git submodule init
-	git submodule update --remote --recursive
+	git submodule update --recursive
 	
 	cd pylib && make
 	
@@ -51,6 +51,8 @@ build:
 	
 	# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
 	$(SUDO2) pip install "ipython[notebook]" || :
+	@echo
+	bash-tools/python-compile.sh
 	@echo
 	@echo 'BUILD SUCCESSFUL (pytools)'
 
@@ -121,10 +123,12 @@ update2:
 .PHONY: update-no-recompile
 update-no-recompile:
 	git pull
-	git submodule update --init --remote --recursive
+	git submodule update --init --recursive
 
 .PHONY: clean
 clean:
-	# the xargs option to ignore blank input doesn't work on Mac
-	@find . -maxdepth 3 -iname '*.pyc' -o -iname '*.jyc' | xargs rm -fv || :
+	@# the xargs option to ignore blank input doesn't work on Mac
+	@find . -maxdepth 3 -iname '*.py[co]' -o -iname '*.jy[co]' -delete
+	@find . -type d -ipath '*/tests' -iname 'test-*spark*.avro' -delete
+	@find . -type d -ipath '*/tests' -iname 'test-*spark*.parquet' -delete
 	@rm parquet-tools-$(PARQUET_VERSION)-bin.zip
