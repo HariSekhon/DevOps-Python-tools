@@ -82,9 +82,13 @@ class SerfEventHandler(CLI):
         elif self.event not in self.events:
             log.warn("SERF_EVENT environment variable passed unrecognized event type '%s'" % self.event)
 
+    def add_option_command_passthru(self):
+        self.parser.add_option('--cmd-passthru', dest='cmd', action='store_true',
+                               help='Allow any query or event to run a command if the first arg is found in $PATH')
+
+    # this allows easier overriding of add_options while adding command passthrough option back in
     def add_options(self):
-        self.parser.add_option('-c', '--cmd', action='store_true', help='Allow any query or event to run a command' + \
-                               ' if the first arg is found in $PATH')
+        self.add_option_command_passthru()
 
     def enable_commands(self):
         if self.event in ['query', 'event']:
