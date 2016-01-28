@@ -3,7 +3,7 @@ Hari Sekhon PyTools [![Build Status](https://travis-ci.org/HariSekhon/pytools.sv
 
 ### Hadoop, Spark / PySpark, Ambari, IPython, Pig and Linux Tools ###
 
-A few of the Hadoop and other nifty "Unixy" / Linux tools I've written over the years that are generally useful across environments. All programs have --help to list the available options.
+A few of the Hadoop, Spark & Linux tools. All programs have --help to list the available options.
 
 For many more tools see [Tools](//github.com/harisekhon/tools) and the [Advanced Nagios Plugins Collection](//github.com/harisekhon/nagios-plugins) which contains many Hadoop, NoSQL, Web and infrastructure tools and Nagios plugins.
 
@@ -41,16 +41,12 @@ Some common options also support optional environment variables for convenience 
 - ```pig-text-to-elasticsearch.pig``` / ```pig-text-to-solr.pig``` - bulk indexes unstructured files in Hadoop to Elasticsearch or Solr/SolrCloud clusters
 - ```pig_udfs.jy``` - Pig Jython UDFs for Hadoop
 - ```ipython-notebook-pyspark.py``` - per-user authenticated IPython Notebook + PySpark integration to allow each user to auto-create their own password protected IPython Notebook running Spark
-- ```spark-avro-to-parquet.py``` - PySpark Avro => Parquet converter
-- ```spark-json-to-parquet.py``` - PySpark JSON => Parquet converter
-- ```spark-json-to-avro.py``` - PySpark CSV => Avro converter, supports both inferred and explicit schemas
-- ```spark-csv-to-parquet.py``` - PySpark CSV => Parquet converter, supports both inferred and explicit schemas
-- ```spark-csv-to-avro.py``` - PySpark JSON => Avro converter
-- ```validate_avro.py``` - validate Avro files, stdin or all ```.avro``` files found in given directories
-- ```validate_json.py``` - validate JSON files, stdin or all ```.json``` files found in given directories. Supports both normal json files as well as json-doc-per-line files such as MongoDB or Hadoop json data files
-- ```validate_parquet.py``` - validate Parquet files, stdin or all ```.parquet``` files found in given directories
-- ```validate_xml.py``` - validate XML files, stdin or all ```.xml``` files found in given directories
-- ```validate_yaml.py``` - validate YAML files, stdin or all ```.yaml``` / ```.yml``` files found in given directories
+- ```spark_avro_to_parquet.py``` - PySpark Avro => Parquet converter
+- ```spark_csv_to_avro.py``` - PySpark CSV => Avro converter, supports both inferred and explicit schemas
+- ```spark_csv_to_parquet.py``` - PySpark CSV => Parquet converter, supports both inferred and explicit schemas
+- ```spark_json_to_avro.py``` - PySpark JSON => Avro converter
+- ```spark_json_to_parquet.py``` - PySpark JSON => Parquet converter
+- ```validate_*.py``` - validate files, directory trees and/or standard input streams for the following file types: Avro, CSV, JSON, Parquet, XML, YAML. Directories are recursed, testing any files with relevant matching extensions (```.avro```, ```.csv```, ```.json```, ```.parquet```, ```.xml```, ```.yml```/```.yaml```). ```validate_json.py``` supports both normal json files as well as json-doc-per-line files such as MongoDB or Hadoop json data files
 - ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user (there also a perl version in my [Tools](https://github.com/harisekhon/tools) repo)
 
 #### Manual Setup ####
@@ -106,5 +102,7 @@ Patches, improvements and even general feedback are welcome in the form of GitHu
 [The Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) - 220+ programs for Nagios monitoring your Hadoop & NoSQL clusters. Covers every Hadoop vendor's management API and every major NoSQL technology (HBase, Cassandra, MongoDB, Elasticsearch, Solr, Riak, Redis etc.) as well as traditional Linux and infrastructure.
 
 [PyLib](https://github.com/harisekhon/pylib) - my personal python library leveraged in this repo as a submodule
+
+[Perl Lib](https://github.com/harisekhon/lib) - Perl version of above library
 
 [Spark Apps eg. Spark => Elasticsearch](https://github.com/harisekhon/spark-to-elasticsearch) - Scala application to index from Spark to Elasticsearch. Used to index data in Hadoop clusters or local data via Spark standalone. This started as a Scala Spark port of ```pig-text-to-elasticsearch.pig``` from this repo.

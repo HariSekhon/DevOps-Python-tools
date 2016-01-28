@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#  pylint: disable=invalid-name
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
@@ -17,7 +16,7 @@
 
 """
 
-PySpark program to convert Avro file(s) to Parquet
+PySpark program to convert JSON file(s) to Avro
 
 Written to work across Python 2.x, supports Spark 1.4+
 
@@ -53,11 +52,11 @@ from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,impo
 __author__ = 'Hari Sekhon'
 __version__ = '0.7.0'
 
-class SparkAvroToParquet(CLI):
+class SparkJSONToAvro(CLI):
 
     def __init__(self):
         # Python 2.x
-        super(SparkAvroToParquet, self).__init__()
+        super(SparkJSONToAvro, self).__init__()
         # Python 3.x
         # super().__init__()
         # logging.config.fileConfig(os.path.join(libdir, 'resources', 'logging.conf'))
@@ -67,30 +66,31 @@ class SparkAvroToParquet(CLI):
     def add_options(self):
         self.set_verbose_default(2)
         self.set_timeout_default(86400)
-        self.parser.add_option('-a', '--avro', metavar='<file/dir>',
-                               help='Avro input file/dir ($AVRO)',
-                               default=getenv('AVRO'))
-        self.parser.add_option('-p', '--parquet-dir', metavar='<dir>',
-                               help='Parquet output dir ($PARQUETDIR)',
-                               default=getenv('PARQUETDIR'))
+        self.parser.add_option('-j', '--json', metavar='<file/dir>',
+                               help='JSON input file/dir ($JSON)',
+                               default=getenv('JSON'))
+        self.parser.add_option('-a', '--avro-dir', metavar='<dir>',
+                               help='Avro output dir ($AVRODIR)',
+                               default=getenv('AVRODIR'))
 
     def parse_args(self):
         self.no_args()
-        if not self.options.avro:
-            self.usage('--avro not defined')
-        if not self.options.parquet_dir:
-            self.usage('--parquet-dir not defined')
+        if not self.options.json:
+            self.usage('--json not defined')
+        if not self.options.avro_dir:
+            self.usage('--avro-dir not defined')
 
     def run(self):
-        avro_file = self.options.avro
-        parquet_dir = self.options.parquet_dir
-        # let Spark fail if avro/parquet aren't available
+        self.no_args()
+        json_file = self.options.json
+        avro_dir = self.options.avro_dir
+        # let Spark fail if json/avro dir aren't available
         # can't check paths exist as want to remain generically portable
         # to HDFS, local filesystm or any other uri scheme Spark supports
-        log.info("Avro Source: %s" % avro_file)
-        log.info("Parquet Destination: %s" % parquet_dir)
+        log.info("Json Source: %s" % json_file)
+        log.info("Avro Destination: %s" % avro_dir)
 
-        conf = SparkConf().setAppName('HS PySpark Avro => Parquet')
+        conf = SparkConf().setAppName('HS PySpark Json => Avro')
         sc = SparkContext(conf=conf) # pylint: disable=invalid-name
         sqlContext = SQLContext(sc)  # pylint: disable=invalid-name
         spark_version = sc.version
@@ -99,15 +99,18 @@ class SparkAvroToParquet(CLI):
         if not isVersionLax(spark_version):
             die("Spark version couldn't be determined. " + support_msg('pytools'))
 
+        #  pylint: disable=invalid-name
+        df = None
         if isMinVersion(spark_version, 1.4):
-            # this doesn't work in Spark <= 1.3 - github docs don't mention the older .method() for reading avro
-            df = sqlContext.read.format('com.databricks.spark.avro').load(avro_file)
-            df.write.parquet(parquet_dir)
+            df = sqlContext.read.json(json_file)
         else:
             die('Spark <= 1.3 is not supported due to avro dependency, sorry! ' + \
                 'I may change this on request but prefer people just upgrade')
             # log.warn('running legacy code for Spark <= 1.3')
-            # df.saveAsParquetFile(parquet_dir)
+            #json = sqlContext.jsonFile(json_file)
+        # this doesn't work in Spark <= 1.3 and the github docs don't mention the older methods for writing avro using
+        # the databricks avro driver
+        df.write.format('com.databricks.spark.avro').save(avro_dir)
 
 if __name__ == '__main__':
-    SparkAvroToParquet().main()
+    SparkJSONToAvro().main()

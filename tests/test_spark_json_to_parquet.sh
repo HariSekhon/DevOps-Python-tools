@@ -14,11 +14,12 @@
 #
 
 set -eu
+[ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "
 # ===================== #
-# Spark Avro => Parquet
+# Spark JSON => Parquet
 # ===================== #
 "
 
@@ -28,7 +29,7 @@ cd "$srcdir/..";
 
 cd "$srcdir"
 
-for SPARK_VERSION in 1.4.0 1.6.0; do
+for SPARK_VERSION in 1.3.1 1.4.0; do
     dir="spark-$SPARK_VERSION-bin-hadoop2.6"
     tar="$dir.tgz"
     if ! [ -d "$dir" ]; then
@@ -47,7 +48,7 @@ for SPARK_VERSION in 1.4.0 1.6.0; do
     echo
     export SPARK_HOME="$dir"
     rm -fr "test-$dir.parquet"
-    ../spark-avro-to-parquet.py -a "test-header-$dir.avro" -p "test-$dir.parquet" $@ &&
+    ../spark_json_to_parquet.py -j data/multirecord.json -p "test-$dir.parquet" $@ &&
         echo "SUCCEEDED with Spark $SPARK_VERSION" ||
         { echo "FAILED test with Spark $SPARK_VERSION"; exit 1; }
 done

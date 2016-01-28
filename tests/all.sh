@@ -14,6 +14,7 @@
 #
 
 set -euo pipefail
+[ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "
@@ -24,18 +25,18 @@ echo "
 
 cd "$srcdir";
 
-./whitespace.sh
+. utils.sh
 
-./compile.sh
+./whitespace.sh
 
 #./syntax.sh
 #./pylint.sh
 
 #./python3.sh
 
-for script in $(find . -name 'test*.sh'); do
-    ./$script -vvv
-done
+../bash-tools/python-compile.sh
+
+../bash-tools/run_tests.sh
 
 # do help afterwards for Spark to be downloaded, and then help will find and use downloaded spark for SPARK_HOME
 ./help.sh

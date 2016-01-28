@@ -14,11 +14,12 @@
 #
 
 set -eu
+[ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "
 # ===================== #
-# Spark JSON => Avro
+# Spark Avro => Parquet
 # ===================== #
 "
 
@@ -28,8 +29,6 @@ cd "$srcdir/..";
 
 cd "$srcdir"
 
-# don't support Spark <= 1.3 due to difference in databricks avro dependency
-#for SPARK_VERSION in 1.3.1 1.4.0; do
 for SPARK_VERSION in 1.4.0 1.6.0; do
     dir="spark-$SPARK_VERSION-bin-hadoop2.6"
     tar="$dir.tgz"
@@ -48,14 +47,9 @@ for SPARK_VERSION in 1.4.0 1.6.0; do
     fi
     echo
     export SPARK_HOME="$dir"
-    # this works for both Spark 1.3.1 and 1.4.0 but calling from within spark-csv-to-avro.py doesn't like it
-    #spark-submit --packages com.databricks:spark-csv_2.10:1.3.0 ../spark-csv-to-avro.py -c data/test.csv -a "test-$dir.avro" --has-header $@ &&
-    # resolved, was due to Spark 1.4+ requiring pyspark-shell for PYSPARK_SUBMIT_ARGS
-
-    rm -fr "test-$dir.avro"
-    ../spark-json-to-avro.py -j data/multirecord.json -a "test-$dir.avro" $@ &&
-        echo "SUCCEEDED with header with Spark $SPARK_VERSION" ||
-        { echo "FAILED with header with Spark $SPARK_VERSION"; exit 1; }
-
+    rm -fr "test-$dir.parquet"
+    ../spark_avro_to_parquet.py -a "test-header-$dir.avro" -p "test-$dir.parquet" $@ &&
+        echo "SUCCEEDED with Spark $SPARK_VERSION" ||
+        { echo "FAILED test with Spark $SPARK_VERSION"; exit 1; }
 done
 echo "SUCCESS"
