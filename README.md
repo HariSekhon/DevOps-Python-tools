@@ -42,6 +42,7 @@ Some common options also support optional environment variables for convenience 
 - ```pig_udfs.jy``` - Pig Jython UDFs for Hadoop
 - ```ipython-notebook-pyspark.py``` - per-user authenticated IPython Notebook + PySpark integration to allow each user to auto-create their own password protected IPython Notebook running Spark
 - ```spark_avro_to_parquet.py``` - PySpark Avro => Parquet converter
+- ```spark_parquet_to_avro.py``` - PySpark Parquet => Avro converter
 - ```spark_csv_to_avro.py``` - PySpark CSV => Avro converter, supports both inferred and explicit schemas
 - ```spark_csv_to_parquet.py``` - PySpark CSV => Parquet converter, supports both inferred and explicit schemas
 - ```spark_json_to_avro.py``` - PySpark JSON => Avro converter
