@@ -34,7 +34,7 @@ build:
 	
 	cd pylib && make
 	
-	wget -O parquet-tools-$(PARQUET_VERSION)-bin.zip http://search.maven.org/remotecontent?filepath=com/twitter/parquet-tools/$(PARQUET_VERSION)/parquet-tools-$(PARQUET_VERSION)-bin.zip && unzip parquet-tools-$(PARQUET_VERSION)-bin.zip
+	wget -c -O parquet-tools-$(PARQUET_VERSION)-bin.zip http://search.maven.org/remotecontent?filepath=com/twitter/parquet-tools/$(PARQUET_VERSION)/parquet-tools-$(PARQUET_VERSION)-bin.zip && unzip parquet-tools-$(PARQUET_VERSION)-bin.zip
 	
 	# json module built-in to Python >= 2.6, backport not available via pypi
 	#$(SUDO2) pip install json
@@ -52,7 +52,7 @@ build:
 	# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
 	$(SUDO2) pip install "ipython[notebook]" || :
 	@echo
-	bash-tools/python-compile.sh
+	bash-tools/python_compile.sh
 	@echo
 	@echo 'BUILD SUCCESSFUL (pytools)'
 
