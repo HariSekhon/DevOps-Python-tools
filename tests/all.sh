@@ -34,7 +34,7 @@ cd "$srcdir";
 
 #./python3.sh
 
-../bash-tools/python-compile.sh
+../bash-tools/python_compile.sh
 
 ../bash-tools/run_tests.sh
 
