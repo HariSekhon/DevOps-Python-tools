@@ -52,7 +52,7 @@ build:
 	# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
 	$(SUDO2) pip install "ipython[notebook]" || :
 	@echo
-	bash-tools/python-compile.sh
+	bash-tools/python_compile.sh
 	@echo
 	@echo 'BUILD SUCCESSFUL (pytools)'
 
