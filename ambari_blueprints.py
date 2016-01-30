@@ -73,6 +73,7 @@ import requests
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
+    # pylint: disable=wrong-import-position
     # import harisekhon.utils
     from harisekhon.utils import log, InvalidOptionException, qquit, die
     from harisekhon.utils import validate_file, validate_dirname, validate_host, validate_port, validate_user, \
@@ -135,7 +136,7 @@ class AmbariBlueprintTool(CLI):
         except IOError as _:
             die("'failed to create dir '%s': %s" % (self.blueprint_dir, _))
 
-    def parse_cluster_name(self, item):
+    def parse_cluster_name(self, item): # pylint: disable=no-self-use
         if isStr(item):
             item = json.loads(item)
         try:
@@ -148,7 +149,7 @@ class AmbariBlueprintTool(CLI):
         json_data = self.list('clusters')
         return [self.parse_cluster_name(item) for item in json_data['items']]
 
-    def parse_blueprint_name(self, item):
+    def parse_blueprint_name(self, item): # pylint: disable=no-self-use
         if isStr(item):
             item = json.loads(item)
         try:
@@ -161,7 +162,7 @@ class AmbariBlueprintTool(CLI):
         json_data = self.list('blueprints')
         return [self.parse_blueprint_name(item) for item in json_data['items']]
 
-    def parse_host_name(self, item):
+    def parse_host_name(self, item): # pylint: disable=no-self-use
         if isStr(item):
             item = json.loads(item)
         try:
@@ -391,7 +392,7 @@ class AmbariBlueprintTool(CLI):
             log.debug("cluster '%s' blueprint content = '%s'" % (cluster, data))
         self.save(cluster, path, data)
 
-    def save(self, name, path, data):
+    def save(self, name, path, data): # pylint: disable=no-self-use
         # log.debug('save(%s, %s)' % (name, data))
         if data is None:
             err = "blueprint '%s' returned None" % name
@@ -539,12 +540,12 @@ class AmbariBlueprintTool(CLI):
     def run(self):
         options = self.process_args()[0]
         self.connection(options.host,
-                   options.port,
-                   options.user,
-                   options.password,
-                   options.ssl,
-                   dir=options.dir,
-                   strip_config=options.strip_config)
+                        options.port,
+                        options.user,
+                        options.password,
+                        options.ssl,
+                        dir=options.dir,
+                        strip_config=options.strip_config)
         if options.list_blueprints:
             self.print_blueprints()
         elif options.list_clusters:
