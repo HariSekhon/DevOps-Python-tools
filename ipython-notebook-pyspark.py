@@ -58,6 +58,8 @@ try:
     from harisekhon.utils import *
 except ImportError as e:
     print('module import failed: %s' % e, file=sys.stderr)
+    print("Did you remember to build the project by running 'make'?", file=sys.stderr)
+    print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
     sys.exit(4)
 pyspark_path()
 
