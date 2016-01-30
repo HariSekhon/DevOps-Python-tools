@@ -177,8 +177,9 @@ class SparkCSVToParquet(CLI):
                                      header=header_str, inferSchema='true')
             elif self.schema:
                 log.info('using explicitly defined schema')
+                schema = self.schema
                 df = sqlContext.load(source="com.databricks.spark.csv", path=csv_file,
-                                     header=header_str, schema=self.schema)
+                                     header=header_str, schema=schema)
             else:
                 die('no header and no schema, caught late')
             df.saveAsParquetFile(parquet_dir)

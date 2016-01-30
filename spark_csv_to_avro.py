@@ -167,10 +167,11 @@ class SparkCSVToAvro(CLI):
                      .load(csv_file)
             else:
                 log.info('using explicitly defined schema')
+                schema = self.schema
                 df = sqlContext.read\
                      .format('com.databricks.spark.csv')\
                      .options(header=header_str)\
-                     .load(csv_file, schema=self.schema)
+                     .load(csv_file, schema=schema)
         else:
             die('Spark <= 1.3 is not supported due to avro dependency, sorry! ' + \
                 'I may change this on request but prefer people just upgrade')
