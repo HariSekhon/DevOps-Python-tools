@@ -81,6 +81,8 @@ try:
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _)
+    print("Did you remember to build the project by running 'make'?", file=sys.stderr)
+    print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'

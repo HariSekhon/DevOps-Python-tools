@@ -42,6 +42,8 @@ try:
     from harisekhon import CLI # pylint: disable=wrong-import-position
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
+    print("Did you remember to build the project by running 'make'?", file=sys.stderr)
+    print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
     sys.exit(4)
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.databricks:spark-csv_2.10:1.3.0 %s' \
                                     % os.getenv('PYSPARK_SUBMIT_ARGS', '')

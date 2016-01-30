@@ -38,6 +38,8 @@ try:
     from harisekhon import CLI # pylint: disable=wrong-import-position
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
+    print("Did you remember to build the project by running 'make'?", file=sys.stderr)
+    print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
     sys.exit(4)
                                     # com.databricks:spark-avro_2.10:2.0.1 - 2.0.1 is for Spark 1.4+
                                     # you can edit this bit if you need to run it on Spark 1.3:
