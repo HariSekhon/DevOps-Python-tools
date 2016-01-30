@@ -65,6 +65,8 @@ else
     exit 1
 fi
 
+###########
+# comment
 expected="#                                 this is a test"
 
 echo "testing args with # prefix"
@@ -104,6 +106,56 @@ fi
 
 echo "testing stdin with // prefix"
 result="$(./center.py <<< " // this is a test")"
+if [ "$result" = "$expected" ]; then
+    echo "Succeeded in centering stdin with // prefix"
+else
+    echo "Failed to center stdin with // prefix"
+    echo "Expected: '$expected'"
+    echo "Got:      '$result'"
+    exit 1
+fi
+
+###########
+# comment handling disabled
+expected="                               #  this is a test"
+
+echo "testing args with # prefix"
+result="$(./center.py -n " #  this is a test ")"
+if [ "$result" = "$expected" ]; then
+    echo "Succeeded in centering args with # prefix"
+else
+    echo "Failed to center args with # prefix"
+    echo "Expected: '$expected'"
+    echo "Got:      '$result'"
+    exit 1
+fi
+
+echo "testing stdin with # prefix"
+result="$(./center.py -n <<< " #  this is a test")"
+if [ "$result" = "$expected" ]; then
+    echo "Succeeded in centering stdin with # prefix"
+else
+    echo "Failed to center stdin with # prefix"
+    echo "Expected: '$expected'"
+    echo "Got:      '$result'"
+    exit 1
+fi
+
+expected="                               //  this is a test"
+
+echo "testing args with // prefix"
+result="$(./center.py -n " //  this is a test ")"
+if [ "$result" = "$expected" ]; then
+    echo "Succeeded in centering args with // prefix"
+else
+    echo "Failed to center args with // prefix"
+    echo "Expected: '$expected'"
+    echo "Got:      '$result'"
+    exit 1
+fi
+
+echo "testing stdin with // prefix"
+result="$(./center.py -n <<< " //  this is a test")"
 if [ "$result" = "$expected" ]; then
     echo "Succeeded in centering stdin with // prefix"
 else
