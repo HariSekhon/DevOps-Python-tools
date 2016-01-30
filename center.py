@@ -38,13 +38,15 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 class Center(CLI):
 
     def add_options(self):
         self.parser.add_option('-w', '--width', default=80, type='int', metavar='<num_chars>',
                                help='Target line width to center for in chars')
+        self.parser.add_option('-n', '--no-comment', action='store_true',
+                               help='No comment prefix handling')
 
     def run(self):
         if self.args:
@@ -54,17 +56,19 @@ class Center(CLI):
                 self.process_line(line)
 
     def process_line(self, line):
-        char = ' '
+        char = ''
         if not line:
             return
-        # preliminary strip() to be able to pick up # if it isn't the first char and their are spaces before it
-        line = line.strip()
-        if isChars(line[0], '#'):
-            char = line[0]
-            line = line.lstrip(char)
-        elif len(line) > 1 and isChars(line[0:1], '/'):
-            char = '//'
-            line = line.lstrip(char)
+        if not self.options.no_comment:
+            char = ' '
+            # preliminary strip() to be able to pick up # if it isn't the first char and their are spaces before it
+            line = line.strip()
+            if isChars(line[0], '#'):
+                char = line[0]
+                line = line.lstrip(char)
+            elif len(line) > 1 and isChars(line[0:1], '/'):
+                char = '//'
+                line = line.lstrip(char)
         line = line.strip()
         side = int(max((self.options.width - len(line)) / 2, 0))
         print(char + ' ' * side + line)
