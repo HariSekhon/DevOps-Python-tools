@@ -52,8 +52,9 @@ import sys
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import die, ERRORS, vlog_option, uniq_list_ordered, log, isChars  # pylint: disable=wrong-import-position
-    from harisekhon import CLI  # pylint: disable=wrong-import-position
+    # pylint: disable=wrong-import-position
+    from harisekhon.utils import die, ERRORS, vlog_option, uniq_list_ordered, log, isChars
+    from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
     print("Did you remember to build the project by running 'make'?", file=sys.stderr)
