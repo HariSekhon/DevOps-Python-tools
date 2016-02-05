@@ -55,8 +55,7 @@ build:
 	bash-tools/python_compile.sh
 	@echo
 	@echo
-	rm -vf spark-deps.zip
-	zip spark-deps.zip pylib
+	make spark-deps
 	@echo
 	@echo 'BUILD SUCCESSFUL (pytools)'
 
@@ -138,3 +137,8 @@ clean:
 	@find . -type d -ipath '*/tests/*' -iname 'test-*spark*.avro' | xargs rm -rf
 	@find . -type d -ipath '*/tests/*' -iname 'test-*spark*.parquet' | xargs rm -rf
 	@rm -f parquet-tools-$(PARQUET_VERSION)-bin.zip
+
+.PHONY: spark-deps
+spark-deps:
+	rm -vf spark-deps.zip
+	zip spark-deps.zip pylib
