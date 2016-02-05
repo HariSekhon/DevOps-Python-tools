@@ -62,7 +62,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.2'
+__version__ = '0.7.3'
 
 class CsvValidatorTool(CLI):
 
@@ -144,14 +144,14 @@ class CsvValidatorTool(CLI):
             die(self.invalid_csv_msg)
 
     def add_options(self):
-        self.parser.add_option('-d', '--delimiter', default=self.delimiter,
-                               help='Delimiter to test (default: None, infers per file)')
-        self.parser.add_option('-q', '--quotechar', default=self.quotechar,
-                               help='Quotechar to test (default: None)')
-                               #     self.parser.add_option('-p', '--print', action='store_true',
-    #                            help='Print the CSV lines(s) which are valid, else print nothing (useful for shell ' +
-    #                            'pipelines). Exit codes are still 0 for success, or %s for failure'
-    #                            % ERRORS['CRITICAL'])
+        self.add_opt('-d', '--delimiter', default=self.delimiter,
+                     help='Delimiter to test (default: None, infers per file)')
+        self.add_opt('-q', '--quotechar', default=self.quotechar,
+                     help='Quotechar to test (default: None)')
+    #   self.add_opt('-p', '--print', action='store_true',
+    #                help='Print the CSV lines(s) which are valid, else print nothing (useful for shell ' +
+    #                'pipelines). Exit codes are still 0 for success, or %s for failure'
+    #                % ERRORS['CRITICAL'])
 
     def run(self):
         self.delimiter = self.options.delimiter

@@ -49,7 +49,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.2'
+__version__ = '0.7.3'
 
 class XmlValidatorTool(CLI):
 
@@ -84,10 +84,10 @@ class XmlValidatorTool(CLI):
                 die(self.invalid_xml_msg)
 
     def add_options(self):
-        self.parser.add_option('-p', '--print', action='store_true',
-                               help='Print the XML document(s) if valid, else print nothing (useful for shell ' +
-                               'pipelines). Exit codes are still 0 for success, or %s for failure'
-                               % ERRORS['CRITICAL'])
+        self.add_opt('-p', '--print', action='store_true',
+                     help='Print the XML document(s) if valid, else print nothing (useful for shell ' +
+                     'pipelines). Exit codes are still 0 for success, or %s for failure'
+                     % ERRORS['CRITICAL'])
 
     def run(self):
         if not self.args:
