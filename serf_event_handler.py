@@ -61,7 +61,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.2.1'
 
 class SerfEventHandler(CLI):
 
@@ -86,8 +86,8 @@ class SerfEventHandler(CLI):
             log.warn("SERF_EVENT environment variable passed unrecognized event type '%s'" % self.event)
 
     def add_option_command_passthru(self):
-        self.parser.add_option('--cmd-passthru', dest='cmd', action='store_true',
-                               help='Allow any query or event to run a command if the first arg is found in $PATH')
+        self.add_opt('--cmd-passthru', dest='cmd', action='store_true',
+                     help='Allow any query or event to run a command if the first arg is found in $PATH')
 
     # this allows easier overriding of add_options while adding command passthrough option back in
     def add_options(self):
