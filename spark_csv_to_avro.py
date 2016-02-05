@@ -60,7 +60,7 @@ from pyspark.sql.types import *     # pylint: disable=wrong-import-position,impo
 from pyspark.sql.types import StructType, StructField  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 
 class SparkCSVToAvro(CLI):
 
@@ -86,18 +86,18 @@ class SparkCSVToAvro(CLI):
     def add_options(self):
         self.set_verbose_default(2)
         self.set_timeout_default(86400)
-        self.parser.add_option('-c', '--csv', metavar='<file/dir>',
-                               help='CSV input file/dir ($CSV)',
-                               default=getenv('CSV'))
-        self.parser.add_option('-a', '--avro-dir', metavar='<dir>',
-                               help='Avro output dir ($AVRODIR)',
-                               default=getenv('AVRODIR'))
-        self.parser.add_option('-e', '--has-header', action='store_true',
-                               help='CSV has header. Infers schema if --schema is not given in which case all ' +
-                               "types are assumed to be 'string'. Must specify --schema to override this")
-        self.parser.add_option('-s', '--schema', metavar='name:type,name2:type2,...',
-                               help="Schema for CSV. Types default to 'string'. Possible types are: %s" \
-                                    % ', '.join(sorted(self.types_mapping)))
+        self.add_opt('-c', '--csv', metavar='<file/dir>',
+                     help='CSV input file/dir ($CSV)',
+                     default=getenv('CSV'))
+        self.add_opt('-a', '--avro-dir', metavar='<dir>',
+                     help='Avro output dir ($AVRODIR)',
+                     default=getenv('AVRODIR'))
+        self.add_opt('-e', '--has-header', action='store_true',
+                     help='CSV has header. Infers schema if --schema is not given in which case all ' +
+                     "types are assumed to be 'string'. Must specify --schema to override this")
+        self.add_opt('-s', '--schema', metavar='name:type,name2:type2,...',
+                     help="Schema for CSV. Types default to 'string'. Possible types are: %s" \
+                     % ', '.join(sorted(self.types_mapping)))
 
     def parse_args(self):
         self.no_args()
