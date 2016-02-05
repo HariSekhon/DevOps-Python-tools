@@ -1,11 +1,17 @@
 #!/usr/bin/env python
+#  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
 #  Date: 2009-12-09 19:58:14 +0000 (Wed, 09 Dec 2009)
 #
 #  https://github.com/harisekhon/pytools
 #
-#  License: see accompanying LICENSE file
+#  License: see accompanying Hari Sekhon LICENSE file
+#
+#  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback
+#  to help improve or steer this or other code I publish
+#
+#  http://www.linkedin.com/in/harisekhon
 #
 
 """
