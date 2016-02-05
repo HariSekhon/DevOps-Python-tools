@@ -135,9 +135,9 @@ class Welcome(CLI):
             print('\b\b\b%s' % msg[i:])
 
     def add_options(self):
-        self.parser.add_option('-q', '--quick', action='store_true', default=False,
-                               help='Print instantly without fancy scrolling effect, saves 2-3 seconds ' +\
-                                    '(you can also Control-C to make output complete instantly)')
+        self.add_opt('-q', '--quick', action='store_true', default=False,
+                     help='Print instantly without fancy scrolling effect, saves 2-3 seconds ' +\
+                     '(you can also Control-C to make output complete instantly)')
 
     def run(self):
         self.quick = self.options.quick
