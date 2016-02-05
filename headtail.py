@@ -41,7 +41,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 class HeadTail(CLI):
 
@@ -57,14 +57,11 @@ class HeadTail(CLI):
 
     def add_options(self):
         #self.set_timeout_default(300)
-        self.parser.add_option('-n', '--num', metavar='number_of_lines',
-                               type=int,
-                               default=self.num_lines,
-                               help='Number of lines to show (default: 10)')
-        self.parser.add_option('-q', '--quiet',
-                               action='store_true',
-                               default=False,
-                               help="Don't print separators in output")
+        self.add_opt('-n', '--num', metavar='number_of_lines',
+                     type=int, default=self.num_lines,
+                     help='Number of lines to show (default: 10)')
+        self.add_opt('-q', '--quiet', action='store_true',
+                     default=False, help="Don't print separators in output")
 
     def run(self):
         self.num_lines = self.options.num
