@@ -41,15 +41,15 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.2.1'
 
 class Center(CLI):
 
     def add_options(self):
-        self.parser.add_option('-w', '--width', default=80, type='int', metavar='<num_chars>',
-                               help='Target line width to center for in chars')
-        self.parser.add_option('-n', '--no-comment', action='store_true',
-                               help='No comment prefix handling')
+        self.add_opt('-w', '--width', default=80, type='int', metavar='<num_chars>',
+                     help='Target line width to center for in chars')
+        self.add_opt('-n', '--no-comment', action='store_true',
+                     help='No comment prefix handling')
 
     def run(self):
         if self.args:
