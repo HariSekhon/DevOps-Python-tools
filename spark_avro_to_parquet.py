@@ -53,7 +53,7 @@ from pyspark import SparkConf       # pylint: disable=wrong-import-position,impo
 from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 
 class SparkAvroToParquet(CLI):
 
@@ -69,12 +69,12 @@ class SparkAvroToParquet(CLI):
     def add_options(self):
         self.set_verbose_default(2)
         self.set_timeout_default(86400)
-        self.parser.add_option('-a', '--avro', metavar='<file/dir>',
-                               help='Avro input file/dir ($AVRO)',
-                               default=getenv('AVRO'))
-        self.parser.add_option('-p', '--parquet-dir', metavar='<dir>',
-                               help='Parquet output dir ($PARQUETDIR)',
-                               default=getenv('PARQUETDIR'))
+        self.add_opt('-a', '--avro', metavar='<file/dir>',
+                     help='Avro input file/dir ($AVRO)',
+                     default=getenv('AVRO'))
+        self.add_opt('-p', '--parquet-dir', metavar='<dir>',
+                     help='Parquet output dir ($PARQUETDIR)',
+                     default=getenv('PARQUETDIR'))
 
     def parse_args(self):
         self.no_args()
