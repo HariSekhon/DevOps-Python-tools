@@ -55,6 +55,7 @@ build:
 	bash-tools/python_compile.sh
 	@echo
 	@echo
+	rm -vf spark-deps.zip
 	zip spark-deps.zip pylib
 	@echo
 	@echo 'BUILD SUCCESSFUL (pytools)'
