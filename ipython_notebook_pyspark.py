@@ -56,6 +56,7 @@ sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
     from harisekhon.utils import isLinux, isMac, isIP, isPythonMinVersion, ERRORS, printerr, warn, pyspark_path
+    from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
     print("Did you remember to build the project by running 'make'?", file=sys.stderr)
@@ -89,6 +90,8 @@ Exception message: %s""" % _)
 #    linux_only()
 #except LinuxOnlyException, e:
 #    die(e)
+
+# TODO: rewrite from here as a CLI class, not using globals
 
 if len(sys.argv) > 1:
     printerr("""Hari Sekhon - https://github.com/harisekhon/pytools
