@@ -12,7 +12,7 @@
 #  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback
 #  to help improve or steer this or other code I publish
 #
-#  http://www.linkedin.com/in/harisekhon
+#  https://www.linkedin.com/in/harisekhon
 #
 
 """
@@ -80,7 +80,7 @@ try:
     from harisekhon.utils import isStr, isHost, isPort, isUser, isDirname, isJson, jsonpp, list_sort_dicts_by_value
     from harisekhon import CLI
 except ImportError as _:
-    print('module import failed: %s' % _)
+    print("module import failed: %s - did you remember to build the project by running 'make' or perhaps you tried to copy this program out without it's adjacent libraries?" % _, file=sys.stderr)
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
