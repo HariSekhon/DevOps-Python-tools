@@ -32,10 +32,13 @@ import sys
 libdir = os.path.join(os.path.dirname(__file__), 'pylib')
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import log, isMinVersion, support_msg, isVersionLax, die, getenv, pyspark_path # pylint: disable=wrong-import-position
-    from harisekhon import CLI # pylint: disable=wrong-import-position
+    # pylint: disable=wrong-import-position
+    from harisekhon.utils import log, isMinVersion, support_msg, isVersionLax, die, getenv, pyspark_path
+    from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
+    print("Did you remember to build the project by running 'make'?", file=sys.stderr)
+    print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
     sys.exit(4)
 pyspark_path()
 from pyspark import SparkContext    # pylint: disable=wrong-import-position,import-error
@@ -43,7 +46,7 @@ from pyspark import SparkConf       # pylint: disable=wrong-import-position,impo
 from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.0'
+__version__ = '0.7.1'
 
 class SparkJsonToParquet(CLI):
 
@@ -59,12 +62,12 @@ class SparkJsonToParquet(CLI):
     def add_options(self):
         self.set_verbose_default(2)
         self.set_timeout_default(86400)
-        self.parser.add_option('-j', '--json', metavar='<file/dir>',
-                               help='JSON input file/dir ($JSON)',
-                               default=getenv('JSON'))
-        self.parser.add_option('-p', '--parquet-dir', metavar='<dir>',
-                               help='Parquet output dir ($PARQUETDIR)',
-                               default=getenv('PARQUETDIR'))
+        self.add_opt('-j', '--json', metavar='<file/dir>',
+                     help='JSON input file/dir ($JSON)',
+                     default=getenv('JSON'))
+        self.add_opt('-p', '--parquet-dir', metavar='<dir>',
+                     help='Parquet output dir ($PARQUETDIR)',
+                     default=getenv('PARQUETDIR'))
 
     def parse_args(self):
         self.no_args()

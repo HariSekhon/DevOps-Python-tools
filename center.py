@@ -31,8 +31,9 @@ import sys
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import isChars  # pylint: disable=wrong-import-position
-    from harisekhon import CLI            # pylint: disable=wrong-import-position
+    # pylint: disable=wrong-import-position
+    from harisekhon.utils import isChars
+    from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
     print("Did you remember to build the project by running 'make'?", file=sys.stderr)
@@ -40,15 +41,15 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.2.1'
 
 class Center(CLI):
 
     def add_options(self):
-        self.parser.add_option('-w', '--width', default=80, type='int', metavar='<num_chars>',
-                               help='Target line width to center for in chars')
-        self.parser.add_option('-n', '--no-comment', action='store_true',
-                               help='No comment prefix handling')
+        self.add_opt('-w', '--width', default=80, type='int', metavar='<num_chars>',
+                     help='Target line width to center for in chars')
+        self.add_opt('-n', '--no-comment', action='store_true',
+                     help='No comment prefix handling')
 
     def run(self):
         if self.args:

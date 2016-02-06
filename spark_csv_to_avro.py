@@ -38,10 +38,13 @@ import sys
 libdir = os.path.join(os.path.dirname(__file__), 'pylib')
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import log, isMinVersion, support_msg, isVersionLax, die, getenv, pyspark_path # pylint: disable=wrong-import-position
-    from harisekhon import CLI # pylint: disable=wrong-import-position
+    # pylint: disable=wrong-import-position
+    from harisekhon.utils import log, isMinVersion, support_msg, isVersionLax, die, getenv, pyspark_path
+    from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
+    print("Did you remember to build the project by running 'make'?", file=sys.stderr)
+    print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
     sys.exit(4)
                                     # com.databricks:spark-avro_2.10:2.0.1 - 2.0.1 is for Spark 1.4+
                                     # you can edit this bit if you need to run it on Spark 1.3:
@@ -57,7 +60,7 @@ from pyspark.sql.types import *     # pylint: disable=wrong-import-position,impo
 from pyspark.sql.types import StructType, StructField  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 
 class SparkCSVToAvro(CLI):
 
@@ -83,18 +86,18 @@ class SparkCSVToAvro(CLI):
     def add_options(self):
         self.set_verbose_default(2)
         self.set_timeout_default(86400)
-        self.parser.add_option('-c', '--csv', metavar='<file/dir>',
-                               help='CSV input file/dir ($CSV)',
-                               default=getenv('CSV'))
-        self.parser.add_option('-a', '--avro-dir', metavar='<dir>',
-                               help='Avro output dir ($AVRODIR)',
-                               default=getenv('AVRODIR'))
-        self.parser.add_option('-e', '--has-header', action='store_true',
-                               help='CSV has header. Infers schema if --schema is not given in which case all ' +
-                               "types are assumed to be 'string'. Must specify --schema to override this")
-        self.parser.add_option('-s', '--schema', metavar='name:type,name2:type2,...',
-                               help="Schema for CSV. Types default to 'string'. Possible types are: %s" \
-                                    % ', '.join(sorted(self.types_mapping)))
+        self.add_opt('-c', '--csv', metavar='<file/dir>',
+                     help='CSV input file/dir ($CSV)',
+                     default=getenv('CSV'))
+        self.add_opt('-a', '--avro-dir', metavar='<dir>',
+                     help='Avro output dir ($AVRODIR)',
+                     default=getenv('AVRODIR'))
+        self.add_opt('-e', '--has-header', action='store_true',
+                     help='CSV has header. Infers schema if --schema is not given in which case all ' +
+                     "types are assumed to be 'string'. Must specify --schema to override this")
+        self.add_opt('-s', '--schema', metavar='name:type,name2:type2,...',
+                     help="Schema for CSV. Types default to 'string'. Possible types are: %s" \
+                     % ', '.join(sorted(self.types_mapping)))
 
     def parse_args(self):
         self.no_args()
@@ -165,10 +168,11 @@ class SparkCSVToAvro(CLI):
                      .load(csv_file)
             else:
                 log.info('using explicitly defined schema')
+                schema = self.schema
                 df = sqlContext.read\
                      .format('com.databricks.spark.csv')\
                      .options(header=header_str)\
-                     .load(csv_file, schema=self.schema)
+                     .load(csv_file, schema=schema)
         else:
             die('Spark <= 1.3 is not supported due to avro dependency, sorry! ' + \
                 'I may change this on request but prefer people just upgrade')

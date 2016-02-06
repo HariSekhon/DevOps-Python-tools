@@ -9,7 +9,8 @@
 #
 
 """
-Starts a unique password protected instance of IPython Notebook integrated with PySpark for the user running this program.
+Starts a unique password protected instance of IPython Notebook integrated with PySpark
+for the user running this program.
 
 This is a workaround to IPython Notebook not have multi-user support as of 2014.
 
@@ -26,12 +27,14 @@ Optional:
     - $SPARK_YARN_USR_ENV
     - $PYSPARK_SUBMIT_ARGS (defaults to 5 executors, 5 cores, 10GB)
 
-Prompts for a password if none has been set before, then creates a new IPython Notebook configuration for PySpark and boots.
+Prompts for a password if none has been set before.
+
+Then creates a new IPython Notebook configuration for PySpark and boots.
 
 Uses Jinja2 template files co-located in the same directory as this program:
 
 .ipython-notebook-pyspark.00-pyspark-setup.py
-.ipython-notebook-pyspark.ipython_notebook_config.py.j2 
+.ipython-notebook-pyspark.ipython_notebook_config.py.j2
 
 Tested on Spark 1.0.x on Hortonworks 2.1 (Yarn + Standalone) and IBM BigInsights 2.1.2 (Standalone)
 """
@@ -41,38 +44,43 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-__author__  = 'Hari Sekhon'
-__version__ = '0.3.1'
-
 import getpass
 import glob
 import os
-import re
 import shutil
 import sys
 import time
+from jinja2 import Template
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
+sys.path.append(libdir)
 try:
-    from jinja2 import Template
-    libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
-    sys.path.append(libdir)
-    from harisekhon.utils import *
-except ImportError as e:
-    print('module import failed: %s' % e, file=sys.stderr)
+    # pylint: disable=wrong-import-position
+    from harisekhon.utils import isLinux, isMac, isIP, isPythonMinVersion, ERRORS, printerr, warn, pyspark_path
+except ImportError as _:
+    print('module import failed: %s' % _, file=sys.stderr)
+    print("Did you remember to build the project by running 'make'?", file=sys.stderr)
+    print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
     sys.exit(4)
 pyspark_path()
 
+__author__ = 'Hari Sekhon'
+__version__ = '0.3.2'
+
 if not isPythonMinVersion(2.7):
-    warn('Python < 2.7 - IPython may not be available on this version of Python (supplied auto-build will likely have failed for this module)\n')
+    warn('Python < 2.7 - IPython may not be available on this version of Python ' +
+         '(supplied auto-build will likely have failed for this module)\n')
 try:
+    # pylint: disable=wrong-import-position
     from IPython.lib import passwd
-except ImportError as e:
+except ImportError as _:
     printerr("""failed to import from IPython.lib
 
 Perhaps you need to 'pip install \"ipython[notebook]\"'
 
-Exception message: %s""" % e)
+Exception message: %s""" % _)
     if not isPythonMinVersion(2.7):
-        printerr('Python < 2.7 - the supplied make auto build with this tool probably failed to install IPython because IPython requires Python >= 2.7')
+        printerr('Python < 2.7 - the supplied make auto build with this tool probably failed ' +
+                 'to install IPython because IPython requires Python >= 2.7')
         sys.exit(ERRORS['UNKNOWN'])
     sys.exit(ERRORS['CRITICAL'])
 
@@ -88,10 +96,10 @@ if len(sys.argv) > 1:
 usage: %s
 
 version %s
-%s""" % ( os.path.basename(sys.argv[0]), __version__, __doc__) )
+%s""" % (os.path.basename(sys.argv[0]), __version__, __doc__))
     sys.exit(3)
 
-dir = os.path.abspath(os.path.dirname(sys.argv[0]))
+srcdir = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 ###########################
 # PySpark Settings
@@ -109,8 +117,8 @@ default_master = "yarn_client"
 master = os.getenv('MASTER', default_master)
 
 # defaults resources to use if not setting PYSPARK_SUBMIT_ARGS
-num_executors   = 5
-executor_cores  = 5
+num_executors = 5
+executor_cores = 5
 executor_memory = "10g"
 
 SPARK_HOME = os.getenv('SPARK_HOME', None)
@@ -135,7 +143,8 @@ sys.path.insert(0, os.path.join(SPARK_HOME, 'python'))
 for lib in glob.glob(os.path.join(SPARK_HOME, 'python/lib/py4j-*-src.zip')):
     sys.path.insert(0, lib)
 #
-# simply appending causes an Array error in Java due to the first element being empty if SPARK_YARN_USER_ENV isn't already set
+# simply appending causes an Array error in Java due to the first element
+# being empty if SPARK_YARN_USER_ENV isn't already set
 if os.getenv('SPARK_YARN_USER_ENV', None):
     os.environ['SPARK_YARN_USER_ENV'] = os.environ['SPARK_YARN_USER_ENV'] + ",PYTHONPATH=" + ":".join(sys.path)
 else:
@@ -148,13 +157,14 @@ if not (os.getenv('HADOOP_CONF_DIR', None) or os.getenv('YARN_CONF_DIR', None)):
 
 if not os.getenv('PYSPARK_SUBMIT_ARGS', None):
     # don't hog the whole cluster - limit executor / RAM / CPU usage
-    os.environ['PYSPARK_SUBMIT_ARGS'] = "--num-executors %d --total-executor-cores %d --executor-memory %s" % (num_executors, executor_cores, executor_memory)
+    os.environ['PYSPARK_SUBMIT_ARGS'] = "--num-executors %d --total-executor-cores %d --executor-memory %s" \
+                                        % (num_executors, executor_cores, executor_memory)
 os.environ['PYSPARK_SUBMIT_ARGS'] = "--master %s %s" % (master, os.environ['PYSPARK_SUBMIT_ARGS'])
 
 ###########################
 # IPython Notebook Settings
-template_file       = dir + "/.ipython-notebook-pyspark.ipython_notebook_config.py.j2"
-pyspark_startup_src = dir + "/.ipython-notebook-pyspark.00-pyspark-setup.py"
+template_file = srcdir + "/.ipython-notebook-pyspark.ipython_notebook_config.py.j2"
+pyspark_startup_src = srcdir + "/.ipython-notebook-pyspark.00-pyspark-setup.py"
 
 # Set default to 0.0.0.0 for portability but better set to your IP
 # for IPython output to give the correct URL to users
@@ -162,9 +172,9 @@ default_ip = "0.0.0.0"
 
 # try setting to the main IP with default gw to give better feedback to user where to connect
 if isLinux():
-    ip = os.popen("ifconfig $(netstat -rn | awk '/^0.0.0.0[[:space:]]/ {print $8}') | sed -n '2 s/.*inet addr://; 2 s/ .*// p'").read().rstrip('\n')
+    ip = os.popen("ifconfig $(netstat -rn | awk '/^0.0.0.0[[:space:]]/ {print $8}') | sed -n '2 s/.*inet addr://; 2 s/ .*// p'").read().rstrip('\n') # pylint: disable=line-too-long
 elif isMac():
-    ip = os.popen("ifconfig $(netstat -rn | awk '/^default[[:space:]]/ {print $6}') | sed -n '4 s/.*inet //; 4 s/ .*// p'").read().rstrip('\n')
+    ip = os.popen("ifconfig $(netstat -rn | awk '/^default[[:space:]]/ {print $6}') | sed -n '4 s/.*inet //; 4 s/ .*// p'").read().rstrip('\n') # pylint: disable=line-too-long
 else:
     warn('OS is not Linux or Mac, IP detection will not work')
 if not isIP(ip):
@@ -177,7 +187,7 @@ ipython_profile_name = "pyspark"
 
 template = Template(open(template_file).read())
 
-password  = "1"
+password = "1"
 password2 = "2"
 
 if getpass.getuser() == 'root':
@@ -190,14 +200,14 @@ def get_password():
     #password  = raw_input("Enter password to protect your personal IPython NoteBook\n\npassword: ")
     #password2 = raw_input("confirm password: ")
     print("\nEnter a password to protect your personal IPython NoteBook (sha1 hashed and written to a config file)\n")
-    password  = getpass.getpass()
+    password = getpass.getpass()
     password2 = getpass.getpass("Confirm Password: ")
 
 try:
-    ipython_profile         = os.popen("ipython locate").read().rstrip("\n") + "/profile_%s" % ipython_profile_name
+    ipython_profile = os.popen("ipython locate").read().rstrip("\n") + "/profile_%s" % ipython_profile_name
     ipython_notebook_config = ipython_profile + "/ipython_notebook_config.py"
-    passwd_txt              = ipython_profile + "/passwd.txt"
-    setup_py                = ipython_profile + "/startup/00-pyspark-setup.py"
+    passwd_txt = ipython_profile + "/passwd.txt"
+    setup_py = ipython_profile + "/startup/00-pyspark-setup.py"
 
     if not os.path.exists(ipython_profile):
         print("creating new ipython notebook profile")
@@ -207,7 +217,7 @@ try:
 
     if not os.path.exists(passwd_txt):
         get_password()
-        while(password != password2):
+        while password != password2:
             print("passwords do not match!\n")
             get_password()
         print("writing new encrypted password")
@@ -222,12 +232,17 @@ try:
 
     try:
         ipython_notebook_config_contents = open(ipython_notebook_config).read()
-    except:
+    except IOError:
         ipython_notebook_config_contents = ""
-    if not os.path.exists(ipython_notebook_config) or passwd_txt not in ipython_notebook_config_contents or "c.NotebookApp.ip = '%s'" % ip not in ipython_notebook_config_contents:
+    if not os.path.exists(ipython_notebook_config) or passwd_txt not in ipython_notebook_config_contents \
+        or "c.NotebookApp.ip = '%s'" % ip not in ipython_notebook_config_contents:
         print("writing new ipython notebook config")
         config = open(ipython_notebook_config, "w")
-        config.write(template.render(passwd_txt = passwd_txt, ip = ip, name = os.path.basename(sys.argv[0]), date = time.ctime(), template_path = template_file ) )
+        config.write(template.render(passwd_txt=passwd_txt,
+                                     ip=ip,
+                                     name=os.path.basename(sys.argv[0]),
+                                     date=time.ctime(),
+                                     template_path=template_file))
         config.close()
         os.chmod(ipython_notebook_config, 0o600)
     # PYSPARK_SUBMIT_ARGS is reset to "" by pyspark wrapper script, call IPython Notebook drectly to avoid this :-/

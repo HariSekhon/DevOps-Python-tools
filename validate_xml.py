@@ -39,14 +39,17 @@ import sys
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import die, ERRORS, isXml, vlog_option, uniq_list_ordered  # pylint: disable=wrong-import-position
-    from harisekhon import CLI                                                       # pylint: disable=wrong-import-position
+    # pylint: disable=wrong-import-position
+    from harisekhon.utils import die, ERRORS, isXml, vlog_option, uniq_list_ordered
+    from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
+    print("Did you remember to build the project by running 'make'?", file=sys.stderr)
+    print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.2'
+__version__ = '0.7.3'
 
 class XmlValidatorTool(CLI):
 
@@ -81,10 +84,10 @@ class XmlValidatorTool(CLI):
                 die(self.invalid_xml_msg)
 
     def add_options(self):
-        self.parser.add_option('-p', '--print', action='store_true',
-                               help='Print the XML document(s) if valid, else print nothing (useful for shell ' +
-                               'pipelines). Exit codes are still 0 for success, or %s for failure'
-                               % ERRORS['CRITICAL'])
+        self.add_opt('-p', '--print', action='store_true',
+                     help='Print the XML document(s) if valid, else print nothing (useful for shell ' +
+                     'pipelines). Exit codes are still 0 for success, or %s for failure'
+                     % ERRORS['CRITICAL'])
 
     def run(self):
         if not self.args:

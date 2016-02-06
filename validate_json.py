@@ -43,14 +43,17 @@ import sys
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import isJson, die, ERRORS, vlog_option, uniq_list_ordered  # pylint: disable=wrong-import-position
-    from harisekhon import CLI                                                        # pylint: disable=wrong-import-position
+    # pylint: disable=wrong-import-position
+    from harisekhon.utils import isJson, die, ERRORS, vlog_option, uniq_list_ordered
+    from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
+    print("Did you remember to build the project by running 'make'?", file=sys.stderr)
+    print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.2'
+__version__ = '0.7.3'
 
 class JsonValidatorTool(CLI):
 
@@ -67,14 +70,14 @@ class JsonValidatorTool(CLI):
         self.failed = False
 
     def add_options(self):
-        self.parser.add_option('-m', '--multi-record', action='store_true',
-                               help='Test explicitly for multi-record JSON data, where each line is a separate json ' \
-                                  + 'document separated by newlines. Must use if reading multi-record json format ' \
-                                  + 'on standard input')
-        self.parser.add_option('-p', '--print', action='store_true',
-                               help='Print the JSON document(s) if valid, else print nothing (useful for shell ' +
-                               'pipelines). Exit codes are still 0 for success, or %s for failure'
-                               % ERRORS['CRITICAL'])
+        self.add_opt('-m', '--multi-record', action='store_true',
+                     help='Test explicitly for multi-record JSON data, where each line is a separate json ' \
+                     + 'document separated by newlines. Must use if reading multi-record json format ' \
+                     + 'on standard input')
+        self.add_opt('-p', '--print', action='store_true',
+                     help='Print the JSON document(s) if valid, else print nothing (useful for shell ' +
+                     'pipelines). Exit codes are still 0 for success, or %s for failure'
+                     % ERRORS['CRITICAL'])
 
     def check_multirecord_json(self):
         for line in self.iostream:

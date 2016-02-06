@@ -23,6 +23,7 @@ cd "$srcdir/..";
 
 for x in ${@:-$(echo *.py *.jy 2>/dev/null)}; do
     isExcluded "$x" && continue
+    [[ $x =~ .*.jy ]] && continue
     if which pylint &>/dev/null; then
         echo "pylint -E $x"
         echo

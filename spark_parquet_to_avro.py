@@ -34,10 +34,13 @@ import sys
 libdir = os.path.join(os.path.dirname(__file__), 'pylib')
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import log, isMinVersion, support_msg, isVersionLax, die, getenv, pyspark_path # pylint: disable=wrong-import-position
-    from harisekhon import CLI # pylint: disable=wrong-import-position
+    # pylint: disable=wrong-import-position
+    from harisekhon.utils import log, isMinVersion, support_msg, isVersionLax, die, getenv, pyspark_path
+    from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
+    print("Did you remember to build the project by running 'make'?", file=sys.stderr)
+    print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
     sys.exit(4)
                                     # com.databricks:spark-avro_2.10:2.0.1 - 2.0.1 is for Spark 1.4+
                                     # you can edit this bit if you need to run it on Spark 1.3:
@@ -50,7 +53,7 @@ from pyspark import SparkConf       # pylint: disable=wrong-import-position,impo
 from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 
 class SparkParquetToAvro(CLI):
 
@@ -66,12 +69,12 @@ class SparkParquetToAvro(CLI):
     def add_options(self):
         self.set_verbose_default(2)
         self.set_timeout_default(86400)
-        self.parser.add_option('-p', '--parquet', metavar='<file/dir>',
-                               help='Parquet input file/dir ($PARQUET)',
-                               default=getenv('PARQUET'))
-        self.parser.add_option('-a', '--avro-dir', metavar='<dir>',
-                               help='Avro output dir ($AVRODIR)',
-                               default=getenv('AVRODIR'))
+        self.add_opt('-p', '--parquet', metavar='<file/dir>',
+                     help='Parquet input file/dir ($PARQUET)',
+                     default=getenv('PARQUET'))
+        self.add_opt('-a', '--avro-dir', metavar='<dir>',
+                     help='Avro output dir ($AVRODIR)',
+                     default=getenv('AVRODIR'))
 
     def parse_args(self):
         self.no_args()

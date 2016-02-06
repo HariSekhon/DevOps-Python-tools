@@ -54,6 +54,9 @@ build:
 	@echo
 	bash-tools/python_compile.sh
 	@echo
+	@echo
+	make spark-deps
+	@echo
 	@echo 'BUILD SUCCESSFUL (pytools)'
 
 .PHONY: apt-packages
@@ -63,6 +66,7 @@ apt-packages:
 	# needed to fetch the library submodule at end of build
 	$(SUDO) apt-get install -y git
 	$(SUDO) apt-get install -y wget
+	$(SUDO) apt-get install -y zip
 	$(SUDO) apt-get install -y unzip
 	$(SUDO) apt-get install -y python-dev
 	$(SUDO) apt-get install -y python-setuptools
@@ -82,6 +86,7 @@ yum-packages:
 	rpm -q gcc     || $(SUDO) yum install -y gcc
 	rpm -q gcc-c++ || $(SUDO) yum install -y gcc-c++
 	rpm -q git     || $(SUDO) yum install -y git
+	rpm -q unzip   || $(SUDO) yum install -y zip
 	rpm -q unzip   || $(SUDO) yum install -y unzip
 	# needed to fetch the library submodule and CPAN modules
 	# python-pip requires EPEL, so try to get the correct EPEL rpm
@@ -132,3 +137,8 @@ clean:
 	@find . -type d -ipath '*/tests/*' -iname 'test-*spark*.avro' | xargs rm -rf
 	@find . -type d -ipath '*/tests/*' -iname 'test-*spark*.parquet' | xargs rm -rf
 	@rm -f parquet-tools-$(PARQUET_VERSION)-bin.zip
+
+.PHONY: spark-deps
+spark-deps:
+	rm -vf spark-deps.zip
+	zip spark-deps.zip pylib

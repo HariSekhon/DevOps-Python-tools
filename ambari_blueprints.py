@@ -73,18 +73,20 @@ import requests
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
+    # pylint: disable=wrong-import-position
     # import harisekhon.utils
     from harisekhon.utils import log, InvalidOptionException, qquit, die
     from harisekhon.utils import validate_file, validate_dirname, validate_host, validate_port, validate_user, \
         validate_password
     from harisekhon.utils import isStr, isHost, isPort, isUser, isDirname, isJson, jsonpp, list_sort_dicts_by_value
     from harisekhon import CLI
-except ImportError as _:
-    print("module import failed: %s - did you remember to build the project by running 'make' or perhaps you tried to copy this program out without it's adjacent libraries?" % _, file=sys.stderr)
+    print('module import failed: %s' % _)
+    print("Did you remember to build the project by running 'make'?", file=sys.stderr)
+    print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.10.0'
+__version__ = '0.10.1'
 
 class AmbariBlueprintTool(CLI):
 
@@ -133,7 +135,7 @@ class AmbariBlueprintTool(CLI):
         except IOError as _:
             die("'failed to create dir '%s': %s" % (self.blueprint_dir, _))
 
-    def parse_cluster_name(self, item):
+    def parse_cluster_name(self, item): # pylint: disable=no-self-use
         if isStr(item):
             item = json.loads(item)
         try:
@@ -146,7 +148,7 @@ class AmbariBlueprintTool(CLI):
         json_data = self.list('clusters')
         return [self.parse_cluster_name(item) for item in json_data['items']]
 
-    def parse_blueprint_name(self, item):
+    def parse_blueprint_name(self, item): # pylint: disable=no-self-use
         if isStr(item):
             item = json.loads(item)
         try:
@@ -159,7 +161,7 @@ class AmbariBlueprintTool(CLI):
         json_data = self.list('blueprints')
         return [self.parse_blueprint_name(item) for item in json_data['items']]
 
-    def parse_host_name(self, item):
+    def parse_host_name(self, item): # pylint: disable=no-self-use
         if isStr(item):
             item = json.loads(item)
         try:
@@ -389,7 +391,7 @@ class AmbariBlueprintTool(CLI):
             log.debug("cluster '%s' blueprint content = '%s'" % (cluster, data))
         self.save(cluster, path, data)
 
-    def save(self, name, path, data):
+    def save(self, name, path, data): # pylint: disable=no-self-use
         # log.debug('save(%s, %s)' % (name, data))
         if data is None:
             err = "blueprint '%s' returned None" % name
@@ -466,30 +468,31 @@ class AmbariBlueprintTool(CLI):
         self.add_hostoption(name='Ambari', default_host='localhost', default_port=8080)
         self.add_useroption(name='Ambari', default_user='admin')
         # TODO: certificate validation not tested yet
-        self.parser.add_option('-s', '--ssl', dest='ssl', action='store_true', default=False,
-                               help='Use SSL connection (not tested yet)')
-        self.parser.add_option('-b', '--blueprint', dest='blueprint',
-                               help='Ambari blueprint name', metavar='<name>')
-        self.parser.add_option('-c', '--cluster', dest='cluster', metavar='<name>',
-                               help='Ambari cluster to blueprint (case sensitive)')
-        self.parser.add_option('--get', dest='get', action='store_true',
-                               help='Get and store Ambari Blueprints locally in --dir or --file')
-        self.parser.add_option('--push', dest='push', action='store_true',
-                               help='Push a local Ambari blueprint to the Ambari server')
-        self.parser.add_option('--create-cluster', dest='create_cluster', action='store_true',
-                               help='Create a cluster (requires --cluster and --file as well as previously uploaded Ambari Blueprint)') # pylint: disable=line-too-long
-        self.parser.add_option('-f', '--file', dest='file', metavar='<file.json>',
-                               help='Ambari Blueprint or Cluster creation file to --get write to or --push send from')
-        self.parser.add_option('-d', '--dir', dest='dir', metavar='<dir>',
-                               help="Ambari Blueprints storage directory if saving all blueprints (defaults to 'ambari_blueprints' directory adjacent to this tool)") # pylint: disable=line-too-long
-        self.parser.add_option('--list-blueprints', dest='list_blueprints', action='store_true', default=False,
-                               help='List available blueprints')
-        self.parser.add_option('--list-clusters', dest='list_clusters', action='store_true', default=False,
-                               help='List available clusters')
-        self.parser.add_option('--list-hosts', dest='list_hosts', action='store_true', default=False,
-                               help='List available hosts')
-        self.parser.add_option('--strip-config', dest='strip_config', action='store_true', default=False,
-                               help="Strip configuration sections out to make more generic. Use with caution more advanced configurations like HDFS HA require some configuration settings in order to validate the topology when submitting a blueprint, so you'd have to add those config keys back in (suggest via a fully config'd cluster blueprint)") # pylint: disable=line-too-long
+        self.add_opt('-s', '--ssl', dest='ssl', action='store_true', default=False,
+                     help='Use SSL connection (not tested yet)')
+        self.add_opt('-b', '--blueprint', dest='blueprint',
+                     help='Ambari blueprint name', metavar='<name>')
+        self.add_opt('-c', '--cluster', dest='cluster', metavar='<name>',
+                     help='Ambari cluster to blueprint (case sensitive)')
+        self.add_opt('--get', dest='get', action='store_true',
+                     help='Get and store Ambari Blueprints locally in --dir or --file')
+        self.add_opt('--push', dest='push', action='store_true',
+                     help='Push a local Ambari blueprint to the Ambari server')
+        self.add_opt('--create-cluster', dest='create_cluster', action='store_true',
+                     help='Create a cluster (requires --cluster and --file as well as previously uploaded Ambari Blueprint)') # pylint: disable=line-too-long
+        self.add_opt('-f', '--file', dest='file', metavar='<file.json>',
+                     help='Ambari Blueprint or Cluster creation file to --get write to or --push send from')
+        self.add_opt('-d', '--dir', dest='dir', metavar='<dir>',
+                     help="Ambari Blueprints storage directory if saving all blueprints (defaults to 'ambari_blueprints' directory adjacent to this tool)") # pylint: disable=line-too-long
+        self.add_opt('--list-blueprints', dest='list_blueprints', action='store_true', default=False,
+                     help='List available blueprints')
+        self.add_opt('--list-clusters', dest='list_clusters', action='store_true', default=False,
+                     help='List available clusters')
+        self.add_opt('--list-hosts', dest='list_hosts', action='store_true', default=False,
+                     help='List available hosts')
+        self.add_opt('--strip-config', dest='strip_config', action='store_true', default=False,
+                     help="Strip configuration sections out to make more generic. Use with caution more advanced configurations like HDFS HA require some configuration settings in order to validate the topology when submitting a blueprint, so you'd have to add those config keys back in (suggest via a fully config'd cluster blueprint)") # pylint: disable=line-too-long
+
     def process_args(self):
         options, args = self.options, self.args
 
@@ -535,14 +538,14 @@ class AmbariBlueprintTool(CLI):
         return options, args
 
     def run(self):
-        options = self.process_args()[0]
+        options = self.options
         self.connection(options.host,
-                   options.port,
-                   options.user,
-                   options.password,
-                   options.ssl,
-                   dir=options.dir,
-                   strip_config=options.strip_config)
+                        options.port,
+                        options.user,
+                        options.password,
+                        options.ssl,
+                        dir=options.dir,
+                        strip_config=options.strip_config)
         if options.list_blueprints:
             self.print_blueprints()
         elif options.list_clusters:

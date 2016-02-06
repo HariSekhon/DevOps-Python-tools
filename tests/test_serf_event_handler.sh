@@ -21,6 +21,13 @@ cd "$srcdir/.."
 
 . "tests/utils.sh"
 
+. "bash-tools/utils.sh"
+
+section "Testing Serf Event Handler"
+
 check 'SERF_EVENT="query" SERF_QUERY_NAME="uptime" ./serf_event_handler.py --cmd-passthru -D < /dev/null | grep "user.*load average"' "Serf Event Handler"
 
 check 'echo "myData" | SERF_EVENT="query" SERF_QUERY_NAME="uptime" ./serf_event_handler.py --cmd-passthru -D 2>&1 | grep "data:[[:space:]]myData"' "Serf Event Handler with data"
+
+echo
+echo
