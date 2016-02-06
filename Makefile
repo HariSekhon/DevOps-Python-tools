@@ -34,7 +34,8 @@ build:
 	
 	cd pylib && make
 	
-	wget -c -O parquet-tools-$(PARQUET_VERSION)-bin.zip http://search.maven.org/remotecontent?filepath=com/twitter/parquet-tools/$(PARQUET_VERSION)/parquet-tools-$(PARQUET_VERSION)-bin.zip && unzip parquet-tools-$(PARQUET_VERSION)-bin.zip
+	wget -c -O parquet-tools-$(PARQUET_VERSION)-bin.zip http://search.maven.org/remotecontent?filepath=com/twitter/parquet-tools/$(PARQUET_VERSION)/parquet-tools-$(PARQUET_VERSION)-bin.zip
+	[ -e parquet-tools-$(PARQUET_VERSION) ] || unzip parquet-tools-$(PARQUET_VERSION)-bin.zip
 	
 	# json module built-in to Python >= 2.6, backport not available via pypi
 	#$(SUDO2) pip install json
