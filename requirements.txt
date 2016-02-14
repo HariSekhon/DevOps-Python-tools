@@ -1,5 +1,10 @@
 avro==1.7.7
 bitarray==0.8.1
+# Elasticsearch library must match major version :(
+# for Elasticsearch 2.x
+#elasticsearch>=2.0.0,<3.0.0
+# for Elasticsearch 1.x
+#elasticsearch>=1.0.0,<2.0.0
 impyla==0.12.0
 Jinja2==2.8
 linecache2==1.0.0
