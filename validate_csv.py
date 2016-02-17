@@ -62,7 +62,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.3'
+__version__ = '0.7.4'
 
 class CsvValidatorTool(CLI):
 
@@ -127,18 +127,18 @@ class CsvValidatorTool(CLI):
 
     def check_csv(self, filehandle):
         if self.process_csv(filehandle):
-            # if self.options.print:
+            # if self.get_opt('print'):
             #     print(content, end='')
             # else:
             #     print(self.valid_csv_msg)
             print(self.valid_csv_msg)
         else:
             self.failed = True
-            # if not self.options.print:
+            # if not self.get_opt('print'):
             #     if self.get_verbose() > 2:
             #         try:
             #         except csv.Error as _:
-                        # if not self.options.print:
+                        # if not self.get_opt('print'):
                         #     print(_)
                 # die(self.invalid_csv_msg)
             die(self.invalid_csv_msg)
@@ -154,8 +154,8 @@ class CsvValidatorTool(CLI):
     #                % ERRORS['CRITICAL'])
 
     def run(self):
-        self.delimiter = self.options.delimiter
-        self.quotechar = self.options.quotechar
+        self.delimiter = self.get_opt('delimiter')
+        self.quotechar = self.get_opt('quotechar')
         vlog_option('delimiter', self.delimiter)
         vlog_option('quotechar', self.quotechar)
         if not self.args:

@@ -56,7 +56,7 @@ from pyspark.sql.types import *     # pylint: disable=wrong-import-position,impo
 from pyspark.sql.types import StructType, StructField  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 class SparkCSVToParquet(CLI):
 
@@ -97,25 +97,25 @@ class SparkCSVToParquet(CLI):
 
     def parse_args(self):
         self.no_args()
-        if not self.options.csv:
+        if not self.get_opt('csv'):
             self.usage('--csv not defined')
-        if not self.options.parquet_dir:
+        if not self.get_opt('parquet_dir'):
             self.usage('--parquet-dir not defined')
-        if not (self.options.has_header or self.options.schema):
+        if not (self.get_opt('has_header') or self.options.schema):
             self.usage('must specify either --has-header or --schema')
         # no longer mutually exclusive now this support schema override
-        # if self.options.has_header and self.options.schema:
+        # if self.get_opt('has_header') and self.options.schema:
         #     self.usage('--has-header and --schema are mutually exclusive')
 
     def run(self):
-        csv_file = self.options.csv
-        parquet_dir = self.options.parquet_dir
-        has_header = self.options.has_header
+        csv_file = self.get_opt('csv')
+        parquet_dir = self.get_opt('parquet_dir')
+        has_header = self.get_opt('has_header')
         # I don't know why the Spark guys made this a string instead of a bool
         header_str = 'false'
         if has_header:
             header_str = 'true'
-        schema = self.options.schema
+        schema = self.get_opt('schema')
         # let Spark fail if csv/parquet aren't available
         # can't check paths exist as want to remain generically portable
         # to HDFS, local filesystm or any other uri scheme Spark supports

@@ -53,7 +53,7 @@ from pyspark import SparkConf       # pylint: disable=wrong-import-position,impo
 from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 class SparkJSONToAvro(CLI):
 
@@ -78,15 +78,15 @@ class SparkJSONToAvro(CLI):
 
     def parse_args(self):
         self.no_args()
-        if not self.options.json:
+        if not self.get_opt('json'):
             self.usage('--json not defined')
-        if not self.options.avro_dir:
+        if not self.get_opt('avro_dir'):
             self.usage('--avro-dir not defined')
 
     def run(self):
         self.no_args()
-        json_file = self.options.json
-        avro_dir = self.options.avro_dir
+        json_file = self.get_opt('json')
+        avro_dir = self.get_opt('avro_dir')
         # let Spark fail if json/avro dir aren't available
         # can't check paths exist as want to remain generically portable
         # to HDFS, local filesystm or any other uri scheme Spark supports

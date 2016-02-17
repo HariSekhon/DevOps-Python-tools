@@ -61,7 +61,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 class SerfEventHandler(CLI):
 
@@ -122,7 +122,7 @@ class SerfEventHandler(CLI):
             for (key, value) in os.environ.iteritems(): # pylint: disable=unused-variable
                 if serf_regex.search(key):
                     log.debug('%(key)s=%(value)s' % locals())
-        if 'cmd' in dir(self.options) and self.options.cmd:
+        if 'cmd' in dir(self.options) and self.get_opt('cmd'):
             self.enable_commands()
         self.handle_event()
 

@@ -41,7 +41,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.2.1'
 
 class HeadTail(CLI):
 
@@ -64,9 +64,9 @@ class HeadTail(CLI):
                      default=False, help="Don't print separators in output")
 
     def run(self):
-        self.num_lines = self.options.num
+        self.num_lines = self.get_opt('num')
         vlog_option('number of lines', self.num_lines)
-        self.quiet = self.options.quiet
+        self.quiet = self.get_opt('quiet')
         vlog_option('quiet', self.quiet)
         if not self.args:
             self.args.append('-')

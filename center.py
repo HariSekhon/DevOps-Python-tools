@@ -41,7 +41,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 class Center(CLI):
 
@@ -62,7 +62,7 @@ class Center(CLI):
         char = ''
         if not line:
             return
-        if not self.options.no_comment:
+        if not self.get_opt('no_comment'):
             char = ' '
             # preliminary strip() to be able to pick up # if it isn't the first char and their are spaces before it
             line = line.strip()
@@ -73,7 +73,7 @@ class Center(CLI):
                 char = '//'
                 line = line.lstrip(char)
         line = line.strip()
-        side = int(max((self.options.width - len(line)) / 2, 0))
+        side = int(max((self.get_opt('width') - len(line)) / 2, 0))
         print(char + ' ' * side + line)
 
 if __name__ == '__main__':

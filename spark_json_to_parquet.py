@@ -46,7 +46,7 @@ from pyspark import SparkConf       # pylint: disable=wrong-import-position,impo
 from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 class SparkJsonToParquet(CLI):
 
@@ -71,14 +71,14 @@ class SparkJsonToParquet(CLI):
 
     def parse_args(self):
         self.no_args()
-        if not self.options.json:
+        if not self.get_opt('json'):
             self.usage('--json not defined')
-        if not self.options.parquet_dir:
+        if not self.get_opt('parquet_dir'):
             self.usage('--parquet-dir not defined')
 
     def run(self):
-        json_file = self.options.json
-        parquet_dir = self.options.parquet_dir
+        json_file = self.get_opt('json')
+        parquet_dir = self.get_opt('parquet_dir')
         # let Spark fail if csv/parquet aren't available
         # can't check paths exist as want to remain generically portable
         # to HDFS, local filesystm or any other uri scheme Spark supports
