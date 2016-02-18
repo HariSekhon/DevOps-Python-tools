@@ -49,7 +49,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.3'
+__version__ = '0.7.4'
 
 class XmlValidatorTool(CLI):
 
@@ -65,13 +65,13 @@ class XmlValidatorTool(CLI):
 
     def check_xml(self, content):
         if isXml(content):
-            if self.options.print:
+            if self.get_opt('print'):
                 print(content, end='')
             else:
                 print(self.valid_xml_msg)
         else:
             self.failed = True
-            if not self.options.print:
+            if not self.get_opt('print'):
                 if self.get_verbose() > 2:
                     try:
                         ET.fromstring(content)
@@ -79,7 +79,7 @@ class XmlValidatorTool(CLI):
                     # Python 2.6 throws xml.parsers.expat.ExpatError
                     # have to catch generic Exception to be able to handle both
                     except Exception as _:  # pylint: disable=broad-except
-                        if not self.options.print:
+                        if not self.get_opt('print'):
                             print(_)
                 die(self.invalid_xml_msg)
 

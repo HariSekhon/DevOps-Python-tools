@@ -53,7 +53,7 @@ from pyspark import SparkConf       # pylint: disable=wrong-import-position,impo
 from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 class SparkParquetToAvro(CLI):
 
@@ -78,14 +78,14 @@ class SparkParquetToAvro(CLI):
 
     def parse_args(self):
         self.no_args()
-        if not self.options.parquet:
+        if not self.get_opt('parquet'):
             self.usage('--parquet not defined')
-        if not self.options.avro_dir:
+        if not self.get_opt('avro_dir'):
             self.usage('--avro-dir not defined')
 
     def run(self):
-        parquet_file = self.options.parquet
-        avro_dir = self.options.avro_dir
+        parquet_file = self.get_opt('parquet')
+        avro_dir = self.get_opt('avro_dir')
         # let Spark fail if avro/parquet aren't available
         # can't check paths exist as want to remain generically portable
         # to HDFS, local filesystm or any other uri scheme Spark supports

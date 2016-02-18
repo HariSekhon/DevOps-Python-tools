@@ -53,7 +53,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.3'
+__version__ = '0.7.4'
 
 class JsonValidatorTool(CLI):
 
@@ -82,27 +82,27 @@ class JsonValidatorTool(CLI):
     def check_multirecord_json(self):
         for line in self.iostream:
             if isJson(line):
-                if self.options.print:
+                if self.get_opt('print'):
                     print(line, end='')
             else:
                 self.failed = True
-                if not self.options.print and isJson(line.replace("'", '"')):
+                if not self.get_opt('print') and isJson(line.replace("'", '"')):
                     die('%s (multi-record format)' % self.invalid_json_msg_single_quotes)
                 else:
                     return False
-        if not self.options.print:
+        if not self.get_opt('print'):
             print('%s (multi-record format)' % self.valid_json_msg)
         return True
 
     def check_json(self, content):
         if isJson(content):
-            if self.options.print:
+            if self.get_opt('print'):
                 print(content, end='')
             else:
                 print(self.valid_json_msg)
         elif isJson(content.replace("'", '"')):
             self.failed = True
-            if not self.options.print:
+            if not self.get_opt('print'):
                 die(self.invalid_json_msg_single_quotes)
         else:
             if self.iostream is not sys.stdin:
@@ -116,7 +116,7 @@ class JsonValidatorTool(CLI):
             #     except Exception, e:
             #         print(e)
             self.failed = True
-            if not self.options.print:
+            if not self.get_opt('print'):
                 die(self.invalid_json_msg)
 
     # looks like this does a .read() anyway, not buying any efficiency enhancement
@@ -176,17 +176,17 @@ class JsonValidatorTool(CLI):
         mem_err = "file '%s', assuming Big Data multi-record json and re-trying validation line-by-line" % filename
         if filename == '<STDIN>':
             self.iostream = sys.stdin
-            if self.options.multi_record:
+            if self.get_opt('multi_record'):
                 if not self.check_multirecord_json():
                     self.failed = True
-                    if not self.options.print:
+                    if not self.get_opt('print'):
                         die(self.invalid_json_msg)
             else:
                 self.check_json(sys.stdin.read())
         else:
             try:
                 with open(filename) as self.iostream:
-                    if self.options.multi_record:
+                    if self.get_opt('multi_record'):
                         self.check_multirecord_json()
                     else:
                         # most JSON files are fine to slurp like this

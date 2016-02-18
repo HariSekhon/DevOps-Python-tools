@@ -45,7 +45,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '1.4.1'
+__version__ = '1.4.2'
 
 class Welcome(CLI):
 
@@ -146,7 +146,7 @@ class Welcome(CLI):
                      '(you can also Control-C to make output complete instantly)')
 
     def run(self):
-        self.quick = self.options.quick
+        self.quick = self.get_opt('quick')
         if self.args:
             self.usage()
         self.print_welcome()
