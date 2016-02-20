@@ -27,8 +27,6 @@ cd "$srcdir";
 
 . utils.sh
 
-./whitespace.sh
-
 #./syntax.sh
 ./pylint.sh
 
