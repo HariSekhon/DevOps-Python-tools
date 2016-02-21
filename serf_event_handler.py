@@ -68,7 +68,7 @@ class SerfEventHandler(CLI):
     def __init__(self):
         super(SerfEventHandler, self).__init__()
         # allow shorter default 10 sec timeout
-        # self.set_timeout_default(30)
+        # self.timeout_default = 30
         self.events = ['member-join', 'member-leave', 'member-failed', 'member-update', 'member-reap', 'user', 'query']
         self.node = os.getenv('SERF_SELF_NAME', '')
         self.role = os.getenv('SERF_SELF_ROLE', None)
