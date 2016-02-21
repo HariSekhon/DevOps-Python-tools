@@ -469,7 +469,7 @@ class AmbariBlueprintTool(CLI):
         sys.exit(0)
 
     def add_options(self):
-        self.set_timeout_default(30)
+        self.timeout_default = 30
         self.add_hostoption(name='Ambari', default_host='localhost', default_port=8080)
         self.add_useroption(name='Ambari', default_user='admin')
         # TODO: certificate validation not tested yet
