@@ -101,10 +101,10 @@ class SparkCSVToParquet(CLI):
             self.usage('--csv not defined')
         if not self.get_opt('parquet_dir'):
             self.usage('--parquet-dir not defined')
-        if not (self.get_opt('has_header') or self.options.schema):
+        if not (self.get_opt('has_header') or self.get_opt('schema')):
             self.usage('must specify either --has-header or --schema')
         # no longer mutually exclusive now this support schema override
-        # if self.get_opt('has_header') and self.options.schema:
+        # if self.get_opt('has_header') and self.get_opt('schema'):
         #     self.usage('--has-header and --schema are mutually exclusive')
 
     def run(self):
