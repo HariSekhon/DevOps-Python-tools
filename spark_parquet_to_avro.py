@@ -67,8 +67,8 @@ class SparkParquetToAvro(CLI):
 
     # @override
     def add_options(self):
-        self.set_verbose_default(2)
-        self.set_timeout_default(86400)
+        self.verbose_default = 2
+        self.timeout_default = 86400
         self.add_opt('-p', '--parquet', metavar='<file/dir>',
                      help='Parquet input file/dir ($PARQUET)',
                      default=getenv('PARQUET'))
