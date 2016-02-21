@@ -88,7 +88,7 @@ check_broken(){
     fi
 }
 
-echo "checking normal json file breakage using --multi-record switch"
+echo "checking normal json stdin breakage using --multi-record switch"
 set +e
 ./validate_json.py - -m < "$data_dir/test.json"
 exitcode=$?
@@ -107,19 +107,29 @@ check_broken "$broken_dir/blah.json"
 echo "{ 'name': 'hari' }" > "$broken_dir/single_quote.json"
 check_broken "$broken_dir/single_quote.json"
 
-echo "checking specifically single quote detection"
+echo "checking invalid single quote detection"
 set +o pipefail
 ./validate_json.py "$broken_dir/single_quote.json" 2>&1 | grep --color 'JSON INVALID.*found single quotes not double quotes' || { echo "Failed to find single quote message in output"; exit 1; }
 set -o pipefail
+echo
+
+echo "checking --permit-single-quotes mode works"
+./validate_json.py -s "$broken_dir/single_quote.json"
 echo
 
 # TODO: add failure print silent mode exit code and stdout/stderr
 echo "testing print mode"
 [ "$(./validate_json.py -p "$data_dir/test.json" | cksum)" = "$(cksum < "$data_dir/test.json")" ] || { echo "print test failed!"; exit 1; }
 echo "successfully passed out test json to stdout"
+echo
 echo "testing print mode with multi-record"
 [ "$(./validate_json.py -mp "$data_dir/multirecord.json" | cksum)" = "$(cksum < "$data_dir/multirecord.json")" ] || { echo "print multi-record test failed!"; exit 1; }
 echo "successfully passed out multi-record json to stdout"
+echo
+echo "testing print mode with --permit-single-quotes"
+[ "$(./validate_json.py -sp "$broken_dir/single_quote.json" | cksum)" = "$(cksum < "$broken_dir/single_quote.json")" ] || { echo "print single quote json test failed!"; exit 1; }
+echo
+
 echo
 
 echo '{ "name": "hari" ' > "$broken_dir/missing_end_quote.json"
