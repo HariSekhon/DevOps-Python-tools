@@ -153,7 +153,7 @@ class JsonValidatorTool(CLI):
                 if self.check_multirecord_json():
                     return True
             # pointless since it would simply return 'ValueError: No JSON object could be decoded'
-            # if self.get_verbose() > 2:
+            # if self.verbose > 2:
             #     try:
             #         json.loads(content)
             #     except Exception, e:

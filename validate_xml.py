@@ -72,7 +72,7 @@ class XmlValidatorTool(CLI):
         else:
             self.failed = True
             if not self.get_opt('print'):
-                if self.get_verbose() > 2:
+                if self.verbose > 2:
                     try:
                         ET.fromstring(content)
                     # Python 2.7 throws xml.etree.ElementTree.ParseError, but

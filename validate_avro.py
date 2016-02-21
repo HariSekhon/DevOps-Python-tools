@@ -74,7 +74,7 @@ class AvroValidatorTool(CLI):
                     % (filehandle.name, _))
             die("%s => ERROR: %s" % (filehandle.name, _))
         except TypeError as _:
-            if self.get_verbose() > 2:
+            if self.verbose > 2:
                 print(_)
             die(self.invalid_avro_msg)
 

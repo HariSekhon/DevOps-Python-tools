@@ -99,7 +99,7 @@ class CsvValidatorTool(CLI):
                 filehandle.seek(0)
                 csvreader = csv.reader(filehandle, dialect)
         except csv.Error  as _:
-            if self.get_verbose() > 2:
+            if self.verbose > 2:
                 print('file {}: {}'.format(self.filename, _))
             return False
         try:
@@ -120,7 +120,7 @@ class CsvValidatorTool(CLI):
                 if not isChars(_[0][0], 'A-Za-z0-9\'"'):
                     return False
         except csv.Error  as _:
-            if self.get_verbose() > 2:
+            if self.verbose > 2:
                 print('file {}, line {}: {}'.format(self.filename, csvreader.line_num, _))
             return False
         return True
@@ -135,7 +135,7 @@ class CsvValidatorTool(CLI):
         else:
             self.failed = True
             # if not self.get_opt('print'):
-            #     if self.get_verbose() > 2:
+            #     if self.verbose > 2:
             #         try:
             #         except csv.Error as _:
                         # if not self.get_opt('print'):

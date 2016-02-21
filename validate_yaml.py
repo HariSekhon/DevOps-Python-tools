@@ -83,7 +83,7 @@ class YamlValidatorTool(CLI):
         else:
             self.failed = True
             if not self.get_opt('print'):
-                if self.get_verbose() > 2:
+                if self.verbose > 2:
                     try:
                         yaml.load(content)
                     except yaml.YAMLError as _:
