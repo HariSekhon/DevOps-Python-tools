@@ -56,7 +56,7 @@ class HeadTail(CLI):
         self.quiet = False
 
     def add_options(self):
-        #self.set_timeout_default(300)
+        #self.timeout_default = 300
         self.add_opt('-n', '--num', metavar='number_of_lines',
                      type=int, default=self.num_lines,
                      help='Number of lines to show (default: 10)')
