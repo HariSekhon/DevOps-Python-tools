@@ -5,7 +5,8 @@ bitarray==0.8.1
 #elasticsearch>=2.0.0,<3.0.0
 # for Elasticsearch 1.x
 #elasticsearch>=1.0.0,<2.0.0
-impyla==0.12.0
+# fails on requiring newer version of setuptools
+#impyla==0.12.0
 Jinja2==2.8
 linecache2==1.0.0
 MarkupSafe==0.23
