@@ -41,8 +41,8 @@ build:
 	#$(SUDO2) pip install json
 	
 	# for impyla
-	pip install --upgrade setuptools || :
-	pip install -r requirements.txt
+	$(SUDO2) pip install --upgrade setuptools || :
+	$(SUDO2) pip install -r requirements.txt
 	# for ipython-notebook-pyspark.py
 	#$(SUDO2) pip install jinja2
 	# HiveServer2
