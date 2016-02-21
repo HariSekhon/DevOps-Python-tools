@@ -35,7 +35,7 @@ stream to test for multi-line on a second pass).
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
+# from __future__ import unicode_literals
 
 import os
 import re
@@ -45,6 +45,7 @@ sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
     from harisekhon.utils import isJson, die, ERRORS, vlog_option, uniq_list_ordered
+    from harisekhon.utils import log
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -53,7 +54,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.4'
+__version__ = '0.8.0'
 
 class JsonValidatorTool(CLI):
 
@@ -64,9 +65,17 @@ class JsonValidatorTool(CLI):
         # super().__init__()
         self.iostream = None
         self.re_json_suffix = re.compile(r'.*\.json$', re.I)
-        self.valid_json_msg = '<unknown> => JSON OK'
-        self.invalid_json_msg = '<unknown> => JSON INVALID'
-        self.invalid_json_msg_single_quotes = '%s (found single quotes not double quotes)' % self.invalid_json_msg
+        # these msgs get reset with the correct filename in check_file further down()
+        self.valid_json_msg = '<UNKNOWN_FILENAME> => JSON OK'
+        self.invalid_json_msg = '<UNKNOWN_FILENAME> => JSON INVALID'
+        single_quotes = '(found single quotes not double quotes)'
+        self.valid_json_msg_single_quotes = '%s %s' % (self.valid_json_msg, single_quotes)
+        self.invalid_json_msg_single_quotes = '%s %s' % (self.invalid_json_msg, single_quotes)
+        self.permit_single_quotes = False
+        self.passthru = False
+        # self.multi_record_detected = False
+        # self.single_quotes_detected = False
+        self.msg = None
         self.failed = False
 
     def add_options(self):
@@ -74,37 +83,71 @@ class JsonValidatorTool(CLI):
                      help='Test explicitly for multi-record JSON data, where each line is a separate json ' \
                      + 'document separated by newlines. Must use if reading multi-record json format ' \
                      + 'on standard input')
-        self.add_opt('-p', '--print', action='store_true',
-                     help='Print the JSON document(s) if valid, else print nothing (useful for shell ' +
+        self.add_opt('-p', '--print', dest='passthru', action='store_true',
+                     help='Print the JSON document(s) if valid (passthrough), else print nothing (useful for shell ' +
                      'pipelines). Exit codes are still 0 for success, or %s for failure'
                      % ERRORS['CRITICAL'])
+        self.add_opt('-s', '--permit-single-quotes', dest='permit_single_quotes', action='store_true',
+                     help='Accept single quotes as valid (JSON standard requires double quotes but some' +
+                     ' systems like MongoDB are ok with single quotes)')
 
     def check_multirecord_json(self):
+        log.debug('check_multirecord_json()')
         for line in self.iostream:
             if isJson(line):
-                if self.get_opt('print'):
+                # can't use self.print() here, don't want to print valid for every line of a file / stdin
+                if self.passthru:
                     print(line, end='')
-            else:
-                self.failed = True
-                if not self.get_opt('print') and isJson(line.replace("'", '"')):
-                    die('%s (multi-record format)' % self.invalid_json_msg_single_quotes)
+            elif isJson(line.replace("'", '"')):
+                if self.permit_single_quotes:
+                    log.debug('valid multirecord json (single quoted)')
+                    # self.single_quotes_detected = True
+                    if self.passthru:
+                        print(line, end='')
                 else:
+                    log.debug('invalid multirecord json (single quoted)')
+                    self.failed = True
+                    if not self.passthru:
+                        die('%s (multi-record format)' % self.invalid_json_msg_single_quotes)
                     return False
-        if not self.get_opt('print'):
+            else:
+                log.debug('invalid multirecord json')
+                self.failed = True
+                return False
+        # self.multi_record_detected = True
+        log.debug('multirecord json (all lines passed)')
+        if not self.passthru:
             print('%s (multi-record format)' % self.valid_json_msg)
         return True
 
-    def check_json(self, content):
-        if isJson(content):
-            if self.get_opt('print'):
-                print(content, end='')
-            else:
-                print(self.valid_json_msg)
-        elif isJson(content.replace("'", '"')):
-            self.failed = True
-            if not self.get_opt('print'):
-                die(self.invalid_json_msg_single_quotes)
+    def print(self, content):
+        if self.passthru:
+            print(content, end='')
         else:
+            print(self.msg)
+
+    def check_json(self, content):
+        log.debug('check_json()')
+        if isJson(content):
+            log.debug('valid json')
+            self.msg = self.valid_json_msg
+            self.print(content)
+        # XXX: Limitation this may not work with JSON with double quotes embedded within single quotes as
+        # that may lead to unbalanced quoting, although that is still a data problem so might be ok for it to be flagged
+        # as failing
+        elif isJson(content.replace("'", '"')):
+            log.debug('valid json (single quotes)')
+            # self.single_quotes_detectedsingle_quotes_detected = True
+            if self.permit_single_quotes:
+                self.msg = self.valid_json_msg_single_quotes
+                self.print(content)
+            else:
+                self.failed = True
+                self.msg = self.invalid_json_msg_single_quotes
+                if not self.passthru:
+                    die(self.msg)
+        else:
+            log.debug('not valid json')
             if self.iostream is not sys.stdin:
                 self.iostream.seek(0)
                 if self.check_multirecord_json():
@@ -115,9 +158,11 @@ class JsonValidatorTool(CLI):
             #         json.loads(content)
             #     except Exception, e:
             #         print(e)
-            self.failed = True
-            if not self.get_opt('print'):
-                die(self.invalid_json_msg)
+            else:
+                self.failed = True
+                self.msg = self.invalid_json_msg
+                if not self.passthru:
+                    die(self.msg)
 
     # looks like this does a .read() anyway, not buying any efficiency enhancement
     #
@@ -134,6 +179,8 @@ class JsonValidatorTool(CLI):
     #         die(self.invalid_json_msg)
 
     def run(self):
+        self.permit_single_quotes = self.get_opt('permit_single_quotes')
+        self.passthru = self.get_opt('passthru')
         if not self.args:
             self.args.append('-')
         args = uniq_list_ordered(self.args)
@@ -172,15 +219,18 @@ class JsonValidatorTool(CLI):
             filename = '<STDIN>'
         self.valid_json_msg = '%s => JSON OK' % filename
         self.invalid_json_msg = '%s => JSON INVALID' % filename
-        self.invalid_json_msg_single_quotes = '%s (found single quotes not double quotes)' % self.invalid_json_msg
+        single_quotes = '(found single quotes not double quotes)'
+        self.valid_json_msg_single_quotes = '%s %s' % (self.valid_json_msg, single_quotes)
+        self.invalid_json_msg_single_quotes = '%s %s' % (self.invalid_json_msg, single_quotes)
         mem_err = "file '%s', assuming Big Data multi-record json and re-trying validation line-by-line" % filename
         if filename == '<STDIN>':
             self.iostream = sys.stdin
             if self.get_opt('multi_record'):
                 if not self.check_multirecord_json():
                     self.failed = True
-                    if not self.get_opt('print'):
-                        die(self.invalid_json_msg)
+                    self.msg = self.invalid_json_msg
+                    if not self.passthru:
+                        die(self.msg)
             else:
                 self.check_json(sys.stdin.read())
         else:
@@ -207,6 +257,8 @@ class JsonValidatorTool(CLI):
                             self.check_multirecord_json()
             except IOError as _:
                 die("ERROR: %s" % _)
+        if self.failed:
+            sys.exit(2)
 
 
 if __name__ == '__main__':
