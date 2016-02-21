@@ -136,6 +136,7 @@ class AmbariBlueprintTool(CLI):
         except IOError as _:
             die("'failed to create dir '%s': %s" % (self.blueprint_dir, _))
 
+    # TODO: change to @staticmethod
     def parse_cluster_name(self, item): # pylint: disable=no-self-use
         if isStr(item):
             item = json.loads(item)
@@ -149,6 +150,7 @@ class AmbariBlueprintTool(CLI):
         json_data = self.list('clusters')
         return [self.parse_cluster_name(item) for item in json_data['items']]
 
+    # TODO: change to @staticmethod
     def parse_blueprint_name(self, item): # pylint: disable=no-self-use
         if isStr(item):
             item = json.loads(item)
@@ -162,6 +164,7 @@ class AmbariBlueprintTool(CLI):
         json_data = self.list('blueprints')
         return [self.parse_blueprint_name(item) for item in json_data['items']]
 
+    # TODO: change to @staticmethod
     def parse_host_name(self, item): # pylint: disable=no-self-use
         if isStr(item):
             item = json.loads(item)
@@ -392,6 +395,7 @@ class AmbariBlueprintTool(CLI):
             log.debug("cluster '%s' blueprint content = '%s'" % (cluster, data))
         self.save(cluster, path, data)
 
+    # TODO: change to @staticmethod
     def save(self, name, path, data): # pylint: disable=no-self-use
         # log.debug('save(%s, %s)' % (name, data))
         if data is None:
