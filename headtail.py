@@ -32,7 +32,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import die, ERRORS, vlog_option
+    from harisekhon.utils import die, ERRORS, log_option
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -65,9 +65,9 @@ class HeadTail(CLI):
 
     def run(self):
         self.num_lines = self.get_opt('num')
-        vlog_option('number of lines', self.num_lines)
+        log_option('number of lines', self.num_lines)
         self.quiet = self.get_opt('quiet')
-        vlog_option('quiet', self.quiet)
+        log_option('quiet', self.quiet)
         if not self.args:
             self.args.append('-')
         for arg in self.args:
@@ -77,9 +77,9 @@ class HeadTail(CLI):
                 print("'%s' not found" % arg)
                 sys.exit(ERRORS['WARNING'])
             if os.path.isfile(arg):
-                vlog_option('file', arg)
+                log_option('file', arg)
             elif os.path.isdir(arg):
-                vlog_option('directory', arg)
+                log_option('directory', arg)
             else:
                 die("path '%s' could not be determined as either a file or directory" % arg)
         for filename in self.args:

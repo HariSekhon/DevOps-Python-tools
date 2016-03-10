@@ -44,7 +44,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import isJson, die, ERRORS, vlog_option, uniq_list_ordered
+    from harisekhon.utils import isJson, die, ERRORS, log_option, uniq_list_ordered
     from harisekhon.utils import log
     from harisekhon import CLI
 except ImportError as _:
@@ -191,9 +191,9 @@ class JsonValidatorTool(CLI):
                 print("'%s' not found" % arg)
                 sys.exit(ERRORS['WARNING'])
             if os.path.isfile(arg):
-                vlog_option('file', arg)
+                log_option('file', arg)
             elif os.path.isdir(arg):
-                vlog_option('directory', arg)
+                log_option('directory', arg)
             else:
                 die("path '%s' could not be determined as either a file or directory" % arg)
         for arg in args:
