@@ -69,7 +69,7 @@ class ParquetValidatorTool(CLI):
         super(ParquetValidatorTool, self).__init__()
         # Python 3.x
         # super().__init__()
-        self.timeout_default = 30
+        self.timeout_default = 300
         self.re_parquet_suffix = re.compile(r'.*\.parquet$', re.I)
         self.valid_parquet_msg = '<unknown> => Parquet OK'
         self.invalid_parquet_msg = '<unknown> => Parquet INVALID'
