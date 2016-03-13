@@ -52,6 +52,7 @@ class TimeoutCommand(CLI): # pylint: disable=too-few-public-methods
         # super().__init__()
         # special case to make all following args belong to the passed in command and not to this program
         self._CLI__parser.disable_interspersed_args()
+        self._CLI__parser.set_usage('timeout [options] <your_command> <your_args> ...')
 
     def run(self):
         cmd = ' '.join(self.args)
