@@ -34,8 +34,8 @@ Some common options also support optional environment variables for convenience 
 
 ### PyTools ###
 
-- ```ambari_blueprints.py``` - Ambari Blueprint tool using Ambari API to find and fetch all blueprints or a specific blueprint to local json files, blueprint an existing cluster, or create a new cluster using a blueprint. See adjacent ```ambari_blueprints``` directory for some blueprint templates
-- ```hadoop_hdfs_time_block_reads.jy``` - Hadoop HDFS per-block read timing debugger with datanode and rack locations for a given file or directory tree. Reports the slowest Hadoop datanodes in descending order at the end
+- ```ambari_blueprints.py``` - Ambari Blueprint tool using Ambari API to find and fetch all blueprints or a specific blueprint to local json files, blueprint an existing cluster, or create a new cluster using a blueprint. Sorts and prettifies the JSON, and optionally strips out configs to create generic templates. See adjacent ```ambari_blueprints``` directory for a variety of Ambari blueprint templates generated using this tool
+- ```hadoop_hdfs_time_block_reads.jy``` - Hadoop HDFS per-block read timing debugger with datanode and rack locations for a given file or directory tree. Reports the slowest Hadoop datanodes in descending order at the end. Helps find cluster data layer bottlenecks such as slow datanodes, faulty hardware or misconfigured top-of-rack switch ports.
 - ```hadoop_hdfs_files_native_checksums.jy``` - fetches native HDFS checksums for quicker file comparisons (about 100x faster than doing hdfs dfs -cat | md5sum)
 - ```hadoop_hdfs_files_stats.jy``` - fetches HDFS file stats
 - ```pig-text-to-elasticsearch.pig``` / ```pig-text-to-solr.pig``` - bulk indexes unstructured files in Hadoop to Elasticsearch or Solr/SolrCloud clusters
