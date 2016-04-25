@@ -48,6 +48,8 @@ Specifying --blueprint is optional for --create-cluster if blueprint is specifie
 
 See the adjacent ambari_blueprints directory for sample templates.
 
+See also validate_json.py adjacent program in PyTools for validating Ambari blueprint templates when hand editing them.
+
 Ambari Blueprints documentation
 
 https://cwiki.apache.org/confluence/display/AMBARI/Blueprints
