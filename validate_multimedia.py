@@ -66,6 +66,7 @@ class MediaValidatorTool(CLI):
         self.re_media_suffix = re.compile(r'.*\.(?:mp[34]|mpe?g|avi|mkv|flv)$', re.I)
         self.failed = False
         self.validate_cmd = "ffmpeg -v error -f null - -i"
+        self.timeout_default = 0
 
     def add_options(self):
         self.add_opt('-q', '--quick', action='store_true',
