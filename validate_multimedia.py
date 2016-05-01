@@ -28,6 +28,7 @@ Directories are recursed, checking any files ending in one of the following exte
 .mpeg
 .avi
 .mkv
+.wmv
 
 """
 
@@ -63,7 +64,7 @@ class MediaValidatorTool(CLI):
         super(MediaValidatorTool, self).__init__()
         # Python 3.x
         # super().__init__()
-        self.re_media_suffix = re.compile(r'.*\.(?:mp[34]|mpe?g|avi|mkv|flv)$', re.I)
+        self.re_media_suffix = re.compile(r'.*\.(?:mp[34]|mpe?g|avi|flv|mkv|wmv)$', re.I)
         self.failed = False
         self.validate_cmd = "ffmpeg -v error -f null - -i"
         self.timeout_default = 0
