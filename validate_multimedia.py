@@ -68,7 +68,10 @@ class MediaValidatorTool(CLI):
         self.validate_cmd = "ffmpeg -v error -f null - -i"
 
     def add_options(self):
-        self.add_opt('-q', '--quick', help='Quick mode - uses ffprobe instead of ffmpeg', action='store_true')
+        self.add_opt('-q', '--quick', action='store_true',
+                     help="Quick mode (uses 'ffprobe' instead of 'ffmpeg')")
+        self.add_opt('-c', '--continue', action='store_true',
+                     help='Continue after finding a broken multimedia file if recursing a directory tree')
 
     def run(self):
         if self.get_opt('quick'):
@@ -91,6 +94,8 @@ class MediaValidatorTool(CLI):
             self.check_path(arg)
         if self.failed:
             sys.exit(ERRORS['CRITICAL'])
+        if self.failed:
+            sys.exit(1)
 
     def check_path(self, path):
         if os.path.isfile(path):
@@ -121,6 +126,9 @@ class MediaValidatorTool(CLI):
         except CalledProcessError as _:
             if self.verbose > 2:
                 print(_.output)
+            if self.get_opt('continue'):
+                self.failed = True
+                return False
             die(invalid_media_msg)
 
 
