@@ -27,12 +27,13 @@ from __future__ import print_function
 #from __future__ import unicode_literals
 
 import os
+import re
 import sys
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import isChars
+    from harisekhon.utils import isChars, log_option
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -41,22 +42,40 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.2'
+__version__ = '0.3.0'
 
 class Center(CLI):
+
+    def __init__(self):
+        # Python 2.x
+        super(Center, self).__init__()
+        # Python 3.x
+        # super().__init__()
+        self.re_bound = re.compile(r'(\b)')
+        self.re_chars = re.compile(r'([^\s])(?!\s)')
 
     def add_options(self):
         self.add_opt('-w', '--width', default=80, type='int', metavar='<num_chars>',
                      help='Target line width to center for in chars')
         self.add_opt('-n', '--no-comment', action='store_true',
                      help='No comment prefix handling')
+        self.add_opt('-s', '--space', action='store_true', default=False,
+                     help='Space all chars out, makes bigger headings')
 
     def run(self):
+        log_option('width', self.get_opt('width'))
+        log_option('no comment prefix', self.get_opt('no_comment'))
+        log_option('space chars', self.get_opt('space'))
         if self.args:
             self.process_line(' '.join(self.args))
         else:
             for line in sys.stdin:
                 self.process_line(line)
+
+    def space(self, line):
+        line = self.re_bound.sub(r' ', line)
+        line = self.re_chars.sub(r'\1 ', line)
+        return line
 
     def process_line(self, line):
         char = ''
@@ -72,6 +91,8 @@ class Center(CLI):
             elif len(line) > 1 and isChars(line[0:1], '/'):
                 char = '//'
                 line = line.lstrip(char)
+        if self.get_opt('space'):
+            line = self.space(line)
         line = line.strip()
         side = int(max((self.get_opt('width') - len(line)) / 2, 0))
         print(char + ' ' * side + line)

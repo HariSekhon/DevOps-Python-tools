@@ -165,4 +165,16 @@ else
     exit 1
 fi
 
+echo "testing spacing"
+expected="                         < t h i s   i s   a    t e s t >"
+result="$(./center.py -s "                     <this is a  test> ")"
+if [ "$result" = "$expected" ]; then
+    echo "Succeeded in centering args with spacing between chars"
+else
+    echo "Failed to center args"
+    echo "Expected: '$expected'"
+    echo "Got:      '$result'"
+    exit 1
+fi
+
 hr
