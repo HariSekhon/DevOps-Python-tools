@@ -33,6 +33,10 @@ until [ $# -lt 1 ]; do
     esac
 done
 
+if [ -n "${TRAVIS:-}" ]; then
+    sudo apt-get install -y ffmpeg
+fi
+
 data_dir="tests/data"
 broken_dir="tests/media_broken"
 test_file="$data_dir/sample.mp3"
