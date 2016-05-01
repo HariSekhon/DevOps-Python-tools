@@ -33,8 +33,10 @@ until [ $# -lt 1 ]; do
     esac
 done
 
-if [ -n "${TRAVIS:-}" ]; then
-    sudo apt-get install -y ffmpeg
+if ! which ffmpeg &>/dev/null; then
+    if which apt-get &>/dev/null; then
+        sudo apt-get install -y ffmpeg
+    fi
 fi
 
 data_dir="tests/data"
