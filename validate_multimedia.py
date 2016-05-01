@@ -34,7 +34,7 @@ Directories are recursed, checking any files ending in one of the following exte
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
+#from __future__ import unicode_literals
 
 import os
 import re
@@ -127,6 +127,7 @@ class MediaValidatorTool(CLI):
             if self.verbose > 2:
                 print(_.output)
             if self.get_opt('continue'):
+                print(invalid_media_msg)
                 self.failed = True
                 return False
             die(invalid_media_msg)
