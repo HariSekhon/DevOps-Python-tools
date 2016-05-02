@@ -36,6 +36,8 @@ done
 if ! which ffmpeg &>/dev/null; then
     if which apt-get &>/dev/null; then
         sudo apt-get install -y ffmpeg
+    elif which yum &>/dev/null; then
+        echo "WARNING: cannot auto-install ffmpeg on RHEL/CentOS, the 3rd party repos and deps are seriously broken"
     fi
 fi
 
