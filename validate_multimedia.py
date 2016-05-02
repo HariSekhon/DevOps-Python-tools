@@ -71,14 +71,15 @@ class MediaValidatorTool(CLI):
         self.timeout_default = 0
 
     def add_options(self):
-        self.add_opt('-q', '--quick', action='store_true',
+        self.add_opt('-q', '--quick', action='store_true', default=False,
                      help="Quick mode (uses 'ffprobe' instead of 'ffmpeg')")
-        self.add_opt('-c', '--continue', action='store_true',
+        self.add_opt('-c', '--continue', action='store_true', default=False,
                      help='Continue after finding a broken multimedia file if recursing a directory tree')
 
     def run(self):
+        log_option('quick', self.get_opt('quick'))
+        log_option('continue-on-error', self.get_opt('continue'))
         if self.get_opt('quick'):
-            log_option('quick', self.get_opt('quick'))
             self.validate_cmd = "ffprobe"
         if not which(self.validate_cmd.split()[0]):
             die('ffmpeg / ffprobe not found in $PATH')
