@@ -101,7 +101,11 @@ check_broken "$data_dir/multirecord.json"
 # turns out this isn't broken and still plays
 #echo 'blah' >  "$broken_dir/broken.mp3"
 #cat "$test_file" >> "$broken_dir/broken.mp3"
-#check_broken "$broken_dir/broken.mp3"
+cp -av "$data_dir/test.csv" "$broken_dir/broken.mp3"
+check_broken "$broken_dir/broken.mp3"
+echo
+echo "Checking failure with continue switch for entire tree"
+check_broken . 2 "$test_file" -c
 rm -fr "$broken_dir"
 
 echo
