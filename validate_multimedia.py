@@ -56,7 +56,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.4'
+__version__ = '0.7.5'
 
 class MediaValidatorTool(CLI):
 
@@ -83,6 +83,7 @@ class MediaValidatorTool(CLI):
         if not which(self.validate_cmd.split()[0]):
             die('ffmpeg / ffprobe not found in $PATH')
         args = uniq_list_ordered(self.args)
+        #log_option('files/dirs', args)
         for arg in args:
             if not os.path.exists(arg):
                 print("'%s' not found" % arg)
@@ -124,7 +125,15 @@ class MediaValidatorTool(CLI):
             log.debug('cmd: %s %s', cmd, filename)
             log.info('verifying {0}'.format(filename))
             # capturing stderr to stdout because ffprobe prints to stderr in all cases
-            subprocess.check_output(cmd.split() + [filename], stderr=subprocess.STDOUT)
+            # Python 2.7+
+            #subprocess.check_output(cmd.split() + [filename], stderr=subprocess.STDOUT)
+            proc = subprocess.Popen(cmd.split() + [filename], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            (stdout, _) = proc.communicate()
+            returncode = proc.wait()
+            if returncode != 0 or (stdout is not None and 'Error' in stdout):
+                _ = CalledProcessError(returncode, cmd)
+                _.output = stdout
+                raise _
             print(valid_media_msg)
         except CalledProcessError as _:
             if self.verbose > 2:
