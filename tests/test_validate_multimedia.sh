@@ -62,9 +62,12 @@ echo "checking quick mode"
 ./validate_multimedia.py -vvv --quick "$test_file" 
 echo
 
-echo
 echo "checking directory recursion (mixed with explicit file given)"
 ./validate_multimedia.py -vvv "$test_file" .
+echo
+
+echo "checking regex with directory recursion"
+./validate_multimedia.py -vvv "$test_file" -r '\.mp3$' .
 echo
 
 echo "checking symlink handling"
@@ -106,12 +109,18 @@ check_broken "$broken_dir/broken.mp3"
 echo
 echo "Checking failure with continue switch for entire tree"
 check_broken . 2 "$test_file" -c
+echo "Checking catches broken regex"
+check_broken . 3 -r "*.mp3"
+echo
+echo "checking regex with directory recursion will skip broken file"
+./validate_multimedia.py -vvv -r 'sample.mp3' .
+echo
 rm -fr "$broken_dir"
 
 echo
 
 echo "checking for non-existent file"
-check_broken nonexistentfile 1
+check_broken nonexistentfile 2
 echo
 
 echo "======="
