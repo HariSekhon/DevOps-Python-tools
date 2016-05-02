@@ -74,6 +74,8 @@ class MediaValidatorTool(CLI):
         self.quick = None
         self.regex = None
         self.timeout_default = 0
+        # method for checking this comes from:
+        # http://superuser.com/questions/100288/how-can-i-check-the-integrity-of-a-video-file-avi-mpeg-mp4
         self.validate_cmd = "ffmpeg -v error -f null - -i"
 
     def add_options(self):
@@ -147,8 +149,6 @@ class MediaValidatorTool(CLI):
     def check_media_file(self, filename):
         valid_media_msg = '%s => OK' % filename
         invalid_media_msg = '%s => INVALID' % filename
-        # method for checking this comes from:
-        # http://superuser.com/questions/100288/how-can-i-check-the-integrity-of-a-video-file-avi-mpeg-mp4
         try:
             # cmd = self.validate_cmd.format(filename)
             cmd = self.validate_cmd
