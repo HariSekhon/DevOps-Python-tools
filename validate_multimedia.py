@@ -128,6 +128,7 @@ class MediaValidatorTool(CLI):
                 self.check_path(arg)
             except OSError as _:
                 print(_)
+                self.failed = True
         if self.failed:
             sys.exit(2)
 
@@ -143,6 +144,7 @@ class MediaValidatorTool(CLI):
                 listing = [x for x in listing if x[0] != '.']
             except OSError as _:
                 print(_)
+                self.failed = True
             for item in listing:
                 subpath = os.path.join(path, item)
                 if os.path.isdir(subpath):
