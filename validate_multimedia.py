@@ -59,7 +59,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.6'
+__version__ = '0.7.7'
 
 class MediaValidatorTool(CLI):
 
@@ -124,7 +124,10 @@ class MediaValidatorTool(CLI):
             else:
                 die("path '%s' could not be determined as either a file or directory" % arg)
         for arg in args:
-            self.check_path(arg)
+            try:
+                self.check_path(arg)
+            except OSError as _:
+                print(_)
         if self.failed:
             sys.exit(2)
 
@@ -134,7 +137,13 @@ class MediaValidatorTool(CLI):
             # if self.regex and self.regex.search(path):
             self.check_media_file(path)
         elif os.path.isdir(path):
-            for item in os.listdir(path):
+            listing = []
+            try:
+                listing = os.listdir(path)
+                listing = [x for x in listing if x[0] != '.']
+            except OSError as _:
+                print(_)
+            for item in listing:
                 subpath = os.path.join(path, item)
                 if os.path.isdir(subpath):
                     self.check_path(subpath)
