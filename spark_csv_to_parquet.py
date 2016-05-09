@@ -56,7 +56,7 @@ from pyspark.sql.types import *     # pylint: disable=wrong-import-position,impo
 from pyspark.sql.types import StructType, StructField  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.2'
+__version__ = '0.7.3'
 
 class SparkCSVToParquet(CLI):
 
@@ -135,7 +135,7 @@ class SparkCSVToParquet(CLI):
                 return _
 
             def create_struct(arg):
-                name = arg
+                name = str(arg).strip()
                 data_type = 'string'
                 if ':' in arg:
                     (name, data_type) = arg.split(':', 1)
