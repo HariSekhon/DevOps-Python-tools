@@ -47,5 +47,6 @@ script:
 
 after_success:
   - coveralls
+  - curl -H "Content-Type: application/json" --data '{"build": true}' -X POST https://registry.hub.docker.com/u/harisekhon/pytools/trigger/0e69c39f-ea1b-43c7-a97d-cef1252f1400/
 
 sudo: required
