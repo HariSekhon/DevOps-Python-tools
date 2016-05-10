@@ -70,6 +70,7 @@ class DockerHubTags(CLI):
     def print_tags(self, repo):
         print('repo: {0}'.format(repo))
         print('tags: ', end='')
+        sys.stdout.flush()
         print('\n      '.join(self.get_tags(repo)) + '\n')
 
     @staticmethod
