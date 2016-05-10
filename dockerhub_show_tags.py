@@ -108,6 +108,11 @@ class DockerHubTags(CLI):
         except KeyError as _:
             die('failed to parse output from DockerHub (format may have changed?): {0}'.format(_))
         tag_list.sort()
+        # put latest to the top of the list
+        try:
+            tag_list.insert(0, tag_list.pop(tag_list.index('latest')))
+        except ValueError:
+            pass
         return tag_list
 
 
