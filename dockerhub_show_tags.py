@@ -64,6 +64,8 @@ class DockerHubTags(CLI):
         self._CLI__parser.usage = '{0} [options] repo1 repo2 ...'.format(prog)
 
     def run(self):
+        if not self.args:
+            self.usage('no repos given as args')
         print('DockerHub\n')
         for arg in self.args:
             self.print_tags(arg)
@@ -82,7 +84,11 @@ class DockerHubTags(CLI):
         url = 'https://registry.hub.docker.com/v2/repositories/{0}/{1}/tags/'.format(urllib.quote_plus(namespace), urllib.quote_plus(repo))
         log.debug('GET %s' % url)
         try:
-            req = requests.get(url)
+            # workaround for Travis CI and older pythons - we're not exchanging secret data so this is ok
+            verify = True
+            if os.getenv('TRAVIS'):
+                verify = False
+            req = requests.get(url, verify=verify)
         except requests.exceptions.RequestException as _:
             die(_)
         log.debug("response: %s %s", req.status_code, req.reason)
