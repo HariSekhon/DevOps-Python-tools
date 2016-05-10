@@ -26,6 +26,7 @@ cd "$srcdir/.."
 section "Testing DockerHub Show Tags"
 
 check './dockerhub_show_tags.py centos debian' "DockerHub Show Tags for CentOS & Debian"
+check './dockerhub_show_tags.py harisekhon/centos-java' "DockerHub Show Tags for harisekhon/centos-java"
 check './dockerhub_show_tags.py centos | grep "6.7"' "DockerHub Show Tags search for CentOS 6.7 tag"
 
 echo
