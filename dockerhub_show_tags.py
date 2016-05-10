@@ -33,6 +33,7 @@ import logging
 import os
 import sys
 import traceback
+import urllib
 try:
     import requests
 except ImportError:
@@ -75,7 +76,10 @@ class DockerHubTags(CLI):
 
     @staticmethod
     def get_tags(repo):
-        url = 'https://registry.hub.docker.com/v2/repositories/library/%s/tags/' % repo
+        namespace = 'library'
+        if '/' in repo:
+            (namespace, repo) = repo.split('/', 2)
+        url = 'https://registry.hub.docker.com/v2/repositories/{0}/{1}/tags/'.format(urllib.quote_plus(namespace), urllib.quote_plus(repo))
         log.debug('GET %s' % url)
         try:
             req = requests.get(url)
