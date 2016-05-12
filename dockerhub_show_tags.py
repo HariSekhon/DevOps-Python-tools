@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 class DockerHubTags(CLI):
@@ -104,8 +104,7 @@ class DockerHubTags(CLI):
         tag_list = []
         try:
             j = json.loads(req.content)
-            for _ in j['results']:
-                tag_list.append(_['name'])
+            tag_list = [_['name'] for _ in j['results']]
         except KeyError as _:
             die('failed to parse output from DockerHub (format may have changed?): {0}'.format(_))
         tag_list.sort()
