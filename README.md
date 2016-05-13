@@ -1,5 +1,7 @@
-Hari Sekhon PyTools [![Build Status](https://travis-ci.org/HariSekhon/pytools.svg?branch=master)](https://travis-ci.org/HariSekhon/pytools)
-================================
+Hari Sekhon PyTools
+===================
+[![Build Status](https://travis-ci.org/HariSekhon/pytools.svg?branch=master)](https://travis-ci.org/HariSekhon/pytools)  [![DockerHub](https://img.shields.io/badge/docker-available-blue.svg)](https://hub.docker.com/r/harisekhon/pytools/)
+
 
 ### Hadoop, Spark / PySpark, Ambari, IPython, Pig and Linux Tools ###
 
