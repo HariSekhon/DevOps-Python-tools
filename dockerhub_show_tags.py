@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.3'
 
 
 class DockerHubTags(CLI):
@@ -63,26 +63,40 @@ class DockerHubTags(CLI):
         # Python 3.x
         # super().__init__()
         self._CLI__parser.usage = '{0} [options] repo1 repo2 ...'.format(prog)
+        self.quiet = False
+
+    def add_options(self):
+        self.add_opt('-q', '--quiet', action='store_true', default=False,
+                     help='Output only the tags, one per line (useful for shell tricks)')
 
     def run(self):
         if not self.args:
             self.usage('no repos given as args')
-        print('DockerHub\n')
+        self.quiet = self.get_opt('quiet')
+        if not self.quiet:
+            print('DockerHub\n')
         for arg in self.args:
             self.print_tags(arg)
 
     def print_tags(self, repo):
-        print('repo: {0}'.format(repo))
-        print('tags: ', end='')
+        if not self.quiet:
+            print('repo: {0}'.format(repo))
+            print('tags: ', end='')
         sys.stdout.flush()
-        print('\n      '.join(self.get_tags(repo)) + '\n')
+        indent = '      '
+        if self.quiet:
+            indent = ''
+        print('\n{0}'.format(indent).join(self.get_tags(repo)))
+        if not self.quiet:
+            print()
 
     @staticmethod
     def get_tags(repo):
         namespace = 'library'
         if '/' in repo:
             (namespace, repo) = repo.split('/', 2)
-        url = 'https://registry.hub.docker.com/v2/repositories/{0}/{1}/tags/'.format(urllib.quote_plus(namespace), urllib.quote_plus(repo))
+        url = 'https://registry.hub.docker.com/v2/repositories/{0}/{1}/tags/'\
+              .format(urllib.quote_plus(namespace), urllib.quote_plus(repo))
         log.debug('GET %s' % url)
         try:
             # workaround for Travis CI and older pythons - we're not exchanging secret data so this is ok
