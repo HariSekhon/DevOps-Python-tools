@@ -2,7 +2,7 @@ Hari Sekhon PyTools [![Build Status](https://travis-ci.org/HariSekhon/pytools.sv
 ===================
 
 
-### Hadoop, Spark / PySpark, Ambari, IPython, Pig and Linux Tools ###
+### Hadoop, Spark / PySpark, HBase, Pig, Ambari, IPython and Linux Tools ###
 
 A few of the Hadoop, Spark & Linux tools. All programs have --help to list the available options.
 
