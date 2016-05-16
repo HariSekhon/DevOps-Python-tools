@@ -39,7 +39,7 @@ export HBASE_STARGATE_PORT=8080
 #export HBASE_THRIFT_PORT=9090
 
 export DOCKER_IMAGE="harisekhon/hbase-dev"
-export DOCKER_CONTAINER="nagios-plugins-hbase-test"
+export DOCKER_CONTAINER="hbase-test"
 
 if ! is_docker_available; then
     echo "Docker not available, skipping HBase checks"
