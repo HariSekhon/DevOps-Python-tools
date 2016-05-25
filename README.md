@@ -51,6 +51,7 @@ Some common options also support optional environment variables for convenience 
 - ```spark_json_to_parquet.py``` - PySpark JSON => Parquet converter
 - ```validate_*.py``` - validate files, directory trees and/or standard input streams for the following file types: Avro, CSV, JSON, Parquet, XML, YAML. Directories are recursed, testing any files with relevant matching extensions (```.avro```, ```.csv```, ```.json```, ```.parquet```, ```.xml```, ```.yml```/```.yaml```). ```validate_json.py``` supports both normal json files as well as json-doc-per-line files such as MongoDB or Hadoop json data files
 - ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user (there is also a perl version in my [Tools](https://github.com/harisekhon/tools) repo)
+- ```dockerhub_show_tags.py``` - shows DockerHub tags - Docker CLI doesn't support this yet but it's a very useful thing to be able to see live on the command line and not relying on hoping the documentation page is correct
 
 #### Manual Setup ####
 
