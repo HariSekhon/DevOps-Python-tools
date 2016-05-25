@@ -92,6 +92,7 @@ Strict validations include host/domain/FQDNs using TLDs which are populated from
 
 If you end up with an error like:
 ```
+./dockerhub_show_tags.py centos ubuntu
 [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:765)
 ```
 One quick fix is to do the following:
