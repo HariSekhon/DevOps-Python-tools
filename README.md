@@ -88,6 +88,17 @@ The ```-J-cp `hadoop classpath` ``` bit does the right thing in finding the Hado
 
 Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list is done via my [PyLib](https://github.com/harisekhon/pylib) library submodule - see there for details on configuring this to permit custom TLDs like ```.local``` or ```.intranet``` (both supported by default).
 
+#### Python SSL certificate verification problems
+
+If you end up with an error like:
+```
+[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:765)
+```
+One quick fix is to do the following:
+```
+pip uninstall -y certifi && pip install certifi==2015.04.28
+```
+
 ### Updating ###
 
 Run ```make update```. This will git pull and then git submodule update which is necessary to pick up corresponding library updates.
