@@ -19,7 +19,7 @@
 Tool to iterate on and major compact all HBase tables (to be scheduled and called off-peak)
 
 This is a pythonic rewrite of an old best practice from a few years back when I worked for Cloudera for off-peak
-compactions to prevent them impacting peak hours and also preventing compactions rolling in to production hours
+compactions to prevent them impacting peak hours.
 
 Uses the HBase Thrift server. For versions older than HBase 0.96+ or using modified protocols, the connection
 protocol / compat / transport settings will need to be adjusted.
