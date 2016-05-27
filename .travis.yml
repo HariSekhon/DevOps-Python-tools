@@ -44,6 +44,7 @@ services:
 install:
   - make
   #- pip install --upgrade ndg-httpsclient
+  - pip uninstall -y certifi && pip install certifi==2015.04.28
 
 script:
   - make test
