@@ -43,7 +43,7 @@ services:
 
 install:
   - make
-  - pip install --upgrade ndg-httpsclient
+  #- pip install --upgrade ndg-httpsclient
 
 script:
   - make test
