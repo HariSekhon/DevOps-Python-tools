@@ -99,10 +99,10 @@ class DockerHubTags(CLI):
               .format(urllib.quote_plus(namespace), urllib.quote_plus(repo))
         log.debug('GET %s' % url)
         try:
-            # workaround for Travis CI and older pythons - we're not exchanging secret data so this is ok
             verify = True
-            if os.getenv('TRAVIS'):
-                verify = False
+            # workaround for Travis CI and older pythons - we're not exchanging secret data so this is ok
+            #if os.getenv('TRAVIS'):
+            #    verify = False
             req = requests.get(url, verify=verify)
         except requests.exceptions.RequestException as _:
             die(_)
