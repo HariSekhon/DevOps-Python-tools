@@ -1,0 +1,153 @@
+#!/usr/bin/env python
+#  vim:ts=4:sts=4:sw=4:et
+#
+#  Author: Hari Sekhon
+#  Date: 2016-05-27 13:15:30 +0100 (Fri, 27 May 2016)
+#
+#  https://github.com/harisekhon/pytools
+#
+#  License: see accompanying Hari Sekhon LICENSE file
+#
+#  If you're using my code you're welcome to connect with me on LinkedIn
+#  and optionally send me feedback to help improve this or other code I publish
+#
+#  https://www.linkedin.com/in/harisekhon
+#
+
+"""
+
+Tool to search DockerHub repos and return a configurable number of results.
+
+Docker CLI doesn't currently support configuring the returned number of search results and always returns 25:
+
+https://github.com/docker/docker/issues/23055
+
+"""
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+#from __future__ import unicode_literals
+
+import json
+import logging
+import os
+import sys
+import traceback
+import urllib
+try:
+    import requests
+except ImportError:
+    print(traceback.format_exc(), end='')
+    sys.exit(4)
+srcdir = os.path.abspath(os.path.dirname(__file__))
+libdir = os.path.join(srcdir, 'pylib')
+sys.path.append(libdir)
+try:
+    # pylint: disable=wrong-import-position
+    from harisekhon.utils import log, die, prog, isJson, jsonpp, isInt, validate_int, support_msg_api
+    from harisekhon import CLI
+except ImportError as _:
+    print(traceback.format_exc(), end='')
+    sys.exit(4)
+
+__author__ = 'Hari Sekhon'
+__version__ = '0.3'
+
+
+class DockerHubSearch(CLI):
+
+    def __init__(self):
+        # Python 2.x
+        super(DockerHubSearch, self).__init__()
+        # Python 3.x
+        # super().__init__()
+        self._CLI__parser.usage = '{0} [options] TERM'.format(prog)
+
+    def add_options(self):
+        self.add_opt('-n', '--num', '--limit', default=50,
+                     help='Number of results to return (default: 50)')
+
+    def run(self):
+        if not self.args:
+            self.usage('no search term given as args')
+        if len(self.args) > 1:
+            self.usage('only single search term argument may be given')
+        term = self.args[0]
+        log.info('term: %s', term)
+        num = self.get_opt('num')
+        validate_int(num, 'limit', 1, 1000)
+        self.print_results(self.args[0], num)
+
+    def print_results(self, term, limit=None):
+        data = self.search(term, limit)
+        results = {}
+        longest_name = 0
+        try:
+            # collect in dict to order by stars like normal docker search command
+            for _ in data['results']:
+                star = _['star_count']
+                name = _['name']
+                if len(name) > longest_name:
+                    longest_name = len(name)
+                if not isInt(star):
+                    die("star count '{0}' for repo '{1}' is not an integer! {2}".format(star, name, support_msg_api()))
+                results[star] = results.get(star, {})
+                results[star][name] = results[star].get(name, {})
+                result = {}
+                result['description'] = _['description']
+                result['official'] = '[OK]' if _['is_official'] else ''
+                # docker search doesn't output this so neither will I
+                #result['trusted'] = _['is_trusted']
+                result['automated'] = '[OK]' if _['is_automated'] else ''
+                results[star][name] = result
+        except KeyError as _:
+            die('failed to parse get field from data returned by DockerHub (format may have changed?): {0}'.format(_))
+        # mimicking out spacing from 'docker search' command
+        print('{0:{5}s}   {1:45s}   {2:7s}   {3:8s}   {4:10s}'.
+              format('NAME', 'DESCRIPTION', 'STARS', 'OFFICIAL', 'AUTOMATED', longest_name))
+
+        def truncate(mystr, length):
+            if len(mystr) > length:
+                mystr = mystr[0:length-3] + '...'
+            return mystr
+
+        for star in reversed(sorted(results)):
+            for name in sorted(results[star]):
+                desc = truncate(results[star][name]['description'], 45)
+                print('{0:{5}s}   {1:45s}   {2:<7d}   {3:8s}   {4:10s}'.
+                      format(name, desc, star,
+                             results[star][name]['official'],
+                             results[star][name]['automated'],
+                             longest_name))
+
+    @staticmethod
+    def search(term, limit=25):
+        url = 'https://index.docker.io/v1/search?q={0}&n={1}'.format(urllib.quote_plus(term), limit)
+        log.debug('GET %s' % url)
+        try:
+            verify = True
+            # workaround for Travis CI and older pythons - we're not exchanging secret data so this is ok
+            #if os.getenv('TRAVIS'):
+            #    verify = False
+            req = requests.get(url, verify=verify)
+        except requests.exceptions.RequestException as _:
+            die(_)
+        log.debug("response: %s %s", req.status_code, req.reason)
+        log.debug("content:\n%s\n%s\n%s", '='*80, req.content.strip(), '='*80)
+        if req.status_code != 200:
+            die("%s %s" % (req.status_code, req.reason))
+        if not isJson(req.content):
+            die('invalid non-JSON response from DockerHub!')
+        if log.isEnabledFor(logging.DEBUG):
+            print(jsonpp(req.content))
+            print('='*80)
+        try:
+            data = json.loads(req.content)
+        except KeyError as _:
+            die('failed to parse output from DockerHub (format may have changed?): {0}'.format(_))
+        return data
+
+
+if __name__ == '__main__':
+    DockerHubSearch().main()
