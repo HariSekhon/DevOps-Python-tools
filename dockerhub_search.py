@@ -82,7 +82,7 @@ class DockerHubSearch(CLI):
     def print_results(self, term, limit=None):
         data = self.search(term, limit)
         results = {}
-        longest_name = 0
+        longest_name = 8
         try:
             # collect in dict to order by stars like normal docker search command
             for _ in data['results']:
