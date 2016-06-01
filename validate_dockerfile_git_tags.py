@@ -122,7 +122,9 @@ class DockerfileGitTagCheckTool(CLI):
         for arg in args:
             self.check_git_tags_dockerfiles(arg)
         if self.failed:
+            log.error('Dockerfile validation FAILED')
             sys.exit(ERRORS['CRITICAL'])
+        log.info('Dockerfile validation SUCCEEDED')
 
     def check_git_tags_dockerfiles(self, target):
         target = os.path.abspath(target)
