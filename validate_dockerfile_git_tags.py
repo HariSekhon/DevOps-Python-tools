@@ -24,7 +24,11 @@ to ensure they're both aligned.
 This requires the git tagging and Dockerfile ARG to be aligned in such as way that 'ARG NAME_VERSION=<version>'
 corresponds to Git tag 'NAME-<version>' where NAME matches regex '\w+' and <version> is in the form 'x.y[.z]' where if
 git tag is at least a prefix of the Dockerfiles ARG version (eg. solr-4 matches ARG SOLR_VERSION=4 and
-ARG SOLR_VERSION=4.10). Git tags of NAME-dev-<version> are stripped of '-dev' and assumed to still use ARG NAME_VERSION.
+ARG SOLR_VERSION=4.10).
+
+Additionally, git tags of NAME-dev-<version> are stripped of '-dev' and assumed to still use ARG NAME_VERSION, and the
+parent directory name for the Dockerfile must match the tag base without the version (but including the -dev part) in
+order to disambiguate between things like SOLRCLOUD_VERSION for either solrcloud/Dockerfile or solrcloud-dev/Docekrfile
 
 Beware this will attempt to do a git checkout of all tags and test containing Dockerfiles under given paths in each tag
 revision. If the git checkout is 'dirty' (ie has uncommitted changes) it will prevent checking out the tag, the program
@@ -34,6 +38,9 @@ branch/tag checkout when complete.
 Prematurely terminating this program can leave the git checkout in an inconsistent state, although all catchable
 exceptions are caught to return to original state. If you end up in an inconsistent state just git reset and do a
 manual checkout back to master.
+
+Recommended to run this on a non-working git checkout to make it easy to reset state and avoid dirty git checkout
+issues eg. run inside your CI system or a secondary git clone location.
 
 Originally this worked on a file-by-file basis which is better when recursing directories across git submodules, but
 was the least efficient way of doing it so I've rewritten it to do a single pass of all tags and check all Dockerfiles
@@ -84,7 +91,7 @@ class DockerfileGitTagCheckTool(CLI):
         # super().__init__()
         self.failed = False
                                        # ARG ZOOKEEPER_VERSION=3.4.8
-        self.arg_regex = re.compile(r'^\s*ARG\s+(\w+)_VERSION=([\w\.]+)\s*')
+        self.arg_regex = re.compile(r'^\s*ARG\s+([\w_]+)_VERSION=([\w\.]+)\s*')
         self.tag_prefix = None
         self.timeout_default = 86400
         self.valid_git_tags_msg = None
@@ -186,7 +193,13 @@ class DockerfileGitTagCheckTool(CLI):
 
     def check_file(self, filename, tag):
         filename = os.path.abspath(filename)
-        if not os.path.basename(filename) == 'Dockerfile':
+        if os.path.basename(filename) != 'Dockerfile':
+            return True
+        parent = os.path.basename(os.path.dirname(filename))
+        tag_base = tag.rsplit('-', 1)[0]
+        if parent.lower() != tag_base.lower():
+            log.debug("skipping '{0}' as it's parent directory '{1}' doesn't match tag base '{2}'".
+                      format(filename, parent, tag_base))
             return True
         self.valid_git_tags_msg = '%s => Dockerfile Git Tags OK' % filename
         self.invalid_git_tags_msg = "%s => Dockerfile Git Tags MISMATCH in tag '%s'" % (filename, tag)
@@ -214,7 +227,7 @@ class DockerfileGitTagCheckTool(CLI):
                 if argversion:
                     log.debug("found arg '%s'", argversion.group(0))
                     log.debug("checking arg group 1 '%s' == tag_base '%s'", argversion.group(1), tag_base)
-                    if argversion.group(1).lower() == tag_base.lower():
+                    if argversion.group(1).lower() == tag_base.lower().replace('-', '_'):
                         log.debug("arg '%s'  matches tag base '%s'", argversion.group(1), tag_base)
                         log.debug("comparing '%s' contents to version derived from tag '%s' => '%s'",
                                   filename, tag, tag_version)
