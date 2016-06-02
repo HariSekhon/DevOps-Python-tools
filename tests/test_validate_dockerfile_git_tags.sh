@@ -23,9 +23,9 @@ cd "$srcdir/.."
 
 . "bash-tools/utils.sh"
 
-section "Testing Validate Dockerfile Git Tags"
+section "Testing DockerfileS Check Git Tags"
 
-check './validate_dockerfile_git_tags.py Dockerfiles' "Validate Dockerfile Git Tags of submodule Dockerfiles/"
+check './dockerfiles_check_git_tags.py Dockerfiles' "Dockerfiles Check Git Tags of submodule Dockerfiles/"
 
 echo
 echo
