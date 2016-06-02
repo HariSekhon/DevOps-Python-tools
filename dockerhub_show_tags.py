@@ -64,6 +64,7 @@ class DockerHubTags(CLI):
         # super().__init__()
         self._CLI__parser.usage = '{0} [options] repo1 repo2 ...'.format(prog)
         self.quiet = False
+        self.timeout_default = 30
 
     def add_options(self):
         self.add_opt('-q', '--quiet', action='store_true', default=False,
