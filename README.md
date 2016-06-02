@@ -1,6 +1,8 @@
-Hari Sekhon PyTools [![Build Status](https://travis-ci.org/HariSekhon/pytools.svg?branch=master)](https://travis-ci.org/HariSekhon/pytools)  [![DockerHub](https://img.shields.io/badge/docker-available-blue.svg)](https://hub.docker.com/r/harisekhon/pytools/)
+Hari Sekhon PyTools
 ===================
-
+[![Build Status](https://travis-ci.org/HariSekhon/pytools.svg?branch=master)](https://travis-ci.org/HariSekhon/pytools)
+![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20OS%20X-lightgrey.svg)
+[![DockerHub](https://img.shields.io/badge/docker%20container-available-blue.svg)](https://hub.docker.com/r/harisekhon/pytools/)
 
 ### Hadoop, Spark / PySpark, HBase, Pig, Ambari, IPython and Linux Tools ###
 
