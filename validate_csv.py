@@ -62,7 +62,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.4'
+__version__ = '0.7.5'
 
 class CsvValidatorTool(CLI):
 
@@ -100,14 +100,14 @@ class CsvValidatorTool(CLI):
                 csvreader = csv.reader(filehandle, dialect)
         except csv.Error  as _:
             if self.verbose > 2:
-                print('file {}: {}'.format(self.filename, _))
+                print('file {0}: {1}'.format(self.filename, _))
             return False
         try:
             # csvreader doesn't seem to generate any errors ever :-(
             # csv module allows entire lines of json/xml/yaml to go in as a single field
             # Adding some invalidations manually
             for _ in csvreader:
-                # log.debug("line: %s" % _)
+                # log.debug("line: %s", _)
                 # make it fail if there is only a single field on any line
                 if len(_) < 2:
                     return False
@@ -121,7 +121,7 @@ class CsvValidatorTool(CLI):
                     return False
         except csv.Error  as _:
             if self.verbose > 2:
-                print('file {}, line {}: {}'.format(self.filename, csvreader.line_num, _))
+                print('file {0}, line {1}: {2}'.format(self.filename, csvreader.line_num, _))
             return False
         return True
 
@@ -165,14 +165,14 @@ class CsvValidatorTool(CLI):
             if arg == '-':
                 continue
             if not os.path.exists(arg):
-                print("'%s' not found" % arg)
+                print("'{0}' not found".format(arg))
                 sys.exit(ERRORS['WARNING'])
             if os.path.isfile(arg):
                 log_option('file', arg)
             elif os.path.isdir(arg):
                 log_option('directory', arg)
             else:
-                die("path '%s' could not be determined as either a file or directory" % arg)
+                die("path '{0}' could not be determined as either a file or directory".format(arg))
         for arg in args:
             self.check_path(arg)
         if self.failed:
@@ -189,7 +189,7 @@ class CsvValidatorTool(CLI):
                 elif self.re_csv_suffix.match(item):
                     self.check_file(subpath)
         else:
-            die("failed to determine if path '%s' is file or directory" % path)
+            die("failed to determine if path '{0}' is file or directory".format(path))
 
     def check_file(self, filename):
         self.filename = filename
@@ -201,7 +201,7 @@ class CsvValidatorTool(CLI):
             log.debug('checking stdin')
             self.check_csv(sys.stdin)
         else:
-            log.debug('checking %s' % self.filename)
+            log.debug('checking %s', self.filename)
             try:
                 with open(self.filename) as iostream:
                     self.check_csv(iostream)
