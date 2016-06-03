@@ -55,7 +55,7 @@ Some common options also support optional environment variables for convenience 
 - ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user (there is also a perl version in my [Tools](https://github.com/harisekhon/tools) repo)
 - ```dockerhub_show_tags.py``` - shows DockerHub tags - Docker CLI doesn't support this yet but it's a very useful thing to be able to see live on the command line and not relying on hoping the documentation page is correct
 - ```dockerhub_search.py``` - search DockerHub with a configurable number of returned results (official ```docker search``` is limited to only 25 results)
-- ```dockerfiles_check_git*.py - check Git tags & branches align with the containing Dockerfile's ```ARG *_VERSION```
+- ```dockerfiles_check_git*.py``` - check Git tags & branches align with the containing Dockerfile's ```ARG *_VERSION```
 
 
 #### Manual Setup ####
