@@ -43,6 +43,8 @@ build:
 	# for impyla
 	$(SUDO2) pip install --upgrade setuptools || :
 	$(SUDO2) pip install -r requirements.txt
+	# prevents https://urllib3.readthedocs.io/en/latest/security.html#insecureplatformwarning
+	$(SUDO) sudo pip install --upgrade ndg-httpsclient
 	# for ipython-notebook-pyspark.py
 	#$(SUDO2) pip install jinja2
 	# HiveServer2
