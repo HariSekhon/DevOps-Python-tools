@@ -34,7 +34,7 @@ build:
 	
 	cd pylib && make
 	
-	[ -d "parquet-tools-$(PARQUET_VERSION)" ] || wget -c -O "parquet-tools-$(PARQUET_VERSION)-bin.zip" "http://search.maven.org/remotecontent?filepath=com/twitter/parquet-tools/$(PARQUET_VERSION)/parquet-tools-$(PARQUET_VERSION)-bin.zip"
+	[ -d "parquet-tools-$(PARQUET_VERSION)" ] || wget -t 100 --retry-connrefused -c -O "parquet-tools-$(PARQUET_VERSION)-bin.zip" "http://search.maven.org/remotecontent?filepath=com/twitter/parquet-tools/$(PARQUET_VERSION)/parquet-tools-$(PARQUET_VERSION)-bin.zip"
 	[ -d "parquet-tools-$(PARQUET_VERSION)" ] || unzip "parquet-tools-$(PARQUET_VERSION)-bin.zip"
 	
 	# json module built-in to Python >= 2.6, backport not available via pypi
@@ -93,7 +93,7 @@ yum-packages:
 	rpm -q unzip   || $(SUDO) yum install -y unzip
 	# needed to fetch the library submodule and CPAN modules
 	# python-pip requires EPEL, so try to get the correct EPEL rpm
-	rpm -q epel-release || yum install -y epel-release || { wget -O /tmp/epel.rpm "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`grep -o '[[:digit:]]' /etc/*release | head -n1`.noarch.rpm" && $(SUDO) rpm -ivh /tmp/epel.rpm && rm -f /tmp/epel.rpm; }
+	rpm -q epel-release || yum install -y epel-release || { wget -t 100 --retry-connrefused -O /tmp/epel.rpm "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`grep -o '[[:digit:]]' /etc/*release | head -n1`.noarch.rpm" && $(SUDO) rpm -ivh /tmp/epel.rpm && rm -f /tmp/epel.rpm; }
 	rpm -q python-setuptools || $(SUDO) yum install -y python-setuptools
 	rpm -q python-pip        || $(SUDO) yum install -y python-pip
 	rpm -q python-devel      || $(SUDO) yum install -y python-devel
