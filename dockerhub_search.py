@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.3.1'
 
 
 class DockerHubSearch(CLI):
@@ -117,7 +117,7 @@ class DockerHubSearch(CLI):
             for name in sorted(results[star]):
                 desc = truncate(results[star][name]['description'], 45)
                 print('{0:{5}s}   {1:45s}   {2:<7d}   {3:8s}   {4:10s}'.
-                      format(name, desc, star,
+                      format(name.encode('utf-8'), desc.encode('utf-8'), star,
                              results[star][name]['official'],
                              results[star][name]['automated'],
                              longest_name))
