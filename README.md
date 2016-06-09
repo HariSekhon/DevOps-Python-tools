@@ -20,7 +20,20 @@ https://www.linkedin.com/in/harisekhon
 
 ### Quick Setup ###
 
-The 'make' command will initialize my library submodule:
+#### Ready to run Docker image #####
+
+All programs and their pre-compiled dependencies can be found ready to run on [DockerHub](https://hub.docker.com/r/harisekhon/pytools/).
+
+List all programs:
+```
+docker run harisekhon/pytools
+```
+Run any given program:
+```
+docker run harisekhon/pytools <program> <args>
+```
+
+#### Automated Build from source #####
 
 ```
 git clone https://github.com/harisekhon/pytools
