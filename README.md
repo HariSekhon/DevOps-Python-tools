@@ -18,7 +18,7 @@ https://www.linkedin.com/in/harisekhon
 
 ##### Make sure you run ```make update``` if updating and not just ```git pull``` as you will often need the latest library submodule and possibly new upstream libraries. #####
 
-### Quick Setup ###
+### Quick Start ###
 
 #### Ready to run Docker image #####
 
