@@ -133,6 +133,13 @@ update-no-recompile:
 	git pull
 	git submodule update --init --recursive
 
+.PHONY: update-submodules
+update-submodules:
+	git submodule update --init --recursive --remote
+.PHONY: updatem
+updatem:
+	make update-submodules
+
 .PHONY: clean
 clean:
 	@# the xargs option to ignore blank input doesn't work on Mac
