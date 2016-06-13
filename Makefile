@@ -10,7 +10,7 @@
 ifdef TRAVIS
 	SUDO2 =
 else
-	SUDO2 = sudo
+	SUDO2 = sudo -H
 endif
 
 # EUID /  UID not exported in Make
@@ -19,7 +19,7 @@ ifeq '$(shell id -u)' '0'
 	SUDO =
 	SUDO2 =
 else
-	SUDO = sudo
+	SUDO = sudo -H
 endif
 
 PARQUET_VERSION=1.5.0
