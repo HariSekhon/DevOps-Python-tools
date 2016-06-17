@@ -24,7 +24,7 @@ PyYAML==3.11
 requests==2.9.1
 sasl==0.1.3
 six==1.10.0
-snakebite==2.8.2
+snakebite[kerberos]==2.8.2
 thrift==0.9.3
 thrift-sasl==0.1.0
 traceback2==1.4.0
