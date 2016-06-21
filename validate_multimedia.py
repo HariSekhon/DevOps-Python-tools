@@ -59,7 +59,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.7'
+__version__ = '0.7.8'
 
 class MediaValidatorTool(CLI):
 
@@ -166,11 +166,11 @@ class MediaValidatorTool(CLI):
     def check_media_file(self, filename):
         valid_media_msg = '%s => OK' % filename
         invalid_media_msg = '%s => INVALID' % filename
+        cmd = self.validate_cmd
+        log.debug('cmd: %s %s', cmd, filename)
+        log.info('verifying {0}'.format(filename))
+        # cmd = self.validate_cmd.format(filename)
         try:
-            # cmd = self.validate_cmd.format(filename)
-            cmd = self.validate_cmd
-            log.debug('cmd: %s %s', cmd, filename)
-            log.info('verifying {0}'.format(filename))
             # capturing stderr to stdout because ffprobe prints to stderr in all cases
             # Python 2.7+
             #subprocess.check_output(cmd.split() + [filename], stderr=subprocess.STDOUT)
@@ -190,6 +190,8 @@ class MediaValidatorTool(CLI):
                 self.failed = True
                 return False
             die(invalid_media_msg)
+        except OSError as _:
+            die("OSError: '{0}' when running '{1} {2}'", _, cmd, filename)
 
 
 if __name__ == '__main__':
