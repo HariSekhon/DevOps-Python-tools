@@ -32,6 +32,7 @@ sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
     from harisekhon import CLI
+    from harisekhon.utils import prog
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
     print("Did you remember to build the project by running 'make'?", file=sys.stderr)
@@ -52,7 +53,7 @@ class TimeoutCommand(CLI): # pylint: disable=too-few-public-methods
         # super().__init__()
         # special case to make all following args belong to the passed in command and not to this program
         self._CLI__parser.disable_interspersed_args()
-        self._CLI__parser.set_usage('timeout [options] <your_command> <your_args> ...')
+        self._CLI__parser.set_usage('{prog} [options] <your_command> <your_args> ...'.format(prog=prog))
 
     def run(self):
         cmd = ' '.join(self.args)
