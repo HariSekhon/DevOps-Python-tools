@@ -162,6 +162,8 @@ class DockerfileGitBranchCheckTool(CLI):
             os.chdir(original_dir)
 
     def check_path(self, path, branch):
+        branch_base = branch.rsplit('-', 1)[0]
+        log.debug('branch_base = %s', branch_base)
         status = True
         if os.path.isfile(path):
             return self.check_file(path, branch)
@@ -173,9 +175,7 @@ class DockerfileGitBranchCheckTool(CLI):
                 if os.path.islink(subpath):
                     subpath = os.path.realpath(subpath)
                 if os.path.isdir(subpath):
-                    branch_base = branch.rsplit('-', 1)[0]
                     subpath_base = os.path.basename(subpath)
-                    log.debug('branch_base = %s', branch_base)
                     log.debug('subpath_base = %s', subpath_base)
                     if subpath_base == branch_base or subpath_base == branch_base + '-dev':
                         if not self.check_path(subpath, branch):
@@ -230,7 +230,7 @@ class DockerfileGitBranchCheckTool(CLI):
                     log.debug("found arg '%s'", argversion.group(0))
                     log.debug("checking arg group 1 '%s' == branch_base '%s'", argversion.group(1), branch_base)
                     if argversion.group(1).lower() == branch_base.lower().replace('-', '_'):
-                        log.debug("arg '%s'  matches branch base '%s'", argversion.group(1), branch_base)
+                        log.debug("arg '%s' matches branch base '%s'", argversion.group(1), branch_base)
                         log.debug("comparing '%s' contents to version derived from branch '%s' => '%s'",
                                   filename, branch, branch_version)
                         if not isVersion(branch_version):
