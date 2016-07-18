@@ -8,7 +8,7 @@ docker-py==1.8.1
 # for Elasticsearch 1.x
 #elasticsearch>=1.0.0,<2.0.0
 # fails on requiring newer version of setuptools
-GitPython==2.0.2
+GitPython==2.0.7
 happybase==0.9
 #impyla==0.12.0
 Jinja2==2.8
