@@ -65,7 +65,7 @@ Some common options also support optional environment variables for convenience 
 - ```spark_csv_to_parquet.py``` - PySpark CSV => Parquet converter, supports both inferred and explicit schemas
 - ```spark_json_to_avro.py``` - PySpark JSON => Avro converter
 - ```spark_json_to_parquet.py``` - PySpark JSON => Parquet converter
-- ```dockerhub_show_tags.py``` - shows DockerHub tags - Docker CLI doesn't support this yet but it's a very useful thing to be able to see live on the command line (also useful in shell scripts - use ```-q``` to return only the tags for piping to other commands)
+- ```dockerhub_show_tags.py``` - shows DockerHub tags - Docker CLI doesn't support this yet but it's a very useful thing to be able to see live on the command line or use in shell scripts (use ```-q``` to return only the tags for piping to other commands)
 - ```dockerhub_search.py``` - search DockerHub with a configurable number of returned results (official ```docker search``` is limited to only 25 results)
 - ```dockerfiles_check_git*.py``` - check Git tags & branches align with the containing Dockerfile's ```ARG *_VERSION```
 - ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user (there is also a perl version in my [Tools](https://github.com/harisekhon/tools) repo)
