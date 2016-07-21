@@ -71,7 +71,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import die, ERRORS, log, log_option, uniq_list_ordered, isVersion, validate_regex
+    from harisekhon.utils import die, ERRORS, find_git_root, log, log_option, uniq_list_ordered, isVersion, validate_regex
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -80,7 +80,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.4'
 
 class DockerfileGitTagCheckTool(CLI):
 
@@ -128,7 +128,7 @@ class DockerfileGitTagCheckTool(CLI):
 
     def check_git_tags_dockerfiles(self, target):
         target = os.path.abspath(target)
-        gitroot = self.find_git_root(target)
+        gitroot = find_git_root(target)
         log.debug("finding tags for target '{0}'".format(target))
         repo = git.Repo(gitroot)
         tags = [str(x).split('/')[-1] for x in repo.tags]
@@ -246,21 +246,6 @@ class DockerfileGitTagCheckTool(CLI):
                                       format(self.invalid_git_tags_msg, tag_version, found_version))
                             return False
         return True
-
-    @staticmethod
-    def find_git_root(target):
-        target = os.path.abspath(target)
-        log.debug("finding git root for target '{0}'".format(target))
-        gitroot = target
-        while gitroot and gitroot != '/':
-            log.debug("trying '{0}'".format(gitroot))
-            # os.path.isdir doesn't work on git submodule Dockerfiles in PyTools repo :-/
-            if os.path.exists(os.path.join(gitroot, '.git')):
-                log.debug("found git root for target '{0}': '{1}'".format(target, gitroot))
-                return gitroot
-            gitroot = os.path.dirname(gitroot)
-        die("could not find git root for target '{0}' - is this located in a Git repository?".
-            format(target))
 
 # a per file method, better for recursing across git submodules but much more brute force as a cartesian product of
 # tags vs Dockerfiles rather than a single pass of tags within one repo
