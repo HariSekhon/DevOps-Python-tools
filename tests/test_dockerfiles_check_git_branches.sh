@@ -23,7 +23,7 @@ cd "$srcdir/.."
 
 . "bash-tools/utils.sh"
 
-section "Testing DockerfileS Check Git branches"
+section "Testing Dockerfiles Check Git branches"
 
 check './dockerfiles_check_git_branches.py Dockerfiles' "Dockerfiles Check Git branches of submodule Dockerfiles/"
 
