@@ -109,7 +109,8 @@ class GitCheckBranchesUpstream(CLI):
             expected = '{0}/{1}'.format(self.origin, branch)
             tracking_branch = str(branch.tracking_branch())
             if tracking_branch == expected:
-                log.info("OK: branch '{0}' is tracking '{1}'".format(branch, tracking_branch))
+                log.info("OK: repo '{0}' branch '{1}' is tracking '{2}'"
+                         .format(gitroot, branch, tracking_branch))
             else:
                 self.status = "ERROR"
                 log.error("BAD: branch '{0}' is tracking '{1}' (expected '{2}')"
