@@ -16,7 +16,7 @@
 
 """
 
-Tool to check Git branches have their upstream set consistently
+Tool to check Git branches have their upstream origin branch set consistently
 
 Mainly written for my https://github.com/harisekhon/Dockerfiles repo
 which has over 100 branches which get merged, pulled and pushed around
@@ -45,7 +45,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 class GitCheckBranchesUpstream(CLI):
@@ -89,7 +89,7 @@ class GitCheckBranchesUpstream(CLI):
         if self.status == "OK":
             log.info('SUCCESS - All Git branches are tracking the expected upstream origin branches')
         else:
-            log.critical('FAILED - Found Git branches not tracking the expected upstream origin branches')
+            log.critical('FAILED')
             sys.exit(ERRORS['CRITICAL'])
 
     def check_git_branches_upstream(self, target):
@@ -103,6 +103,9 @@ class GitCheckBranchesUpstream(CLI):
         if self.branch_prefix is not None:
             log.debug('restricting to branches matching branch prefix')
             branches = [x for x in branches if self.branch_prefix.match(str(x))]
+            if not branches:
+                log.error("No branches matching '%s' for target '%s'", self.get_opt('branch_prefix'), target)
+                self.status = 'NO BRANCHES'
         #if log.isEnabledFor(logging.DEBUG):
         #log.debug('\n\nbranches for target %s:\n\n%s\n', target, '\n'.join(list(branches)))
         for branch in branches:
