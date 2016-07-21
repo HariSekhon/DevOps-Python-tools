@@ -104,6 +104,10 @@ yum-packages:
 	# needed to build python-snappy for avro module
 	rpm -q snappy-devel 	 || $(SUDO) yum install -y snappy-devel
 
+.PHONY: sonar
+sonar:
+	sonar-scanner
+
 .PHONY: test
 test:
 	cd pylib && make test
