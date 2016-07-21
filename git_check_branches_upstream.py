@@ -38,14 +38,14 @@ libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import die, ERRORS, log, log_option, uniq_list_ordered, validate_regex
+    from harisekhon.utils import die, ERRORS, find_git_root, log, log_option, uniq_list_ordered, validate_regex
     from harisekhon import CLI
 except ImportError as _:
     print(traceback.format_exc(), end='')
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.3'
 
 
 class GitCheckBranchesUpstream(CLI):
@@ -94,7 +94,7 @@ class GitCheckBranchesUpstream(CLI):
 
     def check_git_branches_upstream(self, target):
         target = os.path.abspath(target)
-        gitroot = self.find_git_root(target)
+        gitroot = find_git_root(target)
         if gitroot is None:
             die('Failed to find git root for target {0}'.format(target))
         log.debug("finding branches for target '{0}'".format(target))
@@ -118,21 +118,6 @@ class GitCheckBranchesUpstream(CLI):
                 self.status = "ERROR"
                 log.error("BAD: branch '{0}' is tracking '{1}' (expected '{2}')"
                           .format(branch, tracking_branch, expected))
-
-    # move to pylib and add unit tests
-    @staticmethod
-    def find_git_root(target):
-        target = os.path.abspath(target)
-        log.debug("finding git root for target '{0}'".format(target))
-        gitroot = target
-        while gitroot and gitroot != '/':
-            log.debug("trying '{0}'".format(gitroot))
-            # os.path.isdir doesn't work on git submodule Dockerfiles in PyTools repo :-/
-            if os.path.exists(os.path.join(gitroot, '.git')):
-                log.debug("found git root for target '{0}': '{1}'".format(target, gitroot))
-                return gitroot
-            gitroot = os.path.dirname(gitroot)
-        return None
 
 
 if __name__ == '__main__':
