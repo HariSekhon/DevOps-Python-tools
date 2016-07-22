@@ -25,14 +25,16 @@ from __future__ import print_function
 #from __future__ import unicode_literals
 
 import os
+import psutil
 import subprocess
 import sys
+import time
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
     from harisekhon import CLI
-    from harisekhon.utils import prog
+    from harisekhon.utils import plural, prog, qquit
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
     print("Did you remember to build the project by running 'make'?", file=sys.stderr)
@@ -40,7 +42,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 # Timeout behaviour itself is handled by my std base class CLI
@@ -54,6 +56,12 @@ class TimeoutCommand(CLI): # pylint: disable=too-few-public-methods
         # special case to make all following args belong to the passed in command and not to this program
         self._CLI__parser.disable_interspersed_args()
         self._CLI__parser.set_usage('{prog} [options] <your_command> <your_args> ...'.format(prog=prog))
+
+    def timeout_handler(self, signum, frame): # pylint: disable=unused-argument
+        for child in psutil.Process().children():
+            child.kill()
+        time.sleep(1)
+        qquit('UNKNOWN', 'self timed out after %d second%s' % (self.timeout, plural(self.timeout)))
 
     def run(self):
         cmd = ' '.join(self.args)
