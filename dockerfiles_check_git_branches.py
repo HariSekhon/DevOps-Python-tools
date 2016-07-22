@@ -134,7 +134,7 @@ class DockerfileGitBranchCheckTool(CLI):
 
     def check_git_branches_dockerfiles(self, target):
         target = os.path.abspath(target)
-        gitroot = self.find_git_root(target)
+        gitroot = find_git_root(target)
         if gitroot is None:
             die('Failed to find git root for target {0}'.format(target))
         log.debug("finding branches for target '{0}'".format(target))
