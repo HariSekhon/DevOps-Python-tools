@@ -14,6 +14,10 @@
 #  https://www.linkedin.com/in/harisekhon
 #
 
+# TODO: missing centos-scala + centos-java which really really need this cover
+
+# TODO: missing kafka branches and dirs right now
+
 r"""
 
 Tool to validate Git branches are aligned with any Dockerfiles in that revision which correspond with the branch prefix
@@ -55,6 +59,8 @@ must all be contained in the same Git repo (not crossing git submodule boundarie
 This is one of the my less generic tools in the public domain. It requires your use of git branches matches your use of
 Dockerfile ARG. You're welcome to modify it to suit your needs or make it more generic (in which case please
 re-submit improvements in the form for GitHub pull requests).
+
+This was primarily written to test the Dockerfiles repository at https://github.com/HariSekhon/Dockerfiles
 
 """
 
@@ -128,7 +134,9 @@ class DockerfileGitBranchCheckTool(CLI):
 
     def check_git_branches_dockerfiles(self, target):
         target = os.path.abspath(target)
-        gitroot = find_git_root(target)
+        gitroot = self.find_git_root(target)
+        if gitroot is None:
+            die('Failed to find git root for target {0}'.format(target))
         log.debug("finding branches for target '{0}'".format(target))
         repo = git.Repo(gitroot)
         branches = [str(x).split('/')[-1] for x in repo.refs if isinstance(x, git.refs.remote.RemoteReference)]
