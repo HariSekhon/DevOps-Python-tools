@@ -53,6 +53,11 @@ It is more efficient to give a directory tree of Dockerfiles than individual Doc
 must all be contained in the same Git repo (not crossing git submodule boundaries etc, otherwise you must do a
 'find -exec' using this program instead).
 
+There are a couple extra conditions now too - instead of checking ARG {NAME}_VERSION where {NAME} matches branch base,
+this turns out to be too restrictive for branches with multiple versions like kafka-2.10-0.9 so this program now
+expects that ARG {NAME}_VERSION is in the same order as the versions of the branch name, ie SCALA_VERSION comes before
+KAFKA_VERSION to match the branch's version order.
+
 This is one of the my less generic tools in the public domain. It requires your use of git branches matches your use of
 Dockerfile ARG. You're welcome to modify it to suit your needs or make it more generic (in which case please
 re-submit improvements in the form for GitHub pull requests).
@@ -96,7 +101,7 @@ class DockerfileGitBranchCheckTool(CLI):
         # super().__init__()
         self.failed = False
                                        # ARG ZOOKEEPER_VERSION=3.4.8
-        self.arg_regex = re.compile(r'^\s*ARG\s+([\w_]+)_VERSION=([\w\.]+)\s*')
+        self.arg_regex = re.compile(r'^\s*ARG\s+([\w_]+_VERSION)=([\w\.]+)\s*')
         self.branch_prefix = None
         self.branch_regex = re.compile(r'^(.*?)(?:-({version_regex}))?-[A-Za-z]*({version_regex})$'
                                        .format(version_regex=version_regex))
@@ -152,7 +157,6 @@ class DockerfileGitBranchCheckTool(CLI):
         log.info('Dockerfile validation SUCCEEDED')
 
     def check_git_branches_dockerfiles(self, target):
-        target = os.path.abspath(target)
         gitroot = find_git_root(target)
         if gitroot is None:
             die('Failed to find git root for target {0}'.format(target))
@@ -258,7 +262,6 @@ class DockerfileGitBranchCheckTool(CLI):
         return status
 
     def check_file(self, filename, branch):
-        filename = os.path.abspath(filename)
         if os.path.basename(filename) != 'Dockerfile':
             return True
         parent = os.path.basename(os.path.dirname(filename))
@@ -267,8 +270,8 @@ class DockerfileGitBranchCheckTool(CLI):
             log.debug("skipping '{0}' as it's parent directory '{1}' doesn't match branch base '{2}'".
                       format(filename, parent, branch_base))
             return True
-        self.valid_git_branches_msg = '%s => Dockerfile Git branches OK' % filename
-        self.invalid_git_branches_msg = "%s => Dockerfile Git branches MISMATCH in branch '%s'" % (filename, branch)
+        self.valid_git_branches_msg = '%s => OK: git branch %s' % (filename, branch)
+        self.invalid_git_branches_msg = "%s => MISMATCH: in branch '%s'" % (filename, branch)
         try:
             if not self.check_dockerfile_arg(filename, branch):
                 self.failed = True
@@ -292,10 +295,12 @@ class DockerfileGitBranchCheckTool(CLI):
                 if argversion:
                     self.dockerfiles_checked.add(filename)
                     log.debug("found arg '%s'", argversion.group(0))
+                    arg_var = argversion.group(1)
                     # this is too restrictive and prevents finding a lot of issues with
                     # more complex naming conventions for kafka, centos-java/scala etc
+                    # instead we now expect ARG *_VERSION to be in the same order as the version numbers in branch name
                     #log.debug("checking arg group 1 '%s' == branch_base '%s'", argversion.group(1), branch_base)
-                    #if argversion.group(1).lower() == branch_base.lower().replace('-', '_'):
+                    #if self.normalize_name(arg_var) == self.normalize_name(branch_base).replace('-', '_'):
                     if version_index >= len(branch_versions):
                         return True
                     branch_version = branch_versions[version_index]
@@ -308,11 +313,11 @@ class DockerfileGitBranchCheckTool(CLI):
                     found_version = argversion.group(2)
                     #if branch_version == found_version or branch_version == found_version.split('.', 2)[0]:
                     if found_version[0:len(branch_version)] == branch_version:
-                        log.info("{0} (branch version '{1}' matches arg version '{2}')".
-                                 format(self.valid_git_branches_msg, branch_version, found_version))
+                        log.info("{0} version '{1}' matches {2}={3}".
+                                 format(self.valid_git_branches_msg, branch_version, arg_var, found_version))
                     else:
-                        log.error('{0} ({1} branch vs {2} Dockerfile ARG)'.
-                                  format(self.invalid_git_branches_msg, branch_version, found_version))
+                        log.error('{0} version {1} vs Dockerfile ARG {2}={3}'.
+                                  format(self.invalid_git_branches_msg, branch_version, arg_var, found_version))
                         self.dockerfiles_failed += 1
                         self.branches_failed.add(branch)
                         return False
