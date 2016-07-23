@@ -69,13 +69,14 @@ from __future__ import print_function
 import os
 import re
 import sys
+import traceback
 import git
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
     from harisekhon.utils import die, ERRORS, log, log_option
-    from harisekhon.utils import find_git_root, uniq_list_ordered, isVersion, validate_regex
+    from harisekhon.utils import find_git_root, uniq_list_ordered, isVersion, validate_regex, version_regex
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -84,7 +85,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.5'
 
 class DockerfileGitBranchCheckTool(CLI):
 
@@ -97,10 +98,18 @@ class DockerfileGitBranchCheckTool(CLI):
                                        # ARG ZOOKEEPER_VERSION=3.4.8
         self.arg_regex = re.compile(r'^\s*ARG\s+([\w_]+)_VERSION=([\w\.]+)\s*')
         self.branch_prefix = None
+        self.branch_regex = re.compile(r'^(.*?)(?:-({version_regex}))?-[A-Za-z]*({version_regex})$'
+                                       .format(version_regex=version_regex))
+        print('regex pattern = ' + self.branch_regex.pattern)
         self.timeout_default = 86400
         self.valid_git_branches_msg = None
         self.invalid_git_branches_msg = None
         self.verbose_default = 2
+        self.dockerfiles_checked = set()
+        self.dockerfiles_failed = 0
+        self.branches_checked = 0
+        self.branches_skipped = set()
+        self.branches_failed = set()
 
     def add_options(self):
         self.add_opt('-b', '--branch-prefix', help='Branch prefix regex to check')
@@ -125,6 +134,18 @@ class DockerfileGitBranchCheckTool(CLI):
                 die("path '%s' could not be determined as either a file or directory" % arg)
         for arg in args:
             self.check_git_branches_dockerfiles(arg)
+        branches_skipped = len(self.branches_skipped)
+        if branches_skipped > 0:
+            log.warn('{0} branches skipped for not matching expected naming format'
+                     .format(branches_skipped))
+        log.info('{0} Dockerfiles checked across {1} branches'
+                 .format(len(self.dockerfiles_checked), self.branches_checked))
+        branches_failed = len(self.branches_failed)
+        _ = '{0} Dockerfiles failed validation across {1} branches'.format(self.dockerfiles_failed, branches_failed)
+        if branches_failed > 0:
+            log.error(_)
+        else:
+            log.info(_)
         if self.failed:
             log.error('Dockerfile validation FAILED')
             sys.exit(ERRORS['CRITICAL'])
@@ -137,7 +158,9 @@ class DockerfileGitBranchCheckTool(CLI):
             die('Failed to find git root for target {0}'.format(target))
         log.debug("finding branches for target '{0}'".format(target))
         repo = git.Repo(gitroot)
-        branches = [str(x).split('/')[-1] for x in repo.refs if isinstance(x, git.refs.remote.RemoteReference)]
+        branches = [str(x) for x in repo.refs if isinstance(x, git.refs.remote.RemoteReference)]
+        branches = [x.split('/')[-1] for x in branches]
+        branches = [x for x in branches if x not in ('HEAD', 'master')]
         if self.branch_prefix is not None:
             log.debug('restricting to branches matching branch prefix')
             branches = [x for x in branches if self.branch_prefix.match(x)]
@@ -154,23 +177,47 @@ class DockerfileGitBranchCheckTool(CLI):
                 pass
             for branch in branches:
                 log.debug("checking branch '%s' Dockerfiles for target '%s'", branch, target)
+                self.branches_checked += 1
                 try:
                     repo.git.checkout(branch)
                 except git.exc.GitCommandError as _:
                     die(_)
                 self.check_path(target, branch)
         except Exception as _:  # pylint: disable=broad-except
-            die(_)
+            traceback.print_exc()
+            sys.exit(1)
         finally:
             log.debug("returning to original checkout '%s'", original_checkout)
             repo.git.checkout(original_checkout)
             log.debug("cd %s", original_dir)
             os.chdir(original_dir)
 
-    def check_path(self, path, branch):
-        branch_base = branch.rsplit('-', 1)[0]
+    def branch_version(self, branch):
+        branch_base = None
+        branch_versions = []
+        # if ...-x.y-x.y
+        match = self.branch_regex.match(branch)
+        if match:
+            groups = match.groups()
+            #log.debug('groups = %s', groups)
+            branch_base = groups[0]
+            if groups[1] is not None:
+                branch_versions.append(groups[1])
+                branch_versions.append(groups[2])
+            else:
+                branch_versions.append(groups[2])
+        else:
+            log.warn("Failed to match branch format for branch '{0}'".format(branch) +
+                     ", code needs extension for this branch naming format")
+            self.branches_skipped.add(branch)
+            return ('', [])
         log.debug('branch_base = %s', branch_base)
+        log.debug('branch_versions = %s', branch_versions)
+        return (branch_base, branch_versions)
+
+    def check_path(self, path, branch):
         status = True
+        (branch_base, _) = self.branch_version(branch)
         if os.path.isfile(path):
             return self.check_file(path, branch)
         elif os.path.isdir(path):
@@ -205,7 +252,7 @@ class DockerfileGitBranchCheckTool(CLI):
         if os.path.basename(filename) != 'Dockerfile':
             return True
         parent = os.path.basename(os.path.dirname(filename))
-        branch_base = branch.rsplit('-', 1)[0]
+        (branch_base, _) = self.branch_version(branch)
         if branch_base.lower() not in [parent.lower(), parent.rstrip('-dev').lower()]:
             log.debug("skipping '{0}' as it's parent directory '{1}' doesn't match branch base '{2}'".
                       format(filename, parent, branch_base))
@@ -226,33 +273,40 @@ class DockerfileGitBranchCheckTool(CLI):
     def check_dockerfile_arg(self, filename, branch):
         log.debug('check_dockerfile_arg({0}, {1})'.format(filename, branch))
         branch_base = str(branch).replace('-dev', '')
-        (branch_base, branch_version) = branch_base.rsplit('-', 1)
-        log.debug('branch_base = {0}'.format(branch_base))
-        log.debug('branch_version = {0}'.format(branch_version))
+        (branch_base, branch_versions) = self.branch_version(branch)
         with open(filename) as filehandle:
+            version_index = 0
             for line in filehandle:
                 #log.debug(line.strip())
                 argversion = self.arg_regex.match(line.strip())
                 if argversion:
+                    self.dockerfiles_checked.add(filename)
                     log.debug("found arg '%s'", argversion.group(0))
-                    log.debug("checking arg group 1 '%s' == branch_base '%s'", argversion.group(1), branch_base)
-                    if argversion.group(1).lower() == branch_base.lower().replace('-', '_'):
-                        log.debug("arg '%s' matches branch base '%s'", argversion.group(1), branch_base)
-                        log.debug("comparing '%s' contents to version derived from branch '%s' => '%s'",
-                                  filename, branch, branch_version)
-                        if not isVersion(branch_version):
-                            die("unrecognized branch version '{0}' for branch_base '{1}'"
-                                .format(branch_version, branch_base))
-                        found_version = argversion.group(2)
-                        #if branch_version == found_version or branch_version == found_version.split('.', 2)[0]:
-                        if found_version[0:len(branch_version)] == branch_version:
-                            log.info("{0} (branch version '{1}' matches arg version '{2}')".
-                                     format(self.valid_git_branches_msg, branch_version, found_version))
-                            return True
-                        else:
-                            log.error('{0} ({1} branch vs {2} Dockerfile ARG)'.
-                                      format(self.invalid_git_branches_msg, branch_version, found_version))
-                            return False
+                    # this is too restrictive and prevents finding a lot of issues with
+                    # more complex naming conventions for kafka, centos-java/scala etc
+                    #log.debug("checking arg group 1 '%s' == branch_base '%s'", argversion.group(1), branch_base)
+                    #if argversion.group(1).lower() == branch_base.lower().replace('-', '_'):
+                    if version_index >= len(branch_versions):
+                        return True
+                    branch_version = branch_versions[version_index]
+                    #log.debug("arg '%s' matches branch base '%s'", argversion.group(1), branch_base)
+                    log.debug("comparing '%s' contents to version derived from branch '%s' => '%s'",
+                              filename, branch, branch_version)
+                    if not isVersion(branch_version):
+                        die("unrecognized branch version '{0}' for branch_base '{1}'"
+                            .format(branch_version, branch_base))
+                    found_version = argversion.group(2)
+                    #if branch_version == found_version or branch_version == found_version.split('.', 2)[0]:
+                    if found_version[0:len(branch_version)] == branch_version:
+                        log.info("{0} (branch version '{1}' matches arg version '{2}')".
+                                 format(self.valid_git_branches_msg, branch_version, found_version))
+                    else:
+                        log.error('{0} ({1} branch vs {2} Dockerfile ARG)'.
+                                  format(self.invalid_git_branches_msg, branch_version, found_version))
+                        self.dockerfiles_failed += 1
+                        self.branches_failed.add(branch)
+                        return False
+                    version_index += 1
         return True
 
 
