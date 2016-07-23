@@ -217,7 +217,14 @@ class DockerfileGitBranchCheckTool(CLI):
 
     @staticmethod
     def normalize_name(name):
-        return name.split('-dev')[0].split('cloud')[0].lower()
+        # allow all -dev dirs to match same branch
+        # special case for solr -> solrcloud dirs
+        name2 = name
+        name2 = re.sub(pattern=r'-dev$', repl='', string=name2)
+        name2 = re.sub(pattern=r'cloud$', repl='', string=name2)
+        name2 = name2.lower()
+        log.debug("normalized name '%s' => '%s'", name, name2)
+        return name2
 
     def check_path(self, path, branch):
         status = True
@@ -234,8 +241,6 @@ class DockerfileGitBranchCheckTool(CLI):
                 if os.path.isdir(subpath):
                     subpath_base = os.path.basename(subpath)
                     #log.debug('subpath_base = %s', subpath_base)
-                    # special case for solr -> solrcloud dirs
-                    # allow all -dev dirs to match same branch
                     if self.normalize_name(subpath_base) == self.normalize_name(branch_base):
                         if not self.check_path(subpath, branch):
                             status = False
