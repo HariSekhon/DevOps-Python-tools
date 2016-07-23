@@ -229,9 +229,13 @@ class DockerfileGitBranchCheckTool(CLI):
                     subpath = os.path.realpath(subpath)
                 if os.path.isdir(subpath):
                     subpath_base = os.path.basename(subpath)
-                    log.debug('subpath_base = %s', subpath_base)
+                    #log.debug('subpath_base = %s', subpath_base)
+                    # special case for solr -> solrcloud dirs
+                    # allow all -dev dirs to match same branch
+                    subpath_base = subpath_base.split('-dev')[0]
+                    #log.debug('subpath_base = %s', subpath_base)
                     if subpath_base == branch_base or \
-                       subpath_base == branch_base + '-dev':
+                       subpath_base == branch_base + 'cloud':
                         if not self.check_path(subpath, branch):
                             status = False
                 elif os.path.isfile(subpath):
@@ -252,8 +256,10 @@ class DockerfileGitBranchCheckTool(CLI):
         if os.path.basename(filename) != 'Dockerfile':
             return True
         parent = os.path.basename(os.path.dirname(filename))
+        parent_base = parent.split('-dev')[0].lower()
+        log.debug('parent_base = %s', parent_base)
         (branch_base, _) = self.branch_version(branch)
-        if branch_base.lower() not in [parent.lower(), parent.rstrip('-dev').lower()]:
+        if branch_base.lower() not in [parent_base, parent_base + 'cloud', parent_base.split('cloud')[0]]:
             log.debug("skipping '{0}' as it's parent directory '{1}' doesn't match branch base '{2}'".
                       format(filename, parent, branch_base))
             return True
