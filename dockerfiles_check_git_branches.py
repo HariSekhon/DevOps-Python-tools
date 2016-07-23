@@ -14,30 +14,27 @@
 #  https://www.linkedin.com/in/harisekhon
 #
 
-# TODO: missing centos-scala + centos-java which really really need this cover
-
-# TODO: missing kafka branches and dirs right now
-
 r"""
 
-Tool to validate Git branches are aligned with any Dockerfiles in that revision which correspond with the branch prefix
+Tool to validate Git branches are aligned with any Dockerfiles in that revision which correspond with the brancVh prefix
 
 Recurses any given directories to find all Dockerfiles and checks their ARG *_VERSION line in each branch
 to ensure they're both aligned.
 
 This requires the git branching and Dockerfile ARG to be aligned in such as way that 'ARG NAME_VERSION=<version>'
-corresponds to Git branch 'NAME-<version>' where NAME matches regex '\w+' and <version> is in the form 'x.y[.z]' where if
-git branch is at least a prefix of the Dockerfiles ARG version (eg. solr-4 matches ARG SOLR_VERSION=4 and
-ARG SOLR_VERSION=4.10).
+corresponds to Git branch 'NAME-<version>' where NAME matches regex '\w+' and <version> is in the form 'x.y[.z]' where
+if git branch is at least a prefix of the Dockerfiles ARG version (eg. solr-4 matches ARG SOLR_VERSION=4 and ARG
+SOLR_VERSION=4.10).
 
-Additionally, git branches of NAME-dev-<version> are stripped of '-dev' and assumed to still use ARG NAME_VERSION, and the
-parent directory name for the Dockerfile must match the branch base without the version (but including the -dev part) in
-order to disambiguate between things like SOLRCLOUD_VERSION for either solrcloud/Dockerfile or solrcloud-dev/Docekrfile
+Additionally, git branches of NAME-dev-<version> are stripped of '-dev' and assumed to still use ARG NAME_VERSION, and
+the parent directory name for the Dockerfile must match the branch base without the version (but including the -dev
+part) in order to disambiguate between things like SOLRCLOUD_VERSION for either solrcloud/Dockerfile or
+solrcloud-dev/Dockerfile.
 
-Beware this will attempt to do a git checkout of all branches and test containing Dockerfiles under given paths in each branch
-revision. If the git checkout is 'dirty' (ie has uncommitted changes) it will prevent checking out the branch, the program
-will detect this and exit, leaving you to decide what to do. In normal circumstances it will return to the original
-branch/branch checkout when complete.
+Beware this will attempt to do a git checkout of all branches and test containing Dockerfiles under given paths in each
+branch revision. If the git checkout is 'dirty' (ie has uncommitted changes) it will prevent checking out the branch,
+the program will detect this and exit, leaving you to decide what to do. In normal circumstances it will return to the
+original branch/branch checkout when complete.
 
 Prematurely terminating this program can leave the git checkout in an inconsistent state, although all catchable
 exceptions are caught to return to original state. If you end up in an inconsistent state just git reset and do a
@@ -47,10 +44,10 @@ Recommended to run this on a non-working git checkout to make it easy to reset s
 issues eg. run inside your CI system or a secondary git clone location.
 
 Originally this worked on a file-by-file basis which is better when recursing directories across git submodules, but
-was the least efficient way of doing it so I've rewritten it to do a single pass of all branches and check all Dockerfiles
-in given directories, hence it's more efficient to give this program the directory containing the Dockerfiles than each
-individual Dockerfile which would result in a similar behaviour to the original, multiplying each Dockerfile by the
-number of branches and doing that many checkouts.
+was the least efficient way of doing it so I've rewritten it to do a single pass of all branches and check all
+Dockerfiles in given directories, hence it's more efficient to give this program the directory containing the
+Dockerfiles than each individual Dockerfile which would result in a similar behaviour to the original, multiplying each
+Dockerfile by the number of branches and doing that many checkouts.
 
 It is more efficient to give a directory tree of Dockerfiles than individual Dockerfiles... but the caveat is that they
 must all be contained in the same Git repo (not crossing git submodule boundaries etc, otherwise you must do a
@@ -77,7 +74,8 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import die, ERRORS, find_git_root, log, log_option, uniq_list_ordered, isVersion, validate_regex
+    from harisekhon.utils import die, ERRORS, log, log_option
+    from harisekhon.utils import find_git_root, uniq_list_ordered, isVersion, validate_regex
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -185,7 +183,8 @@ class DockerfileGitBranchCheckTool(CLI):
                 if os.path.isdir(subpath):
                     subpath_base = os.path.basename(subpath)
                     log.debug('subpath_base = %s', subpath_base)
-                    if subpath_base == branch_base or subpath_base == branch_base + '-dev':
+                    if subpath_base == branch_base or \
+                       subpath_base == branch_base + '-dev':
                         if not self.check_path(subpath, branch):
                             status = False
                 elif os.path.isfile(subpath):
@@ -207,7 +206,7 @@ class DockerfileGitBranchCheckTool(CLI):
             return True
         parent = os.path.basename(os.path.dirname(filename))
         branch_base = branch.rsplit('-', 1)[0]
-        if branch_base.lower() not in [ parent.lower(), parent.rstrip('-dev').lower()]:
+        if branch_base.lower() not in [parent.lower(), parent.rstrip('-dev').lower()]:
             log.debug("skipping '{0}' as it's parent directory '{1}' doesn't match branch base '{2}'".
                       format(filename, parent, branch_base))
             return True
@@ -242,7 +241,8 @@ class DockerfileGitBranchCheckTool(CLI):
                         log.debug("comparing '%s' contents to version derived from branch '%s' => '%s'",
                                   filename, branch, branch_version)
                         if not isVersion(branch_version):
-                            die("unrecognized branch version '{0}' for branch_base '{1}'".format(branch_version, branch_base))
+                            die("unrecognized branch version '{0}' for branch_base '{1}'"
+                                .format(branch_version, branch_base))
                         found_version = argversion.group(2)
                         #if branch_version == found_version or branch_version == found_version.split('.', 2)[0]:
                         if found_version[0:len(branch_version)] == branch_version:
