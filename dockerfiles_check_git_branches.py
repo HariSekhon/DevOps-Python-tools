@@ -105,7 +105,6 @@ class DockerfileGitBranchCheckTool(CLI):
         self.branch_prefix = None
         self.branch_regex = re.compile(r'^(.*?)(?:-({version_regex}))?-[A-Za-z]*({version_regex})$'
                                        .format(version_regex=version_regex))
-        print('regex pattern = ' + self.branch_regex.pattern)
         self.timeout_default = 86400
         self.valid_git_branches_msg = None
         self.invalid_git_branches_msg = None
