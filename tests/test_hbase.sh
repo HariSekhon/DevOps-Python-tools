@@ -47,8 +47,8 @@ export DOCKER_IMAGE="harisekhon/hbase"
 export DOCKER_CONTAINER="hbase-test"
 
 if ! is_docker_available; then
-    echo "Docker not available, skipping HBase checks"
-    exit 1
+    echo "WARNING: Docker not available, skipping HBase checks"
+    exit 0
 fi
 
 startupwait=50
