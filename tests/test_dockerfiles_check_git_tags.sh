@@ -25,13 +25,14 @@ cd "$srcdir/.."
 
 section "Testing DockerfileS Check Git Tags"
 
-if ! [ -d Dockerfiles ] && which git &>/dev/null; then
-    git clone https://github.com/harisekhon/Dockerfiles
-fi
 if which git &>dev/null; then
-    pushd Dockerfiles
-    git pull
-    popd
+    if ! [ -d Dockerfiles ]; then
+        git clone https://github.com/harisekhon/Dockerfiles
+    else
+        pushd Dockerfiles
+        git pull
+        popd
+    fi
 fi
 if [ -d Dockerfiles ]; then
     check './dockerfiles_check_git_tags.py Dockerfiles' "Dockerfiles Check Git Tags of submodule Dockerfiles/"
