@@ -25,7 +25,14 @@ cd "$srcdir/.."
 
 section "Testing DockerfileS Check Git Tags"
 
-check './dockerfiles_check_git_tags.py Dockerfiles' "Dockerfiles Check Git Tags of submodule Dockerfiles/"
+if ! [ -d Dockerfiles ] && which git &>/dev/null; then
+    git clone https://github.com/harisekhon/Dockerfiles
+fi
+if [ -d Dockerfiles ]; then
+    check './dockerfiles_check_git_tags.py Dockerfiles' "Dockerfiles Check Git Tags of submodule Dockerfiles/"
+else
+    echo "WARNING: Dockerfiles not present and git command not found to clone from github, skipping test"
+fi
 
 echo
 echo
