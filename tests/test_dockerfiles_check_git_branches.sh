@@ -28,6 +28,11 @@ section "Testing Dockerfiles Check Git branches"
 if ! [ -d Dockerfiles ] && which git &>/dev/null; then
     git clone https://github.com/harisekhon/Dockerfiles
 fi
+if which git &>dev/null; then
+    pushd Dockerfiles
+    git pull
+    popd
+fi
 if [ -d Dockerfiles ]; then
     check './dockerfiles_check_git_branches.py Dockerfiles' "Dockerfiles Check Git branches of submodule Dockerfiles/"
 else
