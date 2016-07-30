@@ -26,6 +26,7 @@ PARQUET_VERSION=1.5.0
 
 .PHONY: build
 build:
+	if [ -x /sbin/apk ];        then make apk-packages; fi
 	if [ -x /usr/bin/apt-get ]; then make apt-packages; fi
 	if [ -x /usr/bin/yum ];     then make yum-packages; fi
 	
@@ -61,6 +62,43 @@ build:
 	make spark-deps
 	@echo
 	@echo 'BUILD SUCCESSFUL (pytools)'
+
+.PHONY: apk-packages
+apk-packages:
+	$(SUDO) apk update
+	$(SUDO) apk add alpine-sdk
+	$(SUDO) apk add bash
+	$(SUDO) apk add cyrus-sasl-dev
+	$(SUDO) apk add gcc
+	$(SUDO) apk add git
+	$(SUDO) apk add krb5-dev
+	$(SUDO) apk add libffi-dev
+	$(SUDO) apk add linux-headers
+	$(SUDO) apk add make
+	$(SUDO) apk add openssl-dev
+	$(SUDO) apk add py-pip
+	$(SUDO) apk add python
+	$(SUDO) apk add python-dev
+	$(SUDO) apk add snappy-dev
+	$(SUDO) apk add wget
+	$(SUDO) apk add zip
+	# Spark Java Py4J gets java linking error without this
+	[ -f /lib/libc.musl-x86_64.so.1 ] && ! [ -e /lib/ld-linux-x86-64.so.2 ] && ln -sv /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2 
+
+.PHONY: apk-packages-remove
+apk-packages-remove:
+	$(SUDO) apk del alpine-sdk
+	$(SUDO) apk del bash
+	$(SUDO) apk del cyrus-sasl-dev
+	$(SUDO) apk del gcc
+	$(SUDO) apk del krb5-dev
+	$(SUDO) apk del libffi-dev
+	$(SUDO) apk del linux-headers
+	$(SUDO) apk del openssl-dev
+	$(SUDO) apk del python-dev
+	$(SUDO) apk del snappy-dev
+	$(SUDO) apk del wget
+	$(SUDO) apk del zip
 
 .PHONY: apt-packages
 apt-packages:
