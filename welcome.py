@@ -36,7 +36,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import ERRORS, isUser, which
+    from harisekhon.utils import ERRORS, isUser, which, printerr
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -88,6 +88,8 @@ class Welcome(CLI):
                     continue
                 break
             _.close()
+        else:
+            printerr("WARNING: 'last' command not found, will not be able to get last login information")
         if last:
             msg += 'last login was '
             last_user = re.sub(r'\s+.*$', '', last)
