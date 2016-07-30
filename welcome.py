@@ -36,7 +36,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import ERRORS, isUser
+    from harisekhon.utils import ERRORS, isUser, which
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -45,7 +45,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '1.4.2'
+__version__ = '2.0'
 
 class Welcome(CLI):
 
@@ -75,17 +75,19 @@ class Welcome(CLI):
             sys.exit(ERRORS['CRITICAL'])
         user = self.case_user(user)
         msg = 'Welcome %s - ' % user
-        _ = os.popen('last -100')
-        _.readline()
-        re_skip = re.compile(r'^(?:reboot|wtmp)|^\s*$')
         last = ''
-        for line in _:
-            last = line.rstrip('\n')
-            if re_skip.match(last):
-                last = ''
-                continue
-            break
-        _.close()
+        if which("last"):
+            _ = os.popen('last -100')
+            _.readline()
+            re_skip = re.compile(r'^(?:reboot|wtmp)|^\s*$')
+            last = ''
+            for line in _:
+                last = line.rstrip('\n')
+                if re_skip.match(last):
+                    last = ''
+                    continue
+                break
+            _.close()
         if last:
             msg += 'last login was '
             last_user = re.sub(r'\s+.*$', '', last)
