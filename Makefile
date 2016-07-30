@@ -75,6 +75,7 @@ apk-packages:
 	$(SUDO) apk add libffi-dev
 	$(SUDO) apk add linux-headers
 	$(SUDO) apk add make
+	which java &>/dev/null || $(SUDO) apk add openjdk8-jre-base
 	$(SUDO) apk add openssl-dev
 	$(SUDO) apk add py-pip
 	$(SUDO) apk add python
