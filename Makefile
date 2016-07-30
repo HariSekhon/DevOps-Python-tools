@@ -83,7 +83,7 @@ apk-packages:
 	$(SUDO) apk add wget
 	$(SUDO) apk add zip
 	# Spark Java Py4J gets java linking error without this
-	[ -f /lib/libc.musl-x86_64.so.1 ] && ! [ -e /lib/ld-linux-x86-64.so.2 ] && ln -sv /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2 
+	if [ -f /lib/libc.musl-x86_64.so.1 ]; then [ -e /lib/ld-linux-x86-64.so.2 ] || ln -sv /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2; fi
 
 .PHONY: apk-packages-remove
 apk-packages-remove:
