@@ -89,7 +89,6 @@ apk-packages:
 .PHONY: apk-packages-remove
 apk-packages-remove:
 	$(SUDO) apk del alpine-sdk
-	$(SUDO) apk del bash
 	$(SUDO) apk del cyrus-sasl-dev
 	$(SUDO) apk del gcc
 	$(SUDO) apk del krb5-dev
