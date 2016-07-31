@@ -25,7 +25,20 @@ cd "$srcdir/.."
 
 section "Testing Git check branches upstream"
 
-check './git_check_branches_upstream.py . Dockerfiles' "Git check branches upstream of local repo and Dockerfiles submodule"
+if which git &>dev/null; then
+    if ! [ -d Dockerfiles ]; then
+        git clone https://github.com/harisekhon/Dockerfiles
+    else
+        pushd Dockerfiles
+        git pull
+        popd
+    fi
+fi
+if [ -d Dockerfiles ]; then
+    check './git_check_branches_upstream.py . Dockerfiles' "Git check branches upstream of local repo and Dockerfiles submodule"
+else
+    echo "WARNING: Dockerfiles not present and git command not found to clone from github, skipping test"
+fi
 
 echo
 echo
