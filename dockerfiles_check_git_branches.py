@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
+__version__ = '0.6'
 
 class DockerfileGitBranchCheckTool(CLI):
 
@@ -169,9 +169,6 @@ class DockerfileGitBranchCheckTool(CLI):
             branches = [x for x in branches if self.branch_prefix.match(x)]
         #if log.isEnabledFor(logging.DEBUG):
         log.debug('\n\nbranches for target %s:\n\n%s\n', target, '\n'.join(branches))
-        original_dir = os.getcwd()
-        log.debug('cd %s', gitroot)
-        os.chdir(gitroot)
         original_checkout = 'master'
         try:
             try:
@@ -192,8 +189,6 @@ class DockerfileGitBranchCheckTool(CLI):
         finally:
             log.debug("returning to original checkout '%s'", original_checkout)
             repo.git.checkout(original_checkout)
-            log.debug("cd %s", original_dir)
-            os.chdir(original_dir)
 
     def branch_version(self, branch):
         branch_base = None
