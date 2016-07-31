@@ -71,7 +71,8 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import die, ERRORS, find_git_root, log, log_option, uniq_list_ordered, isVersion, validate_regex
+    from harisekhon.utils import die, ERRORS, find_git_root, log, log_option
+    from harisekhon.utils import uniq_list_ordered, isVersion, validate_regex
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -80,7 +81,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.5'
 
 class DockerfileGitTagCheckTool(CLI):
 
@@ -137,9 +138,6 @@ class DockerfileGitTagCheckTool(CLI):
             tags = [x for x in tags if self.tag_prefix.match(x)]
         #if log.isEnabledFor(logging.DEBUG):
         log.debug('\n\ntags for target %s:\n\n%s\n', target, '\n'.join(tags))
-        original_dir = os.getcwd()
-        log.debug('cd %s', gitroot)
-        os.chdir(gitroot)
         original_checkout = 'master'
         try:
             try:
@@ -158,8 +156,6 @@ class DockerfileGitTagCheckTool(CLI):
         finally:
             log.debug("returning to original checkout '%s'", original_checkout)
             repo.git.checkout(original_checkout)
-            log.debug("cd %s", original_dir)
-            os.chdir(original_dir)
 
     def check_path(self, path, tag):
         status = True
