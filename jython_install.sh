@@ -15,7 +15,7 @@
 
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
-srcdir="$( cd "$( dirname "$0}" )" && pwd )"
+srcdir="$( cd "$( dirname "$0" )" && pwd )"
 
 JYTHON_VERSION=2.7.0
 
@@ -26,7 +26,7 @@ JYTHON_VERSION=2.7.0
 if ! [ -e /opt/jython ]; then
     mkdir -p /opt
     wget -cO jython-installer.jar "http://search.maven.org/remotecontent?filepath=org/python/jython-installer/$JYTHON_VERSION/jython-installer-$JYTHON_VERSION.jar"
-    $sudo "$srcdir/jython_autoinstall.exp"
+    $sudo expect "$srcdir/jython_autoinstall.exp"
     $sudo ln -sf "/opt/jython-$JYTHON_VERSION" /opt/jython
     rm -f jython-installer.jar
     echo
