@@ -19,13 +19,28 @@ srcdir="$( cd "$( dirname "$0}" )" && pwd )"
 
 JYTHON_VERSION=2.7.0
 
+# not set in busybox
+#[ $EUID -eq 0 ] && sudo="" || sudo=sudo
+[ $(whoami) = "root" ] && sudo="" || sudo=sudo
+
 if ! [ -e /opt/jython ]; then
     mkdir -p /opt
     wget -cO jython-installer.jar "http://search.maven.org/remotecontent?filepath=org/python/jython-installer/$JYTHON_VERSION/jython-installer-$JYTHON_VERSION.jar"
-    "$srcdir/jython_autoinstall.exp"
-    ln -sf "/opt/jython-$JYTHON_VERSION" /opt/jython
+    $sudo "$srcdir/jython_autoinstall.exp"
+    $sudo ln -sf "/opt/jython-$JYTHON_VERSION" /opt/jython
     rm -f jython-installer.jar
-    echo "Jython Install DONE - Add /opt/jython/bin to your \$PATH"
+    echo
+    echo "Jython Install done"
 else
     echo "/opt/jython already exists - doing nothing"
 fi
+if ! [ -e /etc/profile.d/jython.sh ]; then
+    echo "Adding /etc/profile.d/jython.sh"
+    # shell execution tracing comes out in the file otherwise
+    set +x
+    cat >> /etc/profile.d/jython.sh <<EOF
+export JYTHON_HOME=/opt/jython
+export PATH=\$PATH:\$JYTHON_HOME/bin
+EOF
+fi
+echo "DONE"
