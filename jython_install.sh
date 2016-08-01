@@ -15,7 +15,7 @@
 
 set -eu
 [ -n "${DEBUG:-}" ] && set -x
-srcdir="$( cd "$( dirname "$0" )" && pwd )"
+srcdir="$(cd "$( dirname "$0" )" && pwd)"
 
 JYTHON_VERSION=2.7.0
 
