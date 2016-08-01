@@ -142,6 +142,10 @@ yum-packages:
 	# needed to build python-snappy for avro module
 	rpm -q snappy-devel 	 || $(SUDO) yum install -y snappy-devel
 
+.PHONY: jython-install
+jython-install:
+	./jython_install.sh
+
 .PHONY: sonar
 sonar:
 	sonar-scanner
