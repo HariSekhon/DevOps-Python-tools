@@ -96,15 +96,26 @@ hadoop_hdfs_files_native_checksums.jy
 hadoop_hdfs_files_stats.jy
 ```
 
-Jython is a simple download and unpack and can be fetched from http://www.jython.org/downloads.html
-
-Then add the Jython untarred directory to the $PATH or specify the /path/to/jythondir/bin/jython explicitly:
-
+Run like so:
 ```
-/path/to/jython-x.y.z/bin/jython -J-cp `hadoop classpath` hadoop_hdfs_time_block_reads.jy --help
+jython -J-cp `hadoop classpath` hadoop_hdfs_time_block_reads.jy --help
 ```
 
 The ```-J-cp `hadoop classpath` ``` bit does the right thing in finding the Hadoop java classes required to use the Hadoop APIs.
+
+See below for procedure to install Jython if you don't already have it.
+
+##### Automated Jython Install
+
+```
+make jython-install
+```
+
+##### Manual Jython Install
+
+Jython is a simple download and unpack and can be fetched from http://www.jython.org/downloads.html
+
+Then add the Jython untarred directory to the $PATH or specify the /path/to/jythondir/bin/jython explicitly when calling jython.
 
 #### Configuration for Strict Domain / FQDN validation ####
 
