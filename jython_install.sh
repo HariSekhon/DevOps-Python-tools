@@ -19,9 +19,13 @@ srcdir="$( cd "$( dirname "$0}" )" && pwd )"
 
 JYTHON_VERSION=2.7.0
 
-mkdir -p /opt
-wget -cO jython-installer.jar "http://search.maven.org/remotecontent?filepath=org/python/jython-installer/$JYTHON_VERSION/jython-installer-$JYTHON_VERSION.jar"
-"$srcdir/jython_autoinstall.exp"
-ln -sf "/opt/jython-$JYTHON_VERSION" /opt/jython
-rm -f jython-installer.jar
-echo "Jython Install DONE - Add /opt/jython/bin to your \$PATH"
+if ! [ -e /opt/jython ]; then
+    mkdir -p /opt
+    wget -cO jython-installer.jar "http://search.maven.org/remotecontent?filepath=org/python/jython-installer/$JYTHON_VERSION/jython-installer-$JYTHON_VERSION.jar"
+    "$srcdir/jython_autoinstall.exp"
+    ln -sf "/opt/jython-$JYTHON_VERSION" /opt/jython
+    rm -f jython-installer.jar
+    echo "Jython Install DONE - Add /opt/jython/bin to your \$PATH"
+else
+    echo "/opt/jython already exists - doing nothing"
+fi
