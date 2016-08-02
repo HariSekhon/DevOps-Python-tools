@@ -10,6 +10,7 @@ solr-env.sh
 .idea/
 .sonar/
 .DS_Store
+htmlcov/
 tests/spark-*-bin-hadoop*
 tests/test-spark-*-bin-hadoop*.parquet
 parquet-tools-*
