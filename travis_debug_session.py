@@ -101,12 +101,13 @@ class TravisDebugSession(CLI):
         log.debug("response: %s %s", req.status_code, req.reason)
         log.debug("content:\n%s\n%s\n%s", '='*80, req.content.strip(), '='*80)
         if req.status_code == 409:
-            error_message = None
+            error_message = ''
             try:
                 _ = json.loads(req.content)
                 error_message = _['error_message']
             except ValueError:
                 pass
+            error_message += " (if you've just retriggered this you can avoid this error using the --ignore-running switch)"
             if self.get_opt('ignore_running'):
                 log.info('job already running (ignoring)')
             else:
