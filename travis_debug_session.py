@@ -139,6 +139,7 @@ class TravisDebugSession(CLI):
         log.info('Executing: ssh -- {0}'.format(ssh_address))
         sys.stdout.flush()
         sys.stderr.flush()
+        self.disable_timeout()
         os.execvp('ssh', ['--', ssh_address])
 
     @staticmethod
