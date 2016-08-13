@@ -51,7 +51,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 class TravisDebugSession(CLI):
@@ -136,11 +136,10 @@ class TravisDebugSession(CLI):
 #            raise
 
         ssh_address = self.get_ssh_address(job_id=job_id)
-        log.info('Executing: ssh {0}'.format(ssh_address))
+        log.info('Executing: ssh -- {0}'.format(ssh_address))
         sys.stdout.flush()
         sys.stderr.flush()
-        #os.execlp('ssh', ssh_address)
-        os.system('ssh %s' % ssh_address)
+        os.execvp('ssh', ['--', ssh_address])
 
     @staticmethod
     def get_ssh_address_attempt(job_id):
