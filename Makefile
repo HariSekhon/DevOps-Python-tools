@@ -90,6 +90,7 @@ apk-packages:
 
 .PHONY: apk-packages-remove
 apk-packages-remove:
+	cd pylib && make apk-packages-remove
 	$(SUDO) apk del alpine-sdk
 	$(SUDO) apk del cyrus-sasl-dev
 	$(SUDO) apk del gcc
@@ -123,18 +124,28 @@ apt-packages:
 	#$(SUDO) apt-get install -y ipython-notebook || :
 	which java || $(SUDO) apt-get install -y openjdk-8-jdk || $(SUDO) apt-get install -y openjdk-7-jdk
 
+.PHONY: apt-packages-remove
+apt-packages-remove:
+	cd pylib && make apt-packages-remove
+	$(SUDO) apt-get purge -y build-essential
+	$(SUDO) apt-get purge -y wget
+	$(SUDO) apt-get purge -y zip
+	$(SUDO) apt-get purge -y unzip
+	$(SUDO) apt-get purge -y python-dev
+	$(SUDO) apt-get purge -y libsnappy-dev
+
 .PHONY: yum-packages
 yum-packages:
-	rpm -q git     || $(SUDO) yum install -y git
-	rpm -q wget    || $(SUDO) yum install -y wget
-	rpm -q gcc     || $(SUDO) yum install -y gcc
-	rpm -q gcc-c++ || $(SUDO) yum install -y gcc-c++
-	rpm -q git     || $(SUDO) yum install -y git
-	rpm -q unzip   || $(SUDO) yum install -y zip
-	rpm -q unzip   || $(SUDO) yum install -y unzip
+	rpm -q git               || $(SUDO) yum install -y git
+	rpm -q wget              || $(SUDO) yum install -y wget
+	rpm -q gcc               || $(SUDO) yum install -y gcc
+	rpm -q gcc-c++           || $(SUDO) yum install -y gcc-c++
+	rpm -q git               || $(SUDO) yum install -y git
+	rpm -q zip               || $(SUDO) yum install -y zip
+	rpm -q unzip             || $(SUDO) yum install -y unzip
 	# needed to fetch the library submodule and CPAN modules
 	# python-pip requires EPEL, so try to get the correct EPEL rpm
-	rpm -q epel-release || yum install -y epel-release || { wget -t 100 --retry-connrefused -O /tmp/epel.rpm "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`grep -o '[[:digit:]]' /etc/*release | head -n1`.noarch.rpm" && $(SUDO) rpm -ivh /tmp/epel.rpm && rm -f /tmp/epel.rpm; }
+	rpm -q epel-release      || yum install -y epel-release || { wget -t 100 --retry-connrefused -O /tmp/epel.rpm "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`grep -o '[[:digit:]]' /etc/*release | head -n1`.noarch.rpm" && $(SUDO) rpm -ivh /tmp/epel.rpm && rm -f /tmp/epel.rpm; }
 	rpm -q python-setuptools || $(SUDO) yum install -y python-setuptools
 	rpm -q python-pip        || $(SUDO) yum install -y python-pip
 	rpm -q python-devel      || $(SUDO) yum install -y python-devel
@@ -143,8 +154,21 @@ yum-packages:
 	# libgsasl-devel saslwrapper-devel
 	rpm -q cyrus-sasl-devel  || $(SUDO) yum install -y cyrus-sasl-devel
 	# needed to build python-snappy for avro module
-	rpm -q snappy-devel 	 || $(SUDO) yum install -y snappy-devel
+	rpm -q snappy-devel      || $(SUDO) yum install -y snappy-devel
 	which java || $(SUDO) yum install -y java
+
+.PHONY: yum-packages-remove
+yum-packages-remove:
+	cd pylib                 && make yum-packages-remove
+	rpm -q wget              && $(SUDO) yum remove -y wget
+	rpm -q gcc               && $(SUDO) yum remove -y gcc
+	rpm -q gcc-c++           && $(SUDO) yum remove -y gcc-c++
+	rpm -q git               && $(SUDO) yum remove -y git
+	rpm -q zip               && $(SUDO) yum remove -y zip
+	rpm -q unzip             && $(SUDO) yum remove -y unzip
+	rpm -q python-devel      && $(SUDO) yum remove -y python-devel
+	rpm -q cyrus-sasl-devel  && $(SUDO) yum remove -y cyrus-sasl-devel
+	rpm -q snappy-devel      && $(SUDO) yum remove -y snappy-devel
 
 .PHONY: jython-install
 jython-install:
