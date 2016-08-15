@@ -22,7 +22,8 @@ Compares files by 2 approaches:
 
 1. basename
 2. size and MD5 checksum - for efficiency only files with identical byte counts are MD5'd to see if they're really the
-                           same file
+                           same file. Zero byte files are skipped (you can find them easily via
+                           'find . -type f -size 0' instead)
 
 The limitation of this approach is that it won't find files as duplicates if there is a slight imperfection in one of
 the files as that would result in a differing MD5.
@@ -53,7 +54,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 class FindDuplicateFiles(CLI):
 
@@ -174,6 +175,8 @@ class FindDuplicateFiles(CLI):
 
     def is_file_dup_by_stats(self, filepath):
         size = os.stat(filepath).st_size
+        if size == 0:
+            return False
         checksum = None
         if size in self.sizes:
             log.info("found file '%s' of matching size '%s' bytes", filepath, size)
