@@ -63,7 +63,7 @@ class FindDuplicateFiles(CLI):
         # Python 3.x
         # super().__init__()
         self.failed = False
-        self.timeout_default = 0
+        self.timeout_default = 86400
         self.files = {}
         self.sizes = {}
         self.hashes = {}
@@ -73,7 +73,7 @@ class FindDuplicateFiles(CLI):
     def process_args(self):
         args = uniq_list_ordered(self.args)
         if not args:
-            self.usage('no dirs specified')
+            self.usage('no directories specified as arguments')
         log_option('directories', args)
         return args
 
