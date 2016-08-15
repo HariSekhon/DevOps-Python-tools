@@ -24,8 +24,8 @@ cd "$srcdir/.."
 
 section "find_duplicate_files.py"
 
-testdir="$(cd tests/data/ && mktemp -d -t tmp_find_duplicate_files)"
-testdir2="$(cd tests/data/ && mktemp -d -t tmp_find_duplicate_files2)"
+testdir="$(cd tests/data/ && mktemp -d -t tmp_find_duplicate_files.XXXXXX)"
+testdir2="$(cd tests/data/ && mktemp -d -t tmp_find_duplicate_files2.XXXXXX)"
 
 mkdir -v -p "$testdir"
 
