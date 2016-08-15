@@ -52,6 +52,8 @@ build:
 	#$(SUDO2) pip install pyhs2
 	# Impala
 	#$(SUDO2) pip install impyla
+	# must downgrade happybase library to work on Python 2.6
+	if [ "$$(python -c 'import sys; sys.path.append("pylib"); import harisekhon; print(harisekhon.utils.getPythonVersion())')" = "2.6" ]; then $(SUDO2) pip install --upgrade "happybase==0.9"; fi
 	
 	# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
 	$(SUDO2) pip install "ipython[notebook]" || :
@@ -75,7 +77,6 @@ apk-packages:
 	$(SUDO) apk add libffi-dev
 	$(SUDO) apk add linux-headers
 	$(SUDO) apk add make
-	which java &>/dev/null || $(SUDO) apk add openjdk8-jre-base
 	$(SUDO) apk add openssl-dev
 	$(SUDO) apk add py-pip
 	$(SUDO) apk add python
@@ -83,6 +84,7 @@ apk-packages:
 	$(SUDO) apk add snappy-dev
 	$(SUDO) apk add wget
 	$(SUDO) apk add zip
+	which java || $(SUDO) apk add openjdk8-jre-base
 	# Spark Java Py4J gets java linking error without this
 	if [ -f /lib/libc.musl-x86_64.so.1 ]; then [ -e /lib/ld-linux-x86-64.so.2 ] || ln -sv /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2; fi
 
@@ -119,6 +121,7 @@ apt-packages:
 	#  python-zmq : Depends: libzmq1 but it is not going to be installed
 	#  E: Unmet dependencies. Try 'apt-get -f install' with no packages (or specify a solution).
 	#$(SUDO) apt-get install -y ipython-notebook || :
+	which java || $(SUDO) apt-get install -y openjdk-8-jdk || $(SUDO) apt-get install -y openjdk-7-jdk
 
 .PHONY: yum-packages
 yum-packages:
@@ -141,6 +144,7 @@ yum-packages:
 	rpm -q cyrus-sasl-devel  || $(SUDO) yum install -y cyrus-sasl-devel
 	# needed to build python-snappy for avro module
 	rpm -q snappy-devel 	 || $(SUDO) yum install -y snappy-devel
+	which java || $(SUDO) yum install -y java
 
 .PHONY: jython-install
 jython-install:
