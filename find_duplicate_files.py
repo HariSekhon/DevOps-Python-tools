@@ -22,8 +22,8 @@ Compares files by 2 approaches:
 
 1. basename
 2. size and MD5 checksum - for efficiency only files with identical byte counts are MD5'd to see if they're really the
-                           same file. Zero byte files are skipped (you can find them easily via
-                           'find . -type f -size 0' instead)
+                           same file. Zero byte files are ignored for this test as they're not real duplicates and
+                           obscure the real results (instead you can find them easily via 'find . -type f -size 0')
 
 The limitation of this approach is that it won't find files as duplicates if there is a slight imperfection in one of
 the files as that would result in a differing MD5.
