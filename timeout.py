@@ -25,10 +25,10 @@ from __future__ import print_function
 #from __future__ import unicode_literals
 
 import os
-import psutil
 import subprocess
 import sys
 import time
+import psutil
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
