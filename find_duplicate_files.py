@@ -72,7 +72,7 @@ class FindDuplicateFiles(CLI):
         self.dups_by_name = {}
         self.dups_by_hash = {}
 
-    # @override, must use self
+    # @override, must use instance method, not static method, in order to match
     def parse_args(self):  # pylint: disable=no-self-use
         log.setLevel(logging.ERROR)
 
