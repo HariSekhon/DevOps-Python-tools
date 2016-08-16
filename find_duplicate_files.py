@@ -39,6 +39,7 @@ from __future__ import print_function
 #from __future__ import unicode_literals
 
 import hashlib
+import logging
 import os
 import sys
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
@@ -54,7 +55,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.3'
 
 class FindDuplicateFiles(CLI):
 
@@ -70,6 +71,10 @@ class FindDuplicateFiles(CLI):
         self.hashes = {}
         self.dups_by_name = {}
         self.dups_by_hash = {}
+
+    # @override, must use self
+    def parse_args(self):  # pylint: disable=no-self-use
+        log.setLevel(logging.ERROR)
 
     def process_args(self):
         args = uniq_list_ordered(self.args)
@@ -176,6 +181,7 @@ class FindDuplicateFiles(CLI):
     def is_file_dup_by_stats(self, filepath):
         size = os.stat(filepath).st_size
         if size == 0:
+            log.warn("skipping zero byte file '%s'", filepath)
             return False
         checksum = None
         if size in self.sizes:
