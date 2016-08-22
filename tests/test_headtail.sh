@@ -59,17 +59,22 @@ check(){
     fi
 }
 
-check "./headtail.py $testfile" "789101572 545" "file"
+expected_checksum="4265687809 622"
+expected_checksum2="3491626949 1101"
+expected_checksum3="4200550990 2364"
+expected_checksum4="594808312 2445"
 
-check "cat $testfile | ./headtail.py -" "789101572 545" "-"
+check "./headtail.py $testfile" "$expected_checksum" "file"
 
-check "cat $testfile | ./headtail.py" "789101572 545" "noarg"
+check "cat $testfile | ./headtail.py -" "$expected_checksum" "-"
 
-check "./headtail.py $testfile -n 20" "741605952 1024" "file -n 20"
+check "cat $testfile | ./headtail.py" "$expected_checksum" "noarg"
 
-check "cat $testfile | ./headtail.py - $testfile -n 20" "3412825758 2210" "mixed - file -n 20"
+check "./headtail.py $testfile -n 20" "$expected_checksum2" "file -n 20"
 
-check "cat $testfile | ./headtail.py - $testfile - -n 20" "2618879084 2297" "mixed - file - -n 20"
+check "cat $testfile | ./headtail.py - $testfile -n 20" "$expected_checksum3" "mixed - file -n 20"
+
+check "cat $testfile | ./headtail.py - $testfile - -n 20" "$expected_checksum4" "mixed - file - -n 20"
 
 echo
 echo "======="
