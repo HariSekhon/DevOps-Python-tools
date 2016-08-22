@@ -41,7 +41,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.1'
+__version__ = '0.3.0'
 
 class HeadTail(CLI):
 
@@ -51,7 +51,8 @@ class HeadTail(CLI):
         # Python 3.x
         # super().__init__()
         self.num_lines = 10
-        self.sep = '...'
+        #self.sep = '...'
+        self.sep = '-' * 80
         self.docsep = '=' * 80
         self.quiet = False
 
@@ -93,10 +94,13 @@ class HeadTail(CLI):
 
     def headtail(self, content):
         lines = content.split(os.linesep)
-        print(os.linesep.join(lines[:self.num_lines]))
-        if not self.quiet:
-            print(self.sep)
-        print(os.linesep.join(lines[-self.num_lines:]).rstrip(os.linesep))
+        if(self.num_lines >= len(lines) / 2):
+            print(content, end='')
+        else:
+            print(os.linesep.join(lines[:self.num_lines]))
+            if not self.quiet:
+                print(self.sep)
+            print(os.linesep.join(lines[-self.num_lines:]).rstrip(os.linesep))
 
 
 if __name__ == '__main__':
