@@ -39,14 +39,14 @@ echo
 
 hr
 
+
 echo "checking for dups by name in same directory tree:"
 mkdir "$testdir/2"
 echo different > "$testdir/2/test1.txt"
 echo
-if ./find_duplicate_files.py "$testdir" "$testdir2"; then
-    echo "Failed to find duplicate file in same directory tree"
-    exit 1
-fi
+set +e
+./find_duplicate_files.py "$testdir" "$testdir2"
+check_exit_code 1
 echo
 rm "$testdir/2/test1.txt"
 
@@ -55,10 +55,8 @@ hr
 echo "checking for dups by checksum in same directory tree:"
 echo test > "$testdir/test2.txt"
 echo
-if ./find_duplicate_files.py "$testdir" "$testdir2"; then
-    echo "Failed to find duplicate file in same directory tree"
-    exit 1
-fi
+./find_duplicate_files.py "$testdir" "$testdir2"
+check_exit_code 1
 echo
 rm "$testdir/test2.txt"
 
@@ -67,10 +65,8 @@ hr
 echo "checking for dups by name across directory trees:"
 echo different > "$testdir2/test1.txt"
 echo
-if ./find_duplicate_files.py "$testdir" "$testdir2"; then
-    echo "Failed to find duplicate file by name in second directory tree"
-    exit 1
-fi
+./find_duplicate_files.py "$testdir" "$testdir2"
+check_exit_code 1
 echo
 rm "$testdir2/test1.txt"
 
@@ -79,10 +75,8 @@ hr
 echo "checking for dups by checksum across directory trees:"
 echo test > "$testdir2/test4.txt"
 echo
-if ./find_duplicate_files.py "$testdir" "$testdir2"; then
-    echo "Failed to find duplicate file by checksum in second directory tree"
-    exit 1
-fi
+./find_duplicate_files.py "$testdir" "$testdir2"
+check_exit_code 1
 echo
 
 rm -fr "$testdir" "$testdir2"
