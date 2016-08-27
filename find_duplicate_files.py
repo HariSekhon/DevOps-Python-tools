@@ -192,11 +192,6 @@ class FindDuplicateFiles(CLI):
            self.dups_by_hash or \
            self.dups_by_regex:
             if self.quiet:
-                # if there are no dups this fails:
-#                self.dup_filepaths.add(*list(self.dups_by_name))
-#                self.dup_filepaths.add(*list(self.dups_by_size.itervalues()))
-#                self.dup_filepaths.add(*list(self.dups_by_hash.itervalues()))
-#                self.dup_filepaths.add(*list(self.dups_by_regex.itervalues()))
                 for _ in self.dups_by_name:
                     self.dup_filepaths.add(_)
                 for _ in itertools.chain.from_iterable(self.dups_by_size.itervalues()):
