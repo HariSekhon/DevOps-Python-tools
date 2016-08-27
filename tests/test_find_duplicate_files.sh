@@ -27,6 +27,8 @@ section "find_duplicate_files.py"
 testdir1="$(cd tests/data/ && mktemp -d -t tmp_find_duplicate_files.XXXXXX)"
 testdir2="$(cd tests/data/ && mktemp -d -t tmp_find_duplicate_files2.XXXXXX)"
 
+trap "rm -fr '$testdir1' '$testdir2'" $TRAP_SIGNALS
+
 echo test > "$testdir1/test1.txt"
 echo nonmatching > "$testdir1/nonmatching.txt"
 
