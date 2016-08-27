@@ -104,6 +104,7 @@ class FindDuplicateFiles(CLI):
         self.dups_by_size = {}
         self.dups_by_hash = {}
         self.dups_by_regex = {}
+        self.dup_filepaths = set()
         self.compare_by_name = False
         self.compare_by_size = False
         self.compare_by_checksum = False
@@ -128,9 +129,9 @@ class FindDuplicateFiles(CLI):
     def parse_args(self):  # pylint: disable=no-self-use
         log.setLevel(logging.ERROR)
 
-    def print(self, *args, **kwargs):
-        if not self.quiet:
-            print(*args, **kwargs)
+    #def print(self, *args, **kwargs):
+    #    if not self.quiet:
+    #        print(*args, **kwargs)
 
     def process_args(self):
         args = uniq_list_ordered(self.args)
@@ -189,36 +190,53 @@ class FindDuplicateFiles(CLI):
            self.dups_by_size or \
            self.dups_by_hash or \
            self.dups_by_regex:
-            self.print('Duplicates detected!\n')
+            if self.quiet:
+                # if there are no dups this fails:
+#                self.dup_filepaths.add(*list(self.dups_by_name))
+#                self.dup_filepaths.add(*list(self.dups_by_size.itervalues()))
+#                self.dup_filepaths.add(*list(self.dups_by_hash.itervalues()))
+#                self.dup_filepaths.add(*list(self.dups_by_regex.itervalues()))
+                for _ in self.dups_by_name:
+                    self.dup_filepaths.add(_)
+                for _ in list(*self.dups_by_size.itervalues()):
+                    self.dup_filepaths.add(_)
+                for _ in list(*self.dups_by_hash.itervalues()):
+                    self.dup_filepaths.add(_)
+                for _ in list(*self.dups_by_regex.itervalues()):
+                    self.dup_filepaths.add(_)
+                for filepath in sorted(self.dup_filepaths):
+                    print(filepath)
+                sys.exit(4)
+            print('Duplicates detected!\n')
             if self.dups_by_name:
-                self.print('Duplicates by name:\n')
+                print('Duplicates by name:\n')
                 for basename in self.dups_by_name:
-                    self.print("--\nbasename '{0}':".format(basename))
+                    print("--\nbasename '{0}':".format(basename))
                     for filepath in sorted(self.dups_by_name[basename]):
                         print(filepath)
             if self.dups_by_size:
-                self.print('Duplicates by size:\n')
+                print('Duplicates by size:\n')
                 for size in self.dups_by_size:
-                    self.print("--\nsize '{0}' bytes:".format(size))
+                    print("--\nsize '{0}' bytes:".format(size))
                     for filepath in sorted(self.dups_by_size[size]):
                         print(filepath)
             if self.dups_by_hash:
-                self.print('Duplicates by checksum:\n')
+                print('Duplicates by checksum:\n')
                 for checksum in self.dups_by_hash:
-                    self.print("--\nchecksum '{0}':".format(checksum))
+                    print("--\nchecksum '{0}':".format(checksum))
                     for filepath in sorted(self.dups_by_hash[checksum]):
                         print(filepath)
             if self.dups_by_regex:
-                self.print('Duplicates by regex match ({0}):\n'.format(self.regex))
+                print('Duplicates by regex match ({0}):\n'.format(self.regex))
                 for matching_portion in self.dups_by_regex:
-                    self.print("--\nregex matching portion '{0}':".format(matching_portion))
+                    print("--\nregex matching portion '{0}':".format(matching_portion))
                     for filepath in sorted(self.dups_by_regex[matching_portion]):
                         print(filepath)
-            sys.exit(1)
+            sys.exit(4)
         elif self.failed:
             sys.exit(2)
         else:
-            self.print('No Duplicates Found')
+            print('No Duplicates Found')
             sys.exit(0)
 
 #    def check_path(self, path):
@@ -254,10 +272,16 @@ class FindDuplicateFiles(CLI):
             # returns generator
             # root is the dir, dirs and files are child basenames
             #for root, dirs, files in os.walk(path):
-            for root, _, files in os.walk(path):
+            for root, dirs, files in os.walk(path):
+                #log.debug('root = %s', root)
+                #log.debug('files = %s', files)
                 # do not check hidden subdirs
-                if (not self.include_dot_dirs) and os.path.basename(root)[0] == '.':
-                    continue
+                if not self.include_dot_dirs:
+                    # results in 'IndexError: string index out of range' if suffixed with '/'
+                    # if os.path.basename(root)[0] == '.':
+                    #    continue
+                    # could regex strip all suffixed '/' but it's cheaper to just modify the dirs list in place
+                    dirs[:] = [d for d in dirs if d[0] != '.']
                 for filebasename in files:
                     filepath = os.path.join(root, filebasename)
                     try:
