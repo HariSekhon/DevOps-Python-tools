@@ -58,10 +58,24 @@ for testdir in "$testdir1" "$testdir2"; do
     echo
     set +e
     ./find_duplicate_files.py "$testdir" "$testdir1"
-    check_exit_code 1
+    check_exit_code 4
     set -e
     echo
     rm "$testdir/2/test1.txt"
+
+    echo "checking for dups by name in dot directories $msg2:"
+    mkdir "$testdir/.3"
+    echo different > "$testdir/.3/test1.txt"
+    echo
+    set +e
+    ./find_duplicate_files.py --include-dot-dirs "$testdir" "$testdir1"
+    check_exit_code 4
+    set -e
+    echo
+    echo "now check no dups found in hidden dot directory by default:"
+    ./find_duplicate_files.py "$testdir" "$testdir1"
+    echo
+    rm "$testdir/.3/test1.txt"
 
     hr
 
@@ -70,7 +84,7 @@ for testdir in "$testdir1" "$testdir2"; do
     echo
     set +e
     ./find_duplicate_files.py --size "$testdir" "$testdir1"
-    check_exit_code 1
+    check_exit_code 4
     set -e
     echo
     echo "checking dups by hash doesn't match on differing contents $msg2:"
@@ -87,7 +101,7 @@ for testdir in "$testdir1" "$testdir2"; do
     echo
     set +e
     ./find_duplicate_files.py --checksum "$testdir" "$testdir1"
-    check_exit_code 1
+    check_exit_code 4
     set -e
     echo
     rm "$testdir/test3.txt"
@@ -106,14 +120,14 @@ for testdir in "$testdir1" "$testdir2"; do
     echo "now check the file basename matches on 'est'":
     set +e
     ./find_duplicate_files.py --regex 'est' "$testdir" "$testdir1" --quiet
-    check_exit_code 1
+    check_exit_code 4
     echo
 
     hr
 
     echo "now check the file basename matches with specified capture subset '(est)\d'":
     ./find_duplicate_files.py --regex '(est)\d' "$testdir" "$testdir1"
-    check_exit_code 1
+    check_exit_code 4
     set -e
     echo
 
@@ -123,6 +137,19 @@ for testdir in "$testdir1" "$testdir2"; do
     ./find_duplicate_files.py --regex 'est\d' "$testdir" "$testdir1"
     echo
     rm "$testdir/test2.txt"
+
+    hr
+    echo "now check --quiet --no-short-circuit finds 3 duplicates":
+    mkdir "$testdir/short-circuit"
+    echo different > "$testdir/short-circuit/test1.txt"
+    echo test      > "$testdir/short-circuit/test2.txt"
+    set +o pipefail
+    ./find_duplicate_files.py --quiet --no-short-circuit "$testdir" "$testdir1" | tee /dev/stderr | wc -l | grep "^[[:space:]]*3[[:space:]]*$" ||
+        { echo "Failed to find expected 3 duplicates with --no-short-circuit! "; exit 1; }
+    set -o pipefail
+    echo
+    rm "$testdir/short-circuit/test1.txt"
+    rm "$testdir/short-circuit/test2.txt"
 
     hr
 done
