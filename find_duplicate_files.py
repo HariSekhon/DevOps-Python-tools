@@ -81,7 +81,8 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
+__version__ = '0.5.1'
+
 
 class FindDuplicateFiles(CLI):
 
@@ -285,6 +286,8 @@ class FindDuplicateFiles(CLI):
                     except OSError as exc:
                         log.error("error while checking file '{0}': {1}".format(filepath, exc))
                         self.failed = True
+        else:
+            die("'%s' is not a file or directory")
 
     def is_file_dup(self, filepath):
         log.debug("checking file path '%s'", filepath)
