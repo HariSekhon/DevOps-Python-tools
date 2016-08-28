@@ -71,6 +71,8 @@ Some common options also support optional environment variables for convenience 
 - ```dockerhub_search.py``` - search DockerHub with a configurable number of returned results (official ```docker search``` is limited to only 25 results)
 - ```dockerfiles_check_git*.py``` - check Git tags & branches align with the containing Dockerfile's ```ARG *_VERSION```
 - ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user (there is also a perl version in my [Tools](https://github.com/harisekhon/tools) repo)
+- ```find_duplicate_files.py``` - finds duplicate files in one or more directory trees via multiple methods including file basename, size, MD5 comparison of same sized files, or bespoke regex capture of partial file basename 
+- ```travis_debug_session.py``` - triggers a Travis CI debug build session via Travis API, tracks the session starting and being ready and then drops user straight in to the shell on the Travis build, very convenient one shot remote debug launcher.
 - ```validate_*.py``` - validate files, directory trees and/or standard input streams for the following file types: Avro, CSV, JSON, Parquet, XML, YAML. Directories are recursed, testing any files with relevant matching extensions (```.avro```, ```.csv```, ```.json```, ```.parquet```, ```.xml```, ```.yml```/```.yaml```). ```validate_json.py``` supports both normal json files as well as json-doc-per-line files such as MongoDB or Hadoop json data files
 
 
