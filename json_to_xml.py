@@ -114,7 +114,7 @@ class JsonToXml(CLI):
         else:
             with open(filepath) as _:
                 content = _.read()
-                print(self.json_to_xml(content, filepath))
+                print(self.json_to_xml(content, filepath=filepath))
 
 
 if __name__ == '__main__':
