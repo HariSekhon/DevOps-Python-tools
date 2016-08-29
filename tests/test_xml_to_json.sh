@@ -25,7 +25,7 @@ cd "$srcdir";
 section "XML => JSON"
 
 for x in simple.xml plant_catalog.xml; do
-    tmpfile="$(mktemp -t xml_to_json_test.xml)"
+    tmpfile="$(mktemp xml_to_json_test.XXXXX.xml)"
     trap "rm -f $tmpfile" $TRAP_SIGNALS
     echo "running xml_to_json.py on $x":
     ../xml_to_json.py "data/$x" > "$tmpfile"
