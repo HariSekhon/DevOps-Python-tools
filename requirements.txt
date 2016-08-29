@@ -1,6 +1,7 @@
 avro>=1.8.1
 bitarray>=0.8.1
 cassandra-driver>=3.6.0
+dicttoxml>=1.7.4
 docker-py>=1.9.0
 # Elasticsearch library must match major version :(
 # for Elasticsearch 2.x
