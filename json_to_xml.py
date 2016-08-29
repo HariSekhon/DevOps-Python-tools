@@ -103,7 +103,7 @@ class JsonToXml(CLI):
                     if self.re_json_suffix.match(filepath):
                         self.process_file(filepath)
         else:
-            die("failed to determine if path '%s' is file or directory" % path)
+            die("failed to determine if path '%s' is a file or directory" % path)
 
     def process_file(self, filepath):
         log.debug('processing filepath \'%s\'', filepath)
