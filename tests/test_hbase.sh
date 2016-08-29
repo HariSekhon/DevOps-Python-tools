@@ -39,6 +39,7 @@ export HBASE_STARGATE_PORT=8080
 export HBASE_THRIFT_PORT=9090
 export ZOOKEEPER_PORT=2181
 export HBASE_PORTS="$ZOOKEEPER_PORT $HBASE_STARGATE_PORT 8085 $HBASE_THRIFT_PORT 9095 16000 16010 16201 16301"
+export HBASE_TEST_PORTS="$ZOOKEEPER_PORT $HBASE_THRIFT_PORT"
 
 #export HBASE_VERSIONS="0.96 0.98 1.0 1.1 1.2"
 # don't work
@@ -61,7 +62,7 @@ test_hbase(){
     echo "Setting up HBase $version test container"
     hr
     launch_container "$DOCKER_IMAGE:$version" "$DOCKER_CONTAINER" 2181 8080 8085 9090 9095 16000 16010 16201 16301
-    when_ports_available $startupwait $HBASE_HOST $HBASE_PORTS
+    when_ports_available $startupwait $HBASE_HOST $HBASE_TEST_PORTS
     echo "setting up test tables"
     uniq_val=$(< /dev/urandom tr -dc 'a-zA-Z0-9' | head -c32 || :)
     docker exec -i "$DOCKER_CONTAINER" /bin/bash <<-EOF
