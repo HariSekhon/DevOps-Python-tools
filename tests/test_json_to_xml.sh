@@ -24,7 +24,7 @@ cd "$srcdir";
 
 section "JSON => XML"
 
-tmpfile="$(mktemp -t json_to_xml_test.xml)"
+tmpfile="$(mktemp json_to_xml_test.XXXXX.xml)"
 #echo "tmpfile is $tmpfile"
 
 trap "rm -f $tmpfile" $TRAP_SIGNALS
