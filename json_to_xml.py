@@ -23,8 +23,7 @@ Reads any given files as JSON and prints the equivalent XML (can redirect to fil
 Directories if given are detected and recursed, processing all files in the directory tree ending in a .json suffix.
 
 Works like a standard unix filter program - if no files are passed as arguments or '-' is passed then reads from
-standard input (--multi-line must be specified explicitly if feeding to stdin as can't rewind the standard input
-stream to test for multi-line on a second pass).
+standard input.
 
 """
 
