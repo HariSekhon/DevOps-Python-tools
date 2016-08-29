@@ -18,7 +18,7 @@
 
 Tool to convert JSON to XML
 
-Reads any given files as JSON and prints the equivalent XML (can redirect to file)
+Reads any given files as JSON and prints the equivalent XML to stdout for piping or redirecting to a file.
 
 Directories if given are detected and recursed, processing all files in the directory tree ending in a .json suffix.
 
@@ -34,6 +34,7 @@ from __future__ import print_function
 
 import json
 import os
+import re
 import sys
 # This library is GNU GPL licensed so this program is also GNU GPL licensed
 import dicttoxml
@@ -42,7 +43,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import die, ERRORS, log_option
+    from harisekhon.utils import die, ERRORS, log, log_option
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -61,13 +62,17 @@ class JsonToXml(CLI):
         super(JsonToXml, self).__init__()
         # Python 3.x
         # super().__init__()
+        self.re_json_suffix = re.compile(r'.*\.json$', re.I)
 
     @staticmethod
-    def json_to_xml(content):
+    def json_to_xml(content, filepath=None):
         try:
             _ = json.loads(content)
         except (KeyError, ValueError) as _:
-            die("Failed to parse JSON: {0}".format(_))
+            file_detail = ''
+            if filepath is not None:
+                file_detail = ' in file \'{0}\''.format(filepath)
+            die("Failed to parse JSON{0}: {1}".format(file_detail, _))
         # doesn't work
         #return ET.tostring(_)
         return dicttoxml.dicttoxml(_)
@@ -103,6 +108,7 @@ class JsonToXml(CLI):
             die("failed to determine if path '%s' is file or directory" % path)
 
     def process_file(self, filepath):
+        log.debug('processing filepath \'%s\'', filepath)
         if filepath == '-':
             filepath = '<STDIN>'
         if filepath == '<STDIN>':
@@ -110,7 +116,7 @@ class JsonToXml(CLI):
         else:
             with open(filepath) as _:
                 content = _.read()
-                print(self.json_to_xml(content))
+                print(self.json_to_xml(content, filepath))
 
 
 if __name__ == '__main__':
