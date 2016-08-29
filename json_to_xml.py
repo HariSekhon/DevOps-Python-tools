@@ -73,8 +73,6 @@ class JsonToXml(CLI):
             if filepath is not None:
                 file_detail = ' in file \'{0}\''.format(filepath)
             die("Failed to parse JSON{0}: {1}".format(file_detail, _))
-        # doesn't work
-        #return ET.tostring(_)
         return dicttoxml.dicttoxml(_)
 
     def run(self):
