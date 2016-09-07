@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6'
+__version__ = '0.6.1'
 
 class DockerfileGitBranchCheckTool(CLI):
 
@@ -258,7 +258,7 @@ class DockerfileGitBranchCheckTool(CLI):
     def check_file(self, filename, branch):
         if os.path.basename(filename) != 'Dockerfile':
             return True
-        parent = os.path.basename(os.path.dirname(filename))
+        parent = os.path.basename(os.path.dirname(os.path.abspath(filename)))
         (branch_base, _) = self.branch_version(branch)
         if self.normalize_name(branch_base) != self.normalize_name(parent):
             log.debug("skipping '{0}' as it's parent directory '{1}' doesn't match branch base '{2}'".
