@@ -90,7 +90,11 @@ EOF
     hr
     ./hbase_compact_tables.py -H $HBASE_HOST
     hr
+    ./hbase_compact_tables.py -H $HBASE_HOST --regex .1
+    hr
     docker_exec hbase_flush_tables.py
+    hr
+    docker_exec hbase_flush_tables.py -r .2
     hr
 
     delete_container
