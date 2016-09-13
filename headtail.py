@@ -32,7 +32,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import die, ERRORS, log_option
+    from harisekhon.utils import die, ERRORS, log_option, isInt
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -41,7 +41,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 
 class HeadTail(CLI):
 
@@ -50,7 +50,12 @@ class HeadTail(CLI):
         super(HeadTail, self).__init__()
         # Python 3.x
         # super().__init__()
-        self.num_lines = 10
+        self.default_num_lines = 10
+        # this is usually None unless you explicitly 'export LINES'
+        lines_env_var = os.getenv('LINES')
+        if lines_env_var and isInt(lines_env_var):
+            self.default_num_lines = int(lines_env_var / 2) - 1
+        self.num_lines = self.default_num_lines
         #self.sep = '...'
         self.sep = '-' * 80
         self.docsep = '=' * 80
@@ -60,7 +65,8 @@ class HeadTail(CLI):
         #self.timeout_default = 300
         self.add_opt('-n', '--num', metavar='number_of_lines',
                      type=int, default=self.num_lines,
-                     help='Number of lines to show (default: 10)')
+                     help='Number of lines to show (default: {0})'.format(self.default_num_lines)
+                     .format(self.default_num_lines))
         self.add_opt('-q', '--quiet', action='store_true',
                      default=False, help="Don't print separators in output")
 
@@ -94,7 +100,7 @@ class HeadTail(CLI):
 
     def headtail(self, content):
         lines = content.split(os.linesep)
-        if(self.num_lines >= len(lines) / 2):
+        if self.num_lines >= len(lines) / 2:
             print(content, end='')
         else:
             print(os.linesep.join(lines[:self.num_lines]))
