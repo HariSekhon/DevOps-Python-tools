@@ -46,8 +46,10 @@ export HBASE_TEST_PORTS="$ZOOKEEPER_PORT $HBASE_THRIFT_PORT"
 #export HBASE_VERSIONS="0.98 0.96"
 export HBASE_VERSIONS="1.0 1.1 1.2"
 
-export DOCKER_IMAGE="harisekhon/hbase"
+export DOCKER_IMAGE="harisekhon/hbase-dev"
 export DOCKER_CONTAINER="hbase-test"
+
+export MNTDIR=/pytools
 
 if ! is_docker_available; then
     echo "WARNING: Docker not available, skipping HBase checks"
@@ -56,11 +58,19 @@ fi
 
 startupwait=50
 
+docker_exec(){
+    docker exec -i "$DOCKER_CONTAINER" /bin/bash <<-EOF
+    export JAVA_HOME=/usr
+    $MNTDIR/$@
+EOF
+}
+
 test_hbase(){
     local version="$1"
     hr
     echo "Setting up HBase $version test container"
     hr
+    local DOCKER_OPTS="-v $srcdir/..:$MNTDIR"
     launch_container "$DOCKER_IMAGE:$version" "$DOCKER_CONTAINER" 2181 8080 8085 9090 9095 16000 16010 16201 16301
     when_ports_available $startupwait $HBASE_HOST $HBASE_TEST_PORTS
     echo "setting up test tables"
@@ -79,6 +89,8 @@ EOF
 
     hr
     ./hbase_compact_tables.py -H $HBASE_HOST
+    hr
+    docker_exec hbase_flush_tables.py
     hr
 
     delete_container
