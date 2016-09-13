@@ -24,7 +24,7 @@ compactions to prevent them impacting peak hours.
 Uses the HBase Thrift server. For versions older than HBase 0.96+ or using modified protocols, the connection
 protocol / compat / transport settings will need to be adjusted.
 
-Tested on Apache HBase 1.2.1
+Tested on Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2
 
 """
 
