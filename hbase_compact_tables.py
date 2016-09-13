@@ -109,7 +109,7 @@ class HBaseCompactTables(CLI):
         tables = self.get_tables()
         if self.get_opt('list_tables'):
             print('Tables:\n\n' + '\n'.join(tables))
-            sys.exit(1)
+            sys.exit(3)
         for table in tables:
             if self.table_regex:
                 if self.table_regex.search(table):
