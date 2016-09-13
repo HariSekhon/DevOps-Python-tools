@@ -55,10 +55,14 @@ tables="$(sed -n '/TABLE/,/row.*[[:space:]]in[[:space:]].*[[:space:]]seconds/p' 
 
 [ -z "$tables" ] && die "No Tables Found"
 
+tables_to_flush="$(egrep "$regex" <<< "$tables")"
+
+[ -z "$tables_to_flush" ] && die "No Tables Found Matching the given regex '$regex'"
+
 echo "Flushing the following tables:
 
-$tables
+$tables_to_flush
 "
 
-sed "s/^[[:space:]]*/flush '/; s/[[:space:]]*$/'/" <<< "$tables" |
+sed "s/^[[:space:]]*/flush '/; s/[[:space:]]*$/'/" <<< "$tables_to_flush" |
 hbase shell
