@@ -64,11 +64,11 @@ expected_checksum2="3491626949 1101"
 expected_checksum3="4200550990 2364"
 expected_checksum4="594808312 2445"
 
-check "./headtail.py $testfile" "$expected_checksum" "file"
+check "./headtail.py -n 10 $testfile" "$expected_checksum" "file"
 
-check "cat $testfile | ./headtail.py -" "$expected_checksum" "-"
+check "cat $testfile | ./headtail.py -n10 -" "$expected_checksum" "-"
 
-check "cat $testfile | ./headtail.py" "$expected_checksum" "noarg"
+check "cat $testfile | ./headtail.py -n10" "$expected_checksum" "noarg"
 
 check "./headtail.py $testfile -n 20" "$expected_checksum2" "file -n 20"
 
