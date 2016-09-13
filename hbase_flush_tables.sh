@@ -21,7 +21,7 @@ Uses HBase Shell which must be in the \$PATH
 
 Written to flush OpenTSDB tables before shutdown as the bulk import tool is using Durability.SKIP_WAL
 
-Tested on Hortonworks HDP 2.3 (HBase 1.1.1) and Apache HBase 1.2.2
+Tested on Hortonworks HDP 2.3 (HBase 1.1.2) and Apache HBase 1.2.2
 
 "
 
