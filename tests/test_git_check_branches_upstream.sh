@@ -25,7 +25,7 @@ cd "$srcdir/.."
 
 section "Testing Git check branches upstream"
 
-if which git &>dev/null; then
+if which git &>/dev/null; then
     if ! [ -d Dockerfiles ]; then
         git clone https://github.com/harisekhon/Dockerfiles
     else
