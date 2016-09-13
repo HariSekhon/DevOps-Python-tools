@@ -54,7 +54,7 @@ class HeadTail(CLI):
         # this is usually None unless you explicitly 'export LINES'
         lines_env_var = os.getenv('LINES')
         if lines_env_var and isInt(lines_env_var):
-            self.default_num_lines = int(lines_env_var / 2) - 1
+            self.default_num_lines = int(int(lines_env_var) / 2) - 1
         self.num_lines = self.default_num_lines
         #self.sep = '...'
         self.sep = '-' * 80
