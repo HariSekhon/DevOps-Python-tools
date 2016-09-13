@@ -41,10 +41,10 @@ export ZOOKEEPER_PORT=2181
 export HBASE_PORTS="$ZOOKEEPER_PORT $HBASE_STARGATE_PORT 8085 $HBASE_THRIFT_PORT 9095 16000 16010 16201 16301"
 export HBASE_TEST_PORTS="$ZOOKEEPER_PORT $HBASE_THRIFT_PORT"
 
-#export HBASE_VERSIONS="0.96 0.98 1.0 1.1 1.2"
+#export HBASE_VERSIONS="${@:-0.96 0.98 1.0 1.1 1.2}"
 # don't work
 #export HBASE_VERSIONS="0.98 0.96"
-export HBASE_VERSIONS="1.0 1.1 1.2"
+export HBASE_VERSIONS="${@:-1.0 1.1 1.2}"
 
 export DOCKER_IMAGE="harisekhon/hbase-dev"
 export DOCKER_CONTAINER="hbase-test"
@@ -88,9 +88,19 @@ EOF2
 EOF
 
     hr
+    set +e
+    ./hbase_compact_tables.py -H $HBASE_HOST --list-tables
+    check_exit_code 3
+    set -e
+    hr
     ./hbase_compact_tables.py -H $HBASE_HOST
     hr
     ./hbase_compact_tables.py -H $HBASE_HOST --regex .1
+    hr
+    set +e
+    docker_exec hbase_flush_tables.py --list-tables
+    check_exit_code 3
+    set -e
     hr
     docker_exec hbase_flush_tables.py
     hr
