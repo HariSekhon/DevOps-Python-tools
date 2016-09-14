@@ -90,14 +90,23 @@ EOF
         return
     fi
     hr
+    ./hbase_generate_data.py -n 10
+    hr
     set +e
-    ./hbase_compact_tables.py -H $HBASE_HOST --list-tables
+    ./hbase_generate_data.py -n 10
+    check_exit_code 2
+    set -e
+    hr
+    ./hbase_generate_data.py -n 10 -d
+    hr
+    set +e
+    ./hbase_compact_tables.py --list-tables
     check_exit_code 3
     set -e
     hr
     ./hbase_compact_tables.py -H $HBASE_HOST
     hr
-    ./hbase_compact_tables.py -H $HBASE_HOST --regex .1
+    ./hbase_compact_tables.py --regex .1
     hr
     set +e
     docker_exec hbase_flush_tables.py --list-tables
