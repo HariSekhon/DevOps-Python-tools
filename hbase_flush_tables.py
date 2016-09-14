@@ -127,11 +127,11 @@ class HBaseFlushTables(CLI):
         tables_to_flush = set()
         if self.table_regex:
             log.info('filtering tables based on regex')
-            for table in tables:
+            for table in sorted(list(tables)):
                 if self.table_regex.search(table):
                     tables_to_flush.add(table)
         else:
-            tables_to_flush = tables
+            tables_to_flush = sorted(list(tables))
         if log.isEnabledFor(logging.INFO):
             log.info('Flushing tables:\n\n%s\n', '\n'.join(tables_to_flush))
         flush_commands = '\n'.join(["flush '{0}'".format(table) for table in tables_to_flush])
