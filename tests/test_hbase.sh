@@ -86,7 +86,9 @@ test_hbase(){
         list
 EOF2
 EOF
-
+    if [ -n "${NOTESTS:-}" ]; then
+        return
+    fi
     hr
     set +e
     ./hbase_compact_tables.py -H $HBASE_HOST --list-tables
