@@ -110,6 +110,7 @@ class HBaseGenerateData(CLI):
         validate_int(self.num_rows, 'num rows', 1, 1000000000)
         validate_int(self.key_len, 'key length', 10, 1000)
         validate_int(self.value_len, 'value length', 1, 1000000)
+        self.num_rows = int(self.num_rows)
         if self.drop_table and self.table != self.default_table_name:
             die("not allowed to use --drop-table if using a table name other than the default table '{0}'"\
                 .format(self.default_table_name))
