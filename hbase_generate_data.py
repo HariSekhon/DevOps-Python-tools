@@ -159,7 +159,8 @@ class HBaseGenerateData(CLI):
         key_len = self.key_len
         value_len = self.value_len
         table_conn = None
-        log.info("connecting to test table '%s'", table)
+        # does not actually connect until sending data
+        #log.info("connecting to test table '%s'", table)
         try:
             table_conn = self.conn.table(table)
         except socket.timeout as _:
