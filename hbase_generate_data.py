@@ -89,7 +89,7 @@ class HBaseGenerateData(CLI):
         self.add_opt('-L', '--value-len', default=self.default_value_len,
                      help='Value length (default: {0})'.format(self.default_value_len))
         self.add_opt('-S', '--skew', action='store_true', default=False,
-                     help='Skew the data row keys intentionally for testing (default: False)')
+                     help='Skew the data row keys intentionally for testing (default: False, NOT IMPLEMENTED YET)')
         self.add_opt('-d', '--drop-table', action='store_true', default=False,
                      help='Drop test data table (only allowed if keeping the default table name for safety)')
 
