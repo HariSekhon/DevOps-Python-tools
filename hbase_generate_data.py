@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.3.1'
 
 
 class HBaseGenerateData(CLI):
@@ -150,7 +150,7 @@ class HBaseGenerateData(CLI):
             self.conn = happybase.Connection(host=self.host, port=self.port, timeout=10 * 1000)  # ms
         except socket.timeout as _:
             die('ERROR: {0}'.format(_))
-        except thriftpy.transport.TTransportException as _:
+        except thriftpy.thrift.TException as _:
             die('ERROR: {0}'.format(_))
         tables = self.get_tables()
         # of course there is a minor race condition here between getting the table list, checking and creating
@@ -187,7 +187,7 @@ class HBaseGenerateData(CLI):
             table_conn = self.conn.table(table)
         except socket.timeout as _:
             die('ERROR while trying to connect to table \'{0}\': {1}'.format(table, _))
-        except thriftpy.transport.TTransportException as _:
+        except thriftpy.thrift.TException as _:
             die('ERROR while trying to connect to table \'{0}\': {1}'.format(table, _))
         log.info("populating test table '%s' with random data", table)
         if self.danger:
@@ -212,7 +212,7 @@ class HBaseGenerateData(CLI):
             log.info('sent %s rows of generated data to HBase in %.2f seconds', self.num_rows, time_taken)
         except socket.timeout as _:
             die('ERROR while trying to populate table \'{0}\': {1}'.format(table, _))
-        except thriftpy.transport.TTransportException as _:
+        except thriftpy.thrift.TException as _:
             die('ERROR while trying to populate table \'{0}\': {1}'.format(table, _))
 
 
