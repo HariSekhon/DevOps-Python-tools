@@ -77,6 +77,7 @@ class HBaseGenerateData(CLI):
         self.skew = False
         self.skew_pc = self.default_skew_pc
         self.drop_table = False
+        self.danger = False
         self.timeout_default = 6 * 3600
         autoflush()
 
@@ -97,6 +98,8 @@ class HBaseGenerateData(CLI):
                      help='Skew percentage (default: {0})'.format(self.default_skew_pc))
         self.add_opt('-d', '--drop-table', action='store_true', default=False,
                      help='Drop test data table (only allowed if keeping the default table name for safety)')
+        self.add_opt('-X', '--danger', action='store_true', help='Allows sending data to an existing table. ' +
+                     'Dangerous but useful to test pre-splitting schemes on test tables')
 
     def process_args(self):
         log.setLevel(logging.INFO)
@@ -123,6 +126,7 @@ class HBaseGenerateData(CLI):
         validate_int(self.skew_pc, 'skew percentage', 0, 100)
         self.skew_pc = int(self.skew_pc)
         self.drop_table = self.get_opt('drop_table')
+        self.danger = self.get_opt('danger')
 
         if self.drop_table and self.table != self.default_table_name:
             die("not allowed to use --drop-table if using a table name other than the default table '{0}'"\
@@ -156,10 +160,13 @@ class HBaseGenerateData(CLI):
                 log.info("table '%s' already existed but -d / --drop-table was specified, removing table first",
                          self.table)
                 self.conn.delete_table(self.table, disable=True)
+            elif self.danger:
+                pass
             else:
                 die("WARNING: table '{0}' already exists, will not send data to a pre-existing table for safety"\
                     .format(self.table))
-        self.create_table()
+        else:
+            self.create_table()
         self.populate_table()
         log.info('finished, closing connection')
         self.conn.close()
