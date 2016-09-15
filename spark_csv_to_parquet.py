@@ -24,7 +24,7 @@ If CSV --has-headers then all fields are assumed to be 'string' unless explicitl
 
 Written to work across Python 2.x and Spark versions, especially Spark given that the Spark API changed after 1.3
 
-Tested on Spark 1.3.1, 1.4.0
+Tested on Spark 1.3.1, 1.4.0, 1.5.1, 1.6.2
 
 """
 
@@ -46,7 +46,7 @@ except ImportError as _:
     print("Did you remember to build the project by running 'make'?", file=sys.stderr)
     print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
     sys.exit(4)
-os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.databricks:spark-csv_2.10:1.3.0 %s' \
+os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.databricks:spark-csv_2.11:1.5.0 %s' \
                                     % os.getenv('PYSPARK_SUBMIT_ARGS', '')
 pyspark_path()
 from pyspark import SparkContext    # pylint: disable=wrong-import-position,import-error
