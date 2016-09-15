@@ -31,7 +31,7 @@ cd "$srcdir"
 
 # don't support Spark <= 1.3 due to difference in databricks avro dependency
 #for SPARK_VERSION in 1.3.1 1.4.0; do
-for SPARK_VERSION in 1.4.0 1.6.0; do
+for SPARK_VERSION in 1.4.0 1.5.1 1.6.2; do
     dir="spark-$SPARK_VERSION-bin-hadoop2.6"
     tar="$dir.tgz"
     if ! [ -d "$dir" ]; then
