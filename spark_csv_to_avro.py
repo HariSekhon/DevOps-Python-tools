@@ -24,7 +24,7 @@ If CSV --has-headers then all fields are assumed to be 'string' unless explicitl
 
 Written to work across Python 2.x, supports Spark 1.4+
 
-Tested on Spark 1.4.0, 1.6.0
+Tested on Spark 1.4.0, 1.5.1, 1.6.0, 1.6.2
 
 """
 
@@ -49,7 +49,7 @@ except ImportError as _:
                                     # com.databricks:spark-avro_2.10:2.0.1 - 2.0.1 is for Spark 1.4+
                                     # you can edit this bit if you need to run it on Spark 1.3:
                                     # https://github.com/databricks/spark-avro#linking
-os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.databricks:spark-csv_2.10:1.3.0,' + \
+os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.databricks:spark-csv_2.10:1.5.0,' + \
                                     'com.databricks:spark-avro_2.10:2.0.1 %s' \
                                     % os.getenv('PYSPARK_SUBMIT_ARGS', '')
 pyspark_path()
