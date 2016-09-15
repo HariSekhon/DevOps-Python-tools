@@ -23,13 +23,17 @@ echo "
 # ===================== #
 "
 
+export SPARK_VERSIONS="${@:-1.3.1 1.4.0 1.5.1 1.6.2}"
+# requires using spark-avro 3.0.0+
+#export SPARK_VERSIONS="${@:-2.0.0}"
+
 cd "$srcdir/..";
 
 . ./tests/utils.sh
 
 cd "$srcdir"
 
-for SPARK_VERSION in 1.4.0 1.6.0; do
+for SPARK_VERSION in $SPARK_VERSIONS; do
     dir="spark-$SPARK_VERSION-bin-hadoop2.6"
     tar="$dir.tgz"
     if ! [ -d "$dir" ]; then
