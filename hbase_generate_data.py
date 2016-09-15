@@ -39,7 +39,7 @@ import time
 import traceback
 import socket
 import happybase
-import thrift
+import thriftpy
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.3'
 
 
 class HBaseGenerateData(CLI):
@@ -78,6 +78,7 @@ class HBaseGenerateData(CLI):
         self.skew_pc = self.default_skew_pc
         self.drop_table = False
         self.danger = False
+        self.cf = 'cf1'
         self.timeout_default = 6 * 3600
         autoflush()
 
@@ -137,7 +138,7 @@ class HBaseGenerateData(CLI):
             return self.conn.tables()
         except socket.timeout as _:
             die('ERROR while trying to get table list: {0}'.format(_))
-        except thrift.transport.TTransport.TTransportException as _:
+        except thriftpy.transport.TTransportException as _:
             die('ERROR while trying to get table list: {0}'.format(_))
 
     def run(self):
@@ -149,7 +150,7 @@ class HBaseGenerateData(CLI):
             self.conn = happybase.Connection(host=self.host, port=self.port, timeout=10 * 1000)  # ms
         except socket.timeout as _:
             die('ERROR: {0}'.format(_))
-        except thrift.transport.TTransport.TTransportException as _:
+        except thriftpy.transport.TTransportException as _:
             die('ERROR: {0}'.format(_))
         tables = self.get_tables()
         # of course there is a minor race condition here between getting the table list, checking and creating
@@ -173,7 +174,7 @@ class HBaseGenerateData(CLI):
 
     def create_table(self):
         log.info('creating table %s', self.table)
-        self.conn.create_table(self.table, {'cf1': dict(max_versions=1)})
+        self.conn.create_table(self.table, {self.cf: dict(max_versions=1)})
 
     def populate_table(self):
         table = self.table
@@ -186,9 +187,12 @@ class HBaseGenerateData(CLI):
             table_conn = self.conn.table(table)
         except socket.timeout as _:
             die('ERROR while trying to connect to table \'{0}\': {1}'.format(table, _))
-        except thrift.transport.TTransport.TTransportException as _:
+        except thriftpy.transport.TTransportException as _:
             die('ERROR while trying to connect to table \'{0}\': {1}'.format(table, _))
         log.info("populating test table '%s' with random data", table)
+        if self.danger:
+            self.cf = sorted(table_conn.families().keys())[0]
+        cf_col = self.cf + ':col1'
         try:
             skew_prefix = 'A' * key_length
             skew_mod = max(1, 100.0 / self.skew_pc)
@@ -198,9 +202,9 @@ class HBaseGenerateData(CLI):
             for _ in range(self.num_rows):
                 if self.skew and int(_ % skew_mod) == 0:
                     table_conn.put(bytes(skew_prefix + '{number:0{width}d}'.format(width=width, number=_)), \
-                                   {b'cf1:col1': bytes(random_alnum(value_length))})
+                                   {bytes(cf_col): bytes(random_alnum(value_length))})
                 else:
-                    table_conn.put(bytes(random_alnum(key_length)), {b'cf1:col1': bytes(random_alnum(value_length))})
+                    table_conn.put(bytes(random_alnum(key_length)), {bytes(cf_col): bytes(random_alnum(value_length))})
                 if _ % 100 == 0:
                     print('.', end='')
             print()
@@ -208,7 +212,7 @@ class HBaseGenerateData(CLI):
             log.info('sent %s rows of generated data to HBase in %.2f seconds', self.num_rows, time_taken)
         except socket.timeout as _:
             die('ERROR while trying to populate table \'{0}\': {1}'.format(table, _))
-        except thrift.transport.TTransport.TTransportException as _:
+        except thriftpy.transport.TTransportException as _:
             die('ERROR while trying to populate table \'{0}\': {1}'.format(table, _))
 
 
