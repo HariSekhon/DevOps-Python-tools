@@ -20,7 +20,7 @@ PySpark program to convert Avro file(s) to Parquet
 
 Written to work across Python 2.x, supports Spark 1.4+
 
-Tested on Spark 1.4.0, 1.6.0
+Tested on Spark 1.4.0, 1.5.1, 1.6.0, 1.6.2, 2.0.0 (requires spark-avro package 3.0.0+)
 
 """
 
@@ -45,6 +45,9 @@ except ImportError as _:
                                     # com.databricks:spark-avro_2.10:2.0.1 - 2.0.1 is for Spark 1.4+
                                     # you can edit this bit if you need to run it on Spark 1.3:
                                     # https://github.com/databricks/spark-avro#linking
+# Must set spark-avro package to 3.0.0+ if using Spark 2.0
+# for Spark < 2.0 it results in Exception => Caused by: java.lang.ClassNotFoundException: org.apache.spark.sql.execution.datasources.FileFormat
+#os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.databricks:spark-avro_2.10:3.0.0 %s' \
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.databricks:spark-avro_2.10:2.0.1 %s' \
                                     % os.getenv('PYSPARK_SUBMIT_ARGS', '')
 pyspark_path()
