@@ -20,7 +20,7 @@ PySpark program to convert to Parquet file(s) to Avro
 
 Written to work across Python 2.x, supports Spark 1.4+
 
-Tested on Spark 1.4.0, 1.5.1, 1.6.0, 1.6.2, 2.0.0 (requires using spark-avro 3.0.0+)
+Tested on Spark 1.4.0, 1.5.1, 1.6.0, 1.6.2, 2.0.0 (requires spark-avro package 3.0.0+)
 
 """
 
