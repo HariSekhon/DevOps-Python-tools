@@ -24,7 +24,7 @@ If CSV --has-headers then all fields are assumed to be 'string' unless explicitl
 
 Written to work across Python 2.x and Spark versions, especially Spark given that the Spark API changed after 1.3
 
-Tested on Spark 1.3.1, 1.4.0, 1.5.1, 1.6.2
+Tested on Spark 1.3.1, 1.4.0, 1.5.1, 1.6.2, 2.0.0
 
 """
 
