@@ -44,7 +44,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log, die, random_alnum, autoflush
+    from harisekhon.utils import log, die, random_alnum, autoflush, log_option
     from harisekhon.utils import validate_host, validate_port, validate_database_tablename, validate_int
     from harisekhon import CLI
 except ImportError as _:
@@ -123,6 +123,7 @@ class HBaseGenerateData(CLI):
         self.num_rows = int(self.num_rows)
 
         self.skew = self.get_opt('skew')
+        log_option('skew data', self.skew)
         self.skew_pc = self.get_opt('skew_percentage')
         validate_int(self.skew_pc, 'skew percentage', 0, 100)
         self.skew_pc = int(self.skew_pc)
