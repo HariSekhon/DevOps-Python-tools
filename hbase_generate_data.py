@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 class HBaseGenerateData(CLI):
@@ -67,13 +67,15 @@ class HBaseGenerateData(CLI):
         self.port = 9090
         self.default_table_name = 'HS_test_data'
         self.default_num_rows = 10000
-        self.default_key_len = 20
-        self.default_value_len = 40
+        self.default_key_length = 20
+        self.default_value_length = 40
+        self.default_skew_pc = 90
         self.table = self.default_table_name
         self.num_rows = self.default_num_rows
-        self.key_len = self.default_key_len
-        self.value_len = self.default_value_len
+        self.key_length = self.default_key_length
+        self.value_length = self.default_value_length
         self.skew = False
+        self.skew_pc = self.default_skew_pc
         self.drop_table = False
         self.timeout_default = 6 * 3600
         autoflush()
@@ -84,12 +86,15 @@ class HBaseGenerateData(CLI):
                      ' Will refuse to send data to any already existing table for safety reasons')
         self.add_opt('-n', '--num', default=self.default_num_rows,
                      help='Number of rows to generate (default {0})'.format(self.default_num_rows))
-        self.add_opt('-K', '--key-len', default=self.default_key_len,
-                     help='Key length (default: {0})'.format(self.default_key_len))
-        self.add_opt('-L', '--value-len', default=self.default_value_len,
-                     help='Value length (default: {0})'.format(self.default_value_len))
-        self.add_opt('-S', '--skew', action='store_true', default=False,
-                     help='Skew the data row keys intentionally for testing (default: False, NOT IMPLEMENTED YET)')
+        self.add_opt('-K', '--key-length', default=self.default_key_length,
+                     help='Key length (default: {0})'.format(self.default_key_length))
+        self.add_opt('-L', '--value-length', default=self.default_value_length,
+                     help='Value length (default: {0})'.format(self.default_value_length))
+        self.add_opt('-s', '--skew', action='store_true', default=False,
+                     help='Skew the data row keys intentionally for testing (default: False). This will use a key of ' +
+                     'all \'A\'s of length --key-length, plus a numerically incrementing padded suffix')
+        self.add_opt('--skew-percentage', '--pc', default=self.default_skew_pc,
+                     help='Skew percentage (default: {0})'.format(self.default_skew_pc))
         self.add_opt('-d', '--drop-table', action='store_true', default=False,
                      help='Drop test data table (only allowed if keeping the default table name for safety)')
 
@@ -100,17 +105,25 @@ class HBaseGenerateData(CLI):
         self.port = self.get_opt('port')
         validate_host(self.host)
         validate_port(self.port)
+
         self.table = self.get_opt('table')
         self.num_rows = self.get_opt('num')
-        self.key_len = self.get_opt('key_len')
-        self.value_len = self.get_opt('value_len')
-        self.skew = self.get_opt('skew')
-        self.drop_table = self.get_opt('drop_table')
+        self.key_length = self.get_opt('key_length')
+        self.value_length = self.get_opt('value_length')
+
         validate_database_tablename(self.table)
         validate_int(self.num_rows, 'num rows', 1, 1000000000)
-        validate_int(self.key_len, 'key length', 10, 1000)
-        validate_int(self.value_len, 'value length', 1, 1000000)
+        validate_int(self.key_length, 'key length', 10, 1000)
+        validate_int(self.value_length, 'value length', 1, 1000000)
+
         self.num_rows = int(self.num_rows)
+
+        self.skew = self.get_opt('skew')
+        self.skew_pc = self.get_opt('skew_percentage')
+        validate_int(self.skew_pc, 'skew percentage', 0, 100)
+        self.skew_pc = int(self.skew_pc)
+        self.drop_table = self.get_opt('drop_table')
+
         if self.drop_table and self.table != self.default_table_name:
             die("not allowed to use --drop-table if using a table name other than the default table '{0}'"\
                 .format(self.default_table_name))
@@ -157,8 +170,8 @@ class HBaseGenerateData(CLI):
 
     def populate_table(self):
         table = self.table
-        key_len = self.key_len
-        value_len = self.value_len
+        key_length = self.key_length
+        value_length = self.value_length
         table_conn = None
         # does not actually connect until sending data
         #log.info("connecting to test table '%s'", table)
@@ -170,9 +183,17 @@ class HBaseGenerateData(CLI):
             die('ERROR while trying to connect to table \'{0}\': {1}'.format(table, _))
         log.info("populating test table '%s' with random data", table)
         try:
+            skew_prefix = 'A' * key_length
+            skew_mod = max(1, 100.0 / self.skew_pc)
+            #log.info('skew mod is %s', skew_mod)
+            width = len('{0}'.format(self.num_rows))
             start = time.time()
             for _ in range(self.num_rows):
-                table_conn.put(bytes(random_alnum(key_len)), {b'cf1:col1': bytes(random_alnum(value_len))})
+                if self.skew and int(_ % skew_mod) == 0:
+                    table_conn.put(bytes(skew_prefix + '{number:0{width}d}'.format(width=width, number=_)), \
+                                   {b'cf1:col1': bytes(random_alnum(value_length))})
+                else:
+                    table_conn.put(bytes(random_alnum(key_length)), {b'cf1:col1': bytes(random_alnum(value_length))})
                 if _ % 100 == 0:
                     print('.', end='')
             print()
