@@ -50,7 +50,7 @@ echo
 
 echo
 echo "checking directory recursion (mixed with explicit file given)"
-./validate_parquet.py -vvv "$data_dir/test.parquet" .
+./validate_parquet.py -vvv "$data_dir/test.parquet" . -t 120
 echo
 
 echo "checking symlink handling"
