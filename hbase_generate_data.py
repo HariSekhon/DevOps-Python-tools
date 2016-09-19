@@ -32,7 +32,7 @@ from __future__ import division
 from __future__ import print_function
 #from __future__ import unicode_literals
 
-import logging
+#import logging
 import os
 import sys
 import time
@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 
 class HBaseGenerateData(CLI):
@@ -65,6 +65,7 @@ class HBaseGenerateData(CLI):
         self.conn = None
         self.host = None
         self.port = 9090
+        self.verbose_default = 2
         self.default_table_name = 'HS_test_data'
         self.default_num_rows = 10000
         self.default_key_length = 20
@@ -103,7 +104,8 @@ class HBaseGenerateData(CLI):
                      'Dangerous but useful to test pre-splitting schemes on test tables')
 
     def process_args(self):
-        log.setLevel(logging.INFO)
+        # this resets DEBUG env var
+        #log.setLevel(logging.INFO)
         self.no_args()
         self.host = self.get_opt('host')
         self.port = self.get_opt('port')
@@ -214,7 +216,10 @@ class HBaseGenerateData(CLI):
         except socket.timeout as _:
             die('ERROR while trying to populate table \'{0}\': {1}'.format(table, _))
         except ThriftException as _:
-            die('ERROR while trying to populate table \'{0}\': {1}'.format(table, _))
+            exp = str(_)
+            exp = exp.replace('\\n', '\n')
+            exp = exp.replace('\\t', '\t')
+            die('ERROR while trying to populate table \'{0}\': {1}'.format(table, exp))
 
 
 if __name__ == '__main__':
