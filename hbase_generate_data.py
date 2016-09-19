@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 
 
 class HBaseGenerateData(CLI):
@@ -164,13 +164,18 @@ class HBaseGenerateData(CLI):
                 log.info("table '%s' already existed but -d / --drop-table was specified, removing table first",
                          self.table)
                 self.conn.delete_table(self.table, disable=True)
+                # wait up to 30 secs for table to be deleted
+                #for _ in range(30):
+                #    if self.table not in self.get_tables():
+                #        break
+                #    log.debug('waiting for table to be deleted before creating new one')
+                #    time.sleep(1)
             elif self.danger:
                 pass
             else:
                 die("WARNING: table '{0}' already exists, will not send data to a pre-existing table for safety"\
                     .format(self.table))
-        else:
-            self.create_table()
+        self.create_table()
         self.populate_table()
         log.info('finished, closing connection')
         self.conn.close()
