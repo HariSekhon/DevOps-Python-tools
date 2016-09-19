@@ -97,11 +97,11 @@ EOF
     check_exit_code 2
     set -e
     hr
-    #./hbase_generate_data.py -n 10 -d
+    ./hbase_generate_data.py -n 10 -d
     hr
-    #./hbase_generate_data.py -n 10 -d -s
+    ./hbase_generate_data.py -n 10 -d -s
     hr
-    #./hbase_generate_data.py -n 10 -d -s --pc 50
+    ./hbase_generate_data.py -n 10 -d -s --pc 50
     hr
     set +e
     ./hbase_compact_tables.py --list-tables
