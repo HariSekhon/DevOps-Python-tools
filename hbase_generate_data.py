@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.3'
+__version__ = '0.3.4'
 
 
 class HBaseGenerateData(CLI):
@@ -78,8 +78,8 @@ class HBaseGenerateData(CLI):
         self.skew = False
         self.skew_pc = self.default_skew_pc
         self.drop_table = False
-        self.danger = False
-        self.cf = 'cf1'
+        self.use_existing_table = False
+        self.column_family = 'cf1'
         self.timeout_default = 6 * 3600
         autoflush()
 
@@ -100,7 +100,8 @@ class HBaseGenerateData(CLI):
                      help='Skew percentage (default: {0})'.format(self.default_skew_pc))
         self.add_opt('-d', '--drop-table', action='store_true', default=False,
                      help='Drop test data table (only allowed if keeping the default table name for safety)')
-        self.add_opt('-X', '--danger', action='store_true', help='Allows sending data to an existing table. ' +
+        self.add_opt('-X', '--use-existing-table', action='store_true',
+                     help='Allows sending data to an existing table. ' +
                      'Dangerous but useful to test pre-splitting schemes on test tables')
 
     def process_args(self):
@@ -130,7 +131,7 @@ class HBaseGenerateData(CLI):
         validate_int(self.skew_pc, 'skew percentage', 0, 100)
         self.skew_pc = int(self.skew_pc)
         self.drop_table = self.get_opt('drop_table')
-        self.danger = self.get_opt('danger')
+        self.use_existing_table = self.get_opt('use_existing_table')
 
         if self.drop_table and self.table != self.default_table_name:
             die("not allowed to use --drop-table if using a table name other than the default table '{0}'"\
@@ -170,19 +171,20 @@ class HBaseGenerateData(CLI):
                 #        break
                 #    log.debug('waiting for table to be deleted before creating new one')
                 #    time.sleep(1)
-            elif self.danger:
+            elif self.use_existing_table:
                 pass
             else:
                 die("WARNING: table '{0}' already exists, will not send data to a pre-existing table for safety"\
                     .format(self.table))
-        self.create_table()
+        if not self.use_existing_table:
+            self.create_table()
         self.populate_table()
         log.info('finished, closing connection')
         self.conn.close()
 
     def create_table(self):
         log.info('creating table %s', self.table)
-        self.conn.create_table(self.table, {self.cf: dict(max_versions=1)})
+        self.conn.create_table(self.table, {self.column_family: dict(max_versions=1)})
 
     def populate_table(self):
         table = self.table
@@ -198,9 +200,9 @@ class HBaseGenerateData(CLI):
         except ThriftException as _:
             die('ERROR while trying to connect to table \'{0}\': {1}'.format(table, _))
         log.info("populating test table '%s' with random data", table)
-        if self.danger:
-            self.cf = sorted(table_conn.families().keys())[0]
-        cf_col = self.cf + ':col1'
+        if self.use_existing_table:
+            self.column_family = sorted(table_conn.families().keys())[0]
+        cf_col = self.column_family + ':col1'
         try:
             skew_prefix = 'A' * key_length
             skew_mod = max(1, 100.0 / self.skew_pc)
