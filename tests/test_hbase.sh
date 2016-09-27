@@ -97,6 +97,8 @@ EOF
     check_exit_code 2
     set -e
     hr
+    ./hbase_generate_data.py -n 10 -X
+    hr
     ./hbase_generate_data.py -n 10 -d
     hr
     ./hbase_generate_data.py -n 10 -d -s
