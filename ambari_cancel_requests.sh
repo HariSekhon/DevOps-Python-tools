@@ -16,11 +16,22 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
-AMBARI_HOST="${AMBARI_HOST:-localhost}"
-AMBARI_PORT="${AMBARI_PORT:-8080}"
-AMBARI_USER="${AMBARI_USER:-admin}"
-AMBARI_PASSWORD="${AMBARI_PASSWORD:-admin}"
-AMBARI_CLUSTER="${AMBARI_CLUSTER:-Sandbox}"
+AMBARI_HOST="${1:-${AMBARI_HOST:-localhost}}"
+AMBARI_PORT="${2:-${AMBARI_PORT:-8080}}"
+AMBARI_USER="${3:-${AMBARI_USER:-admin}}"
+AMBARI_PASSWORD="${4:-${AMBARI_PASSWORD:-admin}}"
+AMBARI_CLUSTER="${5:-${AMBARI_CLUSTER:-Sandbox}}"
+
+usage(){
+    echo "Very simple script to cancel all Ambari op requests
+
+usage: ${0##*/} <ambari_host> <ambari_port> <username> <password> <cluster_name>"
+    exit 1
+}
+
+if [ $# -gt 0 ]; then
+    usage
+fi
 
 echo "querying Ambari for request IDs"
 curl -u $AMBARI_USER:$AMBARI_PASSWORD http://$AMBARI_HOST:$AMBARI_PORT/api/v1/clusters/$AMBARI_CLUSTER/requests |
