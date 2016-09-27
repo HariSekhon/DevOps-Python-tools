@@ -155,6 +155,7 @@ class AmbariTriggerServiceChecks(CLI):
                 if service_requested not in self.services:
                     die('service \'{0}\' is not in the list of available services in Ambari!'.format(service_requested)
                         + ' Here is the list of services available:\n' + '\n'.join(self.services))
+            services_to_check = services_requested
         if cancel:
             self.cancel_service_checks()
         else:
@@ -272,6 +273,9 @@ class AmbariTriggerServiceChecks(CLI):
                 die('failed to parse response for request_id {0}. '.format(request_id) + support_msg_api())
 
     def request_service_checks(self, services):
+        log.debug('requesting service checks for services: %s', services)
+        if not isList(services):
+            code_error('non-list passed to request_service_checks')
         url_suffix = '/clusters/{cluster}/request_schedules'.format(cluster=self.cluster)
         payload = self.gen_payload(services)
         log.info('sending batch schedule check request for services: ' + ', '.join(services))
@@ -322,6 +326,7 @@ class AmbariTriggerServiceChecks(CLI):
             die('parsing schedule request status failed: ' + str(_) + '. ' + support_msg_api())
 
     def gen_payload(self, services=None):
+        log.debug('generating payload for services: %s', services)
         if services is None or services == 'all':
             services = self.get_services()
         if not isList(services):
