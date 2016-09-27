@@ -51,12 +51,16 @@ except ImportError as _:
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.databricks:spark-avro_2.10:2.0.1 %s' \
                                     % os.getenv('PYSPARK_SUBMIT_ARGS', '')
 pyspark_path()
+import pyspark
+print(str(pyspark.SparkContext.version))
+sys.exit(0)
 from pyspark import SparkContext    # pylint: disable=wrong-import-position,import-error
 from pyspark import SparkConf       # pylint: disable=wrong-import-position,import-error
 from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
 __version__ = '0.7.2'
+
 
 class SparkAvroToParquet(CLI):
 
@@ -114,6 +118,7 @@ class SparkAvroToParquet(CLI):
                 'I may change this on request but prefer people just upgrade')
             # log.warn('running legacy code for Spark <= 1.3')
             # df.saveAsParquetFile(parquet_dir)
+
 
 if __name__ == '__main__':
     SparkAvroToParquet().main()
