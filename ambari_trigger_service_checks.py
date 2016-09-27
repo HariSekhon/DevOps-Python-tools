@@ -133,11 +133,10 @@ class AmbariTriggerServiceChecks(CLI):
                 print('Ambari Clusters:\n')
             print('\n'.join(clusters))
             sys.exit(3)
-        if not self.cluster:
-            if len(clusters) == 1:
-                self.cluster = clusters[0]
-                log.info('no --cluster specified, but only one cluster managed by Ambari' +
-                         ', inferring --cluster=\'%s\'', self.cluster)
+        if not self.cluster and len(clusters) == 1:
+            self.cluster = clusters[0]
+            log.info('no --cluster specified, but only one cluster managed by Ambari' +
+                     ', inferring --cluster=\'%s\'', self.cluster)
         validate_chars(self.cluster, 'cluster', r'\w\s\.-')
         self.services = self.get_services()
         if list_services:
