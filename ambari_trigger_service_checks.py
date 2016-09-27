@@ -90,6 +90,7 @@ class AmbariTriggerServiceChecks(CLI):
                      help='List clusters managed by Ambari and exit')
         self.add_opt('-l', '--list-services', action='store_true',
                      help='List services managed by Ambari for given --cluster and exit')
+        self.add_quietoption()
 
     def process_args(self):
         self.no_args()
@@ -121,7 +122,9 @@ class AmbariTriggerServiceChecks(CLI):
         list_services = self.get_opt('list_services')
         clusters = self.get_clusters()
         if list_clusters:
-            print('Ambari Clusters:\n\n' + '\n'.join(clusters))
+            if self.verbose > 0:
+                print('Ambari Clusters:\n\n')
+            print('\n'.join(clusters))
             sys.exit(3)
         if not self.cluster:
             if len(clusters) == 1:
@@ -131,7 +134,9 @@ class AmbariTriggerServiceChecks(CLI):
         validate_chars(self.cluster, 'cluster', r'\w\s\.-')
         self.services = self.get_services()
         if list_services:
-            print('Ambari Services:\n\n' + '\n'.join(self.services))
+            if self.verbose > 0:
+                print('Ambari Services:\n\n')
+            print('\n'.join(self.services))
             sys.exit(3)
         if not services_requested and not all_services:
             self.usage('no --services specified, nor was --all requested')
