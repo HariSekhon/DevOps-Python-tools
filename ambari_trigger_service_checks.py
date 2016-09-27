@@ -123,7 +123,7 @@ class AmbariTriggerServiceChecks(CLI):
         clusters = self.get_clusters()
         if list_clusters:
             if self.verbose > 0:
-                print('Ambari Clusters:\n\n')
+                print('Ambari Clusters:\n')
             print('\n'.join(clusters))
             sys.exit(3)
         if not self.cluster:
@@ -135,7 +135,7 @@ class AmbariTriggerServiceChecks(CLI):
         self.services = self.get_services()
         if list_services:
             if self.verbose > 0:
-                print('Ambari Services:\n\n')
+                print('Ambari Services:\n')
             print('\n'.join(self.services))
             sys.exit(3)
         if not services_requested and not all_services:
