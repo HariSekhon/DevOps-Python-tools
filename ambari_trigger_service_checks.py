@@ -290,13 +290,13 @@ class AmbariTriggerServiceChecks(CLI):
     def watch_scheduled_request(self, request_schedule_id):
         while True:
             content = self.get('/clusters/{0}/request_schedules/{1}'.format(self.cluster, request_schedule_id))
-            status = self.parse_schedule_request(content)
+            status = self.parse_scheduled_request(content)
             if status == 'COMPLETED':
                 return
             time.sleep(1)
 
     @staticmethod
-    def parse_schedule_request(content):
+    def parse_scheduled_request(content):
         try:
             _ = json.loads(content)
             if _['RequestSchedule']['last_execution_status'] == 'COMPLETED':
@@ -307,8 +307,6 @@ class AmbariTriggerServiceChecks(CLI):
                 if 'request_status' in item:
                     request_status = item['request_status']
                 if request_status == 'COMPLETED':
-                    continue
-                if not log.isEnabledFor(logging.DEBUG):
                     continue
                 request_body = item['request_body']
                 request_body_dict = json.loads(request_body)
