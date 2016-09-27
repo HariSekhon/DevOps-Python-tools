@@ -85,7 +85,8 @@ class AmbariTriggerServiceChecks(CLI):
         self.add_opt('-a', '--all', action='store_true', help='Trigger all service checks')
         self.add_opt('-s', '--services', help='Trigger service checks for given list of services (comma separated)')
         self.add_opt('-w', '--wait', action='store_true',
-                     help='Wait for checks to complete before returning, checks once per second for completion')
+                     help='Wait for checks to complete before returning, ' +
+                     'prints status of the service check in progress once per second until completion')
         self.add_opt('--cancel', action='store_true', help='Cancel all pending service check operations')
         self.add_opt('-S', '--ssl', action='store_true', help='use SSL when connecting to Ambari')
         self.add_opt('-L', '--list-clusters', action='store_true',
