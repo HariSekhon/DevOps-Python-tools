@@ -82,7 +82,7 @@ class AmbariTriggerServiceChecks(CLI):
         self.add_opt('-C', '--cluster', help='Cluster to request service checks on ' +
                      '(if Ambari only manages one cluster will detect and not require this option)')
         self.add_opt('-a', '--all', action='store_true', help='Trigger all service checks')
-        self.add_opt('-s', '--services', help='Trigger given service(s) checks (comma separated)')
+        self.add_opt('-s', '--services', help='Trigger service checks for given list of services (comma separated)')
         self.add_opt('-w', '--wait', action='store_true',
                      help='Wait for checks to complete before returning, checks once per second for completion')
         self.add_opt('-S', '--ssl', action='store_true', help='use SSL when connecting to Ambari')
