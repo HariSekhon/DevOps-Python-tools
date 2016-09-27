@@ -16,7 +16,7 @@
 
 """
 
-Tool to trigger Ambari service checks, can find and trigger all service checks with a simple -a / --all switch
+Tool to trigger Ambari service checks, can find and trigger all service checks with a simple --all switch
 
 Written to get around a state in Ambari Express Upgrade complaining that the service checks hadn't run since the last
 configuration changes
@@ -33,6 +33,7 @@ from __future__ import print_function
 import logging
 import json
 import os
+#import re
 import sys
 import time
 import traceback
@@ -46,7 +47,7 @@ libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log, die, support_msg_api, code_error, isList, jsonpp
+    from harisekhon.utils import log, die, support_msg_api, code_error, isInt, isList, jsonpp
     from harisekhon.utils import validate_host, validate_port, validate_user, validate_password, validate_chars
     from harisekhon import CLI
 except ImportError as _:
@@ -54,7 +55,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 class AmbariTriggerServiceChecks(CLI):
@@ -85,6 +86,7 @@ class AmbariTriggerServiceChecks(CLI):
         self.add_opt('-s', '--services', help='Trigger service checks for given list of services (comma separated)')
         self.add_opt('-w', '--wait', action='store_true',
                      help='Wait for checks to complete before returning, checks once per second for completion')
+        self.add_opt('--cancel', action='store_true', help='Cancel all pending service check operations')
         self.add_opt('-S', '--ssl', action='store_true', help='use SSL when connecting to Ambari')
         self.add_opt('-L', '--list-clusters', action='store_true',
                      help='List clusters managed by Ambari and exit')
@@ -113,9 +115,13 @@ class AmbariTriggerServiceChecks(CLI):
         validate_password(self.password)
         all_services = self.get_opt('all')
         services_str = self.get_opt('services')
+        cancel = self.get_opt('cancel')
+        if cancel and (all_services or services_str):
+            self.usage('cannot specify --cancel and --services/--all simultaneously' +
+                       ', --cancel will cancel all pending service checks')
         if all_services and services_str:
             self.usage('cannot specify --all and --services simultaneously, they are mutually exclusive')
-        services_requested = None
+        services_requested = []
         if services_str:
             services_requested = [service.strip().upper() for service in services_str.split(',')]
         list_clusters = self.get_opt('list_clusters')
@@ -138,19 +144,23 @@ class AmbariTriggerServiceChecks(CLI):
                 print('Ambari Services:\n')
             print('\n'.join(self.services))
             sys.exit(3)
-        if not services_requested and not all_services:
+        if not services_requested and not all_services and not cancel:
             self.usage('no --services specified, nor was --all requested')
+        services_to_check = []
         if all_services:
-            self.request_service_checks(self.services)
+            services_to_check = self.services
         else:
             for service_requested in services_requested:
                 if service_requested not in self.services:
                     die('service \'{0}\' is not in the list of available services in Ambari!'.format(service_requested)
                         + ' Here is the list of services available:\n' + '\n'.join(self.services))
-            self.request_service_checks(services_requested)
+        if cancel:
+            self.cancel_service_checks()
+        else:
+            self.request_service_checks(services_to_check)
 
     # throws (URLError, BadStatusLine) - catch in caller for more specific exception handling error reporting
-    def req(self, url_suffix, data=None):
+    def req(self, url_suffix, data=None, request_type='GET'):
         x_requested_by = self.user
         url = self.url_base + '/' + url_suffix.lstrip('/')
         if self.user == 'admin':
@@ -158,7 +168,11 @@ class AmbariTriggerServiceChecks(CLI):
         headers = {'X-Requested-By': x_requested_by}
         log.debug('X-Requested-By: %s', x_requested_by)
         try:
-            if data:
+            if request_type == 'PUT':
+                log.debug('PUT %s', url)
+                log.debug('PUTing data:\n\n%s' % data)
+                result = requests.put(url, auth=(self.user, self.password), headers=headers, data=data)
+            elif data:
                 log.debug('POST %s', url)
                 log.debug('POSTing data:\n\n%s' % data)
                 result = requests.post(url, auth=(self.user, self.password), headers=headers, data=data)
@@ -196,6 +210,9 @@ class AmbariTriggerServiceChecks(CLI):
     def post(self, url_suffix, data):
         return self.req(url_suffix, data)
 
+    def put(self, url_suffix, data):
+        return self.req(url_suffix, data, request_type='PUT')
+
     def get_clusters(self):
         content = self.get('/clusters')
         clusters = set()
@@ -220,6 +237,39 @@ class AmbariTriggerServiceChecks(CLI):
             die('failed to parse services: {0}'.format(_) + support_msg_api())
         return sorted(list(services))
 
+    def get_request_ids(self):
+        content = self.get('/clusters/{cluster}/requests'.format(cluster=self.cluster))
+        try:
+            _ = json.loads(content)
+            request_ids = []
+            for item in _['items']:
+                if item['Requests']['cluster_name'] == self.cluster:
+                    request_id = item['Requests']['id']
+                    if not isInt(request_id):
+                        die('request id returned was not an integer! ' + support_msg_api())
+                    request_ids.append(request_id)
+            return request_ids
+        except (KeyError, ValueError) as _:
+            die('failed to parse response for request IDs: {0}. '.format(_) + support_msg_api())
+
+    def cancel_service_checks(self):
+        log.info('cancelling all requests matching service check context')
+        request_ids = self.get_request_ids()
+        #re_context = re.compile(r'.+ Service Check \(batch \d+ of \d+\)', re.I)
+        cancel_payload = '{"Requests":{"request_status":"ABORTED","abort_reason":"Aborted by user"}}'
+        for request_id in request_ids:
+            content = self.get('/clusters/{cluster}/requests/{request_id}'
+                               .format(cluster=self.cluster, request_id=request_id))
+            try:
+                _ = json.loads(content)
+                request_context = _['Requests']['request_context']
+                if 'Service Check' in request_context:
+                    log.info('cancelling request_id %s (%s)', request_id, request_context)
+                    self.put('/clusters/{cluster}/requests/{request_id}'
+                             .format(cluster=self.cluster, request_id=request_id), data=cancel_payload)
+            except (KeyError, ValueError) as _:
+                die('failed to parse response for request_id {0}. '.format(request_id) + support_msg_api())
+
     def request_service_checks(self, services):
         url_suffix = '/clusters/{cluster}/request_schedules'.format(cluster=self.cluster)
         payload = self.gen_payload(services)
@@ -240,7 +290,9 @@ class AmbariTriggerServiceChecks(CLI):
     def watch_scheduled_request(self, request_schedule_id):
         while True:
             content = self.get('/clusters/{0}/request_schedules/{1}'.format(self.cluster, request_schedule_id))
-            self.parse_schedule_request(content)
+            status = self.parse_schedule_request(content)
+            if status == 'COMPLETED':
+                return
             time.sleep(1)
 
     @staticmethod
@@ -249,12 +301,14 @@ class AmbariTriggerServiceChecks(CLI):
             _ = json.loads(content)
             if _['RequestSchedule']['last_execution_status'] == 'COMPLETED':
                 log.info('COMPLETED')
-                return
+                return 'COMPLETED'
             for item in _['RequestSchedule']['batch']['batch_requests']:
                 request_status = 'NO STATUS YET'
                 if 'request_status' in item:
                     request_status = item['request_status']
                 if request_status == 'COMPLETED':
+                    continue
+                if not log.isEnabledFor(logging.DEBUG):
                     continue
                 request_body = item['request_body']
                 request_body_dict = json.loads(request_body)
@@ -263,7 +317,8 @@ class AmbariTriggerServiceChecks(CLI):
                 log.info('{request_status}: {command}: {context}'.format(request_status=request_status,
                                                                          command=command,
                                                                          context=context))
-                return
+                if request_status != 'ABORTED':
+                    return 'IN_PROGRESS'
         except (KeyError, ValueError) as _:
             die('parsing schedule request status failed: ' + str(_) + '. ' + support_msg_api())
 
