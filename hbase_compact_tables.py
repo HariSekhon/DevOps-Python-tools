@@ -24,7 +24,7 @@ compactions to prevent them impacting peak hours.
 Uses the HBase Thrift server. For versions older than HBase 0.96+ or using modified protocols, the connection
 protocol / compat / transport settings will need to be adjusted.
 
-Tested on Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2
+Tested on Hortonworks HDP 2.3 (HBase 1.1.2) and Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2
 
 """
 
@@ -40,7 +40,7 @@ import sys
 import traceback
 import socket
 import happybase
-import thrift
+from thriftpy.thrift import TException as ThriftException
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
@@ -53,7 +53,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 class HBaseCompactTables(CLI):
@@ -71,7 +71,9 @@ class HBaseCompactTables(CLI):
 
     def add_options(self):
         self.add_hostoption(name='HBase Thrift Server', default_host='localhost', default_port=self.port)
-        self.add_opt('-r', '--regex', help='Regex of tables to compact')
+        self.add_opt('-r', '--regex', help='Regex of tables to compact' +
+                     '. Highly recommended to use this to compact a different subset of tables each night' +
+                     ' to prevent the last running compaction running in to business hours')
         self.add_opt('-l', '--list-tables', action='store_true', help='List tables and exit')
 
     def process_args(self):
@@ -85,14 +87,14 @@ class HBaseCompactTables(CLI):
         if regex:
             validate_regex(regex)
             self.table_regex = re.compile(regex, re.I)
-            log.info('filtering to compact only tables matching regex \'{0}\''.format(regex))
+            log.info("filtering to compact only tables matching regex \'%s\'", regex)
 
     def get_tables(self):
         try:
             return self.conn.tables()
         except socket.timeout as _:
             die('ERROR while trying to get table list: {0}'.format(_))
-        except thrift.transport.TTransport.TTransportException as _:
+        except ThriftException as _:
             die('ERROR while trying to get table list: {0}'.format(_))
 
     def run(self):
@@ -100,11 +102,11 @@ class HBaseCompactTables(CLI):
         # configured to be non-default, see:
         # http://happybase.readthedocs.io/en/stable/api.html#connection
         try:
-            log.info('connecting to HBase Thrift Server at {0}:{1}'.format(self.host, self.port))
+            log.info('connecting to HBase Thrift Server at %s:%s', self.host, self.port)
             self.conn = happybase.Connection(host=self.host, port=self.port, timeout=10 * 1000)  # ms
         except socket.timeout as _:
             die('ERROR: {0}'.format(_))
-        except thrift.transport.TTransport.TTransportException as _:
+        except ThriftException as _:
             die('ERROR: {0}'.format(_))
         tables = self.get_tables()
         if self.get_opt('list_tables'):
@@ -120,12 +122,12 @@ class HBaseCompactTables(CLI):
         self.conn.close()
 
     def compact_table(self, table):
-        log.info('major compacting table {0}'.format(table))
+        log.info("major compacting table '%s'", table)
         try:
             self.conn.compact_table(table, major=True)
         except socket.timeout as _:
             die('ERROR while trying to compact table \'{0}\': {1}'.format(table, _))
-        except thrift.transport.TTransport.TTransportException as _:
+        except ThriftException as _:
             die('ERROR while trying to compact table \'{0}\': {1}'.format(table, _))
 
 
