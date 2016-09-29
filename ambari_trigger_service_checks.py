@@ -19,7 +19,10 @@
 Tool to trigger Ambari service checks, can find and trigger all service checks with a simple --all switch
 
 Written to get around a state in Ambari Express Upgrade complaining that the service checks hadn't run since the last
-configuration changes
+configuration changes (https://issues.apache.org/jira/browse/AMBARI-18470). This works nicely to force a re-run of all
+service checks and clear the state error. In the event that one or more services will fail, you can also try the other
+workaround of adding stack.upgrade.bypass.prechecks=true to ambari-server.properties and restarting ambari server
+(I've used both of these solutions in different situations on a couple of different HDP cluster upgrades).
 
 Tested on Ambari 2.2.0, 2.4.0 with Hortonworks HDP 2.3.2, 2.4.0, 2.5.0
 
