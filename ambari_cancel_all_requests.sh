@@ -34,10 +34,10 @@ if [ $# -gt 0 ]; then
 fi
 
 echo "querying Ambari for request IDs"
-curl -u $AMBARI_USER:$AMBARI_PASSWORD http://$AMBARI_HOST:$AMBARI_PORT/api/v1/clusters/$AMBARI_CLUSTER/requests |
+curl -u "$AMBARI_USER:$AMBARI_PASSWORD" "http://$AMBARI_HOST:$AMBARI_PORT/api/v1/clusters/$AMBARI_CLUSTER/requests" |
 grep id |
 awk '{print $3}' |
 while read id; do
     echo "requesting cancellation of request $id"
-    curl -u $AMBARI_USER:$AMBARI_PASSWORD -i -H "X-Requested-By: $AMBARI_USER ($USER)" -X PUT -d '{"Requests":{"request_status":"ABORTED","abort_reason":"Aborted by user"}}' http://$AMBARI_HOST:$AMBARI_PORT/api/v1/clusters/$AMBARI_CLUSTER/requests/$id
+    curl -u "$AMBARI_USER:$AMBARI_PASSWORD" -i -H "X-Requested-By: $AMBARI_USER ($USER)" -X PUT -d '{"Requests":{"request_status":"ABORTED","abort_reason":"Aborted by user"}}' "http://$AMBARI_HOST:$AMBARI_PORT/api/v1/clusters/$AMBARI_CLUSTER/requests/$id"
 done
