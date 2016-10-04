@@ -47,7 +47,9 @@ opts="-v"
 # Travis CI seems to fail to find things online when they clearly are available, perhaps it's the network delay, increasing
 # per request timeout to try to make this more tolerant
 if is_CI; then
-    opts="$opts --request-timeout 5 --timeout 30"
+    # too much output, causes Travis CI to fail job
+    unset DEBUG
+    opts="$opts -v --request-timeout 5 --timeout 30"
 fi
 
 echo "testing socket ordering result consistency"
