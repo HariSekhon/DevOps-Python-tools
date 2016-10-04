@@ -48,6 +48,11 @@ import re
 import socket
 import subprocess
 import sys
+#from threading import Thread
+from multiprocessing.pool import ThreadPool
+# prefer blocking semantics of que.get() rather than handling deque.popleft() => 'IndexError: pop from an empty deque'
+#from collections import deque
+import Queue
 import traceback
 from random import shuffle
 try:
@@ -62,14 +67,15 @@ sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
     from harisekhon.utils import log, log_option, die, code_error, uniq_list_ordered
-    from harisekhon.utils import validate_hostport_list, validate_port, isPort, validate_regex
+    from harisekhon.utils import validate_hostport_list, validate_port, validate_int, validate_regex
+    from harisekhon.utils import isPort, isStr, isTuple
     from harisekhon import CLI
 except ImportError as _:
     print(traceback.format_exc(), end='')
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 class FindActiveServer(CLI):
@@ -86,8 +92,10 @@ class FindActiveServer(CLI):
         self.url_suffix = None
         self.regex = None
         self.request_timeout = 1
-        self.timeout_default = 60
         self.verbose_default = 1
+        self.num_threads = 10
+        self.que = Queue.Queue()
+        self.pool = None
 
     def add_options(self):
         self.add_hostoption(name='', default_port=self.default_port)
@@ -99,8 +107,12 @@ class FindActiveServer(CLI):
                      '(overrides --http, changes port 80 to 443)')
         self.add_opt('-u', '--url', help='URL suffix to fetch (implies --http)')
         self.add_opt('-r', '--regex', help='Regex to search for in http content (optional)')
-        self.add_opt('-R', '--random', action='store_true', help='Randomize order of hosts tested')
-        self.add_opt('-T', '--request-timeout', metavar='secs',
+        self.add_opt('-n', '--num-threads', default=self.num_threads, type='int',
+                     help='Number or parallel threads to speed up processing (default: 10, ' +
+                     'use -n=1 for deterministic host preference order [slower])')
+        self.add_opt('-R', '--random', action='store_true', help='Randomize order of hosts tested ' +
+                     '(for use with --num-threads=1)')
+        self.add_opt('-T', '--request-timeout', metavar='secs', type='int',
                      help='Timeout for each individual server request in seconds (default: 1 second)')
 
     def process_options(self):
@@ -108,6 +120,7 @@ class FindActiveServer(CLI):
         self.port = self.get_opt('port')
         self.url_suffix = self.get_opt('url')
         self.regex = self.get_opt('regex')
+        self.num_threads = self.get_opt('num_threads')
         if hosts:
             self.host_list = [host.strip() for host in hosts.split(',') if host]
         self.host_list += self.args
@@ -152,24 +165,60 @@ class FindActiveServer(CLI):
                 self.usage('--regex cannot be used without --http / --https')
             validate_regex(self.regex)
             self.regex = re.compile(self.regex)
+        validate_int(self.num_threads, 'num threads', 1, 100)
 
     def run(self):
+        self.pool = ThreadPool(processes=self.num_threads)
         if self.protocol in ('http', 'https'):
             for host in self.host_list:
                 (host, port) = self.port_override(host)
-                if self.check_http(host, port, self.url_suffix):
-                    self.finish(host, port)
+                #if self.check_http(host, port, self.url_suffix):
+                #    self.finish(host, port)
+                self.launch_thread(self.check_http, host, port, self.url_suffix)
         elif self.protocol == 'ping':
             for host in self.host_list:
+                # this strips the :port from host
                 (host, port) = self.port_override(host)
-                if self.check_ping(host):
-                    self.finish(host)
+                #if self.check_ping(host):
+                #    self.finish(host)
+                self.launch_thread(self.check_ping, host)
         else:
             for host in self.host_list:
                 (host, port) = self.port_override(host)
-                if self.check_socket(host, port):
-                    self.finish(host, port)
+                #if self.check_socket(host, port):
+                #    self.finish(host, port)
+                self.launch_thread(self.check_socket, host, port)
+        self.collect_results()
         sys.exit(1)
+
+    def launch_thread(self, func, *args):
+        # works but no tunable concurrency
+        #_ = Thread(target=lambda q, arg1: q.put(self.check_ping(arg1)), args=(que, host))
+        #_ = Thread(target=lambda: que.put(self.check_ping(host)))
+        #_.daemon = True
+        #_.start()
+        #if self.num_threads == 1:
+        #    _.join()
+        #
+        # blocks and prevents concurrency, use que instead
+        #async_result = pool.apply_async(self.check_ping, (host,))
+        #return_val = async_result.get()
+        #
+        self.pool.apply_async(lambda *args: self.que.put(func(*args)), args)
+
+    def collect_results(self):
+        return_val = None
+        for _ in range(len(self.host_list)):
+            return_val = self.que.get()
+            if return_val:
+                break
+        if return_val:
+            if isTuple(return_val):
+                self.finish(*return_val)
+            elif isStr(return_val):
+                self.finish(return_val)
+            else:
+                code_error('collect_results() found non-tuple / non-string on que')
 
     def port_override(self, host):
         port = self.port
@@ -193,7 +242,7 @@ class FindActiveServer(CLI):
 
     @staticmethod
     def check_ping(host, count=1, wait=1):
-        log.info("pinging host '%s'", host)
+        log.info("pinging host '%s' (count=%s, wait=%s)", host, count, wait)
         ping_count = '-c {0}'.format(count)
         if platform.system().lower() == 'windows':
             ping_count = '-n 1'
@@ -204,33 +253,33 @@ class FindActiveServer(CLI):
             exitcode = subprocess.call(["ping", ping_count, ping_wait, host],
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if exitcode == 0:
-                return True
+                return host
         except subprocess.CalledProcessError as _:
             log.warn('ping failed: %s', _.output)
         except OSError as _:
             die('error calling ping: {0}'.format(_))
-        return False
+        return None
 
     def check_socket(self, host, port):
         log.info("checking host '%s' port '%s' socket", host, port)
         try:
             #log.debug('creating socket')
             #sock = socket.socket()
-            log.info(r'connecting to \'%s\:%s\'', host, port)
+            #log.info("connecting to '%s:%s'", host, port)
             #sock.connect((host, int(port)))
             socket.create_connection((host, int(port)), self.request_timeout)
             #sock.close()
-            return True
+            return (host, port)
         except IOError:
-            return False
+            return None
 
     def check_http(self, host, port, url_suffix=''):
-        if url_suffix is None:
+        if not isStr(url_suffix):
             url_suffix = ''
         url = '{protocol}://{host}:{port}/{url_suffix}'.format(protocol=self.protocol,
                                                                host=host,
                                                                port=port,
-                                                               url_suffix=url_suffix)
+                                                               url_suffix=url_suffix.lstrip('/'))
         log.info('GET %s', url)
             # timeout here isn't total timeout, it's response time
         try:
@@ -240,15 +289,15 @@ class FindActiveServer(CLI):
         log.debug("response: %s %s", req.status_code, req.reason)
         log.debug("content:\n%s\n%s\n%s", '='*80, req.content.strip(), '='*80)
         if req.status_code != 200:
-            return False
+            return None
         if self.regex:
             log.info('checking regex against content')
             if self.regex.search(req.content):
                 log.info('matched regex in http output')
             else:
                 log.info('regex match not found in http output')
-                return False
-        return True
+                return None
+        return (host, port)
 
 
 if __name__ == '__main__':
