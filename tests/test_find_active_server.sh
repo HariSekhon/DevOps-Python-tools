@@ -35,7 +35,7 @@ echo
 
 check_output "yahoo.com" ./find_active_server.py yahoo.com google.com --port 80 -n1
 
-check_output "google.com" ./find_active_server.py 0.0.0.0 google.com yahoo.com --port 80 -n1
+check_output "google.com" ./find_active_server.py 0.0.0.1 google.com yahoo.com --port 80 -n1
 
 hr
 echo "testing socket ordering result consistency with individual port overrides"
@@ -49,14 +49,14 @@ check_output "google.com:80" ./find_active_server.py yahoo.com google.com:80 --p
 hr
 echo "checking --port --ping switch conflict fails"
 echo
-./find_active_server.py 0.0.0.0 google.com --port 1 --ping -n1
+./find_active_server.py 0.0.0.1 google.com --port 1 --ping -n1
 check_exit_code 3
 echo
 
 hr
 echo "checking --ping and --http switch conflict fails"
 echo
-./find_active_server.py 0.0.0.0 google.com --ping --http
+./find_active_server.py 0.0.0.1 google.com --ping --http
 check_exit_code 3
 echo
 
@@ -64,20 +64,20 @@ echo
 hr
 echo "testing ping ordering result consistency"
 echo
-check_output "google.com" ./find_active_server.py 0.0.0.0 google.com --ping -n1
+check_output "google.com" ./find_active_server.py 0.0.0.1 google.com --ping -n1
 
 hr
 echo "testing ping ordering result consistency with individual port overrides"
 echo
 
-check_output "google.com" ./find_active_server.py 0.0.0.0 google.com:80 --ping -n1
+check_output "google.com" ./find_active_server.py 0.0.0.1 google.com:80 --ping -n1
 
 # ============================================================================ #
 hr
 echo "testing http ordering result consistency"
 echo
 
-check_output "yahoo.com" ./find_active_server.py 0.0.0.0 yahoo.com google.com --http -n1
+check_output "yahoo.com" ./find_active_server.py 0.0.0.1 yahoo.com google.com --http -n1
 
 check_output "google.com" ./find_active_server.py google.com yahoo.com --http -n1
 
@@ -87,7 +87,7 @@ echo
 
 check_output "yahoo.com" ./find_active_server.py yahoo.com google.com --https -n1
 
-check_output "google.com" ./find_active_server.py 0.0.0.0 google.com yahoo.com --https -n1
+check_output "google.com" ./find_active_server.py 0.0.0.1 google.com yahoo.com --https -n1
 
 echo
 echo "testing https returns no results when using wrong port 25"
