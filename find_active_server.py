@@ -158,9 +158,8 @@ class FindActiveServer(CLI):
             self.usage('no hosts specified')
         validate_hostport_list(self.host_list, port_optional=True)
         validate_port(self.port)
-        if self.protocol:
-            if self.protocol not in ('http', 'https', 'ping'):
-                code_error('invalid protocol, must be one of http or https')
+        if self.protocol and self.protocol not in ('http', 'https', 'ping'):
+            code_error('invalid protocol, must be one of http or https')
         if self.regex:
             if not self.protocol:
                 self.usage('--regex cannot be used without --http / --https')
