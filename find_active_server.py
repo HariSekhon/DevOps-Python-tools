@@ -16,24 +16,22 @@
 
 """
 
-Tool to find which server from a list is active / alive / master
+Tool to return the first available healthy server or active master from a given list
 
-Generic tool written to be used to extend single server written tools by finding and returning the first alive server
-or the first server which is the active master in a cluster
+Useful for pre-determining a server to be passed to tools that only take a single --host argument but for which the
+technology has later added multi-master support or active-standby masters (eg. Hadoop, HBase) or where you want to
+query cluster wide information available from any online peer (eg. Elasticsearch), eg:
 
-Can be used to extend other command lines tools that only accept one server parameter to pre-select which server the
-tool should contact
+./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py --http --port 9200 node1 node2 node3 node4 ...)
 
-Good for extending Nagios Plugins and other CLI tools that only take a single server parameter by pre-selecting which
-server they should contact, either via a socket check or http(s) with optional content regex matching to be able to
-determine the current master.
+Configurable tests include socket, http, https, ping, url and/or regex content match.
 
-Use --random to randomize the test order, returns the first randomly available server (that also matches the criteria
-if --url / --regex are specified)
+Multi-threaded for speed and exits with first result to not significantly delay the top level tool it's called for
+by more than ~ 1 second.
 
-By default checks the same --port on all servers. Hosts may have optional :<port> suffixes added to override them
+By default checks the same --port on all servers. Hosts may have optional :<port> suffixes added to override them.
 
-Exits with return code 1 and no output if none of the supplied --host or args are available on the given port
+Exits with return code 1 and no output if none of the supplied servers pass the test criteria.
 
 """
 
