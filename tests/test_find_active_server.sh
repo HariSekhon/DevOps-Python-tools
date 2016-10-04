@@ -28,6 +28,8 @@ section "find_active_server.py"
 
 #datestring="$(date '+%F')"
 
+unset HOST
+
 echo "testing socket ordering result consistency"
 echo
 
