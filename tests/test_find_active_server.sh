@@ -28,14 +28,26 @@ section "find_active_server.py"
 
 #datestring="$(date '+%F')"
 
+# this is set to localhost in Travis CI, which via --host takes precedence and messes with our expected first result
 unset HOST
+
+# not using nonexistent DNS servers as some environments have DNS servers which respond with a generic catch all address
+# which will mess with results, hence using IP addresses
+
+# can't use this, accidentally succeeds in Travis CI:
+# 0.0.0.0 ping => 127.0.0.1
+
+# test both types of unsuitable hosts:
+#
+# 0.0.0.1 ping => connect: Invalid argument
+# 4.4.4.4 ping => no response
 
 echo "testing socket ordering result consistency"
 echo
 
 check_output "yahoo.com" ./find_active_server.py yahoo.com google.com --port 80 -n1
 
-check_output "google.com" ./find_active_server.py 0.0.0.1 google.com yahoo.com --port 80 -n1
+check_output "google.com" ./find_active_server.py 0.0.0.1 4.4.4.4 google.com yahoo.com --port 80 -n1
 
 hr
 echo "testing socket ordering result consistency with individual port overrides"
@@ -49,14 +61,14 @@ check_output "google.com:80" ./find_active_server.py yahoo.com google.com:80 --p
 hr
 echo "checking --port --ping switch conflict fails"
 echo
-./find_active_server.py 0.0.0.1 google.com --port 1 --ping -n1
+./find_active_server.py 0.0.0.1 4.4.4.4 google.com --port 1 --ping -n1
 check_exit_code 3
 echo
 
 hr
 echo "checking --ping and --http switch conflict fails"
 echo
-./find_active_server.py 0.0.0.1 google.com --ping --http
+./find_active_server.py 0.0.0.1 4.4.4.4 google.com --ping --http
 check_exit_code 3
 echo
 
@@ -64,20 +76,20 @@ echo
 hr
 echo "testing ping ordering result consistency"
 echo
-check_output "google.com" ./find_active_server.py 0.0.0.1 google.com --ping -n1
+check_output "google.com" ./find_active_server.py 0.0.0.1 4.4.4.4 google.com --ping -n1
 
 hr
 echo "testing ping ordering result consistency with individual port overrides"
 echo
 
-check_output "google.com" ./find_active_server.py 0.0.0.1 google.com:80 --ping -n1
+check_output "google.com" ./find_active_server.py 0.0.0.1 4.4.4.4 google.com:80 --ping -n1
 
 # ============================================================================ #
 hr
 echo "testing http ordering result consistency"
 echo
 
-check_output "yahoo.com" ./find_active_server.py 0.0.0.1 yahoo.com google.com --http -n1
+check_output "yahoo.com" ./find_active_server.py 0.0.0.1 4.4.4.4 yahoo.com google.com --http -n1
 
 check_output "google.com" ./find_active_server.py google.com yahoo.com --http -n1
 
@@ -87,13 +99,15 @@ echo
 
 check_output "yahoo.com" ./find_active_server.py yahoo.com google.com --https -n1
 
-check_output "google.com" ./find_active_server.py 0.0.0.1 google.com yahoo.com --https -n1
+check_output "google.com" ./find_active_server.py 0.0.0.1 4.4.4.4 google.com yahoo.com --https -n1
 
 echo
 echo "testing https returns no results when using wrong port 25"
 echo
 
 check_output "" ./find_active_server.py mail.google.com --https --port 25
+
+check_output "NO_AVAILABLE_SERVER" ./find_active_server.py mail.google.com --https --port 25 -v
 
 echo
 echo "testing https with url suffix and regex matching"
