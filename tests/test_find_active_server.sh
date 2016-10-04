@@ -31,55 +31,61 @@ section "find_active_server.py"
 echo "testing socket ordering result consistency"
 echo
 
-check_output "yahoo.com" ./find_active_server.py yahoo.com google.com --port 80
+check_output "yahoo.com" ./find_active_server.py yahoo.com google.com --port 80 -n1
 
-check_output "google.com" ./find_active_server.py 0.0.0.0 google.com yahoo.com --port 80
+check_output "google.com" ./find_active_server.py 0.0.0.0 google.com yahoo.com --port 80 -n1
 
 hr
 echo "testing socket ordering result consistency with individual port overrides"
 echo
 
-check_output "yahoo.com:80" ./find_active_server.py yahoo.com:80 google.com --port 1
+check_output "yahoo.com:80" ./find_active_server.py yahoo.com:80 google.com --port 1 -n1
 
-check_output "google.com:80" ./find_active_server.py yahoo.com google.com:80 --port 1
+check_output "google.com:80" ./find_active_server.py yahoo.com google.com:80 --port 1 -n1
 
 # ============================================================================ #
 hr
 echo "checking --port --ping switch conflict fails"
 echo
-./find_active_server.py 0.0.0.0 google.com --port 1 --ping
+./find_active_server.py 0.0.0.0 google.com --port 1 --ping -n1
 check_exit_code 3
 echo
-hr
 
+hr
+echo "checking --ping and --http switch conflict fails"
+echo
+./find_active_server.py 0.0.0.0 google.com --ping --http
+check_exit_code 3
+echo
+
+# ============================================================================ #
+hr
 echo "testing ping ordering result consistency"
 echo
-check_output "google.com" ./find_active_server.py 0.0.0.0 google.com --ping
+check_output "google.com" ./find_active_server.py 0.0.0.0 google.com --ping -n1
 
 hr
 echo "testing ping ordering result consistency with individual port overrides"
 echo
 
-check_output "google.com" ./find_active_server.py 0.0.0.0 google.com:80 --ping
+check_output "google.com" ./find_active_server.py 0.0.0.0 google.com:80 --ping -n1
 
 # ============================================================================ #
 hr
-echo
 echo "testing http ordering result consistency"
 echo
 
-check_output "yahoo.com" ./find_active_server.py yahoo.com google.com --http
+check_output "yahoo.com" ./find_active_server.py 0.0.0.0 yahoo.com google.com --http -n1
 
-check_output "google.com" ./find_active_server.py 0.0.0.0 google.com yahoo.com --http
+check_output "google.com" ./find_active_server.py google.com yahoo.com --http -n1
 
 hr
-echo
 echo "testing https ordering result consistency"
 echo
 
-check_output "yahoo.com" ./find_active_server.py yahoo.com google.com --https
+check_output "yahoo.com" ./find_active_server.py yahoo.com google.com --https -n1
 
-check_output "google.com" ./find_active_server.py 0.0.0.0 google.com yahoo.com --https
+check_output "google.com" ./find_active_server.py 0.0.0.0 google.com yahoo.com --https -n1
 
 echo
 echo "testing https returns no results when using wrong port 25"
@@ -87,43 +93,32 @@ echo
 
 check_output "" ./find_active_server.py mail.google.com --https --port 25
 
-# ============================================================================ #
-hr
 echo
-echo "testing HTTP regex filtering excludes first result"
+echo "testing https with url suffix and regex matching"
 echo
 
-check_output "yahoo.com" ./find_active_server.py yahoo.com google.com --http --regex 'yahoo.*'
-
-check_output "yahoo.com" ./find_active_server.py google.com yahoo.com --http --regex 'yahoo.*'
+check_output "github.com" ./find_active_server.py --https google.com github.com -u /harisekhon --regex 'pytools'
 
 # ============================================================================ #
 hr
-echo
-echo "testing HTTPS regex filtering excludes first result"
+echo "testing HTTP regex filtering"
 echo
 
-check_output "yahoo.com" ./find_active_server.py yahoo.com google.com --https --regex 'yahoo.*'
-
-check_output "yahoo.com" ./find_active_server.py google.com yahoo.com --https --regex 'yahoo.*'
+check_output "yahoo.com" ./find_active_server.py google.com yahoo.com --http --regex 'yahoo'
 
 # ============================================================================ #
 hr
-echo
-echo "testing random socket result selection"
+echo "testing HTTPS regex filtering"
 echo
 
-#output="$(./find_active_server.py google.com google.co.uk --random --port 80 2>&1)"
-#[[ "$output" = *google* ]] || die "FAILED: --random google socket test"
-check_output "*google*" ./find_active_server.py google.com google.co.uk --random --port 80
+check_output "yahoo.com" ./find_active_server.py google.com yahoo.com --https --regex '(?:yahoo)'
 
 # ============================================================================ #
 hr
-echo
 echo "testing random socket select 10 times contains both google and yahoo results"
 echo
 
-output="$(for x in {1..10}; do ./find_active_server.py google.com yahoo.com --random --port 80 2>&1; done)"
+output="$(for x in {1..10}; do ./find_active_server.py google.com yahoo.com --random -n1 --port 80 2>&1; done)"
 grep "google.com" <<< "$output" &&
 grep "yahoo.com" <<< "$output" ||
     die "FAILED: --random google + yahoo test, didn't return both results for 10 random runs"
@@ -131,54 +126,14 @@ echo
 
 # ============================================================================ #
 hr
-echo
-echo "testing random http result selection"
-echo
-
-check_output "*google*" ./find_active_server.py google.com google.co.uk --random --http
-
-# ============================================================================ #
-hr
-echo
-echo "testing random https result selection"
-echo
-
-check_output "*google*" ./find_active_server.py google.com google.co.uk --random --https
-
-# ============================================================================ #
-hr
-echo
 echo "testing random http select 10 times contains both google and yahoo results"
 echo
 
-output="$(for x in {1..10}; do ./find_active_server.py google.com yahoo.com --random --http 2>&1; done)"
+output="$(for x in {1..10}; do ./find_active_server.py google.com yahoo.com --http --random -n1 2>&1; done)"
 grep "google.com" <<< "$output" &&
 grep "yahoo.com" <<< "$output" ||
     die "FAILED: --random google + yahoo test, didn't return both results for 10 random HTTP runs"
 echo
-
-# ============================================================================ #
-hr
-echo
-echo "testing random https select 10 times contains both google and yahoo results"
-echo
-
-output="$(for x in {1..10}; do ./find_active_server.py google.com yahoo.com --random --https 2>&1; done)"
-grep "google.com" <<< "$output" &&
-grep "yahoo.com" <<< "$output" ||
-    die "FAILED: --random google + yahoo test, didn't return both results for 10 random HTTP runs"
-echo
-
-# ============================================================================ #
-hr
-echo
-echo "testing random result selection with regex returns google but omits yahoo"
-echo
-
-output="$(for x in {1..10}; do ./find_active_server.py google.com yahoo.com --random --https --regex yahoo 2>&1; done)"
-grep "yahoo.com" <<< "$output" &&
-! grep "google.com" <<< "$output" ||
-    die "FAILED: --random google + yahoo test, didn't return only google results for 10 random HTTP runs with regex filter"
 
 echo
 echo "SUCCEEDED - all tests passed for find_active_server.py"
