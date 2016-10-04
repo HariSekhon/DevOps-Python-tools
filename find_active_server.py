@@ -33,7 +33,8 @@ by more than ~ 1 second.
 
 By default checks the same --port on all servers. Hosts may have optional :<port> suffixes added to override them.
 
-Exits with return code 1 and no output if none of the supplied servers pass the test criteria.
+Exits with return code 1 and no output by if none of the supplied servers pass the test criteria, --verbose mode will
+output the token NO_AVAILABLE_SERVER.
 
 """
 
@@ -75,7 +76,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.3'
 
 
 class FindActiveServer(CLI):
@@ -92,7 +93,6 @@ class FindActiveServer(CLI):
         self.url_suffix = None
         self.regex = None
         self.request_timeout = 1
-        self.verbose_default = 1
         self.num_threads = 10
         self.que = Queue.Queue()
         self.pool = None
@@ -189,6 +189,8 @@ class FindActiveServer(CLI):
                 #    self.finish(host, port)
                 self.launch_thread(self.check_socket, host, port)
         self.collect_results()
+        if self.verbose:
+            print('NO_AVAILABLE_SERVER')
         sys.exit(1)
 
     def launch_thread(self, func, *args):
