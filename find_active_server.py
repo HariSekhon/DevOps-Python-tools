@@ -24,7 +24,7 @@ query cluster wide information available from any online peer (eg. Elasticsearch
 
 example using the Advanced Nagios Plugins Collection:
 
-./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py -v --http --port 9200 node1 node2 node3 node4 ...)
+./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py -v --http --port 9200 node1 node2 node3 ...)
 
 Configurable tests include socket, http, https, ping, url and/or regex content match.
 
@@ -76,7 +76,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.3.1'
 
 
 class FindActiveServer(CLI):
@@ -121,6 +121,7 @@ class FindActiveServer(CLI):
         self.url_suffix = self.get_opt('url')
         self.regex = self.get_opt('regex')
         self.num_threads = self.get_opt('num_threads')
+        self.request_timeout = self.get_opt('request_timeout')
         if hosts:
             self.host_list = [host.strip() for host in hosts.split(',') if host]
         self.host_list += self.args
