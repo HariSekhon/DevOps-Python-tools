@@ -24,7 +24,7 @@ query cluster wide information available from any online peer (eg. Elasticsearch
 
 example using the Advanced Nagios Plugins Collection:
 
-./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py --http --port 9200 node1 node2 node3 node4 ...)
+./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py -v --http --port 9200 node1 node2 node3 node4 ...)
 
 Configurable tests include socket, http, https, ping, url and/or regex content match.
 
