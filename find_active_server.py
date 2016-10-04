@@ -210,7 +210,7 @@ class FindActiveServer(CLI):
 
     def collect_results(self):
         return_val = None
-        for _ in range(len(self.host_list)):
+        for _ in self.host_list:
             return_val = self.que.get()
             if return_val:
                 break
