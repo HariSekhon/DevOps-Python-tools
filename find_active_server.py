@@ -20,7 +20,9 @@ Tool to return the first available healthy server or active master from a given 
 
 Useful for pre-determining a server to be passed to tools that only take a single --host argument but for which the
 technology has later added multi-master support or active-standby masters (eg. Hadoop, HBase) or where you want to
-query cluster wide information available from any online peer (eg. Elasticsearch), eg:
+query cluster wide information available from any online peer (eg. Elasticsearch).
+
+example using the Advanced Nagios Plugins Collection:
 
 ./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py --http --port 9200 node1 node2 node3 node4 ...)
 
