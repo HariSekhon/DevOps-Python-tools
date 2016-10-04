@@ -284,8 +284,8 @@ class FindActiveServer(CLI):
                                                                port=port,
                                                                url_suffix=url_suffix.lstrip('/'))
         log.info('GET %s', url)
-            # timeout here isn't total timeout, it's response time
         try:
+            # timeout here isn't total timeout, it's response time
             req = requests.get(url, timeout=self.request_timeout)
         except requests.exceptions.RequestException:
             return False
