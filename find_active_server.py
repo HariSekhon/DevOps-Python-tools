@@ -28,8 +28,8 @@ example using the Advanced Nagios Plugins Collection:
 
 Configurable tests include socket, http, https, ping, url and/or regex content match.
 
-Multi-threaded for speed and exits with first result to not significantly delay the top level tool it's called for
-by more than ~ 1 second.
+Multi-threaded for speed and exits upon first available host response to minimize delay to ~ 1 second or less
+when sub-shelled for the argument to a top level CLI tool.
 
 By default checks the same --port on all servers. Hosts may have optional :<port> suffixes added to override them.
 
