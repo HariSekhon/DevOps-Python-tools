@@ -94,7 +94,7 @@ pip install -r requirements.txt
 
 ### Jython for Hadoop Utils ###
 
-The 3 Hadoop utility programs listed below require Jython (as well as Hadoop to be installed and correctly configured or course)
+The 3 Hadoop utility programs listed below require Jython (as well as Hadoop to be installed and correctly configured of course)
 
 ```
 hadoop_hdfs_time_block_reads.jy
