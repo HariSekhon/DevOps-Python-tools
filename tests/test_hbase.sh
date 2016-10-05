@@ -125,7 +125,10 @@ EOF
     hr
     docker_exec hbase_flush_tables.py -r .2
     hr
+    set +e
     ./hbase_show_table_region_ranges.py --list-tables
+    check_exit_code 3
+    set -e
     hr
     ./hbase_show_table_region_ranges.py -T HexStringSplitTable -v
     hr
