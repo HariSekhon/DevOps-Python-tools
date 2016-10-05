@@ -18,20 +18,28 @@
 
 Tool to return the first available healthy server or active master from a given list
 
+Configurable test criteria: TCP socket, HTTP, HTTPS, Ping, URL with optional Regex content match.
+
+Can mix and match between a comma separated list of hosts (--host server1,server2,server3... or contents of the $HOST
+environment variable if not specified) and general free-form space separated arguments, which is useful if piping
+a host list through xargs.
+
+eg. return the first web server to respond:
+
+cat host_list.txt | xargs ./find_active_server.py --http
+
+Multi-threaded for speed and exits upon first available host response to minimize delay to ~ 1 second or less.
+
 Useful for pre-determining a server to be passed to tools that only take a single --host argument but for which the
 technology has later added multi-master support or active-standby masters (eg. Hadoop, HBase) or where you want to
 query cluster wide information available from any online peer (eg. Elasticsearch).
 
-example using the Advanced Nagios Plugins Collection:
+Example of extending an Elasticsearch check from the Advanced Nagios Plugins Collection:
 
-./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py -v --http --port 9200 node1 node2 node3 ...)
+./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py -v --http --port 9200 node1 node2 node3)
 
-Configurable tests include socket, http, https, ping, url and/or regex content match.
-
-Multi-threaded for speed and exits upon first available host response to minimize delay to ~ 1 second or less
-when sub-shelled for the argument to a top level CLI tool.
-
-By default checks the same --port on all servers. Hosts may have optional :<port> suffixes added to override them.
+By default checks the same --port on all servers. Hosts may have optional :<port> suffixes added to individually
+override each one.
 
 Exits with return code 1 and no output by if none of the supplied servers pass the test criteria, --verbose mode will
 output the token NO_AVAILABLE_SERVER.
