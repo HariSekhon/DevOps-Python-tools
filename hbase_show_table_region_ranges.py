@@ -78,7 +78,8 @@ class HBaseShowTableRegionRanges(CLI):
         self.table = self.get_opt('table')
         validate_host(self.host)
         validate_port(self.port)
-        validate_chars(self.table, 'hbase table', 'A-Za-z0-9:._-')
+        if not self.get_opt('list_tables'):
+            validate_chars(self.table, 'hbase table', 'A-Za-z0-9:._-')
 
     def get_tables(self):
         try:
