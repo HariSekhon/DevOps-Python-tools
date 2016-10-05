@@ -85,6 +85,8 @@ test_hbase(){
         put 't1', 'r2', 'cf1:q2', 'test'
         list
 EOF2
+        hbase org.apache.hadoop.hbase.util.RegionSplitter UniformSplitTable UniformSplit -c 5 -f cf1
+        hbase org.apache.hadoop.hbase.util.RegionSplitter HexStringSplitTable HexStringSplit -c 5 -f cf1
 EOF
     if [ -n "${NOTESTS:-}" ]; then
         return
@@ -122,6 +124,12 @@ EOF
     docker_exec hbase_flush_tables.py
     hr
     docker_exec hbase_flush_tables.py -r .2
+    hr
+    ./hbase_show_table_region_ranges.py --list-tables
+    hr
+    ./hbase_show_table_region_ranges.py -T HexStringSplitTable -v
+    hr
+    ./hbase_show_table_region_ranges.py -T UniformSplitTable -v
     hr
 
     delete_container
