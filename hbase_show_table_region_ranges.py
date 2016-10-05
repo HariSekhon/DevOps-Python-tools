@@ -43,7 +43,7 @@ sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
     from harisekhon.utils import log, die, support_msg_api
-    from harisekhon.utils import validate_host, validate_port, validate_chars, isStr
+    from harisekhon.utils import validate_host, validate_port, validate_chars
     from harisekhon import CLI
 except ImportError as _:
     print(traceback.format_exc(), end='')
