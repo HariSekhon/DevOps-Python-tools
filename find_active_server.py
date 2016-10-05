@@ -84,7 +84,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.1'
+__version__ = '0.3.3'
 
 
 class FindActiveServer(CLI):
@@ -189,7 +189,7 @@ class FindActiveServer(CLI):
                 (host, port) = self.port_override(host)
                 #if self.check_ping(host):
                 #    self.finish(host)
-                self.launch_thread(self.check_ping, host)
+                self.launch_thread(self.check_ping, host, 1, self.request_timeout)
         else:
             for host in self.host_list:
                 (host, port) = self.port_override(host)
@@ -263,6 +263,7 @@ class FindActiveServer(CLI):
             exitcode = subprocess.call(["ping", ping_count, ping_wait, host],
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if exitcode == 0:
+                log.info("host '%s' responded to ping", host)
                 return host
         except subprocess.CalledProcessError as _:
             log.warn('ping failed: %s', _.output)
@@ -279,6 +280,7 @@ class FindActiveServer(CLI):
             #sock.connect((host, int(port)))
             socket.create_connection((host, int(port)), self.request_timeout)
             #sock.close()
+            log.info("socket connected to host '%s' port '%s'", host, port)
             return (host, port)
         except IOError:
             return None
@@ -296,17 +298,20 @@ class FindActiveServer(CLI):
             req = requests.get(url, timeout=self.request_timeout)
         except requests.exceptions.RequestException:
             return False
-        log.debug("response: %s %s", req.status_code, req.reason)
-        log.debug("content:\n%s\n%s\n%s", '='*80, req.content.strip(), '='*80)
+        except IOError:
+            return False
+        log.debug("%s - response: %s %s", url, req.status_code, req.reason)
+        log.debug("%s - content:\n%s\n%s\n%s", url, '='*80, req.content.strip(), '='*80)
         if req.status_code != 200:
             return None
         if self.regex:
-            log.info('checking regex against content')
+            log.info('%s - checking regex against content', url)
             if self.regex.search(req.content):
-                log.info('matched regex in http output')
+                log.info('%s - regex matched http output', url)
             else:
-                log.info('regex match not found in http output')
+                log.info('%s - regex did not match http output', url)
                 return None
+        log.info("%s - passed all checks", url)
         return (host, port)
 
 
