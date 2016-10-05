@@ -121,12 +121,12 @@ class HBaseShowTableRegionRanges(CLI):
         encode_char = self.encode_char
         return ''.join([ encode_char(x) for x in arg])
 
+    # some extra effort to make it look the same as HBase presents it as
     def encode_char(self, char):
-        # some extra effor to make it look the same as HBase
         if char in string.printable and char not in ('\t', '\n', '\r'):
             return char
         else:
-            _ = str(hex(ord(char))).replace('0x', '\\x')
+            _ = '{0:#0{1}x}'.format(ord(char), 4).replace('0x', '\\x')
             uppercase_callback = lambda x: x.group(1).upper()
             _ = self.re_hex.sub(uppercase_callback, _)
             return _
