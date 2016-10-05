@@ -85,8 +85,8 @@ test_hbase(){
         put 't1', 'r2', 'cf1:q2', 'test'
         list
 EOF2
-        hbase org.apache.hadoop.hbase.util.RegionSplitter UniformSplitTable UniformSplit -c 5 -f cf1
-        hbase org.apache.hadoop.hbase.util.RegionSplitter HexStringSplitTable HexStringSplit -c 5 -f cf1
+        hbase org.apache.hadoop.hbase.util.RegionSplitter UniformSplitTable UniformSplit -c 100 -f cf1
+        hbase org.apache.hadoop.hbase.util.RegionSplitter HexStringSplitTable HexStringSplit -c 100 -f cf1
 EOF
     if [ -n "${NOTESTS:-}" ]; then
         return
