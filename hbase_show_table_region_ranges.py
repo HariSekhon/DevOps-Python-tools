@@ -127,8 +127,7 @@ class HBaseShowTableRegionRanges(CLI):
             return char
         else:
             _ = '{0:#0{1}x}'.format(ord(char), 4).replace('0x', '\\x')
-            uppercase_callback = lambda x: x.group(1).upper()
-            _ = self.re_hex.sub(uppercase_callback, _)
+            _ = self.re_hex.sub(lambda x: x.group(1).upper(), _)
             return _
 
     def print_table_regions(self, table):
