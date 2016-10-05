@@ -84,7 +84,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.1'
+__version__ = '0.3.3'
 
 
 class FindActiveServer(CLI):
@@ -98,7 +98,7 @@ class FindActiveServer(CLI):
         self.default_port = 80
         self.port = self.default_port
         self.protocol = None
-        self.url_suffix = None
+        self.url_path = None
         self.regex = None
         self.request_timeout = 1
         self.num_threads = 10
@@ -113,7 +113,7 @@ class FindActiveServer(CLI):
         self.add_opt('-s', '--https', action='store_true',
                      help='Fetch web page over HTTPS protocol instead of doing a socket test ' +
                      '(overrides --http, changes port 80 to 443)')
-        self.add_opt('-u', '--url', help='URL suffix to fetch (implies --http)')
+        self.add_opt('-u', '--url', help='URL path to fetch (implies --http)')
         self.add_opt('-r', '--regex', help='Regex to search for in http content (optional)')
         self.add_opt('-n', '--num-threads', default=self.num_threads, type='int',
                      help='Number or parallel threads to speed up processing (default: 10, ' +
@@ -126,7 +126,7 @@ class FindActiveServer(CLI):
     def process_options(self):
         hosts = self.get_opt('host')
         self.port = self.get_opt('port')
-        self.url_suffix = self.get_opt('url')
+        self.url_path = self.get_opt('url')
         self.regex = self.get_opt('regex')
         self.num_threads = self.get_opt('num_threads')
         self.request_timeout = self.get_opt('request_timeout')
@@ -154,11 +154,11 @@ class FindActiveServer(CLI):
             elif self.port != self.default_port:
                 self.usage('cannot specify --port with --ping, mutually exclusive options!')
             self.protocol = 'ping'
-        if self.url_suffix:
+        if self.url_path:
             if self.protocol is None:
                 self.protocol = 'http'
             elif self.protocol == 'ping':
-                self.usage('cannot specify --url-suffix with --ping, mutually exclusive options!')
+                self.usage('cannot specify --url-path with --ping, mutually exclusive options!')
         self.validate_options()
 
     def validate_options(self):
@@ -180,16 +180,16 @@ class FindActiveServer(CLI):
         if self.protocol in ('http', 'https'):
             for host in self.host_list:
                 (host, port) = self.port_override(host)
-                #if self.check_http(host, port, self.url_suffix):
+                #if self.check_http(host, port, self.url_path):
                 #    self.finish(host, port)
-                self.launch_thread(self.check_http, host, port, self.url_suffix)
+                self.launch_thread(self.check_http, host, port, self.url_path)
         elif self.protocol == 'ping':
             for host in self.host_list:
                 # this strips the :port from host
                 (host, port) = self.port_override(host)
                 #if self.check_ping(host):
                 #    self.finish(host)
-                self.launch_thread(self.check_ping, host)
+                self.launch_thread(self.check_ping, host, 1, self.request_timeout)
         else:
             for host in self.host_list:
                 (host, port) = self.port_override(host)
@@ -263,6 +263,7 @@ class FindActiveServer(CLI):
             exitcode = subprocess.call(["ping", ping_count, ping_wait, host],
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if exitcode == 0:
+                log.info("host '%s' responded to ping", host)
                 return host
         except subprocess.CalledProcessError as _:
             log.warn('ping failed: %s', _.output)
@@ -279,34 +280,38 @@ class FindActiveServer(CLI):
             #sock.connect((host, int(port)))
             socket.create_connection((host, int(port)), self.request_timeout)
             #sock.close()
+            log.info("socket connected to host '%s' port '%s'", host, port)
             return (host, port)
         except IOError:
             return None
 
-    def check_http(self, host, port, url_suffix=''):
-        if not isStr(url_suffix):
-            url_suffix = ''
-        url = '{protocol}://{host}:{port}/{url_suffix}'.format(protocol=self.protocol,
+    def check_http(self, host, port, url_path=''):
+        if not isStr(url_path):
+            url_path = ''
+        url = '{protocol}://{host}:{port}/{url_path}'.format(protocol=self.protocol,
                                                                host=host,
                                                                port=port,
-                                                               url_suffix=url_suffix.lstrip('/'))
+                                                               url_path=url_path.lstrip('/'))
         log.info('GET %s', url)
         try:
             # timeout here isn't total timeout, it's response time
             req = requests.get(url, timeout=self.request_timeout)
         except requests.exceptions.RequestException:
             return False
-        log.debug("response: %s %s", req.status_code, req.reason)
-        log.debug("content:\n%s\n%s\n%s", '='*80, req.content.strip(), '='*80)
+        except IOError:
+            return False
+        log.debug("%s - response: %s %s", url, req.status_code, req.reason)
+        log.debug("%s - content:\n%s\n%s\n%s", url, '='*80, req.content.strip(), '='*80)
         if req.status_code != 200:
             return None
         if self.regex:
-            log.info('checking regex against content')
+            log.info('%s - checking regex against content', url)
             if self.regex.search(req.content):
-                log.info('matched regex in http output')
+                log.info('%s - regex matched http output', url)
             else:
-                log.info('regex match not found in http output')
+                log.info('%s - regex did not match http output', url)
                 return None
+        log.info("%s - passed all checks", url)
         return (host, port)
 
 

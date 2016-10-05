@@ -135,7 +135,7 @@ check_output "NO_AVAILABLE_SERVER" ./find_active_server.py --https localhost --p
 #check_output "NO_AVAILABLE_SERVER" ./find_active_server.py $opts mail.google.com --https --port 25
 
 echo
-echo "testing https with url suffix and regex matching"
+echo "testing https with url path and regex matching"
 echo
 
 check_output "github.com" ./find_active_server.py $opts --https google.com github.com -u /harisekhon --regex 'pytools'
