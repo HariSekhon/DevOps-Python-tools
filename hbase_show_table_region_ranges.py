@@ -123,7 +123,7 @@ class HBaseShowTableRegionRanges(CLI):
 
     # some extra effort to make it look the same as HBase presents it as
     def encode_char(self, char):
-        if char in string.printable and char not in ('\t', '\n', '\r'):
+        if char in string.printable and char not in ('\t', '\n', '\r', '\x0b', '\x0c'):
             return char
         else:
             _ = '{0:#0{1}x}'.format(ord(char), 4).replace('0x', '\\x')
