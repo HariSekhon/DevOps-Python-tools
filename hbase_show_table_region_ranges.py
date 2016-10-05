@@ -119,7 +119,7 @@ class HBaseShowTableRegionRanges(CLI):
         #else:
         #    die('unrecognized region name/start/end key, not bytes or string!')
         encode_char = self.encode_char
-        return ''.join([ encode_char(x) for x in arg])
+        return ''.join([encode_char(x) for x in arg])
 
     # some extra effort to make it look the same as HBase presents it as
     def encode_char(self, char):
@@ -160,22 +160,41 @@ class HBaseShowTableRegionRanges(CLI):
         total_width = region_width + start_key_width + end_key_width + server_width + len(3 * separator)
         print('=' * total_width)
         print('{region_header:{region_width}}{sep}'
-              .format(region_header=region_header, region_width=region_width, sep=separator), end='')
+              .format(region_header=region_header,
+                      region_width=region_width,
+                      sep=separator),
+              end='')
         print('{start_key:{start_key_width}}{sep}'
-              .format(start_key=start_key_header, start_key_width=start_key_width, sep=separator), end='')
+              .format(start_key=start_key_header,
+                      start_key_width=start_key_width,
+                      sep=separator),
+              end='')
         print('{end_key:{end_key_width}}{sep}'
-              .format(end_key=end_key_header, end_key_width=end_key_width, sep=separator), end='')
+              .format(end_key=end_key_header,
+                      end_key_width=end_key_width,
+                      sep=separator),
+              end='')
         print('{server_header}'.format(server_header=server_header))
         print('=' * total_width)
         try:
             for region in table.regions():
                 print('{region:{region_width}}{sep}'
-                      .format(region=self.bytes_to_str(region['name']), region_width=region_width, sep=separator), end='')
+                      .format(region=self.bytes_to_str(region['name']),
+                              region_width=region_width,
+                              sep=separator),
+                      end='')
                 print('{start_key:{start_key_width}}{sep}'
-                      .format(start_key=self.bytes_to_str(region['start_key']), start_key_width=start_key_width, sep=separator), end='')
+                      .format(start_key=self.bytes_to_str(region['start_key']),
+                              start_key_width=start_key_width,
+                              sep=separator),
+                      end='')
                 print('{end_key:{end_key_width}}{sep}'
-                      .format(end_key=self.bytes_to_str(region['end_key']), end_key_width=end_key_width, sep=separator), end='')
-                print('{server}:{port}'.format(server=region['server_name'], port=region['port']))
+                      .format(end_key=self.bytes_to_str(region['end_key']),
+                              end_key_width=end_key_width,
+                              sep=separator),
+                      end='')
+                print('{server}:{port}'.format(server=region['server_name'],
+                                               port=region['port']))
         except KeyError as _:
             die('error parsing region info: {0}. '.format(_) + support_msg_api())
         # old method
