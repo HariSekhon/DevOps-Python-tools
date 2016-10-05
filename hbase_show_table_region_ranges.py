@@ -31,10 +31,11 @@ from __future__ import print_function
 
 #import logging
 import os
+import re
 import sys
 import traceback
 import socket
-#import string
+import string
 import happybase
 from thriftpy.thrift import TException as ThriftException
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
@@ -42,14 +43,14 @@ sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
     from harisekhon.utils import log, die, support_msg_api
-    from harisekhon.utils import validate_host, validate_port, validate_chars
+    from harisekhon.utils import validate_host, validate_port, validate_chars, isStr
     from harisekhon import CLI
 except ImportError as _:
     print(traceback.format_exc(), end='')
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 class HBaseShowTableRegionRanges(CLI):
@@ -64,6 +65,7 @@ class HBaseShowTableRegionRanges(CLI):
         self.port = 9090
         self.table = None
         self.timeout_default = 300
+        self.re_hex = re.compile('([a-f]+)')
 
     def add_options(self):
         self.add_hostoption(name='HBase Thrift Server', default_host='localhost', default_port=self.port)
@@ -109,6 +111,26 @@ class HBaseShowTableRegionRanges(CLI):
         table = self.conn.table(self.table)
         self.print_table_regions(table)
 
+    def bytes_to_str(self, arg):
+        # unfortunately this is passed in a type str, must encode char by char
+        #if isStr(arg):
+        #    return arg
+        #elif isByte(arg):
+        #else:
+        #    die('unrecognized region name/start/end key, not bytes or string!')
+        encode_char = self.encode_char
+        return ''.join([ encode_char(x) for x in arg])
+
+    def encode_char(self, char):
+        # some extra effor to make it look the same as HBase
+        if char in string.printable and char not in ('\t', '\n', '\r'):
+            return char
+        else:
+            _ = str(hex(ord(char))).replace('0x', '\\x')
+            uppercase_callback = lambda x: x.group(1).upper()
+            _ = self.re_hex.sub(uppercase_callback, _)
+            return _
+
     def print_table_regions(self, table):
         region_header = 'Region'
         start_key_header = 'Start Key'
@@ -122,13 +144,13 @@ class HBaseShowTableRegionRanges(CLI):
         try:
             for region in table.regions():
                 log.debug(region)
-                _ = len(region['name'])
+                _ = len(self.bytes_to_str(region['name']))
                 if _ > region_width:
                     region_width = _
-                _ = len(region['start_key'])
+                _ = len(self.bytes_to_str(region['start_key']))
                 if _ > start_key_width:
                     start_key_width = _
-                _ = len(region['end_key'])
+                _ = len(self.bytes_to_str(region['end_key']))
                 if _ > end_key_width:
                     end_key_width = _
                 _ = len(region['server_name'] + ':' + str(region['port']))
@@ -149,11 +171,11 @@ class HBaseShowTableRegionRanges(CLI):
         try:
             for region in table.regions():
                 print('{region:{region_width}}{sep}'
-                      .format(region=region['name'], region_width=region_width, sep=separator), end='')
+                      .format(region=self.bytes_to_str(region['name']), region_width=region_width, sep=separator), end='')
                 print('{start_key:{start_key_width}}{sep}'
-                      .format(start_key=region['start_key'], start_key_width=start_key_width, sep=separator), end='')
+                      .format(start_key=self.bytes_to_str(region['start_key']), start_key_width=start_key_width, sep=separator), end='')
                 print('{end_key:{end_key_width}}{sep}'
-                      .format(end_key=region['end_key'], end_key_width=end_key_width, sep=separator), end='')
+                      .format(end_key=self.bytes_to_str(region['end_key']), end_key_width=end_key_width, sep=separator), end='')
                 print('{server}:{port}'.format(server=region['server_name'], port=region['port']))
         except KeyError as _:
             die('error parsing region info: {0}. '.format(_) + support_msg_api())
