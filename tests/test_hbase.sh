@@ -99,13 +99,13 @@ EOF
     check_exit_code 2
     set -e
     hr
-    ./hbase_generate_data.py -n 10 -X
-    hr
     ./hbase_generate_data.py -n 10 -d
     hr
     ./hbase_generate_data.py -n 10 -d -s
     hr
-    ./hbase_generate_data.py -n 10 -d -s --pc 50
+    ./hbase_generate_data.py -n 10000 -X -s --pc 50 -T UniformSplitTable
+    hr
+    ./hbase_generate_data.py -n 10000 -X -T HexStringSplitTable
     hr
     set +e
     ./hbase_compact_tables.py --list-tables
@@ -130,9 +130,18 @@ EOF
     check_exit_code 3
     set -e
     hr
-    ./hbase_show_table_region_ranges.py -T HexStringSplitTable -v
+    ./hbase_show_table_region_ranges.py -T HexStringSplitTable -v -s
     hr
     ./hbase_show_table_region_ranges.py -T UniformSplitTable -v
+    hr
+    set +e
+    ./hbase_show_table_region_row_distribution.py --list-tables
+    check_exit_code 3
+    set -e
+    hr
+    ./hbase_show_table_region_row_distribution.py -T UniformSplitTable -v
+    hr
+    ./hbase_show_table_region_row_distribution.py -T HexStringSplitTable -v -s
     hr
 
     delete_container
