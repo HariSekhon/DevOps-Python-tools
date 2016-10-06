@@ -20,7 +20,7 @@ Tool to show HBase table region ranges
 
 Useful for exploring tables when evaluating pre-splitting strategies, eg. HexStringSplit vs UniformSplit
 
-Tested on Hortonworks HDP 2.3 (HBase 1.1.2) and Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2
+Tested on Hortonworks HDP 2.5 (HBase 1.1.2) and Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2
 
 """
 
