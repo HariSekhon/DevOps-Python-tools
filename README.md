@@ -62,7 +62,7 @@ Some common options also support optional environment variables for convenience 
 - ```hadoop_hdfs_files_stats.jy``` - fetches HDFS file stats. Useful to generate a list of all files in a directory tree showing block size, replication factor, underfilled blocks and small files
 - ```hbase_generate_data.py``` - inserts random generated data in to HBase, with optional skew support with configurable skew percentage
 - ```hbase_show_table_region_ranges.py``` - dumps HBase table region ranges information, useful when pre-splitting tables
-- ```hbase_show_table_region_row_distribution.py``` - calculates the distribution of rows across regions in an HBase table, giving per region counts and % of total rows for the table
+- ```hbase_calculate_table_region_row_distribution.py``` - calculates the distribution of rows across regions in an HBase table, giving per region counts and % of total rows for the table
 - ```hbase_compact_tables.py``` - compacts HBase tables (for off-peak compactions). Defaults to finding and iterating on all tables or takes an optional regex and compacts only matching tables.
 - ```hbase_flush_tables.py``` - flushes HBase tables. Defaults to finding and iterating on all tables or takes an optional regex and flushes only matching tables.
 - ```pig-text-to-elasticsearch.pig``` / ```pig-text-to-solr.pig``` - bulk indexes unstructured files in Hadoop to Elasticsearch or Solr/SolrCloud clusters
