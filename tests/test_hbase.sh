@@ -139,7 +139,7 @@ EOF
     check_exit_code 3
     set -e
     hr
-    ./hbase_show_table_region_row_distribution.py -T UniformSplitTable -v
+    ./hbase_show_table_region_row_distribution.py -T UniformSplitTable -v -n
     hr
     ./hbase_show_table_region_row_distribution.py -T HexStringSplitTable -v -s
     hr
