@@ -140,7 +140,7 @@ class HBaseShowTableRegionRowDistribution(HBaseShowTableRegionRanges):
                                       self.separator),
                   end='')
             print('{0:{1}}{2}'.format(region['server'], self.server_width, self.separator), end='')
-            print('{0:{1}}{2}{3:>9}'.format(region['row_count'],
+            print('{0:{1}}{2}{3:>10}'.format(region['row_count'],
                                             self.row_count_width,
                                             self.separator,
                                             region['pc']))
