@@ -42,7 +42,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log, die, support_msg_api
+    from harisekhon.utils import log, log_option, die, support_msg_api
     from harisekhon.utils import validate_host, validate_port, validate_chars
     from harisekhon import CLI
 except ImportError as _:
@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.3'
 
 
 class HBaseShowTableRegionRanges(CLI):
@@ -66,10 +66,25 @@ class HBaseShowTableRegionRanges(CLI):
         self.table = None
         self.timeout_default = 300
         self.re_hex = re.compile('([a-f]+)')
+        self.region_header = 'Region'
+        self.start_key_header = 'Start Key'
+        self.end_key_header = 'End Key'
+        self.server_header = 'Server (host:port)'
+        self.separator = '    '
+        self.short_region_name = False
+        self.region_width = len(self.region_header)
+        self.start_key_width = len(self.start_key_header)
+        self.end_key_width = len(self.end_key_header)
+        self.server_width = len(self.server_header)
+        self.total_width = (self.region_width + self.server_width +
+                            self.start_key_width + self.end_key_width +
+                            len(3 * self.separator))
 
     def add_options(self):
         self.add_hostoption(name='HBase Thrift Server', default_host='localhost', default_port=self.port)
         self.add_opt('-T', '--table', help='Table name')
+        self.add_opt('-s', '--short-region-name', action='store_true',
+                     help='Shorten region name to not include redundant table prefix')
         self.add_opt('-l', '--list-tables', action='store_true', help='List tables and exit')
 
     def process_args(self):
@@ -82,6 +97,8 @@ class HBaseShowTableRegionRanges(CLI):
         validate_port(self.port)
         if not self.get_opt('list_tables'):
             validate_chars(self.table, 'hbase table', 'A-Za-z0-9:._-')
+        self.short_region_name = self.get_opt('short_region_name')
+        log_option('shorten region name', self.short_region_name)
 
     def get_tables(self):
         try:
@@ -98,18 +115,20 @@ class HBaseShowTableRegionRanges(CLI):
         try:
             log.info('connecting to HBase Thrift Server at %s:%s', self.host, self.port)
             self.conn = happybase.Connection(host=self.host, port=self.port, timeout=10 * 1000)  # ms
+            tables = self.get_tables()
+            if self.get_opt('list_tables'):
+                print('Tables:\n\n' + '\n'.join(tables))
+                sys.exit(3)
+            if self.table not in tables:
+                die("HBase table '{0}' does not exist!".format(self.table))
+            table_conn = self.conn.table(self.table)
+            self.local_main(table_conn)
+            log.info('finished, closing connection')
+            self.conn.close()
         except socket.timeout as _:
             die('ERROR: {0}'.format(_))
         except ThriftException as _:
             die('ERROR: {0}'.format(_))
-        tables = self.get_tables()
-        if self.get_opt('list_tables'):
-            print('Tables:\n\n' + '\n'.join(tables))
-            sys.exit(3)
-        if self.table not in tables:
-            die("HBase table '{0}' does not exist!".format(self.table))
-        table = self.conn.table(self.table)
-        self.print_table_regions(table)
 
     def bytes_to_str(self, arg):
         # unfortunately this is passed in a type str, must encode char by char
@@ -130,71 +149,68 @@ class HBaseShowTableRegionRanges(CLI):
             _ = self.re_hex.sub(lambda x: x.group(1).upper(), _)
             return _
 
-    def print_table_regions(self, table):
-        region_header = 'Region'
-        start_key_header = 'Start Key'
-        end_key_header = 'End Key'
-        server_header = 'Server (host:port)'
-        region_width = len(region_header)
-        start_key_width = len(start_key_header)
-        end_key_width = len(end_key_header)
-        server_width = len(server_header)
-        separator = '    '
+    def shorten_region_name(self, region_name):
+        if self.short_region_name:
+            return region_name.lstrip(self.table + ',')
+        return region_name
+
+    def local_main(self, table_conn):
+        self.calculate_widths(table_conn)
+        self.print_table_regions(table_conn)
+
+    def calculate_widths(self, table_conn):
         try:
-            for region in table.regions():
+            for region in table_conn.regions():
                 log.debug(region)
-                _ = len(self.bytes_to_str(region['name']))
-                if _ > region_width:
-                    region_width = _
+                _ = len(self.bytes_to_str(self.shorten_region_name(region['name'])))
+                if _ > self.region_width:
+                    self.region_width = _
                 _ = len(self.bytes_to_str(region['start_key']))
-                if _ > start_key_width:
-                    start_key_width = _
+                if _ > self.start_key_width:
+                    self.start_key_width = _
                 _ = len(self.bytes_to_str(region['end_key']))
-                if _ > end_key_width:
-                    end_key_width = _
+                if _ > self.end_key_width:
+                    self.end_key_width = _
                 _ = len(region['server_name'] + ':' + str(region['port']))
-                if _ > server_width:
-                    server_width = _
+                if _ > self.server_width:
+                    self.server_width = _
         except KeyError as _:
             die('error parsing region info: {0}. '.format(_) + support_msg_api())
-        total_width = region_width + start_key_width + end_key_width + server_width + len(3 * separator)
-        print('=' * total_width)
-        print('{region_header:{region_width}}{sep}'
-              .format(region_header=region_header,
-                      region_width=region_width,
-                      sep=separator),
+        self.total_width = (self.region_width + self.server_width +
+                            self.start_key_width + self.end_key_width +
+                            len(3 * self.separator))
+
+    def print_table_regions(self, table_conn):
+        print('=' * self.total_width)
+        print('{0:{1}}{2}'.format(self.region_header,
+                                  self.region_width,
+                                  self.separator),
               end='')
-        print('{start_key:{start_key_width}}{sep}'
-              .format(start_key=start_key_header,
-                      start_key_width=start_key_width,
-                      sep=separator),
+        print('{0:{1}}{2}'.format(self.start_key_header,
+                                  self.start_key_width,
+                                  self.separator),
               end='')
-        print('{end_key:{end_key_width}}{sep}'
-              .format(end_key=end_key_header,
-                      end_key_width=end_key_width,
-                      sep=separator),
+        print('{0:{1}}{2}'.format(self.end_key_header,
+                                  self.end_key_width,
+                                  self.separator),
               end='')
-        print('{server_header}'.format(server_header=server_header))
-        print('=' * total_width)
+        print('{0}'.format(self.server_header))
+        print('=' * self.total_width)
         try:
-            for region in table.regions():
-                print('{region:{region_width}}{sep}'
-                      .format(region=self.bytes_to_str(region['name']),
-                              region_width=region_width,
-                              sep=separator),
+            for region in table_conn.regions():
+                print('{0:{1}}{2}'.format(self.bytes_to_str(self.shorten_region_name(region['name'])),
+                                          self.region_width,
+                                          self.separator),
                       end='')
-                print('{start_key:{start_key_width}}{sep}'
-                      .format(start_key=self.bytes_to_str(region['start_key']),
-                              start_key_width=start_key_width,
-                              sep=separator),
+                print('{0:{1}}{2}'.format(self.bytes_to_str(region['start_key']),
+                                          self.start_key_width,
+                                          self.separator),
                       end='')
-                print('{end_key:{end_key_width}}{sep}'
-                      .format(end_key=self.bytes_to_str(region['end_key']),
-                              end_key_width=end_key_width,
-                              sep=separator),
+                print('{0:{1}}{2}'.format(self.bytes_to_str(region['end_key']),
+                                          self.end_key_width,
+                                          self.separator),
                       end='')
-                print('{server}:{port}'.format(server=region['server_name'],
-                                               port=region['port']))
+                print('{0}:{1}'.format(region['server_name'], region['port']))
         except KeyError as _:
             die('error parsing region info: {0}. '.format(_) + support_msg_api())
         # old method
@@ -202,8 +218,8 @@ class HBaseShowTableRegionRanges(CLI):
 #        table = self.conn.table('hbase:meta')
 #        log.info('scanning hbase:meta')
 #        scanner = table.scan(row_prefix=self.table, columns=('info:regioninfo', 'info:server'), sorted_columns=False)
-#        start_key_width = 20
-#        end_key_width = 20
+#        self.start_key_width = 20
+#        self.end_key_width = 20
 #        for row in scanner:
 #            log.debug('Raw RegionInfo: %s', row)
 #            if len(row) != 2:
@@ -219,10 +235,8 @@ class HBaseShowTableRegionRanges(CLI):
 #            regioninfo = regioninfo.replace('\n', '')
 #            regioninfo = filter(lambda x: x in set(string.ascii_letters + string.digits), regioninfo)
 #            print('{regioninfo:{width}}'.format(regioninfo=regioninfo,
-#                                                width=start_key_width + end_key_width + 4), end='\t')
+#                                                width=self.start_key_width + self.end_key_width + 4), end='\t')
 #            print(cf['info:server'])
-        log.info('finished, closing connection')
-        self.conn.close()
 
 
 if __name__ == '__main__':
