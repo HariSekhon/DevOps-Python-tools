@@ -18,8 +18,11 @@
 
 Tool to show distribution of rows across HBase table regions to help analyze hotspotting caused by row key skew
 
-This a very heavy operation and can takes a very long time to run for large tables as it runs a full table scan
-region-by-region ie. O(n). Should be run periodically for analysis only.
+This is designed for lab testing small to medium data distributions and is not scalable due to being a very heavy
+region-by-region full table scan operation ie. O(n).
+
+It will likely time out on tables with very large regions such as wide row opentsdb tables, in which case you should
+instead consider using Spark, Hive or Phoenix instead.
 
 Tested on Hortonworks HDP 2.5 (HBase 1.1.2) and Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2
 
