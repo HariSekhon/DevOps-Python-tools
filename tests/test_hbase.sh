@@ -135,13 +135,13 @@ EOF
     ./hbase_show_table_region_ranges.py -T UniformSplitTable -v
     hr
     set +e
-    ./hbase_show_table_region_row_distribution.py --list-tables
+    ./hbase_calculate_table_region_row_distribution.py --list-tables
     check_exit_code 3
     set -e
     hr
-    ./hbase_show_table_region_row_distribution.py -T UniformSplitTable -v -n
+    ./hbase_calculate_table_region_row_distribution.py -T UniformSplitTable -v -n
     hr
-    ./hbase_show_table_region_row_distribution.py -T HexStringSplitTable -v -s
+    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -v -s
     hr
 
     delete_container
