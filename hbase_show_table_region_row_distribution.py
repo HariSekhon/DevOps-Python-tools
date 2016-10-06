@@ -57,6 +57,7 @@ class HBaseShowTableRegionRowDistribution(HBaseShowTableRegionRanges):
         # super().__init__()
         self.timeout_default = 6 * 3600
         self.regions = []
+        self.no_region_col = False
         self.total_rows = 0
         self.row_count_header = 'Row Count'
         self.row_count_width = len(self.row_count_header)
@@ -64,8 +65,16 @@ class HBaseShowTableRegionRowDistribution(HBaseShowTableRegionRanges):
         self.row_count_pc_width = len(self.row_count_pc_header)
         autoflush()
 
+    def add_options(self):
+        super(HBaseShowTableRegionRowDistribution, self).add_options()
+        self.add_opt('-n', '--no-region-name', action='store_true',
+                     help='Do not output Region name column to save screen space')
+
     def local_main(self, table_conn):
         self.calculate_widths(table_conn)
+        self.no_region_col = self.get_opt('no_region_name')
+        if self.no_region_col:
+            self.total_width -= self.region_width
         self.populate_region_metadata(table_conn)
         self.populate_row_counts(table_conn)
         self.calculate_row_count_widths()
@@ -93,10 +102,11 @@ class HBaseShowTableRegionRowDistribution(HBaseShowTableRegionRanges):
 
     def print_table_region_row_counts(self):
         print('=' * self.total_width)
-        print('{0:{1}}{2}'.format(self.region_header,
-                                  self.region_width,
-                                  self.separator),
-              end='')
+        if not self.no_region_col:
+            print('{0:{1}}{2}'.format(self.region_header,
+                                      self.region_width,
+                                      self.separator),
+                  end='')
         print('{0:{1}}{2}'.format(self.start_key_header,
                                   self.start_key_width,
                                   self.separator),
@@ -105,8 +115,9 @@ class HBaseShowTableRegionRowDistribution(HBaseShowTableRegionRanges):
                                   self.end_key_width,
                                   self.separator),
               end='')
-        print('{0}{1}'.format(self.server_header,
-                              self.separator),
+        print('{0:{1}}{2}'.format(self.server_header,
+                                  self.server_width,
+                                  self.separator),
               end='')
         print('{0:{1}}{2}{3}'.format(self.row_count_header,
                                      self.row_count_width,
@@ -115,10 +126,11 @@ class HBaseShowTableRegionRowDistribution(HBaseShowTableRegionRanges):
              )
         print('=' * self.total_width)
         for region in self.regions:
-            print('{0:{1}}{2}'.format(region['name'],
-                                      self.region_width,
-                                      self.separator),
-                  end='')
+            if not self.no_region_col:
+                print('{0:{1}}{2}'.format(region['name'],
+                                          self.region_width,
+                                          self.separator),
+                      end='')
             print('{0:{1}}{2}'.format(region['start_key'],
                                       self.start_key_width,
                                       self.separator),
@@ -127,7 +139,7 @@ class HBaseShowTableRegionRowDistribution(HBaseShowTableRegionRanges):
                                       self.end_key_width,
                                       self.separator),
                   end='')
-            print('{0}{1}'.format(region['server'], self.separator), end='')
+            print('{0:{1}}{2}'.format(region['server'], self.server_width, self.separator), end='')
             print('{0:{1}}{2}{3:>9}'.format(region['row_count'],
                                             self.row_count_width,
                                             self.separator,
