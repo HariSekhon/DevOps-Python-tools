@@ -72,7 +72,7 @@ class HBaseShowTableRegionRanges(CLI):
         self.server_header = 'Server (host:port)'
         self.separator = '    '
         self.short_region_name = False
-        self.regions = None
+        self._regions = None
         self.region_width = len(self.region_header)
         self.start_key_width = len(self.start_key_header)
         self.end_key_width = len(self.end_key_header)
@@ -123,6 +123,7 @@ class HBaseShowTableRegionRanges(CLI):
             if self.table not in tables:
                 die("HBase table '{0}' does not exist!".format(self.table))
             table_conn = self.conn.table(self.table)
+            self._regions = table_conn.regions()
             self.local_main(table_conn)
             log.info('finished, closing connection')
             self.conn.close()
@@ -156,13 +157,12 @@ class HBaseShowTableRegionRanges(CLI):
         return region_name
 
     def local_main(self, table_conn):
-        self.regions = table_conn.regions()
         self.calculate_widths()
         self.print_table_regions()
 
     def calculate_widths(self):
         try:
-            for region in self.regions:
+            for region in self._regions:
                 log.debug(region)
                 _ = len(self.bytes_to_str(self.shorten_region_name(region['name'])))
                 if _ > self.region_width:
@@ -199,7 +199,7 @@ class HBaseShowTableRegionRanges(CLI):
         print('{0}'.format(self.server_header))
         print('=' * self.total_width)
         try:
-            for region in self.regions:
+            for region in self._regions:
                 print('{0:{1}}{2}'.format(self.bytes_to_str(self.shorten_region_name(region['name'])),
                                           self.region_width,
                                           self.separator),
@@ -215,7 +215,7 @@ class HBaseShowTableRegionRanges(CLI):
                 print('{0}:{1}'.format(region['server_name'], region['port']))
         except KeyError as _:
             die('error parsing region info: {0}. '.format(_) + support_msg_api())
-        print('\nNumber of Regions: {0:d}'.format(len(self.regions)))
+        print('\nNumber of Regions: {0:d}'.format(len(self._regions)))
         # old method
 #        log.info('getting hbase:meta table instance')
 #        table = self.conn.table('hbase:meta')
