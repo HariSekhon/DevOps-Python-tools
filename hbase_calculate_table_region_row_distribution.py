@@ -34,6 +34,7 @@ from __future__ import division
 from __future__ import print_function
 #from __future__ import unicode_literals
 
+import math
 #import logging
 import os
 import sys
@@ -49,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.3.1'
 
 
 class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
@@ -60,7 +61,7 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         # Python 3.x
         # super().__init__()
         self.timeout_default = 6 * 3600
-        self.regions = []
+        self._regions_meta = []
         self.no_region_col = False
         self.total_rows = 0
         self.row_count_header = 'Row Count'
@@ -75,19 +76,48 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
                      help='Do not output Region name column to save screen space')
 
     def local_main(self, table_conn):
-        self.calculate_widths(table_conn)
         self.no_region_col = self.get_opt('no_region_name')
         if self.no_region_col:
             self.total_width -= self.region_width
-        self.populate_region_metadata(table_conn)
+        num_regions = len(self._regions)
+        # sanity check and protect against division by zero in summary stats
+        if num_regions < 1:
+            die('number of regions detected = {0:d} (< 1)'.format(num_regions))
+        self.populate_region_metadata()
+        self.calculate_widths()
         self.populate_row_counts(table_conn)
         self.calculate_row_count_widths()
         self.calculate_row_percentages()
         self.print_table_region_row_counts()
-        print('\nTotal Rows: {0:d}'.format(self.total_rows))
+        self.print_summary()
+
+    def print_summary(self):
+        num_regions = len(self._regions)
+        regions_meta_non_zero = [region for region in self._regions_meta if region['row_count'] > 0]
+        num_regions_non_zero = len(regions_meta_non_zero)
+        median_row_count = self._regions_meta[int(math.ceil(len(self._regions_meta)/2))]['row_count']
+        median_row_count_non_empty = self._regions_meta[int(math.ceil(len(regions_meta_non_zero)/2))]['row_count']
+        print()
+        print('Total Rows: {0:d}'.format(self.total_rows))
+        print('Total Regions: {0:d}'.format(num_regions))
+        print('Total Regions (non-empty): {0:d}'.format(num_regions_non_zero))
+        print()
+        print('Average Rows Per Region: {0:.2f}'.format(self.total_rows / num_regions))
+        print('Average Rows Per Region (excluding empty regions): {0:.2f}'.format(self.total_rows /
+                                                                                  num_regions_non_zero))
+        print()
+        print('Average Rows Per Region (% of total): {0:.2f}%'.format(self.total_rows /
+                                                                      num_regions /
+                                                                      self.total_rows * 100))
+        print('Average Rows Per Region (% of total, excluding empty regions): {0:.2f}%'.format(self.total_rows /
+                                                                                               num_regions_non_zero /
+                                                                                               self.total_rows * 100))
+        print()
+        print('Median Rows per Region: {0:d}'.format(median_row_count))
+        print('Median Rows per Region (excluding empty regions): {0:d}'.format(median_row_count_non_empty))
 
     def calculate_row_count_widths(self):
-        for region in self.regions:
+        for region in self._regions_meta:
             _ = len(str(region['row_count']))
             if _ > self.row_count_width:
                 self.row_count_width = _
@@ -95,14 +125,14 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
 
     def calculate_row_percentages(self):
         log.info('calculating row percentages')
-        for region in self.regions:
+        for region in self._regions_meta:
             self.total_rows += region['row_count']
         # make sure we don't run in to division by zero error
         #if self.total_rows == 0:
         #    die("0 total rows detected for table '{0}'!".format(self.table))
         if self.total_rows < 0:
             die("negative total rows detected for table '{0}'!".format(self.table))
-        for region in self.regions:
+        for region in self._regions_meta:
             region['pc'] = '{0:.2f}'.format(region['row_count'] / max(self.total_rows, 1) * 100)
 
     def print_table_region_row_counts(self):
@@ -130,7 +160,7 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
                                      self.row_count_pc_header)
              )
         print('=' * self.total_width)
-        for region in self.regions:
+        for region in self._regions_meta:
             if not self.no_region_col:
                 print('{0:{1}}{2}'.format(region['name'],
                                           self.region_width,
@@ -146,15 +176,15 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
                   end='')
             print('{0:{1}}{2}'.format(region['server'], self.server_width, self.separator), end='')
             print('{0:{1}}{2}{3:>10}'.format(region['row_count'],
-                                            self.row_count_width,
-                                            self.separator,
-                                            region['pc']))
+                                             self.row_count_width,
+                                             self.separator,
+                                             region['pc']))
 
-    def populate_region_metadata(self, table_conn):
+    def populate_region_metadata(self):
         log.info('getting region metadata')
         try:
-            for region in table_conn.regions():
-                self.regions.append({
+            for region in self._regions:
+                self._regions_meta.append({
                     'name': self.bytes_to_str(self.shorten_region_name(region['name'])),
                     'start_key': self.bytes_to_str(region['start_key']),
                     'end_key': self.bytes_to_str(region['end_key']),
@@ -167,7 +197,7 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         log.info('getting region row counts')
         if self.verbose < 2:
             print('progress dots (1 per region scanned): ', end='')
-        for region in self.regions:
+        for region in self._regions_meta:
             log.info("scanning region '%s'", region['name'])
             region['row_count'] = self.scan_count(table_conn,
                                                   region['start_key'],
