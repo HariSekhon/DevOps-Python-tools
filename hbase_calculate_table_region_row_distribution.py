@@ -16,13 +16,14 @@
 
 """
 
-Tool to show distribution of rows across HBase table regions to help analyze hotspotting caused by row key skew
+Tool to show distribution of rows across HBase table regions via Thrift API
 
-This is designed for lab testing small to medium data distributions and is not scalable due to being a very heavy
+Designed to help analyze region hotspotting caused by row key skew while lab testing
+small to medium data distributions and is not scalable due to being a very heavy
 region-by-region full table scan operation ie. O(n).
 
-It will likely time out on tables with very large regions such as wide row opentsdb tables, in which case you should
-instead consider using Spark, Hive or Phoenix instead.
+This may time out on HBase tables with very large regions such as wide row opentsdb tables,
+in which case you should instead consider using Spark, Hive or Phoenix instead.
 
 Tested on Hortonworks HDP 2.5 (HBase 1.1.2) and Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2
 
@@ -48,7 +49,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.3'
 
 
 class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
@@ -83,6 +84,7 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         self.calculate_row_count_widths()
         self.calculate_row_percentages()
         self.print_table_region_row_counts()
+        print('\nTotal Rows: {0:d}'.format(self.total_rows))
 
     def calculate_row_count_widths(self):
         for region in self.regions:
@@ -178,7 +180,7 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
     @staticmethod
     def scan_count(table_conn, start_row, end_row):
         # row_stop is exclusive but so is end_row passed from region info so shouldn't be off by one
-        rows = table_conn.scan(row_start=start_row, row_stop=end_row)
+        rows = table_conn.scan(row_start=start_row, row_stop=end_row, columns=[])
         return len(list(rows))
 
 
