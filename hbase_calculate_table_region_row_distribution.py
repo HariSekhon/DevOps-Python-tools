@@ -34,11 +34,11 @@ from __future__ import division
 from __future__ import print_function
 #from __future__ import unicode_literals
 
-import math
 #import logging
 import os
 import sys
 import traceback
+import numpy as np
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.1'
+__version__ = '0.4'
 
 
 class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
@@ -95,26 +95,41 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         num_regions = len(self._regions)
         regions_meta_non_zero = [region for region in self._regions_meta if region['row_count'] > 0]
         num_regions_non_zero = len(regions_meta_non_zero)
-        median_row_count = self._regions_meta[int(math.ceil(len(self._regions_meta)/2))]['row_count']
-        median_row_count_non_empty = self._regions_meta[int(math.ceil(len(regions_meta_non_zero)/2))]['row_count']
+        np_rows = np.array([int(region['row_count']) for region in self._regions_meta])
+        np_rows_non_empty = np.array([int(region['row_count']) for region in regions_meta_non_zero])
+        avg_rows = np_rows.mean()
+        avg_rows_non_empty = np_rows_non_empty.mean()
+        (first_quartile, median, third_quartile) = np.percentile(np_rows, [25, 50, 75]) # pylint: disable=no-member
+        (first_quartile_non_empty, median_non_empty, third_quartile_non_empty) = \
+            np.percentile(np_rows_non_empty, [25, 50, 75]) # pylint: disable=no-member
         print()
         print('Total Rows: {0:d}'.format(self.total_rows))
         print('Total Regions: {0:d}'.format(num_regions))
-        print('Total Regions (non-empty): {0:d}'.format(num_regions_non_zero))
+        print('Empty Regions: {0:d}'.format(num_regions - num_regions_non_zero))
+        print('Used  Regions: {0:d}'.format(num_regions_non_zero))
         print()
-        print('Average Rows Per Region: {0:.2f}'.format(self.total_rows / num_regions))
-        print('Average Rows Per Region (excluding empty regions): {0:.2f}'.format(self.total_rows /
-                                                                                  num_regions_non_zero))
+        print('Average Rows Per Region: {0:.2f}'.format(avg_rows))
+        print('Average Rows Per Region (% of total): {0:.2f}%'.format(avg_rows / self.total_rows * 100))
+        width = 0
+        for stat in (first_quartile, median, third_quartile,
+                     first_quartile_non_empty, median_non_empty, third_quartile_non_empty):
+            _ = len(str(stat))
+            if _ > width:
+                width = _
         print()
-        print('Average Rows Per Region (% of total): {0:.2f}%'.format(self.total_rows /
-                                                                      num_regions /
-                                                                      self.total_rows * 100))
-        print('Average Rows Per Region (% of total, excluding empty regions): {0:.2f}%'.format(self.total_rows /
-                                                                                               num_regions_non_zero /
-                                                                                               self.total_rows * 100))
+        print('Rows per Region:')
+        print('1st quartile:  {0:{1}}'.format(first_quartile, width))
+        print('median:        {0:{1}}'.format(median, width))
+        print('3rd quartile:  {0:{1}}'.format(third_quartile, width))
         print()
-        print('Median Rows per Region: {0:d}'.format(median_row_count))
-        print('Median Rows per Region (excluding empty regions): {0:d}'.format(median_row_count_non_empty))
+        print('Excluding Empty Regions:\n')
+        print('Average Rows Per Region: {0:.2f}'.format(avg_rows_non_empty))
+        print('Average Rows Per Region (% of total): {0:.2f}%'.format(avg_rows_non_empty / self.total_rows * 100))
+        print()
+        print('Rows per Region:')
+        print('1st quartile:  {0:{1}}'.format(first_quartile_non_empty, width))
+        print('median:        {0:{1}}'.format(median_non_empty, width))
+        print('3rd quartile:  {0:{1}}'.format(third_quartile_non_empty, width))
 
     def calculate_row_count_widths(self):
         for region in self._regions_meta:
