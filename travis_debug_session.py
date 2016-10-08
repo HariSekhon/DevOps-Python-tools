@@ -16,8 +16,9 @@
 
 """
 
-Tool to automate initiating a Travis CI debug build session, track the creation of the debug build and drop you in
-to an SSH shell as soon as it's available
+Tool to automate initiating a Travis CI interactive debug build session
+
+Tracks the creation of the debug build and drops you in to an SSH shell as soon as it's available
 
 """
 
