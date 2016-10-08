@@ -56,7 +56,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 
 
 class HBaseCalculateTableRegionRowDistribution(CLI):
@@ -143,25 +143,6 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         except ThriftException as _:
             die('ERROR: {0}'.format(_))
 
-    def bytes_to_str(self, arg):
-        # unfortunately this is passed in a type str, must encode char by char
-        #if isStr(arg):
-        #    return arg
-        #elif isByte(arg):
-        #else:
-        #    die('unrecognized region name/start/end key, not bytes or string!')
-        encode_char = self.encode_char
-        return ''.join([encode_char(x) for x in arg])
-
-    # some extra effort to make it look the same as HBase presents it as
-    def encode_char(self, char):
-        if char in string.printable and char not in ('\t', '\n', '\r', '\x0b', '\x0c'):
-            return char
-        else:
-            _ = '{0:#0{1}x}'.format(ord(char), 4).replace('0x', '\\x')
-            _ = self.re_hex.sub(lambda x: x.group(1).upper(), _)
-            return _
-
     def populate_row_counts(self, table_conn):
         log.info('getting row counts (this may take a long time)')
         #rows = table_conn.scan(columns=[])
@@ -180,6 +161,25 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
             self.rows[prefix]['row_count'] += 1
         if self.verbose < 2:
             print()
+
+    def bytes_to_str(self, arg):
+        # unfortunately this is passed in a type str, must encode char by char
+        #if isStr(arg):
+        #    return arg
+        #elif isByte(arg):
+        #else:
+        #    die('unrecognized region name/start/end key, not bytes or string!')
+        encode_char = self.encode_char
+        return ''.join([encode_char(x) for x in arg])
+
+    # some extra effort to make it look the same as HBase presents it as
+    def encode_char(self, char):
+        if char in string.printable and char not in ('\t', '\n', '\r', '\x0b', '\x0c'):
+            return char
+        else:
+            _ = '{0:#0{1}x}'.format(ord(char), 4).replace('0x', '\\x')
+            _ = self.re_hex.sub(lambda x: x.group(1).upper(), _)
+            return _
 
     def calculate_row_count_widths(self):
         for row_prefix in self.rows:
