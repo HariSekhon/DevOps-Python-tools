@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.3.1'
 
 
 class HBaseShowTableRegionRanges(CLI):
@@ -132,30 +132,6 @@ class HBaseShowTableRegionRanges(CLI):
         except ThriftException as _:
             die('ERROR: {0}'.format(_))
 
-    def bytes_to_str(self, arg):
-        # unfortunately this is passed in a type str, must encode char by char
-        #if isStr(arg):
-        #    return arg
-        #elif isByte(arg):
-        #else:
-        #    die('unrecognized region name/start/end key, not bytes or string!')
-        encode_char = self.encode_char
-        return ''.join([encode_char(x) for x in arg])
-
-    # some extra effort to make it look the same as HBase presents it as
-    def encode_char(self, char):
-        if char in string.printable and char not in ('\t', '\n', '\r', '\x0b', '\x0c'):
-            return char
-        else:
-            _ = '{0:#0{1}x}'.format(ord(char), 4).replace('0x', '\\x')
-            _ = self.re_hex.sub(lambda x: x.group(1).upper(), _)
-            return _
-
-    def shorten_region_name(self, region_name):
-        if self.short_region_name:
-            return region_name.lstrip(self.table + ',')
-        return region_name
-
     def local_main(self, table_conn):
         self.calculate_widths()
         self.print_table_regions()
@@ -181,6 +157,30 @@ class HBaseShowTableRegionRanges(CLI):
         self.total_width = (self.region_width + self.server_width +
                             self.start_key_width + self.end_key_width +
                             len(3 * self.separator))
+
+    def shorten_region_name(self, region_name):
+        if self.short_region_name:
+            return region_name.lstrip(self.table + ',')
+        return region_name
+
+    # some extra effort to make it look the same as HBase presents it as
+    def encode_char(self, char):
+        if char in string.printable and char not in ('\t', '\n', '\r', '\x0b', '\x0c'):
+            return char
+        else:
+            _ = '{0:#0{1}x}'.format(ord(char), 4).replace('0x', '\\x')
+            _ = self.re_hex.sub(lambda x: x.group(1).upper(), _)
+            return _
+
+    def bytes_to_str(self, arg):
+        # unfortunately this is passed in a type str, must encode char by char
+        #if isStr(arg):
+        #    return arg
+        #elif isByte(arg):
+        #else:
+        #    die('unrecognized region name/start/end key, not bytes or string!')
+        encode_char = self.encode_char
+        return ''.join([encode_char(x) for x in arg])
 
     def print_table_regions(self):
         print('=' * self.total_width)
