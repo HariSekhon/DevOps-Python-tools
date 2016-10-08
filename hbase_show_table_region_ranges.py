@@ -65,7 +65,7 @@ class HBaseShowTableRegionRanges(CLI):
         self.port = 9090
         self.table = None
         self.timeout_default = 300
-        self.re_hex = re.compile('([a-f]+)')
+        self.re_hex = re.compile('([a-f]+)') # to convert to uppercase later for aesthetics
         self.region_header = 'Region'
         self.start_key_header = 'Start Key'
         self.end_key_header = 'End Key'
