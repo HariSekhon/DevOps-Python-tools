@@ -36,6 +36,7 @@ from __future__ import print_function
 
 #import logging
 import os
+import re
 import socket
 import string
 import sys
@@ -55,7 +56,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.3.1'
 
 
 class HBaseCalculateTableRegionRowDistribution(CLI):
@@ -70,6 +71,7 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         self.port = 9090
         self.table = None
         self.timeout_default = 6 * 3600
+        self.re_hex = re.compile('([a-f]+)') # to convert to uppercase later for aesthetics
         self.total_rows = 0
         self.rows = {}
         self.prefix_size = 1
