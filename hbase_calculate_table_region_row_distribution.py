@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.4.1'
 
 
 class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
@@ -226,7 +226,12 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
     def scan_count(table_conn, start_row, end_row):
         # row_stop is exclusive but so is end_row passed from region info so shouldn't be off by one
         rows = table_conn.scan(row_start=start_row, row_stop=end_row, columns=[])
-        return len(list(rows))
+        # memory vs time trade off
+        #return len(list(rows))
+        count = 0
+        for _ in rows:
+            count += 1
+        return count
 
 
 if __name__ == '__main__':
