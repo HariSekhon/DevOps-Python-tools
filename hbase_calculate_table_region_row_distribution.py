@@ -228,10 +228,7 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         rows = table_conn.scan(row_start=start_row, row_stop=end_row, columns=[])
         # memory vs time trade off
         #return len(list(rows))
-        count = 0
-        for _ in rows:
-            count += 1
-        return count
+        return sum(1 for _ in rows)
 
 
 if __name__ == '__main__':
