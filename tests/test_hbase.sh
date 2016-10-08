@@ -143,6 +143,10 @@ EOF
     hr
     ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -v -s
     hr
+    ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v -K 2
+    hr
+    ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable -v
+    hr
 
     delete_container
     echo
