@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.1'
+__version__ = '0.4.2'
 
 
 class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
@@ -91,45 +91,40 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         self.print_table_region_row_counts()
         self.print_summary()
 
-    def print_summary(self):
-        num_regions = len(self._regions)
-        regions_meta_non_zero = [region for region in self._regions_meta if region['row_count'] > 0]
-        num_regions_non_zero = len(regions_meta_non_zero)
-        np_rows = np.array([int(region['row_count']) for region in self._regions_meta])
-        np_rows_non_empty = np.array([int(region['row_count']) for region in regions_meta_non_zero])
-        avg_rows = np_rows.mean()
-        avg_rows_non_empty = np_rows_non_empty.mean()
-        (first_quartile, median, third_quartile) = np.percentile(np_rows, [25, 50, 75]) # pylint: disable=no-member
-        (first_quartile_non_empty, median_non_empty, third_quartile_non_empty) = \
-            np.percentile(np_rows_non_empty, [25, 50, 75]) # pylint: disable=no-member
-        print()
-        print('Total Rows: {0:d}'.format(self.total_rows))
-        print('Total Regions: {0:d}'.format(num_regions))
-        print('Empty Regions: {0:d}'.format(num_regions - num_regions_non_zero))
-        print('Used  Regions: {0:d}'.format(num_regions_non_zero))
-        print()
-        print('Average Rows Per Region: {0:.2f}'.format(avg_rows))
-        print('Average Rows Per Region (% of total): {0:.2f}%'.format(avg_rows / self.total_rows * 100))
-        width = 0
-        for stat in (first_quartile, median, third_quartile,
-                     first_quartile_non_empty, median_non_empty, third_quartile_non_empty):
-            _ = len(str(stat))
-            if _ > width:
-                width = _
-        print()
-        print('Rows per Region:')
-        print('1st quartile:  {0:{1}}'.format(first_quartile, width))
-        print('median:        {0:{1}}'.format(median, width))
-        print('3rd quartile:  {0:{1}}'.format(third_quartile, width))
-        print()
-        print('Excluding Empty Regions:\n')
-        print('Average Rows Per Region: {0:.2f}'.format(avg_rows_non_empty))
-        print('Average Rows Per Region (% of total): {0:.2f}%'.format(avg_rows_non_empty / self.total_rows * 100))
-        print()
-        print('Rows per Region:')
-        print('1st quartile:  {0:{1}}'.format(first_quartile_non_empty, width))
-        print('median:        {0:{1}}'.format(median_non_empty, width))
-        print('3rd quartile:  {0:{1}}'.format(third_quartile_non_empty, width))
+    def populate_region_metadata(self):
+        log.info('getting region metadata')
+        try:
+            for region in self._regions:
+                self._regions_meta.append({
+                    'name': self.bytes_to_str(self.shorten_region_name(region['name'])),
+                    'start_key': self.bytes_to_str(region['start_key']),
+                    'end_key': self.bytes_to_str(region['end_key']),
+                    'server': '{0}:{1}'.format(region['server_name'], region['port'])
+                })
+        except KeyError as _:
+            die('error parsing region info: {0}. '.format(_) + support_msg_api())
+
+    def populate_row_counts(self, table_conn):
+        log.info('getting region row counts')
+        if self.verbose < 2:
+            print('progress dots (1 per region scanned): ', end='')
+        for region in self._regions_meta:
+            log.info("scanning region '%s'", region['name'])
+            region['row_count'] = self.scan_count(table_conn,
+                                                  region['start_key'],
+                                                  region['end_key'])
+            if self.verbose < 2:
+                print('.', end='')
+        if self.verbose < 2:
+            print()
+
+    @staticmethod
+    def scan_count(table_conn, start_row, end_row):
+        # row_stop is exclusive but so is end_row passed from region info so shouldn't be off by one
+        rows = table_conn.scan(row_start=start_row, row_stop=end_row, columns=[])
+        # memory vs time trade off
+        #return len(list(rows))
+        return sum(1 for _ in rows)
 
     def calculate_row_count_widths(self):
         for region in self._regions_meta:
@@ -195,40 +190,45 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
                                              self.separator,
                                              region['pc']))
 
-    def populate_region_metadata(self):
-        log.info('getting region metadata')
-        try:
-            for region in self._regions:
-                self._regions_meta.append({
-                    'name': self.bytes_to_str(self.shorten_region_name(region['name'])),
-                    'start_key': self.bytes_to_str(region['start_key']),
-                    'end_key': self.bytes_to_str(region['end_key']),
-                    'server': '{0}:{1}'.format(region['server_name'], region['port'])
-                })
-        except KeyError as _:
-            die('error parsing region info: {0}. '.format(_) + support_msg_api())
-
-    def populate_row_counts(self, table_conn):
-        log.info('getting region row counts')
-        if self.verbose < 2:
-            print('progress dots (1 per region scanned): ', end='')
-        for region in self._regions_meta:
-            log.info("scanning region '%s'", region['name'])
-            region['row_count'] = self.scan_count(table_conn,
-                                                  region['start_key'],
-                                                  region['end_key'])
-            if self.verbose < 2:
-                print('.', end='')
-        if self.verbose < 2:
-            print()
-
-    @staticmethod
-    def scan_count(table_conn, start_row, end_row):
-        # row_stop is exclusive but so is end_row passed from region info so shouldn't be off by one
-        rows = table_conn.scan(row_start=start_row, row_stop=end_row, columns=[])
-        # memory vs time trade off
-        #return len(list(rows))
-        return sum(1 for _ in rows)
+    def print_summary(self):
+        num_regions = len(self._regions)
+        regions_meta_non_zero = [region for region in self._regions_meta if region['row_count'] > 0]
+        num_regions_non_zero = len(regions_meta_non_zero)
+        np_rows = np.array([int(region['row_count']) for region in self._regions_meta])
+        np_rows_non_empty = np.array([int(region['row_count']) for region in regions_meta_non_zero])
+        avg_rows = np_rows.mean()
+        avg_rows_non_empty = np_rows_non_empty.mean()
+        (first_quartile, median, third_quartile) = np.percentile(np_rows, [25, 50, 75]) # pylint: disable=no-member
+        (first_quartile_non_empty, median_non_empty, third_quartile_non_empty) = \
+            np.percentile(np_rows_non_empty, [25, 50, 75]) # pylint: disable=no-member
+        print()
+        print('Total Rows: {0:d}'.format(self.total_rows))
+        print('Total Regions: {0:d}'.format(num_regions))
+        print('Empty Regions: {0:d}'.format(num_regions - num_regions_non_zero))
+        print('Used  Regions: {0:d}'.format(num_regions_non_zero))
+        print()
+        print('Average Rows Per Region: {0:.2f}'.format(avg_rows))
+        print('Average Rows Per Region (% of total): {0:.2f}%'.format(avg_rows / self.total_rows * 100))
+        width = 0
+        for stat in (first_quartile, median, third_quartile,
+                     first_quartile_non_empty, median_non_empty, third_quartile_non_empty):
+            _ = len(str(stat))
+            if _ > width:
+                width = _
+        print()
+        print('Rows per Region:')
+        print('1st quartile:  {0:{1}}'.format(first_quartile, width))
+        print('median:        {0:{1}}'.format(median, width))
+        print('3rd quartile:  {0:{1}}'.format(third_quartile, width))
+        print()
+        print('Excluding Empty Regions:\n')
+        print('Average Rows Per Region: {0:.2f}'.format(avg_rows_non_empty))
+        print('Average Rows Per Region (% of total): {0:.2f}%'.format(avg_rows_non_empty / self.total_rows * 100))
+        print()
+        print('Rows per Region:')
+        print('1st quartile:  {0:{1}}'.format(first_quartile_non_empty, width))
+        print('median:        {0:{1}}'.format(median_non_empty, width))
+        print('3rd quartile:  {0:{1}}'.format(third_quartile_non_empty, width))
 
 
 if __name__ == '__main__':
