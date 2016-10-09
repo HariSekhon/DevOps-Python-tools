@@ -82,6 +82,12 @@ for testdir in "$testdir1" "$testdir2"; do
     ./find_duplicate_files.py "$testdir" "$testdir2"
     rm -f "$testdir2/test1.txt"
     echo
+    echo "checking .DS_Store files are ignored:"
+    echo "DS_STORE" > "$testdir1/.DS_Store"
+    cp "$testdir1/.DS_Store" "$testdir2/.DS_Store"
+    ./find_duplicate_files.py "$testdir" "$testdir2"
+    rm -f "$testdir1/.DS_Store"  "$testdir2/.DS_Store"
+    echo
 
     hr
 
