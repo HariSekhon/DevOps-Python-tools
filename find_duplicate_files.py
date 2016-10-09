@@ -81,7 +81,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 
 
 class FindDuplicateFiles(CLI):
@@ -102,6 +102,11 @@ class FindDuplicateFiles(CLI):
         self.regex_captures = {}
         self.no_short_circuit = False
         self.include_dot_dirs = False
+        # Basenames for files, dot dirs are ignored by default unless using --include-dot-dirs
+        self.ignore_list = [
+            '.DS_Store'
+            ]
+        self.ignore_list = [_.lower() for _ in self.ignore_list]
         self.dups_by_name = {}
         self.dups_by_size = {}
         self.dups_by_hash = {}
@@ -128,7 +133,7 @@ class FindDuplicateFiles(CLI):
                      help='Only output file paths with duplicates (for use in shell scripts)')
 
     # @override, must use instance method, not static method, in order to match
-    def parse_args(self):  # pylint: disable=no-self-use
+    def setup(self):  # pylint: disable=no-self-use
         log.setLevel(logging.ERROR)
 
     #def print(self, *args, **kwargs):
@@ -163,15 +168,16 @@ class FindDuplicateFiles(CLI):
         log_option('compare by regex', True if self.regex else False)
         return args
 
-    def check_args(self, args):
+    @staticmethod
+    def check_args(args):
         for arg in args:
             if not os.path.exists(arg):
                 _ = "'%s' not found" % arg
-                if self.skip_errors:
-                    log.error(_)
-                    self.failed = True
-                else:
-                    die(_)
+                #if self.skip_errors:
+                #    log.error(_)
+                #    self.failed = True
+                #else:
+                die(_)
             if os.path.isfile(arg):
                 log_option('file', arg)
             elif os.path.isdir(arg):
@@ -292,6 +298,10 @@ class FindDuplicateFiles(CLI):
     def is_file_dup(self, filepath):
         log.debug("checking file path '%s'", filepath)
         if os.path.islink(filepath):
+            log.debug("ignoring symlink '%s'", filepath)
+            return False
+        elif os.path.basename(filepath).lower() in self.ignore_list:
+            log.debug("ignoring file '%s', basename '%s' is in ignore list", filepath, os.path.basename(filepath))
             return False
         is_dup = False
         if self.compare_by_name:
