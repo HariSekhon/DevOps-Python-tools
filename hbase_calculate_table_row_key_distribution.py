@@ -92,7 +92,8 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         self.add_hostoption(name='HBase Thrift Server', default_host='localhost', default_port=self.port)
         self.add_opt('-T', '--table', help='Table name')
         self.add_opt('-K', '--row-key-prefix-len', metavar='<int>', default=self.prefix_size,
-                     help='Row key prefix length (default: {0})'.format(self.prefix_size))
+                     help='Row key prefix summary length (default: {0})'.format(self.prefix_size) +
+                     '. Use with increasing sizes for more granular analysis')
         self.add_opt('-l', '--list-tables', action='store_true', help='List tables and exit')
 
     def process_args(self):
