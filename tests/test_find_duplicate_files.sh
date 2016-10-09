@@ -76,6 +76,12 @@ for testdir in "$testdir1" "$testdir2"; do
     ./find_duplicate_files.py "$testdir" "$testdir1"
     echo
     rm "$testdir/.3/test1.txt"
+    echo
+    echo "checking symlinks are not detected as duplicates by basename:"
+    ln -s "$testdir/test1.txt" "$testdir2/test1.txt"
+    ./find_duplicate_files.py "$testdir" "$testdir2"
+    rm -f "$testdir2/test1.txt"
+    echo
 
     hr
 
