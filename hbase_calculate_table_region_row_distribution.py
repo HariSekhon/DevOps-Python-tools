@@ -43,7 +43,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log, die, support_msg_api, autoflush
+    from harisekhon.utils import log, log_option, die, support_msg_api, autoflush
     from hbase_show_table_region_ranges import HBaseShowTableRegionRanges
 except ImportError as _:
     print(traceback.format_exc(), end='')
@@ -82,6 +82,8 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
     def local_main(self, table_conn):
         self.no_region_col = self.get_opt('no_region_name')
         self.sort_by_server = self.get_opt('sort_by_server')
+        log_option('no region name', self.no_region_col)
+        log_option('sort by server', self.sort_by_server)
         if self.no_region_col:
             self.total_width -= self.region_width
         num_regions = len(self._regions)
