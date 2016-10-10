@@ -130,7 +130,7 @@ EOF
     check_exit_code 3
     set -e
     hr
-    ./hbase_show_table_region_ranges.py -T HexStringSplitTable -v -s
+    ./hbase_show_table_region_ranges.py -T HexStringSplitTable -v --short-region-name
     hr
     ./hbase_show_table_region_ranges.py -T UniformSplitTable -v
     hr
@@ -141,11 +141,11 @@ EOF
     hr
     ./hbase_calculate_table_region_row_distribution.py -T UniformSplitTable -v -n
     hr
-    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -v -s
+    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -v --short-region-name
     hr
-    ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v -K 2
+    ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2
     hr
-    ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable -v
+    ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable -vv
     hr
 
     delete_container
@@ -155,3 +155,6 @@ EOF
 for version in $HBASE_VERSIONS; do
     test_hbase $version
 done
+echo
+echo "All HBase Tests Succeeded"
+echo
