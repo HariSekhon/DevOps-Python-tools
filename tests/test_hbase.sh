@@ -139,11 +139,17 @@ EOF
     check_exit_code 3
     set -e
     hr
-    ./hbase_calculate_table_region_row_distribution.py -T UniformSplitTable -v -n
+    ./hbase_calculate_table_region_row_distribution.py -T UniformSplitTable -v --no-region-name
     hr
-    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -v --short-region-name
+    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable
     hr
-    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -vv --short-region-name --sort-by-server
+    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -vv --short-region-name --sort server
+    hr
+    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort server --desc
+    hr
+    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count
+    hr
+    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc
     hr
     ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2
     hr
