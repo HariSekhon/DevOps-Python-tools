@@ -48,7 +48,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log, die, autoflush #, support_msg_api
+    from harisekhon.utils import log, die, autoflush, merge_dicts #, support_msg_api
     from harisekhon.utils import validate_host, validate_port, validate_chars, validate_int
     from harisekhon import CLI
 except ImportError as _:
@@ -56,7 +56,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.1'
+__version__ = '0.5.0'
 
 
 class HBaseCalculateTableRegionRowDistribution(CLI):
@@ -74,6 +74,8 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         self.re_hex = re.compile('([a-f]+)') # to convert to uppercase later for aesthetics
         self.total_rows = 0
         self.rows = {}
+        self.sort = False
+        self.sort_desc = False
         self.prefix_length = 1
         self.key_prefix_header = 'Key Prefix'
         self.key_prefix_width = len(self.key_prefix_header)
@@ -94,6 +96,8 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         self.add_opt('-K', '--key-prefix-length', metavar='<int>', default=self.prefix_length,
                      help='Row key prefix summary length (default: {0})'.format(self.prefix_length) +
                      '. Use with increasing sizes for more granular analysis')
+        self.add_opt('-s', '--sort', action='store_true', help='Sort by row count')
+        self.add_opt('-d', '--desc', action='store_true', help='Descending sort order')
         self.add_opt('-l', '--list-tables', action='store_true', help='List tables and exit')
 
     def process_args(self):
@@ -103,6 +107,8 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         self.port = self.get_opt('port')
         self.table = self.get_opt('table')
         self.prefix_length = self.get_opt('key_prefix_length')
+        self.sort = self.get_opt('sort')
+        self.sort_desc = self.get_opt('desc')
         validate_host(self.host)
         validate_port(self.port)
         if not self.get_opt('list_tables'):
@@ -149,7 +155,7 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         #rows = table_conn.scan(columns=[])
         rows = table_conn.scan() # columns=[]) doesn't return without cf
         if self.verbose < 2:
-            print('progress dots (1 per new key prefix scanned): ', end='')
+            print('progress dots (1 per new key prefix scanned): ', file=sys.stderr, end='')
         for row in rows:
             #log.debug(row)
             key = row[0]
@@ -158,10 +164,10 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
             if not self.rows.get(prefix):
                 self.rows[prefix] = {'row_count': 0}
                 if self.verbose < 2:
-                    print('.', end='')
+                    print('.', file=sys.stderr, end='')
             self.rows[prefix]['row_count'] += 1
         if self.verbose < 2:
-            print()
+            print(file=sys.stderr)
 
     def bytes_to_str(self, arg):
         # unfortunately this is passed in a type str, must encode char by char
@@ -220,15 +226,21 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
                                      self.row_count_pc_header)
              )
         print('=' * self.total_width)
-        for row_prefix in sorted(self.rows):
-            print('{0:{1}}{2}'.format(row_prefix,
+        tmp_list = [merge_dicts({'key_prefix': key}, self.rows[key]) for key in self.rows]
+        if self.sort:
+            if self.sort_desc:
+                tmp_list.sort(key=lambda _: -_['row_count'])
+            else:
+                tmp_list.sort(key=lambda _: _['row_count'])
+        for item in tmp_list:
+            print('{0:{1}}{2}'.format(item['key_prefix'],
                                       self.key_prefix_width,
                                       self.separator),
                   end='')
-            print('{0:{1}}{2}{3:>10}'.format(self.rows[row_prefix]['row_count'],
+            print('{0:{1}}{2}{3:>10}'.format(item['row_count'],
                                              self.row_count_width,
                                              self.separator,
-                                             self.rows[row_prefix]['pc']))
+                                             item['pc']))
 
     def print_summary(self):
         print()
