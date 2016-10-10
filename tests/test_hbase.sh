@@ -143,11 +143,11 @@ EOF
     hr
     ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -v --short-region-name
     hr
+    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -vv --short-region-name --sort-by-server
+    hr
     ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2
     hr
     ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
-    hr
-    ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable -vv --sort-by-server
     hr
 
     delete_container
