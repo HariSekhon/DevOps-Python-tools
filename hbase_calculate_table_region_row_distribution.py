@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.2'
+__version__ = '0.5.0'
 
 
 class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
@@ -63,6 +63,7 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         self.timeout_default = 6 * 3600
         self._regions_meta = []
         self.no_region_col = False
+        self.sort_by_server = False
         self.total_rows = 0
         self.row_count_header = 'Row Count'
         self.row_count_width = len(self.row_count_header)
@@ -74,9 +75,13 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         super(HBaseCalculateTableRegionRowDistribution, self).add_options()
         self.add_opt('-n', '--no-region-name', action='store_true',
                      help='Do not output Region name column to save screen space')
+        self.add_opt('-s', '--sort-by-server', action='store_true',
+                     help='Sort by server to make it easier to see if one server is hosting more rows' +
+                     '. See also hbase_calculate_server_row_distribution.py')
 
     def local_main(self, table_conn):
         self.no_region_col = self.get_opt('no_region_name')
+        self.sort_by_server = self.get_opt('sort_by_server')
         if self.no_region_col:
             self.total_width -= self.region_width
         num_regions = len(self._regions)
@@ -146,6 +151,9 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
             region['pc'] = '{0:.2f}'.format(region['row_count'] / max(self.total_rows, 1) * 100)
 
     def print_table_region_row_counts(self):
+        if self.sort_by_server:
+            log.info('sorting output by server')
+            self._regions_meta.sort(key=lambda _: _['server'])
         print('=' * self.total_width)
         if not self.no_region_col:
             print('{0:{1}}{2}'.format(self.region_header,
