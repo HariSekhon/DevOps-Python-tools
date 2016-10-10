@@ -56,7 +56,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.3'
+__version__ = '0.4.0'
 
 
 class HBaseCalculateTableRegionRowDistribution(CLI):
@@ -74,7 +74,7 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         self.re_hex = re.compile('([a-f]+)') # to convert to uppercase later for aesthetics
         self.total_rows = 0
         self.rows = {}
-        self.prefix_size = 1
+        self.prefix_length = 1
         self.key_prefix_header = 'Key Prefix'
         self.key_prefix_width = len(self.key_prefix_header)
         self.row_count_header = 'Row Count'
@@ -91,8 +91,8 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
     def add_options(self):
         self.add_hostoption(name='HBase Thrift Server', default_host='localhost', default_port=self.port)
         self.add_opt('-T', '--table', help='Table name')
-        self.add_opt('-K', '--row-key-prefix-len', metavar='<int>', default=self.prefix_size,
-                     help='Row key prefix summary length (default: {0})'.format(self.prefix_size) +
+        self.add_opt('-K', '--key-prefix-length', metavar='<int>', default=self.prefix_length,
+                     help='Row key prefix summary length (default: {0})'.format(self.prefix_length) +
                      '. Use with increasing sizes for more granular analysis')
         self.add_opt('-l', '--list-tables', action='store_true', help='List tables and exit')
 
@@ -102,13 +102,13 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         self.host = self.get_opt('host')
         self.port = self.get_opt('port')
         self.table = self.get_opt('table')
-        self.prefix_size = self.get_opt('row_key_prefix_len')
+        self.prefix_length = self.get_opt('key_prefix_length')
         validate_host(self.host)
         validate_port(self.port)
         if not self.get_opt('list_tables'):
             validate_chars(self.table, 'hbase table', 'A-Za-z0-9:._-')
-            validate_int(self.prefix_size, 'row key prefix length', 1, 10)
-            self.prefix_size = int(self.prefix_size)
+            validate_int(self.prefix_length, 'row key prefix length', 1, 10)
+            self.prefix_length = int(self.prefix_length)
 
     def get_tables(self):
         try:
@@ -153,7 +153,7 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         for row in rows:
             #log.debug(row)
             key = row[0]
-            prefix = key[0:min(self.prefix_size, len(key))]
+            prefix = key[0:min(self.prefix_length, len(key))]
             prefix = self.bytes_to_str(prefix)
             if not self.rows.get(prefix):
                 self.rows[prefix] = {'row_count': 0}
@@ -238,7 +238,7 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         print('Total Rows: {0:d}'.format(self.total_rows))
         print('Average Rows Per Prefix: {0:.2f}'.format(avg_rows))
         print('Average Rows Per Prefix (% of total): {0:.2f}%'.format(avg_rows / self.total_rows * 100))
-        print('Number of Row Key Prefixes of length \'{0}\': {1}'.format(self.prefix_size, len(self.rows)))
+        print('Number of Row Key Prefixes of length \'{0}\': {1}'.format(self.prefix_length, len(self.rows)))
         width = 0
         for stat in (first_quartile, median, third_quartile):
             _ = len(str(stat))
