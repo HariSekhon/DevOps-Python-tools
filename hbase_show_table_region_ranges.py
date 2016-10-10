@@ -18,7 +18,14 @@
 
 Tool to show HBase table region ranges
 
-Useful for exploring tables when evaluating pre-splitting strategies, eg. HexStringSplit vs UniformSplit
+Useful for exploring tables when evaluating pre-splitting strategies, eg. HexStringSplit vs UniformSplit vs Custom
+
+See also:
+
+- check_hbase_region_balance.py (in the Advanced Nagios Plugins Collection) to check the % imbalance on the
+number of regions hosted across region servers to make sure there is a spread.
+- hbase_calculate_table_region_row_distribution.py (in this PyTools repo) to see the row distribution across regions
+- hbase_calcualte_table_row_key_distribution.py (in this PyTools repo) to see the row key distribution / data skew
 
 Tested on Hortonworks HDP 2.5 (HBase 1.1.2) and Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2
 
@@ -50,7 +57,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.1'
+__version__ = '0.4.0'
 
 
 class HBaseShowTableRegionRanges(CLI):
@@ -84,7 +91,7 @@ class HBaseShowTableRegionRanges(CLI):
     def add_options(self):
         self.add_hostoption(name='HBase Thrift Server', default_host='localhost', default_port=self.port)
         self.add_opt('-T', '--table', help='Table name')
-        self.add_opt('-s', '--short-region-name', action='store_true',
+        self.add_opt('-r', '--short-region-name', action='store_true',
                      help='Shorten region name to not include redundant table prefix')
         self.add_opt('-l', '--list-tables', action='store_true', help='List tables and exit')
 
