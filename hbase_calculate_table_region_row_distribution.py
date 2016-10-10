@@ -43,14 +43,14 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log, log_option, die, support_msg_api, autoflush
+    from harisekhon.utils import log, log_option, die, code_error, support_msg_api, autoflush
     from hbase_show_table_region_ranges import HBaseShowTableRegionRanges
 except ImportError as _:
     print(traceback.format_exc(), end='')
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.0'
+__version__ = '0.6.0'
 
 
 class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
@@ -63,7 +63,9 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         self.timeout_default = 6 * 3600
         self._regions_meta = []
         self.no_region_col = False
-        self.sort_by_server = False
+        self.sort = None
+        self.sort_desc = False
+        self.valid_sorts = ('count', 'server')
         self.total_rows = 0
         self.row_count_header = 'Row Count'
         self.row_count_width = len(self.row_count_header)
@@ -75,15 +77,22 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         super(HBaseCalculateTableRegionRowDistribution, self).add_options()
         self.add_opt('-n', '--no-region-name', action='store_true',
                      help='Do not output Region name column to save screen space')
-        self.add_opt('-s', '--sort-by-server', action='store_true',
-                     help='Sort by server to make it easier to see if one server is hosting more rows' +
+        self.add_opt('-s', '--sort', metavar='|'.join(self.valid_sorts),
+                     help='Sort ordering (possible values: count, server)' +
+                     '. Makes it easier to see the regions with the most rows or if one server is rows heavy regions' +
                      '. See also hbase_calculate_server_row_distribution.py')
+        self.add_opt('-d', '--desc', action='store_true', help='Reverse sort order (descending)')
 
     def local_main(self, table_conn):
         self.no_region_col = self.get_opt('no_region_name')
-        self.sort_by_server = self.get_opt('sort_by_server')
+        self.sort = self.get_opt('sort')
+        self.sort_desc = self.get_opt('desc')
+        if self.sort is not None:
+            self.sort = self.sort.lower()
+            if self.sort not in self.valid_sorts:
+                self.usage('invalid --sort option given, must be one of: {0}'.format(', '.join(self.valid_sorts)))
         log_option('no region name', self.no_region_col)
-        log_option('sort by server', self.sort_by_server)
+        log_option('sort', self.sort)
         if self.no_region_col:
             self.total_width -= self.region_width
         num_regions = len(self._regions)
@@ -153,9 +162,20 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
             region['pc'] = '{0:.2f}'.format(region['row_count'] / max(self.total_rows, 1) * 100)
 
     def print_table_region_row_counts(self):
-        if self.sort_by_server:
-            log.info('sorting output by server')
-            self._regions_meta.sort(key=lambda _: _['server'])
+        if self.sort:
+            if self.sort == 'count':
+                log.info('sorting output by counts')
+                if self.sort_desc:
+                    self._regions_meta.sort(key=lambda _: -_['row_count'])
+                else:
+                    self._regions_meta.sort(key=lambda _: _['row_count'])
+            elif self.sort == 'server':
+                log.info('sorting output by server')
+                self._regions_meta.sort(key=lambda _: _['server'])
+                if self.sort_desc:
+                    self._regions_meta.reverse()
+            else:
+                code_error('--sort was not either count or server')
         print('=' * self.total_width)
         if not self.no_region_col:
             print('{0:{1}}{2}'.format(self.region_header,
