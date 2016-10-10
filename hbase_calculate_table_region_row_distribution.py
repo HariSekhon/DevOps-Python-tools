@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.0'
+__version__ = '0.6.1'
 
 
 class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
@@ -153,9 +153,11 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         log.info('calculating row percentages')
         for region in self._regions_meta:
             self.total_rows += region['row_count']
+        if not self._regions_meta:
+            die("no regions found for table '{0}'!".format(self.table))
         # make sure we don't run in to division by zero error
-        #if self.total_rows == 0:
-        #    die("0 total rows detected for table '{0}'!".format(self.table))
+        if self.total_rows == 0:
+            die("0 total rows detected for table '{0}'!".format(self.table))
         if self.total_rows < 0:
             die("negative total rows detected for table '{0}'!".format(self.table))
         for region in self._regions_meta:
@@ -225,12 +227,8 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         regions_meta_non_zero = [region for region in self._regions_meta if region['row_count'] > 0]
         num_regions_non_zero = len(regions_meta_non_zero)
         np_rows = np.array([int(region['row_count']) for region in self._regions_meta])
-        np_rows_non_empty = np.array([int(region['row_count']) for region in regions_meta_non_zero])
         avg_rows = np_rows.mean()
-        avg_rows_non_empty = np_rows_non_empty.mean()
         (first_quartile, median, third_quartile) = np.percentile(np_rows, [25, 50, 75]) # pylint: disable=no-member
-        (first_quartile_non_empty, median_non_empty, third_quartile_non_empty) = \
-            np.percentile(np_rows_non_empty, [25, 50, 75]) # pylint: disable=no-member
         print()
         print('Total Rows: {0:d}'.format(self.total_rows))
         print('Total Regions: {0:d}'.format(num_regions))
@@ -240,6 +238,12 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         print('Average Rows Per Region: {0:.2f}'.format(avg_rows))
         print('Average Rows Per Region (% of total): {0:.2f}%'.format(avg_rows / self.total_rows * 100))
         width = 0
+        (first_quartile_non_empty, median_non_empty, third_quartile_non_empty) = (None, None, None)
+        if regions_meta_non_zero:
+            np_rows_non_empty = np.array([int(region['row_count']) for region in regions_meta_non_zero])
+            avg_rows_non_empty = np_rows_non_empty.mean()
+            (first_quartile_non_empty, median_non_empty, third_quartile_non_empty) = \
+                np.percentile(np_rows_non_empty, [25, 50, 75]) # pylint: disable=no-member
         for stat in (first_quartile, median, third_quartile,
                      first_quartile_non_empty, median_non_empty, third_quartile_non_empty):
             _ = len(str(stat))
@@ -250,15 +254,17 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         print('1st quartile:  {0:{1}}'.format(first_quartile, width))
         print('median:        {0:{1}}'.format(median, width))
         print('3rd quartile:  {0:{1}}'.format(third_quartile, width))
+        if regions_meta_non_zero:
+            print()
+            print('Excluding Empty Regions:\n')
+            print('Average Rows Per Region: {0:.2f}'.format(avg_rows_non_empty))
+            print('Average Rows Per Region (% of total): {0:.2f}%'.format(avg_rows_non_empty / self.total_rows * 100))
+            print()
+            print('Rows per Region:')
+            print('1st quartile:  {0:{1}}'.format(first_quartile_non_empty, width))
+            print('median:        {0:{1}}'.format(median_non_empty, width))
+            print('3rd quartile:  {0:{1}}'.format(third_quartile_non_empty, width))
         print()
-        print('Excluding Empty Regions:\n')
-        print('Average Rows Per Region: {0:.2f}'.format(avg_rows_non_empty))
-        print('Average Rows Per Region (% of total): {0:.2f}%'.format(avg_rows_non_empty / self.total_rows * 100))
-        print()
-        print('Rows per Region:')
-        print('1st quartile:  {0:{1}}'.format(first_quartile_non_empty, width))
-        print('median:        {0:{1}}'.format(median_non_empty, width))
-        print('3rd quartile:  {0:{1}}'.format(third_quartile_non_empty, width))
 
 
 if __name__ == '__main__':
