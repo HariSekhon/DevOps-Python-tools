@@ -100,6 +100,12 @@ EOF
     check_exit_code 2
     set -e
     hr
+    set +e
+    echo "trying to send generated data to DisabledTable (times out):"
+    ./hbase_generate_data.py -n 10 -T DisabledTable -X
+    check_exit_code 2
+    set -e
+    hr
     ./hbase_generate_data.py -n 10 -d
     hr
     ./hbase_generate_data.py -n 10 -d -s
@@ -115,6 +121,8 @@ EOF
     hr
     ./hbase_compact_tables.py -H $HBASE_HOST
     hr
+    ./hbase_compact_tables.py -r DisabledTable
+    hr
     ./hbase_compact_tables.py --regex .1
     hr
     set +e
@@ -124,7 +132,7 @@ EOF
     hr
     docker_exec hbase_flush_tables.py
     hr
-    docker_exec hbase_flush_tables.py -r .2
+    docker_exec hbase_flush_tables.py -r Disabled.*
     hr
     set +e
     ./hbase_show_table_region_ranges.py --list-tables
@@ -147,7 +155,10 @@ EOF
     set -e
     hr
     echo "checking hbase_calculate_table_region_row_distribution.py against DisabledTable"
+    set +e
     ./hbase_calculate_table_region_row_distribution.py -T DisabledTable -vvv
+    check_exit_code 2
+    set -e
     hr
     echo "checking hbase_calculate_table_region_row_distribution.py against EmptyTable"
     ./hbase_calculate_table_region_row_distribution.py -T EmptyTable -vvv
@@ -165,10 +176,16 @@ EOF
     ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc
     hr
     echo "checking hbase_calculate_table_row_key_distribution.py against DisabledTable"
+    set +e
     ./hbase_calculate_table_row_key_distribution.py -T DisabledTable -vvv
+    check_exit_code 2
+    set -e
     hr
     echo "checking hbase_calculate_table_row_key_distribution.py against EmptyTable"
+    set +e
     ./hbase_calculate_table_row_key_distribution.py -T EmptyTable -vvv
+    check_exit_code 2
+    set -e
     hr
     ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2
     hr
@@ -182,6 +199,5 @@ EOF
 for version in $HBASE_VERSIONS; do
     test_hbase $version
 done
-echo
 echo "All HBase Tests Succeeded"
 echo
