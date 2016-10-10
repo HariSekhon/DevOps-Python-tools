@@ -161,7 +161,10 @@ EOF
     set -e
     hr
     echo "checking hbase_calculate_table_region_row_distribution.py against EmptyTable"
+    set +e
     ./hbase_calculate_table_region_row_distribution.py -T EmptyTable -vvv
+    check_exit_code 2
+    set -e
     hr
     ./hbase_calculate_table_region_row_distribution.py -T UniformSplitTable -v --no-region-name
     hr
