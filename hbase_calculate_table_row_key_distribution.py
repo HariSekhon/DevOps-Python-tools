@@ -248,9 +248,9 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         (first_quartile, median, third_quartile) = np.percentile(np_rows, [25, 50, 75]) # pylint: disable=no-member
         print()
         print('Total Rows: {0:d}'.format(self.total_rows))
+        print('Unique Row Key Prefixes (length \'{0}\'): {1}'.format(self.prefix_length, len(self.rows)))
         print('Average Rows Per Prefix: {0:.2f}'.format(avg_rows))
         print('Average Rows Per Prefix (% of total): {0:.2f}%'.format(avg_rows / self.total_rows * 100))
-        print('Number of Row Key Prefixes of length \'{0}\': {1}'.format(self.prefix_length, len(self.rows)))
         width = 0
         for stat in (first_quartile, median, third_quartile):
             _ = len(str(stat))
