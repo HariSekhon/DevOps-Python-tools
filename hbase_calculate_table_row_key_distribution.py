@@ -200,8 +200,8 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         for row_prefix in self.rows:
             self.total_rows += self.rows[row_prefix]['row_count']
         # make sure we don't run in to division by zero error
-        #if self.total_rows == 0:
-        #    die("0 total rows detected for table '{0}'!".format(self.table))
+        if self.total_rows == 0:
+            die("0 total rows detected for table '{0}'!".format(self.table))
         if self.total_rows < 0:
             die("negative total rows detected for table '{0}'!".format(self.table))
         for row_prefix in self.rows:
@@ -233,8 +233,6 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
     def print_summary(self):
         print()
         print('Total Rows: {0:d}'.format(self.total_rows))
-        if not self.rows:
-            return
         np_rows = np.array([int(self.rows[row]['row_count']) for row in self.rows])
         avg_rows = np_rows.mean()
         (first_quartile, median, third_quartile) = np.percentile(np_rows, [25, 50, 75]) # pylint: disable=no-member
