@@ -79,8 +79,9 @@ test_hbase(){
         export JAVA_HOME=/usr
         /hbase/bin/hbase shell <<-EOF2
         create 't1', 'cf1', { 'REGION_REPLICATION' => 1 }
-        create 't2', 'cf2', { 'REGION_REPLICATION' => 1 }
-        disable 't2'
+        create 'EmptyTable', 'cf2', { 'REGION_REPLICATION' => 1 }
+        create 'DisabledTable', 'cf3', { 'REGION_REPLICATION' => 1 }
+        disable 'DisabledTable'
         put 't1', 'r1', 'cf1:q1', '$uniq_val'
         put 't1', 'r2', 'cf1:q2', 'test'
         list
@@ -130,6 +131,12 @@ EOF
     check_exit_code 3
     set -e
     hr
+    echo "checking hbase_show_table_region_ranges.py against DisabledTable"
+    ./hbase_show_table_region_ranges.py -T DisabledTable -vvv
+    hr
+    echo "checking hbase_show_table_region_ranges.py against EmptyTable"
+    ./hbase_show_table_region_ranges.py -T EmptyTable -vvv
+    hr
     ./hbase_show_table_region_ranges.py -T HexStringSplitTable -v --short-region-name
     hr
     ./hbase_show_table_region_ranges.py -T UniformSplitTable -v
@@ -138,6 +145,12 @@ EOF
     ./hbase_calculate_table_region_row_distribution.py --list-tables
     check_exit_code 3
     set -e
+    hr
+    echo "checking hbase_calculate_table_region_row_distribution.py against DisabledTable"
+    ./hbase_calculate_table_region_row_distribution.py -T DisabledTable -vvv
+    hr
+    echo "checking hbase_calculate_table_region_row_distribution.py against EmptyTable"
+    ./hbase_calculate_table_region_row_distribution.py -T EmptyTable -vvv
     hr
     ./hbase_calculate_table_region_row_distribution.py -T UniformSplitTable -v --no-region-name
     hr
@@ -150,6 +163,12 @@ EOF
     ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count
     hr
     ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc
+    hr
+    echo "checking hbase_calculate_table_row_key_distribution.py against DisabledTable"
+    ./hbase_calculate_table_row_key_distribution.py -T DisabledTable -vvv
+    hr
+    echo "checking hbase_calculate_table_row_key_distribution.py against EmptyTable"
+    ./hbase_calculate_table_row_key_distribution.py -T EmptyTable -vvv
     hr
     ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2
     hr
