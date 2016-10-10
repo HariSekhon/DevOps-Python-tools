@@ -216,8 +216,8 @@ class HBaseGenerateData(CLI):
                 else:
                     table_conn.put(bytes(random_alnum(key_length)), {bytes(cf_col): bytes(random_alnum(value_length))})
                 if _ % 100 == 0:
-                    print('.', end='')
-            print()
+                    print('.', file=sys.stderr, end='')
+            print(file=sys.stderr)
             time_taken = time.time() - start
             log.info('sent %s rows of generated data to HBase in %.2f seconds', self.num_rows, time_taken)
         except socket.timeout as _:
