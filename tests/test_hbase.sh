@@ -145,7 +145,9 @@ EOF
     hr
     ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2
     hr
-    ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable -vv
+    ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
+    hr
+    ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable -vv --sort-by-server
     hr
 
     delete_container
