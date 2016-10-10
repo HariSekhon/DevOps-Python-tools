@@ -259,7 +259,7 @@ class OpenTSDBCalculateImportDistribution(CLI):
         print()
         print('Total Keys: {0:d}'.format(self.total_keys))
         if self.prefix_length:
-            print('Unique Key Prefixes of length {0}: {1}'.format(self.prefix_length, len(self.keys)))
+            print('Unique Key Prefixes (length {0}): {1}'.format(self.prefix_length, len(self.keys)))
         else:
             print('Unique Keys: {0}'.format(len(self.keys)))
         print('Average Keys Per Prefix: {0:.2f}'.format(avg_keys))
