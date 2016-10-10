@@ -123,16 +123,16 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
     def populate_row_counts(self, table_conn):
         log.info('getting region row counts')
         if self.verbose < 2:
-            print('progress dots (1 per region scanned): ', end='')
+            print('progress dots (1 per region scanned): ', file=sys.stderr, end='')
         for region in self._regions_meta:
             log.info("scanning region '%s'", region['name'])
             region['row_count'] = self.scan_count(table_conn,
                                                   region['start_key'],
                                                   region['end_key'])
             if self.verbose < 2:
-                print('.', end='')
+                print('.', file=sys.stderr, end='')
         if self.verbose < 2:
-            print()
+            print(file=sys.stderr)
 
     @staticmethod
     def scan_count(table_conn, start_row, end_row):
