@@ -56,7 +56,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 
 
 class HBaseCalculateTableRegionRowDistribution(CLI):
@@ -151,6 +151,8 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
             die('ERROR: {0}'.format(_))
 
     def populate_row_counts(self, table_conn):
+        if not self.conn.is_table_enabled(self.table):
+            die("table '{0}' is not enabled".format(self.table))
         log.info('getting row counts (this may take a long time)')
         #rows = table_conn.scan(columns=[])
         rows = table_conn.scan() # columns=[]) doesn't return without cf
