@@ -56,7 +56,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 
 
 class HBaseCalculateTableRegionRowDistribution(CLI):
@@ -119,7 +119,9 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
     def get_tables(self):
         try:
             return self.conn.tables()
-        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
+        # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
+        #except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
+        except (socket.timeout, ThriftException) as _:
             die('ERROR while trying to get table list: {0}'.format(_))
 
     def run(self):
@@ -143,7 +145,9 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
             self.print_summary()
             log.info('finished, closing connection')
             self.conn.close()
-        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
+        # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
+        #except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
+        except (socket.timeout, ThriftException) as _:
             die('ERROR: {0}'.format(_))
 
     def populate_row_counts(self, table_conn):
@@ -245,8 +249,7 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         print()
         print('Total Rows: {0:d}'.format(self.total_rows))
         print('Unique Row Key Prefixes (length \'{0}\'): {1}'.format(self.prefix_length, len(self.rows)))
-        print('Average Rows Per Prefix: {0:.2f}'.format(avg_rows))
-        print('Average Rows Per Prefix (% of total): {0:.2f}%'.format(avg_rows / self.total_rows * 100))
+        print('Average Rows Per Prefix: {0:.2f} ({1:.2f}%)'.format(avg_rows, avg_rows / self.total_rows * 100))
         width = 0
         for stat in (first_quartile, median, third_quartile):
             _ = len(str(stat))
@@ -254,9 +257,9 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
                 width = _
         print()
         print('Rows per Prefix:')
-        print('1st quartile:  {0:{1}}'.format(first_quartile, width))
-        print('median:        {0:{1}}'.format(median, width))
-        print('3rd quartile:  {0:{1}}'.format(third_quartile, width))
+        print('1st quartile:  {0:{1}} ({2:.2f}%)'.format(first_quartile, width, first_quartile / self.total_rows * 100))
+        print('median:        {0:{1}} ({2:.2f}%)'.format(median, width, median / self.total_rows * 100))
+        print('3rd quartile:  {0:{1}} ({2:.2f}%)'.format(third_quartile, width, third_quartile / self.total_rows * 100))
         print()
 
 
