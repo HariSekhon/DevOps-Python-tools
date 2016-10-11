@@ -197,10 +197,10 @@ class OpenTSDBCalculateImportDistribution(CLI):
             # prefix = self.bytes_to_str(prefix)
             if not self.keys.get(prefix):
                 self.keys[prefix] = {'count': 0}
-            if self.verbose < 2 and self.total_keys % 10000 == 0:
-                print('.', file=sys.stderr, end='')
             self.keys[prefix]['count'] += 1
             self.total_keys += 1
+            if self.verbose < 2 and self.total_keys % 10000 == 0:
+                print('.', file=sys.stderr, end='')
 
     def calculate_count_widths(self):
         for key_prefix in self.keys:
