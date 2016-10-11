@@ -92,7 +92,7 @@ class HBaseCompactTables(CLI):
     def get_tables(self):
         try:
             return self.conn.tables()
-        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
+        except (socket.timeout, ThriftException) as _:
             die('ERROR while trying to get table list: {0}'.format(_))
 
     def run(self):
@@ -102,7 +102,7 @@ class HBaseCompactTables(CLI):
         try:
             log.info('connecting to HBase Thrift Server at %s:%s', self.host, self.port)
             self.conn = happybase.Connection(host=self.host, port=self.port, timeout=10 * 1000)  # ms
-        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
+        except (socket.timeout, ThriftException) as _:
             die('ERROR: {0}'.format(_))
         tables = self.get_tables()
         if self.get_opt('list_tables'):
@@ -121,7 +121,7 @@ class HBaseCompactTables(CLI):
         log.info("major compacting table '%s'", table)
         try:
             self.conn.compact_table(table, major=True)
-        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
+        except (socket.timeout, ThriftException) as _:
             die('ERROR while trying to compact table \'{0}\': {1}'.format(table, _))
 
 
