@@ -140,7 +140,7 @@ class HBaseGenerateData(CLI):
     def get_tables(self):
         try:
             return self.conn.tables()
-        except (socket.timeout, ThriftException) as _:
+        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
             die('ERROR while trying to get table list: {0}'.format(_))
 
     def run(self):
@@ -150,9 +150,7 @@ class HBaseGenerateData(CLI):
         try:
             log.info('connecting to HBase Thrift Server at {0}:{1}'.format(self.host, self.port))
             self.conn = happybase.Connection(host=self.host, port=self.port, timeout=10 * 1000)  # ms
-        except socket.timeout as _:
-            die('ERROR: {0}'.format(_))
-        except ThriftException as _:
+        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
             die('ERROR: {0}'.format(_))
         tables = self.get_tables()
         # of course there is a minor race condition here between getting the table list, checking and creating
@@ -193,9 +191,7 @@ class HBaseGenerateData(CLI):
         #log.info("connecting to test table '%s'", table)
         try:
             table_conn = self.conn.table(table)
-        except socket.timeout as _:
-            die('ERROR while trying to connect to table \'{0}\': {1}'.format(table, _))
-        except ThriftException as _:
+        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
             die('ERROR while trying to connect to table \'{0}\': {1}'.format(table, _))
         log.info("populating test table '%s' with random data", table)
         if self.use_existing_table:
@@ -218,7 +214,7 @@ class HBaseGenerateData(CLI):
             print(file=sys.stderr)
             time_taken = time.time() - start
             log.info('sent %s rows of generated data to HBase in %.2f seconds', self.num_rows, time_taken)
-        except (socket.timeout, ThriftException) as _:
+        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
             exp = str(_)
             exp = exp.replace('\\n', '\n')
             exp = exp.replace('\\t', '\t')
