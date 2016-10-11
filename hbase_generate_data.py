@@ -218,7 +218,7 @@ class HBaseGenerateData(CLI):
             print(file=sys.stderr)
             time_taken = time.time() - start
             log.info('sent %s rows of generated data to HBase in %.2f seconds', self.num_rows, time_taken)
-        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
+        except (socket.timeout, ThriftException) as _:
             exp = str(_)
             exp = exp.replace('\\n', '\n')
             exp = exp.replace('\\t', '\t')
