@@ -44,7 +44,7 @@ build:
 	
 	# for impyla
 	$(SUDO2) pip install --upgrade setuptools || :
-	$(SUDO2) pip install -r requirements.txt
+	$(SUDO2) pip install --upgrade -r requirements.txt
 	# prevents https://urllib3.readthedocs.io/en/latest/security.html#insecureplatformwarning
 	$(SUDO2) pip install --upgrade ndg-httpsclient
 	# for ipython-notebook-pyspark.py
