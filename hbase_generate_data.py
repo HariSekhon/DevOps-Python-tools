@@ -140,9 +140,7 @@ class HBaseGenerateData(CLI):
     def get_tables(self):
         try:
             return self.conn.tables()
-        except socket.timeout as _:
-            die('ERROR while trying to get table list: {0}'.format(_))
-        except ThriftException as _:
+        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
             die('ERROR while trying to get table list: {0}'.format(_))
 
     def run(self):
@@ -220,9 +218,7 @@ class HBaseGenerateData(CLI):
             print(file=sys.stderr)
             time_taken = time.time() - start
             log.info('sent %s rows of generated data to HBase in %.2f seconds', self.num_rows, time_taken)
-        except socket.timeout as _:
-            die('ERROR while trying to populate table \'{0}\': {1}'.format(table, _))
-        except ThriftException as _:
+        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
             exp = str(_)
             exp = exp.replace('\\n', '\n')
             exp = exp.replace('\\t', '\t')
