@@ -53,7 +53,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.4.1'
 
 
 class OpenTSDBCalculateImportDistribution(CLI):
@@ -159,7 +159,7 @@ class OpenTSDBCalculateImportDistribution(CLI):
 
     def populate_metric_counts(self):
         if self.verbose < 2:
-            print('progress dots (one per 10,000 lines): ', end='')
+            print('progress dots (one per 10,000 lines): ', file=sys.stderr, end='')
         for filename in self.files:
             if filename == '-':
                 log.info('reading stdin')
@@ -169,7 +169,7 @@ class OpenTSDBCalculateImportDistribution(CLI):
                 with open(filename) as file_handle:
                     self.process_file(filename, file_handle)
         if self.verbose < 2:
-            print()
+            print(file=sys.stderr)
 
     def process_file(self, filename, file_handle):
         for line in file_handle:
@@ -199,7 +199,7 @@ class OpenTSDBCalculateImportDistribution(CLI):
                 self.keys[prefix] = {'count': 0}
             self.total_keys += 1
             if self.verbose < 2 and self.total_keys % 10000 == 0:
-                print('.', end='')
+                print('.', file=sys.stderr, end='')
             self.keys[prefix]['count'] += 1
 
     def calculate_count_widths(self):
