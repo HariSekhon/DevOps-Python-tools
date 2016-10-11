@@ -134,7 +134,7 @@ class HBaseShowTableRegionRanges(CLI):
             self.local_main(table_conn)
             log.info('finished, closing connection')
             self.conn.close()
-        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
+        except (socket.timeout, ThriftException) as _:
             die('ERROR: {0}'.format(_))
 
     def local_main(self, table_conn):
