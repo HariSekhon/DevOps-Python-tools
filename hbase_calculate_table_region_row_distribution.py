@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 
 
 class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
@@ -121,6 +121,8 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
             die('error parsing region info: {0}. '.format(_) + support_msg_api())
 
     def populate_row_counts(self, table_conn):
+        if not self.conn.is_table_enabled(self.table):
+            die("table '{0}' is not enabled".format(self.table))
         log.info('getting region row counts')
         if self.verbose < 2:
             print('progress dots (1 per region scanned): ', file=sys.stderr, end='')
@@ -235,8 +237,7 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         print('Empty Regions: {0:d}'.format(num_regions - num_regions_non_zero))
         print('Used  Regions: {0:d}'.format(num_regions_non_zero))
         print()
-        print('Average Rows Per Region: {0:.2f}'.format(avg_rows))
-        print('Average Rows Per Region (% of total): {0:.2f}%'.format(avg_rows / self.total_rows * 100))
+        print('Average Rows Per Region: {0:.2f} ({1:.2f}%)'.format(avg_rows, avg_rows / self.total_rows * 100))
         width = 0
         (first_quartile_non_empty, median_non_empty, third_quartile_non_empty) = (None, None, None)
         if regions_meta_non_zero:
@@ -251,19 +252,22 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
                 width = _
         print()
         print('Rows per Region:')
-        print('1st quartile:  {0:{1}}'.format(first_quartile, width))
-        print('median:        {0:{1}}'.format(median, width))
-        print('3rd quartile:  {0:{1}}'.format(third_quartile, width))
+        print('1st quartile:  {0:{1}} ({2:.2f}%)'.format(first_quartile, width, first_quartile / self.total_rows * 100))
+        print('median:        {0:{1}} ({2:.2f}%)'.format(median, width, median / self.total_rows * 100))
+        print('3rd quartile:  {0:{1}} ({2:.2f}%)'.format(third_quartile, width, third_quartile / self.total_rows * 100))
         if regions_meta_non_zero:
             print()
             print('Excluding Empty Regions:\n')
-            print('Average Rows Per Region: {0:.2f}'.format(avg_rows_non_empty))
-            print('Average Rows Per Region (% of total): {0:.2f}%'.format(avg_rows_non_empty / self.total_rows * 100))
+            print('Average Rows Per Region: {0:.2f} ({1:.2f}%)'.format(avg_rows_non_empty,
+                                                                       avg_rows_non_empty / self.total_rows * 100))
             print()
             print('Rows per Region:')
-            print('1st quartile:  {0:{1}}'.format(first_quartile_non_empty, width))
-            print('median:        {0:{1}}'.format(median_non_empty, width))
-            print('3rd quartile:  {0:{1}}'.format(third_quartile_non_empty, width))
+            print('1st quartile:  {0:{1}} ({2:.2f}%)'.format(first_quartile_non_empty, width,
+                                                             first_quartile_non_empty / self.total_rows * 100))
+            print('median:        {0:{1}} ({2:.2f}%)'.format(median_non_empty, width,
+                                                             median_non_empty / self.total_rows * 100))
+            print('3rd quartile:  {0:{1}} ({2:.2f}%)'.format(third_quartile_non_empty, width,
+                                                             third_quartile_non_empty  / self.total_rows * 100))
         print()
 
 
