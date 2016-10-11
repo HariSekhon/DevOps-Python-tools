@@ -53,7 +53,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.2'
+__version__ = '0.4'
 
 
 class OpenTSDBCalculateImportDistribution(CLI):
@@ -264,8 +264,7 @@ class OpenTSDBCalculateImportDistribution(CLI):
             print('Unique Key Prefixes (length {0}): {1}'.format(self.prefix_length, len(self.keys)))
         else:
             print('Unique Keys: {0}'.format(len(self.keys)))
-        print('Average Keys Per Prefix: {0:.2f}'.format(avg_keys))
-        print('Average Keys Per Prefix (% of total): {0:.2f}%'.format(avg_keys / self.total_keys * 100))
+        print('Average Keys Per Prefix: {0:.2f} ({1:.2f}%)'.format(avg_keys, avg_keys / self.total_keys * 100))
         width = 0
         for stat in (first_quartile, median, third_quartile):
             _ = len(str(stat))
@@ -273,9 +272,9 @@ class OpenTSDBCalculateImportDistribution(CLI):
                 width = _
         print()
         print('Keys per Prefix:')
-        print('1st quartile:  {0:{1}}'.format(first_quartile, width))
-        print('median:        {0:{1}}'.format(median, width))
-        print('3rd quartile:  {0:{1}}'.format(third_quartile, width))
+        print('1st quartile:  {0:{1}} ({2:.2f}%)'.format(first_quartile, width, first_quartile / self.total_keys * 100))
+        print('median:        {0:{1}} ({2:.2f}%)'.format(median, width, median / self.total_keys * 100))
+        print('3rd quartile:  {0:{1}} ({2:.2f}%)'.format(third_quartile, width, third_quartile / self.total_keys * 100))
         print()
 
 
