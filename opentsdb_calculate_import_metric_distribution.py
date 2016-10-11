@@ -53,7 +53,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.3.1'
 
 
 class OpenTSDBCalculateImportDistribution(CLI):
@@ -70,7 +70,7 @@ class OpenTSDBCalculateImportDistribution(CLI):
         self.files = []
         self.keys = {}
         self.total_keys = 0
-        self.re_line = re.compile(r'^\s*(\S+)\s+(\d+)\s+(\d+(?:\.\d+)?)\s+(\S+)\s*$')
+        self.re_line = re.compile(r'^\s*(\S+)\s+(\d+)\s+(-?\d+(?:\.\d+)?)\s+(\S+)\s*$')
         self.skip_errors = False
         self.sort_desc = False
         self.prefix_length = None
