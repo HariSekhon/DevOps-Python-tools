@@ -194,7 +194,7 @@ EOF
     hr
     ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable --sort
     hr
-    ./hbase_calculate_table_row_key_distribution.py -T HexStrngSplitTable --sort --desc
+    ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable --sort --desc
     hr
     ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
     hr
