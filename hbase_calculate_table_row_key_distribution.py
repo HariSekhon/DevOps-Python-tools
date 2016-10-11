@@ -56,7 +56,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.2'
+__version__ = '0.5.3'
 
 
 class HBaseCalculateTableRegionRowDistribution(CLI):
@@ -157,7 +157,7 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         #rows = table_conn.scan(columns=[])
         rows = table_conn.scan() # columns=[]) doesn't return without cf
         if self.verbose < 2:
-            print('progress dots (1 per new key prefix scanned): ', file=sys.stderr, end='')
+            print('progress dots (one per 10,000 rows): ', file=sys.stderr, end='')
         for row in rows:
             #log.debug(row)
             key = row[0]
@@ -165,9 +165,10 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
             prefix = self.bytes_to_str(prefix)
             if not self.rows.get(prefix):
                 self.rows[prefix] = {'row_count': 0}
-                if self.verbose < 2:
-                    print('.', file=sys.stderr, end='')
             self.rows[prefix]['row_count'] += 1
+            self.total_rows += 1
+            if self.verbose < 2 and self.total_rows % 10000 == 0:
+                print('.', file=sys.stderr, end='')
         if self.verbose < 2:
             print(file=sys.stderr)
 
@@ -205,8 +206,9 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
 
     def calculate_row_percentages(self):
         log.info('calculating row percentages')
-        for row_prefix in self.rows:
-            self.total_rows += self.rows[row_prefix]['row_count']
+        # incremented instead now for one progress dot per 10k lines
+        #for row_prefix in self.rows:
+        #    self.total_rows += self.rows[row_prefix]['row_count']
         # make sure we don't run in to division by zero error
         if self.total_rows == 0:
             die("0 total rows detected for table '{0}'!".format(self.table))
