@@ -119,9 +119,7 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
     def get_tables(self):
         try:
             return self.conn.tables()
-        except socket.timeout as _:
-            die('ERROR while trying to get table list: {0}'.format(_))
-        except ThriftException as _:
+        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
             die('ERROR while trying to get table list: {0}'.format(_))
 
     def run(self):
