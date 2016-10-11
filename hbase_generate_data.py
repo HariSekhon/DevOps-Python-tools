@@ -140,7 +140,7 @@ class HBaseGenerateData(CLI):
     def get_tables(self):
         try:
             return self.conn.tables()
-        # no longer there in Happybase 1.0
+        # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
         #except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
         except (socket.timeout, ThriftException) as _:
             die('ERROR while trying to get table list: {0}'.format(_))
