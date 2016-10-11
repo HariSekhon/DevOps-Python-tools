@@ -53,7 +53,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 
 class OpenTSDBCalculateImportDistribution(CLI):
@@ -159,7 +159,7 @@ class OpenTSDBCalculateImportDistribution(CLI):
 
     def populate_metric_counts(self):
         if self.verbose < 2:
-            print('progress dots (1 per new key prefix scanned): ', end='')
+            print('progress dots (one per 10,000 lines): ', end='')
         for filename in self.files:
             if filename == '-':
                 log.info('reading stdin')
@@ -197,8 +197,9 @@ class OpenTSDBCalculateImportDistribution(CLI):
             # prefix = self.bytes_to_str(prefix)
             if not self.keys.get(prefix):
                 self.keys[prefix] = {'count': 0}
-                if self.verbose < 2:
-                    print('.', end='')
+            self.total_keys += 1
+            if self.verbose < 2 and self.total_keys % 10000 == 0:
+                print('.', end='')
             self.keys[prefix]['count'] += 1
 
     def calculate_count_widths(self):
@@ -218,8 +219,9 @@ class OpenTSDBCalculateImportDistribution(CLI):
 
     def calculate_key_percentages(self):
         log.info('calculating key percentages')
-        for key_prefix in self.keys:
-            self.total_keys += self.keys[key_prefix]['count']
+        # incremented instead now for one progress dot per 10k lines
+        #for key_prefix in self.keys:
+        #    self.total_keys += self.keys[key_prefix]['count']
         # make sure we don't run in to division by zero error
         if self.total_keys == 0:
             die("0 total keys detected!")
