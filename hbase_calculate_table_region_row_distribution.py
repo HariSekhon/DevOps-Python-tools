@@ -20,7 +20,7 @@ Tool to show distribution of rows across HBase table regions via Thrift API
 
 Designed to help analyze region hotspotting caused by row key skew while lab testing
 small to medium data distributions and is not scalable due to being a very heavy
-region-by-region full table scan operation ie. O(n).
+region-by-region full table scan operation ie. O(n). Tested with 50M data points.
 
 This may time out on HBase tables with very large regions such as wide row opentsdb tables,
 in which case you should instead consider using Spark, Hive or Phoenix instead.
