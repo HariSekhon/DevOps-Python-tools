@@ -30,22 +30,16 @@ from __future__ import division
 from __future__ import print_function
 # from __future__ import unicode_literals
 
-# import logging
 import os
 import re
-# import socket
-#import string
 import sys
 import traceback
-# import happybase
 import numpy as np
-# from thriftpy.thrift import TException as ThriftException
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
     from harisekhon.utils import log, log_option, die, code_error, printerr, autoflush, uniq_list_ordered, merge_dicts
-    #from harisekhon.utils import validate_host, validate_port, validate_chars
     from harisekhon.utils import validate_file, validate_int
     from harisekhon import CLI
 except ImportError as _:
@@ -62,10 +56,6 @@ class OpenTSDBCalculateImportDistribution(CLI):
         super(OpenTSDBCalculateImportDistribution, self).__init__()
         # Python 3.x
         # super().__init__()
-        # self.conn = None
-        # self.host = None
-        # self.port = 9090
-        # self.table = None
         self.timeout_default = 3600
         self.files = []
         self.keys = {}
@@ -87,9 +77,7 @@ class OpenTSDBCalculateImportDistribution(CLI):
                             len(self.separator) * 2)
         autoflush()
 
-        # def add_options(self):
-        # self.add_hostoption(name='HBase Thrift Server', default_host='localhost', default_port=self.port)
-        # self.add_opt('-T', '--table', help='Table name')
+    def add_options(self):
         self.add_opt('-K', '--key-prefix-length', metavar='<int>', default=self.prefix_length,
                      help='Prefix summary length (default: {0})'.format(self.prefix_length) +
                      '. Use to greater coarser stats')
@@ -98,15 +86,6 @@ class OpenTSDBCalculateImportDistribution(CLI):
         self.add_opt('-d', '--desc', action='store_true', help='Sort descending')
 
     def process_args(self):
-        # log.setLevel(logging.INFO)
-        #        self.no_args()
-        #        self.host = self.get_opt('host')
-        #        self.port = self.get_opt('port')
-        #        self.table = self.get_opt('table')
-        #        validate_host(self.host)
-        #        validate_port(self.port)
-        #        if not self.get_opt('list_tables'):
-        #            validate_chars(self.table, 'hbase table', 'A-Za-z0-9:._-')
         self.files = self.args
         self.prefix_length = self.get_opt('key_prefix_length')
         self.skip_errors = self.get_opt('skip_errors')
@@ -123,39 +102,12 @@ class OpenTSDBCalculateImportDistribution(CLI):
                 continue
             validate_file(filename)
 
-            #    def get_tables(self):
-            #        try:
-            #            return self.conn.tables()
-            #        except socket.timeout as _:
-            #            die('ERROR while trying to get table list: {0}'.format(_))
-            #        except ThriftException as _:
-            #            die('ERROR while trying to get table list: {0}'.format(_))
-
     def run(self):
-        # might have to use compat / transport / protocol args for older versions of HBase or if protocol has been
-        # configured to be non-default, see:
-        # http://happybase.readthedocs.io/en/stable/api.html#connection
-        #        try:
-        #            log.info('connecting to HBase Thrift Server at %s:%s', self.host, self.port)
-        #            self.conn = happybase.Connection(host=self.host, port=self.port, timeout=10 * 1000)  # ms
-        #            tables = self.get_tables()
-        #            if self.get_opt('list_tables'):
-        #                print('Tables:\n\n' + '\n'.join(tables))
-        #                sys.exit(3)
-        #            if self.table not in tables:
-        #                die("HBase table '{0}' does not exist!".format(self.table))
-        #            table_conn = self.conn.table(self.table)
         self.populate_metric_counts()
         self.calculate_count_widths()
         self.calculate_key_percentages()
         self.print_key_prefix_counts()
         self.print_summary()
-    #            log.info('finished, closing connection')
-    #            self.conn.close()
-    #        except socket.timeout as _:
-    #            die('ERROR: {0}'.format(_))
-    #        except ThriftException as _:
-    #            die('ERROR: {0}'.format(_))
 
     def populate_metric_counts(self):
         if self.verbose < 2:
