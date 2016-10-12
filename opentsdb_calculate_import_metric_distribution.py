@@ -23,6 +23,11 @@ Designed to help analyze bulk import files for data skew to help avoid region ho
 One or more files may be given as arguments. Can also read from standard input by specifying a dash as the argument,
 similar to standard unix tools.
 
+Files are expected to be in plaintext opentsdb load format, so if they are compressed with gzip, then decompress
+them into a pipe and supply the '-' argument to this program to have them read from standard input:
+
+zcat /path/to/myfiles*.gz | opentsdb_calculate_import_metric_distribution.py -
+
 """
 
 from __future__ import absolute_import
@@ -47,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.1'
+__version__ = '0.5'
 
 
 class OpenTSDBCalculateImportDistribution(CLI):
@@ -60,7 +65,7 @@ class OpenTSDBCalculateImportDistribution(CLI):
         self.files = []
         self.keys = {}
         self.total_keys = 0
-        self.re_line = re.compile(r'^\s*(\S+)\s+(\d+)\s+(-?\d+(?:\.\d+)?)\s+(\S+)\s*$')
+        self.re_line = re.compile(r'^\s*(\S+)\s+(\d+)\s+(-?\d+(?:\.\d+)?)\s+(\S+=\S+(?:\s+\S+=\S+)*)\s*$')
         self.skip_errors = False
         self.sort_desc = False
         self.prefix_length = None
@@ -140,7 +145,7 @@ class OpenTSDBCalculateImportDistribution(CLI):
             # value = match.grlup(3)
             tags = match.group(4)
             key = metric
-            for tag in sorted(tags.split(',')):
+            for tag in sorted(tags.split()):
                 key += ' ' + tag.strip()
             if self.prefix_length is None:
                 prefix = key
