@@ -105,7 +105,7 @@ test_opentsdb(){
     ./opentsdb_calculate_import_metric_distribution.py -K 1 -vv "$DATA_FILE"
     hr
     echo "testing from STDIN:"
-    ./opentsdb_calculate_import_metric_distribution.py -K 1 -vv - < "$DATA_FILE"
+    ./opentsdb_calculate_import_metric_distribution.py -K 2 -vv - < "$DATA_FILE"
     hr
     echo "testing reverse sort on count:"
     ./opentsdb_calculate_import_metric_distribution.py -K 3 -d "$DATA_FILE"
