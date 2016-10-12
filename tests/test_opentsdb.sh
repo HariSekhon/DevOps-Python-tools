@@ -65,14 +65,11 @@ docker_exec(){
 EOF
 }
 
-test_opentsdb(){
-    local version="$1"
-    #hr
-    #echo "Setting up OpenTSDB $version test container"
-    #hr
-    #local DOCKER_OPTS="-v $srcdir/..:$MNTDIR"
-    #launch_container "$DOCKER_IMAGE:$version" "$DOCKER_CONTAINER" 2181 8080 8085 9090 9095 16000 16010 16201 16301
-    #when_ports_available $startupwait $OPENTSDB_HOST $OPENTSDB_TEST_PORTS
+generate_test_data(){
+    if [ -f "$DATA_FILE" ]; then
+        echo "data file '$DATA_FILE' already exists, not regenerating"
+        return
+    fi
     echo "generating opentsdb test data => $DATA_FILE"
     local chars
     local ts
@@ -83,9 +80,23 @@ test_opentsdb(){
     for x in {1..100}; do
         for y in {1..1000}; do
             metric="metric${chars:$((RANDOM % ${#chars})):1}"
-            echo "ship${RANDOM:0:3} $(($ts + $RANDOM)) $RANDOM id=$metric"
+            for z in {1..5}; do
+                echo "ship${RANDOM:0:3} $(($ts + $RANDOM)) $RANDOM id=$metric crew=$z"
+            done
         done
     done > "$DATA_FILE"
+}
+
+generate_test_data
+
+test_opentsdb(){
+    local version="$1"
+    #hr
+    #echo "Setting up OpenTSDB $version test container"
+    #hr
+    #local DOCKER_OPTS="-v $srcdir/..:$MNTDIR"
+    #launch_container "$DOCKER_IMAGE:$version" "$DOCKER_CONTAINER" 2181 8080 8085 9090 9095 16000 16010 16201 16301
+    #when_ports_available $startupwait $OPENTSDB_HOST $OPENTSDB_TEST_PORTS
     if [ -n "${NOTESTS:-}" ]; then
         return
     fi
@@ -101,14 +112,13 @@ test_opentsdb(){
     hr
     echo "testing skipping error lines:"
     ./opentsdb_calculate_import_metric_distribution.py -K 4 --skip-errors - <<EOF
-shipCustom $(date +%s) 10 metric1
+shipCustom $(date +%s) 10 id=metric1
 made up error line
 EOF
     hr
     echo "testing from data file and STDIN at the same time:"
     ./opentsdb_calculate_import_metric_distribution.py --key-prefix-length 7 "$DATA_FILE" - < "$DATA_FILE"
     hr
-    rm -vf "$DATA_FILE"
 
     #delete_container
     echo
@@ -117,5 +127,10 @@ EOF
 for version in $OPENTSDB_VERSIONS; do
     test_opentsdb $version
 done
+if [ -z "${NODELETE:-}" ]; then
+    echo -n "removing test data: "
+    rm -vf "$DATA_FILE"
+    echo; echo
+fi
 echo "All OpenTSDB tests succeeded"
 echo
