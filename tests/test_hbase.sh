@@ -78,13 +78,13 @@ test_hbase(){
     docker exec -i "$DOCKER_CONTAINER" /bin/bash <<-EOF
         export JAVA_HOME=/usr
         /hbase/bin/hbase shell <<-EOF2
-        create 't1', 'cf1', { 'REGION_REPLICATION' => 1 }
-        create 'EmptyTable', 'cf2', { 'REGION_REPLICATION' => 1 }
-        create 'DisabledTable', 'cf3', { 'REGION_REPLICATION' => 1 }
-        disable 'DisabledTable'
-        put 't1', 'r1', 'cf1:q1', '$uniq_val'
-        put 't1', 'r2', 'cf1:q2', 'test'
-        list
+            create 't1', 'cf1', { 'REGION_REPLICATION' => 1 }
+            create 'EmptyTable', 'cf2', { 'REGION_REPLICATION' => 1 }
+            create 'DisabledTable', 'cf3', { 'REGION_REPLICATION' => 1 }
+            disable 'DisabledTable'
+            put 't1', 'r1', 'cf1:q1', '$uniq_val'
+            put 't1', 'r2', 'cf1:q2', 'test'
+            list
 EOF2
         hbase org.apache.hadoop.hbase.util.RegionSplitter UniformSplitTable UniformSplit -c 100 -f cf1
         hbase org.apache.hadoop.hbase.util.RegionSplitter HexStringSplitTable HexStringSplit -c 100 -f cf1
