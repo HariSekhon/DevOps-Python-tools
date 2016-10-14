@@ -43,9 +43,19 @@ import sys
 import traceback
 import socket
 import string
-import happybase
-from thriftpy.thrift import TException as ThriftException
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
+try:
+    # pylint: disable=wrong-import-position
+    import happybase  # pylint: disable=unused-import
+    # weird this is only importable after happybase, must global implicit import
+    # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
+    from Hbase_thrift import IOError as HBaseIOError  # pylint: disable=import-error
+    from thriftpy.thrift import TException as ThriftException
+except ImportError as _:
+    print('Happybase / thrift module import error - did you forget to build this project?\n\n'
+          + traceback.format_exc(), end='')
+    sys.exit(4)
+srcdir = os.path.abspath(os.path.dirname(__file__))
+libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
@@ -111,9 +121,7 @@ class HBaseShowTableRegionRanges(CLI):
     def get_tables(self):
         try:
             return self.conn.tables()
-        # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
-        #except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
-        except (socket.timeout, ThriftException) as _:
+        except (socket.timeout, ThriftException, HBaseIOError) as _:
             die('ERROR while trying to get table list: {0}'.format(_))
 
     def run(self):
@@ -134,12 +142,10 @@ class HBaseShowTableRegionRanges(CLI):
             self.local_main(table_conn)
             log.info('finished, closing connection')
             self.conn.close()
-        # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
-        #except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
-        except (socket.timeout, ThriftException) as _:
+        except (socket.timeout, ThriftException, HBaseIOError) as _:
             die('ERROR: {0}'.format(_))
 
-    def local_main(self, table_conn):
+    def local_main(self, table_conn):  # pylint: disable=unused-argument
         self.calculate_widths()
         self.print_table_regions()
 
