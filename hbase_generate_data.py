@@ -160,8 +160,6 @@ class HBaseGenerateData(CLI):
         try:
             log.info('connecting to HBase Thrift Server at {0}:{1}'.format(self.host, self.port))
             self.conn = happybase.Connection(host=self.host, port=self.port, timeout=10 * 1000)  # ms
-        # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
-        #except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
         except (socket.timeout, ThriftException, HBaseIOError) as _:
             die('ERROR: {0}'.format(_))
         tables = self.get_tables()
