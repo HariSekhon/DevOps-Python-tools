@@ -39,9 +39,19 @@ import re
 import sys
 import traceback
 import socket
-import happybase
-from thriftpy.thrift import TException as ThriftException
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
+try:
+    # pylint: disable=wrong-import-position
+    import happybase  # pylint: disable=unused-import
+    # weird this is only importable after happybase, must global implicit import
+    # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
+    from Hbase_thrift import IOError as HBaseIOError  # pylint: disable=import-error
+    from thriftpy.thrift import TException as ThriftException
+except ImportError as _:
+    print('Happybase / thrift module import error - did you forget to build this project?\n\n'
+          + traceback.format_exc(), end='')
+    sys.exit(4)
+srcdir = os.path.abspath(os.path.dirname(__file__))
+libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
@@ -53,7 +63,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.3'
 
 
 class HBaseCompactTables(CLI):
@@ -92,7 +102,7 @@ class HBaseCompactTables(CLI):
     def get_tables(self):
         try:
             return self.conn.tables()
-        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
+        except (socket.timeout, ThriftException, HBaseIOError) as _:
             die('ERROR while trying to get table list: {0}'.format(_))
 
     def run(self):
@@ -102,7 +112,7 @@ class HBaseCompactTables(CLI):
         try:
             log.info('connecting to HBase Thrift Server at %s:%s', self.host, self.port)
             self.conn = happybase.Connection(host=self.host, port=self.port, timeout=10 * 1000)  # ms
-        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
+        except (socket.timeout, ThriftException, HBaseIOError) as _:
             die('ERROR: {0}'.format(_))
         tables = self.get_tables()
         if self.get_opt('list_tables'):
@@ -121,7 +131,7 @@ class HBaseCompactTables(CLI):
         log.info("major compacting table '%s'", table)
         try:
             self.conn.compact_table(table, major=True)
-        except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
+        except (socket.timeout, ThriftException, HBaseIOError) as _:
             die('ERROR while trying to compact table \'{0}\': {1}'.format(table, _))
 
 
