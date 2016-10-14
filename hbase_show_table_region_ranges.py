@@ -145,6 +145,7 @@ class HBaseShowTableRegionRanges(CLI):
         except (socket.timeout, ThriftException, HBaseIOError) as _:
             die('ERROR: {0}'.format(_))
 
+    # table_conn is used in inherited in hbase_calculate_table_region_row_distribution.py
     def local_main(self, table_conn):  # pylint: disable=unused-argument
         self.calculate_widths()
         self.print_table_regions()
