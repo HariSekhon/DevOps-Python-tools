@@ -38,9 +38,19 @@ import sys
 import time
 import traceback
 import socket
-import happybase
-from thriftpy.thrift import TException as ThriftException
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
+try:
+    # pylint: disable=wrong-import-position
+    import happybase  # pylint: disable=unused-import
+    # weird this is only importable after happybase, must global implicit import
+    # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
+    from Hbase_thrift import IOError as HBaseIOError  # pylint: disable=import-error
+    from thriftpy.thrift import TException as ThriftException
+except ImportError as _:
+    print('Happybase / thrift module import error - did you forget to build this project?\n\n'
+          + traceback.format_exc(), end='')
+    sys.exit(4)
+srcdir = os.path.abspath(os.path.dirname(__file__))
+libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
@@ -52,7 +62,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.4'
+__version__ = '0.4'
 
 
 class HBaseGenerateData(CLI):
@@ -140,9 +150,7 @@ class HBaseGenerateData(CLI):
     def get_tables(self):
         try:
             return self.conn.tables()
-        # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
-        #except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
-        except (socket.timeout, ThriftException) as _:
+        except (socket.timeout, ThriftException, HBaseIOError) as _:
             die('ERROR while trying to get table list: {0}'.format(_))
 
     def run(self):
@@ -154,7 +162,7 @@ class HBaseGenerateData(CLI):
             self.conn = happybase.Connection(host=self.host, port=self.port, timeout=10 * 1000)  # ms
         # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
         #except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
-        except (socket.timeout, ThriftException) as _:
+        except (socket.timeout, ThriftException, HBaseIOError) as _:
             die('ERROR: {0}'.format(_))
         tables = self.get_tables()
         # of course there is a minor race condition here between getting the table list, checking and creating
@@ -195,9 +203,7 @@ class HBaseGenerateData(CLI):
         #log.info("connecting to test table '%s'", table)
         try:
             table_conn = self.conn.table(table)
-        # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
-        #except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
-        except (socket.timeout, ThriftException) as _:
+        except (socket.timeout, ThriftException, HBaseIOError) as _:
             die('ERROR while trying to connect to table \'{0}\': {1}'.format(table, _))
         log.info("populating test table '%s' with random data", table)
         if self.use_existing_table:
@@ -220,9 +226,7 @@ class HBaseGenerateData(CLI):
             print(file=sys.stderr)
             time_taken = time.time() - start
             log.info('sent %s rows of generated data to HBase in %.2f seconds', self.num_rows, time_taken)
-        # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
-        #except (socket.timeout, ThriftException, happybase.hbase.ttypes.IOError) as _:
-        except (socket.timeout, ThriftException) as _:
+        except (socket.timeout, ThriftException, HBaseIOError) as _:
             exp = str(_)
             exp = exp.replace('\\n', '\n')
             exp = exp.replace('\\t', '\t')
