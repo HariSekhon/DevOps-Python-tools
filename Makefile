@@ -7,7 +7,10 @@
 #  License: see accompanying LICENSE file
 #
 
-ifdef VIRTUAL_ENV
+#ifdef VIRTUAL_ENV
+# Travis has custom python install earlier in $PATH even in Perl builds so need to install PyPI modules to non-system python otherwise they're not found by programs.
+# Better than modifying $PATH to put /usr/bin first which is likely to affect many other things including potentially not finding the perlbrew installation first
+ifneq '$(VIRTUAL_ENV)$(CONDA_DEFAULT_ENV)$(TRAVIS)' ''
 	SUDO2 =
 else
 	SUDO2 = sudo -H
@@ -54,7 +57,7 @@ build:
 	# Impala
 	#$(SUDO2) pip install impyla
 	# must downgrade happybase library to work on Python 2.6
-	#if [ "$$(python -c 'import sys; sys.path.append("pylib"); import harisekhon; print(harisekhon.utils.getPythonVersion())')" = "2.6" ]; then $(SUDO2) pip install --upgrade "happybase==0.9"; fi
+	if [ "$$(python -c 'import sys; sys.path.append("pylib"); import harisekhon; print(harisekhon.utils.getPythonVersion())')" = "2.6" ]; then $(SUDO2) pip install --upgrade "happybase==0.9"; fi
 	
 	# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
 	$(SUDO2) pip install "ipython[notebook]" || :
