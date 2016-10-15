@@ -46,9 +46,15 @@ import string
 try:
     # pylint: disable=wrong-import-position
     import happybase  # pylint: disable=unused-import
-    # weird this is only importable after happybase, must global implicit import
     # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
-    from Hbase_thrift import IOError as HBaseIOError  # pylint: disable=import-error
+    try:
+        # this is only importable after happybase module
+        # pylint: disable=import-error
+        from Hbase_thrift import IOError as HBaseIOError
+    except ImportError:
+        # probably Happybase <= 0.9
+        # pylint: disable=import-error,no-name-in-module,ungrouped-imports
+        from happybase.hbase.ttypes import IOError as HBaseIOError
     from thriftpy.thrift import TException as ThriftException
 except ImportError as _:
     print('Happybase / thrift module import error - did you forget to build this project?\n\n'
@@ -67,7 +73,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.0'
+__version__ = '0.5'
 
 
 class HBaseShowTableRegionRanges(CLI):
