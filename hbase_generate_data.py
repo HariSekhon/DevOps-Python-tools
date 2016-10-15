@@ -41,9 +41,15 @@ import socket
 try:
     # pylint: disable=wrong-import-position
     import happybase  # pylint: disable=unused-import
-    # weird this is only importable after happybase, must global implicit import
     # happybase.hbase.ttypes.IOError no longer there in Happybase 1.0
-    from Hbase_thrift import IOError as HBaseIOError  # pylint: disable=import-error
+    try:
+        # this is only importable after happybase module
+        # pylint: disable=import-error
+        from Hbase_thrift import IOError as HBaseIOError
+    except ImportError:
+        # probably Happybase <= 0.9
+        # pylint: disable=import-error,no-name-in-module,ungrouped-imports
+        from happybase.hbase.ttypes import IOError as HBaseIOError
     from thriftpy.thrift import TException as ThriftException
 except ImportError as _:
     print('Happybase / thrift module import error - did you forget to build this project?\n\n'
@@ -62,7 +68,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.5'
 
 
 class HBaseGenerateData(CLI):
@@ -160,33 +166,33 @@ class HBaseGenerateData(CLI):
         try:
             log.info('connecting to HBase Thrift Server at {0}:{1}'.format(self.host, self.port))
             self.conn = happybase.Connection(host=self.host, port=self.port, timeout=10 * 1000)  # ms
+            tables = self.get_tables()
+            # of course there is a minor race condition here between getting the table list, checking and creating
+            # not sure if it's solvable, if you have any idea of how to solve it please let me know, even locking
+            # would only protect again multiple runs of this script on the same machine...
+            if self.table in tables:
+                if self.drop_table:
+                    log.info("table '%s' already existed but -d / --drop-table was specified, removing table first",
+                             self.table)
+                    self.conn.delete_table(self.table, disable=True)
+                    # wait up to 30 secs for table to be deleted
+                    #for _ in range(30):
+                    #    if self.table not in self.get_tables():
+                    #        break
+                    #    log.debug('waiting for table to be deleted before creating new one')
+                    #    time.sleep(1)
+                elif self.use_existing_table:
+                    pass
+                else:
+                    die("WARNING: table '{0}' already exists, will not send data to a pre-existing table for safety"\
+                        .format(self.table))
+            if not self.use_existing_table:
+                self.create_table()
+            self.populate_table()
+            log.info('finished, closing connection')
+            self.conn.close()
         except (socket.timeout, ThriftException, HBaseIOError) as _:
             die('ERROR: {0}'.format(_))
-        tables = self.get_tables()
-        # of course there is a minor race condition here between getting the table list, checking and creating
-        # not sure if it's solvable, if you have any idea of how to solve it please let me know, even locking
-        # would only protect again multiple runs of this script on the same machine...
-        if self.table in tables:
-            if self.drop_table:
-                log.info("table '%s' already existed but -d / --drop-table was specified, removing table first",
-                         self.table)
-                self.conn.delete_table(self.table, disable=True)
-                # wait up to 30 secs for table to be deleted
-                #for _ in range(30):
-                #    if self.table not in self.get_tables():
-                #        break
-                #    log.debug('waiting for table to be deleted before creating new one')
-                #    time.sleep(1)
-            elif self.use_existing_table:
-                pass
-            else:
-                die("WARNING: table '{0}' already exists, will not send data to a pre-existing table for safety"\
-                    .format(self.table))
-        if not self.use_existing_table:
-            self.create_table()
-        self.populate_table()
-        log.info('finished, closing connection')
-        self.conn.close()
 
     def create_table(self):
         log.info('creating table %s', self.table)
