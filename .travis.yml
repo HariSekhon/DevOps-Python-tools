@@ -15,7 +15,7 @@
 
 language: python
 python:
-  - "2.6"
+#  - "2.6"
   - "2.7"
 # MySQL in lib doesn't build from pip in Python 3
 #  - "3.2"
