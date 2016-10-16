@@ -142,7 +142,7 @@ class OpenTSDBCalculateImportDistribution(CLI):
             metric = match.group(1)
             # don't have a need for this right now
             #timestamp = match.group(2)
-            # value = match.grlup(3)
+            # value = match.group(3)
             tags = match.group(4)
             key = metric
             for tag in sorted(tags.split()):
