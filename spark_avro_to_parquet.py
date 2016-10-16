@@ -68,11 +68,11 @@ class SparkAvroToParquet(CLI):
         # super().__init__()
         # logging.config.fileConfig(os.path.join(libdir, 'resources', 'logging.conf'))
         # log = logging.getLogger(self.__class__.__name__)
+        self.verbose_default = 2
+        self.timeout_default = 86400
 
     # @override
     def add_options(self):
-        self.verbose_default = 2
-        self.timeout_default = 86400
         self.add_opt('-a', '--avro', metavar='<file/dir>',
                      help='Avro input file/dir ($AVRO)',
                      default=getenv('AVRO'))
