@@ -38,6 +38,7 @@ from __future__ import print_function
 import os
 import re
 import sys
+import time
 import traceback
 import numpy as np
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
@@ -88,7 +89,8 @@ class OpenTSDBCalculateImportDistribution(CLI):
                      help='Prefix summary length (default: {0})'.format(self.prefix_length) +
                      '. Use to greater coarser stats')
         self.add_opt('-T', '--include-timestamps', action='store_true',
-                     help='Include timestamps in the key distribution as this is how OpenTSDB writes HBase row keys')
+                     help='Include timestamps in the key distribution, summarizing to row hour ' +
+                     'as this is how OpenTSDB writes HBase row keys (assumes source is in UTC)')
         self.add_opt('--skip-errors', action='store_true', help='Skip lines with errors (exits otherwise)')
         self.add_opt('-d', '--desc', action='store_true', help='Sort descending')
 
@@ -149,7 +151,12 @@ class OpenTSDBCalculateImportDistribution(CLI):
             tags = match.group(4)
             key = metric
             if self.include_timestamps:
-                key += ' ' + timestamp
+                timestamp = int(timestamp)
+                # remove millis
+                if len(str(timestamp)) >= 15:
+                    timestamp = round(timestamp / 1000)
+                hour = time.strftime('%Y-%m-%d %H:00', time.gmtime(timestamp))
+                key += ' ' + hour
             for tag in sorted(tags.split()):
                 key += ' ' + tag.strip()
             if self.prefix_length is None:
