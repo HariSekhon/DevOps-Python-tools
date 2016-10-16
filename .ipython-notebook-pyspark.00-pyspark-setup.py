@@ -5,7 +5,7 @@
 
 # Yarn library support
 
-# Requires SPARK_HOME to be set 
+# Requires SPARK_HOME to be set
 
 __author__  = "Hari Sekhon"
 __version__ = "0.1"
