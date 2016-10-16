@@ -46,7 +46,8 @@ except ImportError as _:
                                     # you can edit this bit if you need to run it on Spark 1.3:
                                     # https://github.com/databricks/spark-avro#linking
 # Must set spark-avro package to 3.0.0+ if using Spark 2.0
-# for Spark < 2.0 it results in Exception => Caused by: java.lang.ClassNotFoundException: org.apache.spark.sql.execution.datasources.FileFormat
+# for Spark < 2.0 it results in Exception:
+# Caused by: java.lang.ClassNotFoundException: org.apache.spark.sql.execution.datasources.FileFormat
 #os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.databricks:spark-avro_2.10:3.0.0 %s' \
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.databricks:spark-avro_2.10:2.0.1 %s' \
                                     % os.getenv('PYSPARK_SUBMIT_ARGS', '')
