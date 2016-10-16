@@ -108,7 +108,8 @@ class TravisDebugSession(CLI):
                 error_message = _['error_message']
             except ValueError:
                 pass
-            error_message += " (if you've just retriggered this you can avoid this error using the --ignore-running switch)"
+            error_message += (" (if you've just retriggered this you can avoid this error " +
+                              "using the --ignore-running switch)")
             if self.get_opt('ignore_running'):
                 log.info('job already running (ignoring)')
             else:
