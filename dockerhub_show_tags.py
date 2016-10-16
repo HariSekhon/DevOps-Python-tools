@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.4'
 
 
 class DockerHubTags(CLI):
@@ -91,13 +91,29 @@ class DockerHubTags(CLI):
         if not self.quiet:
             print()
 
-    @staticmethod
-    def get_tags(repo):
+    def get_tags(self, repo):
         namespace = 'library'
         if '/' in repo:
             (namespace, repo) = repo.split('/', 2)
+        # there is another endpoint but it requires authentication
         url = 'https://registry.hub.docker.com/v2/repositories/{0}/{1}/tags/'\
               .format(urllib.quote_plus(namespace), urllib.quote_plus(repo))
+        tag_list = []
+        while True:
+            (tags, url) = self.query(url)
+            tag_list += tags
+            if not url:
+                break
+        tag_list.sort()
+        # put latest to the top of the list
+        try:
+            tag_list.insert(0, tag_list.pop(tag_list.index('latest')))
+        except ValueError:
+            pass
+        return tag_list
+
+    @staticmethod
+    def query(url):
         log.debug('GET %s' % url)
         try:
             verify = True
@@ -120,15 +136,13 @@ class DockerHubTags(CLI):
         try:
             j = json.loads(req.content)
             tag_list = [_['name'] for _ in j['results']]
+            # could perhaps stack overflow in some scenario
+            # not as functional programming 'cool' but will do own tail recursion and just while loop instead
+            #if 'next' in j and j['next']:
+            #    tag_list += self.query(j['next'])
+            return (tag_list, j['next'])
         except KeyError as _:
             die('failed to parse output from DockerHub (format may have changed?): {0}'.format(_))
-        tag_list.sort()
-        # put latest to the top of the list
-        try:
-            tag_list.insert(0, tag_list.pop(tag_list.index('latest')))
-        except ValueError:
-            pass
-        return tag_list
 
 
 if __name__ == '__main__':
