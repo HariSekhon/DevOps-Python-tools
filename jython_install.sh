@@ -31,15 +31,12 @@ JYTHON_INSTALL_DIR="${2:-/opt/jython-$JYTHON_VERSION}"
     wget -cO jython-installer.jar "http://search.maven.org/remotecontent?filepath=org/python/jython-installer/$JYTHON_VERSION/jython-installer-$JYTHON_VERSION.jar"
     #$sudo expect "$srcdir/jython_autoinstall.exp"
     #
-    # 'core' ie. minimal install results in:
+    # 'core' = too minimal to be useful to my real world programs, install results in:
     # import socket
     # ...
     # ImportError: No module named encodings
     #
-    # --silent --include modules --include pip+setuptools --directory ...
-    #$sudo java -jar jython-installer.jar -s -i mod -i ensurepip -d "$JYTHON_INSTALL_DIR"
-    # tried to be too minimal to be useful to my real world programs
-    # --silent --type standard --directory ...
+    #$sudo java -jar jython-installer.jar --silent --include mod --include ensurepip --directory "$JYTHON_INSTALL_DIR"
     $sudo java -jar jython-installer.jar -s -t standard -d "$JYTHON_INSTALL_DIR"
     $sudo ln -sf "$JYTHON_INSTALL_DIR" /opt/jython
     rm -f jython-installer.jar
