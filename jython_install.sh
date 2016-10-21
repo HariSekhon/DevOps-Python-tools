@@ -38,6 +38,7 @@ JYTHON_INSTALL_DIR="${2:-/opt/jython-$JYTHON_VERSION}"
     #
     #$sudo java -jar jython-installer.jar --silent --include mod --include ensurepip --directory "$JYTHON_INSTALL_DIR"
     $sudo java -jar jython-installer.jar -s -t standard -d "$JYTHON_INSTALL_DIR"
+    $sudo rm -fr "$JYTHON_INSTALL_DIR"/{Docs,Demo,tests}
     $sudo ln -sf "$JYTHON_INSTALL_DIR" /opt/jython
     rm -f jython-installer.jar
     echo
