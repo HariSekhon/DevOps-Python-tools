@@ -91,7 +91,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.2'
+__version__ = '0.6.4'
 
 class DockerfileGitBranchCheckTool(CLI):
 
@@ -103,8 +103,9 @@ class DockerfileGitBranchCheckTool(CLI):
         self.failed = False
                                        # ARG ZOOKEEPER_VERSION=3.4.8
         self.arg_regex = re.compile(r'^\s*ARG\s+([\w_]+_VERSION)=([\w\.]+)\s*')
+        self.jdk_regex = re.compile(r'.*((?:jdk|jre)\d+).*')
         self.branch_prefix = None
-        self.branch_regex = re.compile(r'^([\w-]+?)-?({version_regex})(?:(?:-[A-Za-z]+)?-?({version_regex}))?$'
+        self.branch_regex = re.compile(r'^([\w-]+?)-?({version_regex})(?:-((?:[A-Za-z]+)?-?{version_regex}))?$'
                                        .format(version_regex=version_regex))
         self.timeout_default = 86400
         self.valid_git_branches_msg = None
@@ -239,8 +240,11 @@ class DockerfileGitBranchCheckTool(CLI):
         # don't need this hack, just check for generic java/jdk/jre to match JAVA_VERSION below
         #name2 = re.sub(pattern=r'(?:alpine|centos|debian|ubuntu)-$', repl='', string=name2)
         # special case for Java versions
-        if re.search('(?:java|jre|jdk)', name2):
+        if re.search(r'\b(?:java|jre|jdk)\b', name2):
             name2 = 'java'
+        # special case for Scala versions
+        if re.search(r'\bscala\b', name2):
+            name2 = 'scala'
         name2 = name2.lower()
         #log.debug("normalized name '%s' => '%s'", name, name2)
         return name2
@@ -308,12 +312,10 @@ class DockerfileGitBranchCheckTool(CLI):
             version_index = 0
             for line in filehandle:
                 #log.debug(line.strip())
-                argversion = self.arg_regex.match(line.strip())
-                if argversion:
-                    self.branches_dockerfile_checked.add(branch)
-                    self.dockerfiles_checked.add(filename)
-                    log.debug("found arg '%s'", argversion.group(0))
-                    arg_var = argversion.group(1)
+                # hack for Scala Java version, hacky but can't think of a better more generic way to do this right now
+                match = self.arg_regex.match(line.strip())
+                if match:
+                    arg_var = match.group(1)
                     # this is too restrictive and prevents finding a lot of issues with
                     # more complex naming conventions for kafka, centos-java/scala etc
                     # instead we now expect ARG *_VERSION to be in the same order as the version numbers in branch name
@@ -322,24 +324,56 @@ class DockerfileGitBranchCheckTool(CLI):
                     if version_index >= len(branch_versions):
                         return True
                     branch_version = branch_versions[version_index]
-                    #log.debug("arg '%s' matches branch base '%s'", argversion.group(1), branch_base)
-                    log.debug("comparing '%s' contents to version derived from branch '%s' => '%s'",
-                              filename, branch, branch_version)
-                    if not isVersion(branch_version):
-                        die("unrecognized branch version '{0}' for branch_base '{1}'"
-                            .format(branch_version, branch_base))
-                    found_version = argversion.group(2)
-                    #if branch_version == found_version or branch_version == found_version.split('.', 2)[0]:
-                    if found_version[0:len(branch_version)] == branch_version:
-                        log.info("{0} version '{1}' matches {2}={3}".
-                                 format(self.valid_git_branches_msg, branch_version, arg_var, found_version))
-                    else:
-                        log.error('{0} version {1} vs Dockerfile ARG {2}={3}'.
-                                  format(self.invalid_git_branches_msg, branch_version, arg_var, found_version))
-                        self.dockerfiles_failed += 1
-                        self.branches_failed.add(branch)
+                    found_version = match.group(2)
+                    if not self.check_version(filename=filename,
+                                              branch=branch,
+                                              branch_base=branch_base,
+                                              arg_var=arg_var,
+                                              found_version=found_version,
+                                              branch_version=branch_version):
                         return False
                     version_index += 1
+                elif branch_base == 'scala' \
+                   and len(branch_versions) > 1 \
+                   and branch_versions[1] is not None:
+                    #log.debug('special scala condition checking for jdk version')
+                    match = self.jdk_regex.match(line)
+                    if match:
+                        found_version = match.group(1)
+                        #log.debug('found jdk version \'%s\'', found_version)
+                        if not self.check_version(filename=filename,
+                                                  branch=branch,
+                                                  branch_base=branch_base,
+                                                  arg_var=None,
+                                                  found_version=found_version,
+                                                  branch_version=branch_versions[version_index+1]):
+                            return False
+        return True
+
+    def check_version(self, filename, branch, branch_base, arg_var, found_version, branch_version):
+        self.branches_dockerfile_checked.add(branch)
+        self.dockerfiles_checked.add(filename)
+        if arg_var:
+            log.debug("found arg '%s'", arg_var)
+            arg_version = "ARG '{0}={1}'".format(arg_var, found_version)
+        else:
+            arg_version = "'{0}'".format(found_version)
+        #log.debug("arg '%s' matches branch base '%s'", argversion.group(1), branch_base)
+        log.debug("comparing '%s' contents to version derived from branch '%s' => '%s'",
+                  filename, branch, branch_version)
+        if not isVersion(branch_version.lstrip('jdk').lstrip('jre')):
+            die("unrecognized branch version '{0}' for branch_base '{1}'"
+                .format(branch_version, branch_base))
+        #if branch_version == found_version or branch_version == found_version.split('.', 2)[0]:
+        if found_version[0:len(branch_version)] == branch_version:
+            log.info("{0} version '{1}' matches {2}".
+                     format(self.valid_git_branches_msg, branch_version, arg_version))
+        else:
+            log.error("{0} version '{1}' vs Dockerfile {2}".
+                      format(self.invalid_git_branches_msg, branch_version, arg_version))
+            self.dockerfiles_failed += 1
+            self.branches_failed.add(branch)
+            return False
         return True
 
 
