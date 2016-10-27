@@ -18,13 +18,13 @@
 
 Tool to search DockerHub repos and return a configurable number of results
 
-Mimics 'docker searchi' results format but more flexible
+Mimics 'docker search' results format but more flexible
 
 Docker CLI doesn't currently support configuring the returned number of search results and always returns 25:
 
 https://github.com/docker/docker/issues/23055
 
-Verbose mode will also show the total number of results found for the search at the end
+Verbose mode will also show a summary for number of results displayed and total number of results available
 
 """
 
