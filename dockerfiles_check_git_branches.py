@@ -154,7 +154,8 @@ class DockerfileGitBranchCheckTool(CLI):
         if branches_not_checked > 1:
             log.warn('{0} branches not checked (no matching Dockerfile found?)'.format(branches_not_checked))
             if log.isEnabledFor(logging.DEBUG):
-                log.debug('Branches with no corresponding Dockerfile found:\n%s', '\n'.join(set(self.selected_branches) - set(self.branches_dockerfile_checked)))
+                log.debug('Branches with no corresponding Dockerfile found:\n%s',
+                          '\n'.join(set(self.selected_branches) - set(self.branches_dockerfile_checked)))
         log.info('{0} Dockerfiles checked'.format(len(self.dockerfiles_checked)))
         branches_failed = len(self.branches_failed)
         _ = '{0} Dockerfiles failed validation across {1} branches'.format(self.dockerfiles_failed, branches_failed)
