@@ -16,11 +16,15 @@
 
 """
 
-Tool to search DockerHub repos and return a configurable number of results.
+Tool to search DockerHub repos and return a configurable number of results
+
+Mimics 'docker searchi' results format but more flexible
 
 Docker CLI doesn't currently support configuring the returned number of search results and always returns 25:
 
 https://github.com/docker/docker/issues/23055
+
+Verbose mode will also show the total number of results found for the search at the end
 
 """
 
@@ -52,7 +56,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.1'
+__version__ = '0.4'
 
 
 class DockerHubSearch(CLI):
@@ -86,9 +90,9 @@ class DockerHubSearch(CLI):
         longest_name = 8
         try:
             # collect in dict to order by stars like normal docker search command
-            for _ in data['results']:
-                star = _['star_count']
-                name = _['name']
+            for item in data['results']:
+                star = item['star_count']
+                name = item['name']
                 if len(name) > longest_name:
                     longest_name = len(name)
                 if not isInt(star):
@@ -96,14 +100,15 @@ class DockerHubSearch(CLI):
                 results[star] = results.get(star, {})
                 results[star][name] = results[star].get(name, {})
                 result = {}
-                result['description'] = _['description']
-                result['official'] = '[OK]' if _['is_official'] else ''
+                result['description'] = item['description']
+                result['official'] = '[OK]' if item['is_official'] else ''
                 # docker search doesn't output this so neither will I
-                #result['trusted'] = _['is_trusted']
-                result['automated'] = '[OK]' if _['is_automated'] else ''
+                #result['trusted'] = result['is_trusted']
+                result['automated'] = '[OK]' if item['is_automated'] else ''
                 results[star][name] = result
         except KeyError as _:
-            die('failed to parse get field from data returned by DockerHub (format may have changed?): {0}'.format(_))
+            die('failed to parse results fields from data returned by DockerHub ' +
+                '(format may have changed?): {0}'.format(_))
         # mimicking out spacing from 'docker search' command
         print('{0:{5}s}   {1:45s}   {2:7s}   {3:8s}   {4:10s}'.
               format('NAME', 'DESCRIPTION', 'STARS', 'OFFICIAL', 'AUTOMATED', longest_name))
@@ -121,6 +126,12 @@ class DockerHubSearch(CLI):
                              results[star][name]['official'],
                              results[star][name]['automated'],
                              longest_name))
+        if self.verbose:
+            try:
+                print('\nResults Shown: {0}\nTotal Results: {1}'.format(len(data['results']), data['num_results']))
+            except KeyError as _:
+                die('failed to parse get total results count from data returned by DockerHub ' +
+                    '(format may have changed?): {0}'.format(_))
 
     @staticmethod
     def search(term, limit=25):
