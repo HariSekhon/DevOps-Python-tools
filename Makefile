@@ -106,6 +106,7 @@ apk-packages-remove:
 	$(SUDO) apk del snappy-dev
 	$(SUDO) apk del wget
 	$(SUDO) apk del zip
+	$(SUDO) rm -fr /var/cache/apk/*
 
 .PHONY: apt-packages
 apt-packages:
