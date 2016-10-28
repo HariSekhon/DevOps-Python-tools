@@ -72,22 +72,23 @@ build:
 .PHONY: apk-packages
 apk-packages:
 	$(SUDO) apk update
-	$(SUDO) apk add alpine-sdk
-	$(SUDO) apk add bash
-	$(SUDO) apk add cyrus-sasl-dev
-	$(SUDO) apk add gcc
-	$(SUDO) apk add git
-	$(SUDO) apk add krb5-dev
-	$(SUDO) apk add libffi-dev
-	$(SUDO) apk add linux-headers
-	$(SUDO) apk add make
-	$(SUDO) apk add openssl-dev
-	$(SUDO) apk add py-pip
-	$(SUDO) apk add python
-	$(SUDO) apk add python-dev
-	$(SUDO) apk add snappy-dev
-	$(SUDO) apk add wget
-	$(SUDO) apk add zip
+	$(SUDO) apk add \
+		alpine-sdk \
+		bash \
+		cyrus-sasl-dev \
+		gcc \
+		git \
+		krb5-dev \
+		libffi-dev \
+		linux-headers \
+		make \
+		openssl-dev \
+		py-pip \
+		python \
+		python-dev \
+		snappy-dev \
+		wget \
+		zip
 	which java || $(SUDO) apk add openjdk8-jre-base
 	# Spark Java Py4J gets java linking error without this
 	if [ -f /lib/libc.musl-x86_64.so.1 ]; then [ -e /lib/ld-linux-x86-64.so.2 ] || ln -sv /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2; fi
@@ -95,17 +96,19 @@ apk-packages:
 .PHONY: apk-packages-remove
 apk-packages-remove:
 	cd pylib && make apk-packages-remove
-	$(SUDO) apk del alpine-sdk
-	$(SUDO) apk del cyrus-sasl-dev
-	$(SUDO) apk del gcc
-	$(SUDO) apk del krb5-dev
-	$(SUDO) apk del libffi-dev
-	$(SUDO) apk del linux-headers
-	$(SUDO) apk del openssl-dev
-	$(SUDO) apk del python-dev
-	$(SUDO) apk del snappy-dev
-	$(SUDO) apk del wget
-	$(SUDO) apk del zip
+	$(SUDO) apk del \
+		alpine-sdk \
+		cyrus-sasl-dev \
+		gcc \
+		krb5-dev \
+		libffi-dev \
+		linux-headers \
+		openssl-dev \
+		python-dev \
+		snappy-dev \
+		wget \
+		zip \
+		|| :
 	$(SUDO) rm -fr /var/cache/apk/*
 
 .PHONY: apt-packages
