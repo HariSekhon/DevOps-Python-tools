@@ -1,0 +1,36 @@
+#
+#  Author: Hari Sekhon
+#  Date: 2013-02-03 10:25:36 +0000 (Sun, 03 Feb 2013)
+#
+#  https://github.com/harisekhon/pytools
+#
+#  License: see accompanying LICENSE file
+#
+#  https://www.linkedin.com/in/harisekhon
+#
+
+# ============================================================================ #
+#                          Alpine Package Requirements
+# ============================================================================ #
+
+alpine-sdk
+bash
+cyrus-sasl-dev
+gcc
+git
+krb5-dev
+libffi-dev
+linux-headers
+make
+openssl-dev
+py-pip
+python
+python-dev
+snappy-dev
+wget
+zip
+
+#which java || $(SUDO) apk add openjdk8-jre-base
+
+# Spark Java Py4J gets java linking error without this
+#if [ -f /lib/libc.musl-x86_64.so.1 ]; then [ -e /lib/ld-linux-x86-64.so.2 ] || ln -sv /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2; fi

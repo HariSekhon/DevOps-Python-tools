@@ -1,0 +1,33 @@
+#
+#  Author: Hari Sekhon
+#  Date: 2013-02-03 10:25:36 +0000 (Sun, 03 Feb 2013)
+#
+#  https://github.com/harisekhon/pytools
+#
+#  License: see accompanying LICENSE file
+#
+#  https://www.linkedin.com/in/harisekhon
+#
+
+# ============================================================================ #
+#                          RPM Package Requirements
+# ============================================================================ #
+
+gcc
+gcc-c++
+git
+python-devel
+python-pip
+python-setuptools
+unzip
+wget
+zip
+
+# needed to build pyhs2
+# libgsasl-devel saslwrapper-devel
+#cyrus-sasl-devel
+
+# needed to build python-snappy for avro module
+snappy-devel
+
+#which java || $(SUDO) yum install -y java
