@@ -52,18 +52,18 @@ __version__ = '0.7.2'
 
 class SparkJsonToParquet(CLI):
 
-    # def __init__(self):
+    def __init__(self):
         # Python 2.x
-        # super(SparkJsonToParquet, self).__init__()
+        super(SparkJsonToParquet, self).__init__()
         # Python 3.x
         # super().__init__()
         # logging.config.fileConfig(os.path.join(libdir, 'resources', 'logging.conf'))
         # log = logging.getLogger(self.__class__.__name__)
+        self.verbose_default = 2
+        self.timeout_default = 86400
 
     # @override
     def add_options(self):
-        self.verbose_default = 2
-        self.timeout_default = 86400
         self.add_opt('-j', '--json', metavar='<file/dir>',
                      help='JSON input file/dir ($JSON)',
                      default=getenv('JSON'))

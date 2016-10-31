@@ -15,25 +15,37 @@
 
 set -eu
 [ -n "${DEBUG:-}" ] && set -x
-srcdir="$(cd "$( dirname "$0" )" && pwd)"
+srcdir="$(cd "$(dirname "$0")" && pwd)"
 
-JYTHON_VERSION=2.7.0
+JYTHON_VERSION="${1:-2.7.0}"
+
+JYTHON_INSTALL_DIR="${2:-/opt/jython-$JYTHON_VERSION}"
 
 # not set in busybox
 #[ $EUID -eq 0 ] && sudo="" || sudo=sudo
 [ $(whoami) = "root" ] && sudo="" || sudo=sudo
 
-if ! [ -e /opt/jython ]; then
-    mkdir -p /opt
+# installer will tell us if dir isn't empty
+#if ! [ -e "$JYTHON_INSTALL_DIR" ]; then
+    $sudo mkdir -p "$JYTHON_INSTALL_DIR"
     wget -cO jython-installer.jar "http://search.maven.org/remotecontent?filepath=org/python/jython-installer/$JYTHON_VERSION/jython-installer-$JYTHON_VERSION.jar"
-    $sudo expect "$srcdir/jython_autoinstall.exp"
-    $sudo ln -sf "/opt/jython-$JYTHON_VERSION" /opt/jython
+    #$sudo expect "$srcdir/jython_autoinstall.exp"
+    #
+    # 'core' = too minimal to be useful to my real world programs, install results in:
+    # import socket
+    # ...
+    # ImportError: No module named encodings
+    #
+    #$sudo java -jar jython-installer.jar --silent --include mod --include ensurepip --directory "$JYTHON_INSTALL_DIR"
+    $sudo java -jar jython-installer.jar -s -t standard -d "$JYTHON_INSTALL_DIR"
+    $sudo rm -fr "$JYTHON_INSTALL_DIR"/{Docs,Demo,tests}
+    $sudo ln -sf "$JYTHON_INSTALL_DIR" /opt/jython
     rm -f jython-installer.jar
     echo
     echo "Jython Install done"
-else
-    echo "/opt/jython already exists - doing nothing"
-fi
+#else
+#    echo "$JYTHON_INSTALL_DIR already exists - doing nothing"
+#fi
 if ! [ -e /etc/profile.d/jython.sh ]; then
     echo "Adding /etc/profile.d/jython.sh"
     # shell execution tracing comes out in the file otherwise

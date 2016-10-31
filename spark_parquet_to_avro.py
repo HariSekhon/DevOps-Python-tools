@@ -46,7 +46,8 @@ except ImportError as _:
                                     # you can edit this bit if you need to run it on Spark 1.3:
                                     # https://github.com/databricks/spark-avro#linking
 # Must set spark-avro package to 3.0.0+ if using Spark 2.0
-# for Spark < 2.0 it results in Exception => Caused by: java.lang.ClassNotFoundException: org.apache.spark.sql.execution.datasources.FileFormat
+# for Spark < 2.0 it results in Exception:
+# Caused by: java.lang.ClassNotFoundException: org.apache.spark.sql.execution.datasources.FileFormat
 #os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.databricks:spark-avro_2.10:3.0.0 %s' \
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.databricks:spark-avro_2.10:2.0.1 %s' \
                                     % os.getenv('PYSPARK_SUBMIT_ARGS', '')
@@ -67,11 +68,11 @@ class SparkParquetToAvro(CLI):
         # super().__init__()
         # logging.config.fileConfig(os.path.join(libdir, 'resources', 'logging.conf'))
         # log = logging.getLogger(self.__class__.__name__)
+        self.verbose_default = 2
+        self.timeout_default = 86400
 
     # @override
     def add_options(self):
-        self.verbose_default = 2
-        self.timeout_default = 86400
         self.add_opt('-p', '--parquet', metavar='<file/dir>',
                      help='Parquet input file/dir ($PARQUET)',
                      default=getenv('PARQUET'))

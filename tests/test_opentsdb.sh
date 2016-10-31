@@ -107,6 +107,9 @@ test_opentsdb(){
     echo "testing from STDIN:"
     ./opentsdb_calculate_import_metric_distribution.py -K 2 -vv - < "$DATA_FILE"
     hr
+    echo "testing including timestamps:"
+    ./opentsdb_calculate_import_metric_distribution.py -K 22 -vv --include-timestamps "$DATA_FILE"
+    hr
     echo "testing reverse sort on count:"
     ./opentsdb_calculate_import_metric_distribution.py -K 3 -d "$DATA_FILE"
     hr

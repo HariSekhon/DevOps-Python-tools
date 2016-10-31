@@ -16,7 +16,7 @@
 
 """
 
-Tool to check Git branches have their upstream origin branch set consistently
+Tool to check Git branches have their upstream origin branch set consistently and auto-fix if necessary
 
 Mainly written for my https://github.com/harisekhon/Dockerfiles repo
 which has over 100 branches which get merged, pulled and pushed around
@@ -45,7 +45,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.4'
 
 
 class GitCheckBranchesUpstream(CLI):
@@ -64,6 +64,10 @@ class GitCheckBranchesUpstream(CLI):
     def add_options(self):
         self.add_opt('-b', '--branch-prefix', help='Branch prefix regex to check')
         self.add_opt('-o', '--origin', help='Origin repo (default: origin)', default='origin')
+        self.add_opt('-f', '--fix', action='store_true',
+                     help='Set any branches without upstream to corresponding origin/<branch>')
+        self.add_opt('-F', '--force-fix', action='store_true',
+                     help='Override all branches\' upstreams to track corresponding origin/<branch>')
 
     def run(self):
         if not self.args:
@@ -110,10 +114,20 @@ class GitCheckBranchesUpstream(CLI):
         #log.debug('\n\nbranches for target %s:\n\n%s\n', target, '\n'.join(list(branches)))
         for branch in branches:
             expected = '{0}/{1}'.format(self.origin, branch)
+            # have to str() this as it returns an object that will fail equality match otherwise
             tracking_branch = str(branch.tracking_branch())
             if tracking_branch == expected:
                 log.info("OK: repo '{0}' branch '{1}' is tracking '{2}'"
                          .format(gitroot, branch, tracking_branch))
+            elif self.get_opt('fix') and tracking_branch == 'None':
+                log.warn("WARN: setting repo '{0}' unconfigured branch '{1}' to track '{2}'"
+                         .format(gitroot, branch, expected))
+                #print(list(repo.remotes.origin.refs))
+                branch.set_tracking_branch(git.refs.remote.RemoteReference(repo, 'refs/remotes/' + expected))
+            elif self.get_opt('force_fix'):
+                log.warn("WARN: forcibly resetting repo '{0}' branch '{1}' to track '{2}'"
+                         .format(gitroot, branch, expected))
+                branch.set_tracking_branch(git.refs.remote.RemoteReference(repo, 'refs/remotes/' + expected))
             else:
                 self.status = "ERROR"
                 log.error("BAD: branch '{0}' is tracking '{1}' (expected '{2}')"

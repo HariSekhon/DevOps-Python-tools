@@ -67,6 +67,8 @@ class SparkCSVToParquet(CLI):
         # super().__init__()
         # logging.config.fileConfig(os.path.join(libdir, 'resources', 'logging.conf'))
         # log = logging.getLogger(self.__class__.__name__)
+        self.verbose_default = 2
+        self.timeout_default = 86400
         self.schema = None
         self.types_mapping = {}
         # dynamically generate types mapping from available types in PySpark
@@ -80,8 +82,6 @@ class SparkCSVToParquet(CLI):
 
     # @override
     def add_options(self):
-        self.verbose_default = 2
-        self.timeout_default = 86400
         self.add_opt('-c', '--csv', metavar='<file/dir>',
                      help='CSV input file/dir ($CSV)',
                      default=getenv('CSV'))

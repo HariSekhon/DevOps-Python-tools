@@ -38,6 +38,7 @@ from __future__ import print_function
 import os
 import re
 import sys
+import time
 import traceback
 import numpy as np
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
@@ -52,7 +53,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
+__version__ = '0.6'
 
 
 class OpenTSDBCalculateImportDistribution(CLI):
@@ -66,6 +67,7 @@ class OpenTSDBCalculateImportDistribution(CLI):
         self.keys = {}
         self.total_keys = 0
         self.re_line = re.compile(r'^\s*(\S+)\s+(\d+)\s+(-?\d+(?:\.\d+)?)\s+(\S+=\S+(?:\s+\S+=\S+)*)\s*$')
+        self.include_timestamps = False
         self.skip_errors = False
         self.sort_desc = False
         self.prefix_length = None
@@ -86,7 +88,9 @@ class OpenTSDBCalculateImportDistribution(CLI):
         self.add_opt('-K', '--key-prefix-length', metavar='<int>', default=self.prefix_length,
                      help='Prefix summary length (default: {0})'.format(self.prefix_length) +
                      '. Use to greater coarser stats')
-        # self.add_opt('-l', '--list-tables', action='store_true', help='List tables and exit')
+        self.add_opt('-T', '--include-timestamps', action='store_true',
+                     help='Include timestamps in the key distribution, summarizing to row hour ' +
+                     'as this is how OpenTSDB writes HBase row keys (assumes source is in UTC)')
         self.add_opt('--skip-errors', action='store_true', help='Skip lines with errors (exits otherwise)')
         self.add_opt('-d', '--desc', action='store_true', help='Sort descending')
 
@@ -95,6 +99,7 @@ class OpenTSDBCalculateImportDistribution(CLI):
         self.prefix_length = self.get_opt('key_prefix_length')
         self.skip_errors = self.get_opt('skip_errors')
         self.sort_desc = self.get_opt('desc')
+        self.include_timestamps = self.get_opt('include_timestamps')
         if self.prefix_length is not None:
             validate_int(self.prefix_length, 'key key prefix length', 1, 100)
             self.prefix_length = int(self.prefix_length)
@@ -140,11 +145,18 @@ class OpenTSDBCalculateImportDistribution(CLI):
                 log.warn(err_msg)
                 continue
             metric = match.group(1)
+            timestamp = match.group(2)
             # don't have a need for this right now
-            #timestamp = match.group(2)
-            # value = match.grlup(3)
+            # value = match.group(3)
             tags = match.group(4)
             key = metric
+            if self.include_timestamps:
+                timestamp = int(timestamp)
+                # remove millis
+                if len(str(timestamp)) >= 15:
+                    timestamp = round(timestamp / 1000)
+                hour = time.strftime('%Y-%m-%d %H:00', time.gmtime(timestamp))
+                key += ' ' + hour
             for tag in sorted(tags.split()):
                 key += ' ' + tag.strip()
             if self.prefix_length is None:
