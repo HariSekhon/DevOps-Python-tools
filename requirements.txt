@@ -24,7 +24,8 @@ py>=1.4.31
 pytest>=3.0.0
 #python-jenkins>=0.4.13
 #python-krbV>=1.0.90
-#python-snappy>=0.5
+# needed by avro
+python-snappy>=0.5
 PyYAML>=3.11
 requests>=2.11.1
 sasl>=0.2.1
