@@ -51,8 +51,9 @@ try:
         # pylint: disable=import-error,no-name-in-module,ungrouped-imports
         from happybase.hbase.ttypes import IOError as HBaseIOError
     from thriftpy.thrift import TException as ThriftException
+    import humanize
 except ImportError as _:
-    print('Happybase / thrift module import error - did you forget to build this project?\n\n'
+    print('module import error - did you forget to build this project?\n\n'
           + traceback.format_exc(), end='')
     sys.exit(4)
 srcdir = os.path.abspath(os.path.dirname(__file__))
@@ -68,7 +69,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
+__version__ = '0.5.1'
 
 
 class HBaseGenerateData(CLI):
@@ -229,7 +230,12 @@ class HBaseGenerateData(CLI):
                     print('.', file=sys.stderr, end='')
             print(file=sys.stderr)
             time_taken = time.time() - start
-            log.info('sent %s rows of generated data to HBase in %.2f seconds', self.num_rows, time_taken)
+            log.info('sent %s rows of generated data to HBase in %.2f seconds (%s rows/sec, %s/sec)',
+                     self.num_rows,
+                     time_taken,
+                     int(self.num_rows/time_taken),
+                     humanize.naturalsize(self.num_rows * (key_length + value_length) / time_taken)
+                    )
         except (socket.timeout, ThriftException, HBaseIOError) as _:
             exp = str(_)
             exp = exp.replace('\\n', '\n')
