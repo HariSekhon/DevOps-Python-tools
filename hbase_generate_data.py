@@ -186,7 +186,8 @@ class HBaseGenerateData(CLI):
                     pass
                 else:
                     die("WARNING: table '{0}' already exists, will not send data to a pre-existing table for safety"\
-                        .format(self.table))
+                        .format(self.table) +
+                        ". You can choose to either --drop-table or --use-existing-table")
             if not self.use_existing_table:
                 self.create_table()
             self.populate_table()
