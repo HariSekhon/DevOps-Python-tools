@@ -11,6 +11,7 @@ dicttoxml>=1.7.4
 # fails on requiring newer version of setuptools
 GitPython>=2.0.8
 happybase>=1.0.0
+humanize>=0.5.1
 #impyla>=0.12.0
 Jinja2>=2.8
 #kazoo>=2.2.1
