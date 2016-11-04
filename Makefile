@@ -6,6 +6,8 @@
 #
 #  License: see accompanying LICENSE file
 #
+#  https://www.linkedin.com/in/harisekhon
+#
 
 #ifdef VIRTUAL_ENV
 # Travis has custom python install earlier in $PATH even in Perl builds so need to install PyPI modules to non-system python otherwise they're not found by programs.
@@ -72,23 +74,7 @@ build:
 .PHONY: apk-packages
 apk-packages:
 	$(SUDO) apk update
-	$(SUDO) apk add \
-		alpine-sdk \
-		bash \
-		cyrus-sasl-dev \
-		gcc \
-		git \
-		krb5-dev \
-		libffi-dev \
-		linux-headers \
-		make \
-		openssl-dev \
-		py-pip \
-		python \
-		python-dev \
-		snappy-dev \
-		wget \
-		zip
+	$(SUDO) apk add `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/apk-packages.txt`
 	which java || $(SUDO) apk add openjdk8-jre-base
 	# Spark Java Py4J gets java linking error without this
 	if [ -f /lib/libc.musl-x86_64.so.1 ]; then [ -e /lib/ld-linux-x86-64.so.2 ] || ln -sv /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2; fi
@@ -96,87 +82,35 @@ apk-packages:
 .PHONY: apk-packages-remove
 apk-packages-remove:
 	cd pylib && make apk-packages-remove
-	$(SUDO) apk del \
-		alpine-sdk \
-		cyrus-sasl-dev \
-		gcc \
-		krb5-dev \
-		libffi-dev \
-		linux-headers \
-		openssl-dev \
-		python-dev \
-		snappy-dev \
-		wget \
-		zip \
-		|| :
+	$(SUDO) apk del `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/apk-packages-dev.txt` || :
 	$(SUDO) rm -fr /var/cache/apk/*
 
 .PHONY: apt-packages
 apt-packages:
 	$(SUDO) apt-get update
-	$(SUDO) apt-get install -y build-essential
-	# needed to fetch the library submodule at end of build
-	$(SUDO) apt-get install -y git
-	$(SUDO) apt-get install -y wget
-	$(SUDO) apt-get install -y zip
-	$(SUDO) apt-get install -y unzip
-	$(SUDO) apt-get install -y python-dev
-	$(SUDO) apt-get install -y python-setuptools
-	$(SUDO) apt-get install -y python-pip
-	# needed to build python-snappy for avro module
-	$(SUDO) apt-get install -y libsnappy-dev
-	# IPython Notebook fails and leave apt broken
-	# The following packages have unmet dependencies:
-	#  python-zmq : Depends: libzmq1 but it is not going to be installed
-	#  E: Unmet dependencies. Try 'apt-get -f install' with no packages (or specify a solution).
-	#$(SUDO) apt-get install -y ipython-notebook || :
+	$(SUDO) apt-get install -y `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/deb-packages.txt`
 	which java || $(SUDO) apt-get install -y openjdk-8-jdk || $(SUDO) apt-get install -y openjdk-7-jdk
 
 .PHONY: apt-packages-remove
 apt-packages-remove:
 	cd pylib && make apt-packages-remove
-	$(SUDO) apt-get purge -y build-essential
-	$(SUDO) apt-get purge -y wget
-	$(SUDO) apt-get purge -y zip
-	$(SUDO) apt-get purge -y unzip
-	$(SUDO) apt-get purge -y python-dev
-	$(SUDO) apt-get purge -y libsnappy-dev
+	$(SUDO) apt-get purge -y `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/deb-packages-dev.txt`
 
 .PHONY: yum-packages
 yum-packages:
-	rpm -q git               || $(SUDO) yum install -y git
-	rpm -q wget              || $(SUDO) yum install -y wget
-	rpm -q gcc               || $(SUDO) yum install -y gcc
-	rpm -q gcc-c++           || $(SUDO) yum install -y gcc-c++
-	rpm -q git               || $(SUDO) yum install -y git
-	rpm -q zip               || $(SUDO) yum install -y zip
-	rpm -q unzip             || $(SUDO) yum install -y unzip
-	# needed to fetch the library submodule and CPAN modules
 	# python-pip requires EPEL, so try to get the correct EPEL rpm
+	rpm -q wget || $(SUDO) yum install -y wget
 	rpm -q epel-release      || yum install -y epel-release || { wget -t 100 --retry-connrefused -O /tmp/epel.rpm "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`grep -o '[[:digit:]]' /etc/*release | head -n1`.noarch.rpm" && $(SUDO) rpm -ivh /tmp/epel.rpm && rm -f /tmp/epel.rpm; }
-	rpm -q python-setuptools || $(SUDO) yum install -y python-setuptools
-	rpm -q python-pip        || $(SUDO) yum install -y python-pip
-	rpm -q python-devel      || $(SUDO) yum install -y python-devel
-	rpm -q ipython-notebook  || $(SUDO) yum install -y ipython-notebook || :
-	# needed to build pyhs2
-	# libgsasl-devel saslwrapper-devel
-	rpm -q cyrus-sasl-devel  || $(SUDO) yum install -y cyrus-sasl-devel
-	# needed to build python-snappy for avro module
-	rpm -q snappy-devel      || $(SUDO) yum install -y snappy-devel
+	
+	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages.txt`; do rpm -q $$x || $(SUDO) yum install -y $$x; done
+	
 	which java || $(SUDO) yum install -y java
+
 
 .PHONY: yum-packages-remove
 yum-packages-remove:
 	cd pylib                 && make yum-packages-remove
-	rpm -q wget              && $(SUDO) yum remove -y wget
-	rpm -q gcc               && $(SUDO) yum remove -y gcc
-	rpm -q gcc-c++           && $(SUDO) yum remove -y gcc-c++
-	rpm -q git               && $(SUDO) yum remove -y git
-	rpm -q zip               && $(SUDO) yum remove -y zip
-	rpm -q unzip             && $(SUDO) yum remove -y unzip
-	rpm -q python-devel      && $(SUDO) yum remove -y python-devel
-	rpm -q cyrus-sasl-devel  && $(SUDO) yum remove -y cyrus-sasl-devel
-	rpm -q snappy-devel      && $(SUDO) yum remove -y snappy-devel
+	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages-dev.txt`; do rpm -q $$x && $(SUDO) yum remove -y $$x; done
 
 .PHONY: jython-install
 jython-install:

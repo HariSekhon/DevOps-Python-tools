@@ -1,0 +1,37 @@
+#
+#  Author: Hari Sekhon
+#  Date: 2013-02-03 10:25:36 +0000 (Sun, 03 Feb 2013)
+#
+#  https://github.com/harisekhon/pytools
+#
+#  License: see accompanying LICENSE file
+#
+#  https://www.linkedin.com/in/harisekhon
+#
+
+# ============================================================================ #
+#                            Deb Package Requirements
+# ============================================================================ #
+
+# needed to fetch the library submodule at end of build
+git
+
+build-essential
+python-dev
+python-pip
+python-setuptools
+unzip
+wget
+zip
+
+# needed to build python-snappy for avro module
+libsnappy-dev
+
+# IPython Notebook fails and leave apt broken
+# The following packages have unmet dependencies:
+#  python-zmq : Depends: libzmq1 but it is not going to be installed
+#  E: Unmet dependencies. Try 'apt-get -f install' with no packages (or specify a solution).
+#
+#ipython-notebook || :
+
+#which java || $(SUDO) apt-get install -y openjdk-8-jdk || $(SUDO) apt-get install -y openjdk-7-jdk
