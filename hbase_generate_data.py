@@ -231,10 +231,10 @@ class HBaseGenerateData(CLI):
                     print('.', file=sys.stderr, end='')
             print(file=sys.stderr)
             time_taken = time.time() - start
-            log.info('sent %s rows of generated data to HBase in %.2f seconds (%s rows/sec, %s/sec)',
+            log.info('sent %s rows of generated data to HBase in %.2f seconds (%d rows/sec, %s/sec)',
                      self.num_rows,
                      time_taken,
-                     int(self.num_rows/time_taken),
+                     self.num_rows / time_taken,
                      humanize.naturalsize(self.num_rows * (key_length + value_length) / time_taken)
                     )
         except (socket.timeout, ThriftException, HBaseIOError) as _:
