@@ -167,3 +167,19 @@ clean:
 spark-deps:
 	rm -vf spark-deps.zip
 	zip spark-deps.zip pylib
+
+.PHONY: docker-run
+docker-run:
+	docker run -ti --rm harisekhon/pytools ${ARGS}
+
+.PHONY: run
+run:
+	make docker-run
+
+.PHONY: docker-mount
+docker-mount:
+	docker run -ti --rm -v $$PWD:/py harisekhon/pytools bash -c "cd /py; exec bash"
+
+.PHONY: mount
+mount:
+	make docker-mount
