@@ -84,7 +84,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.3'
+__version__ = '0.4'
 
 
 class FindActiveServer(CLI):
@@ -120,6 +120,8 @@ class FindActiveServer(CLI):
                      'use -n=1 for deterministic host preference order [slower])')
         self.add_opt('-R', '--random', action='store_true', help='Randomize order of hosts tested ' +
                      '(for use with --num-threads=1)')
+        self.add_opt('-q', '--quiet', action='store_true', help='Returns no output instead of NO_AVAILABLE_SERVER '\
+                                                              + '(convenience for scripting)')
         self.add_opt('-T', '--request-timeout', metavar='secs', type='int',
                      help='Timeout for each individual server request in seconds (default: 1 second)')
 
@@ -197,7 +199,7 @@ class FindActiveServer(CLI):
                 #    self.finish(host, port)
                 self.launch_thread(self.check_socket, host, port)
         self.collect_results()
-        if self.verbose:
+        if not self.get_opt('quiet'):
             print('NO_AVAILABLE_SERVER')
         sys.exit(1)
 
@@ -289,9 +291,9 @@ class FindActiveServer(CLI):
         if not isStr(url_path):
             url_path = ''
         url = '{protocol}://{host}:{port}/{url_path}'.format(protocol=self.protocol,
-                                                               host=host,
-                                                               port=port,
-                                                               url_path=url_path.lstrip('/'))
+                                                             host=host,
+                                                             port=port,
+                                                             url_path=url_path.lstrip('/'))
         log.info('GET %s', url)
         try:
             # timeout here isn't total timeout, it's response time
