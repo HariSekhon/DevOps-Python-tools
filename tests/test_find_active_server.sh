@@ -61,7 +61,7 @@ hr
 echo "testing socket returns only functional server"
 echo
 
-check_output "google.com" ./find_active_server.py $opts --port 80 0.0.0.1 4.4.4.4 google.com
+check_output "google.com" ./find_active_server.py $opts --port 80 0.0.0.1 google.com
 
 hr
 echo "testing socket ordering result consistency with individual port overrides"
@@ -112,17 +112,17 @@ echo
 
 check_output "yahoo.com" ./find_active_server.py $opts -n1 --https yahoo.com google.com
 
-check_output "google.com" ./find_active_server.py $opts -n3 --https 0.0.0.1 4.4.4.4 google.com yahoo.com
+check_output "google.com" ./find_active_server.py $opts -n3 --https 0.0.0.1 google.com yahoo.com
 
 echo
 echo "testing blank result for localhost 9999"
 echo
-DEBUG="" check_output "" ./find_active_server.py --https localhost --port 9999
+DEBUG="" check_output "" ./find_active_server.py --https localhost --port 9999 -q
 
 echo
 echo "testing NO_AVAILABLE_SERVER for localhost 9999 verbose"
 echo
-check_output "NO_AVAILABLE_SERVER" ./find_active_server.py --https localhost --port 9999 -v
+check_output "NO_AVAILABLE_SERVER" ./find_active_server.py --https localhost --port 9999
 
 #echo
 #echo "testing http returns no results when using wrong port 25"
