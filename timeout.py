@@ -28,11 +28,12 @@ import os
 import subprocess
 import sys
 import time
-import psutil
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
+srcdir = os.path.abspath(os.path.dirname(__file__))
+libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
+    import psutil
     from harisekhon import CLI
     from harisekhon.utils import plural, prog, qquit
 except ImportError as _:
@@ -42,7 +43,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.2.1'
 
 
 # Timeout behaviour itself is handled by my std base class CLI
