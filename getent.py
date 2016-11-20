@@ -74,7 +74,7 @@ class Getent(CLI):
         #self._CLI__parser.disable_interspersed_args()
         self._CLI__parser.set_usage('{prog} [options] <command> <args> ...'.format(prog=self._prog))
         # for Mac to convert to 'x' same as Linux
-        self.star_regex = re.compile('^\*+$')
+        self.star_regex = re.compile(r'^\*+$')
 
     def timeout_handler(self, signum, frame): # pylint: disable=unused-argument
         for child in psutil.Process().children():
@@ -273,7 +273,6 @@ class Getent(CLI):
         arg = args[0]
         return arg
 
-    # TODO: make a slightly more generic version similar to Perl lib and put in PyLib
     @staticmethod
     def cmd(command):
         log.debug('command: %s', command)
