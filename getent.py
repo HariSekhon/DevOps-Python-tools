@@ -36,6 +36,7 @@ from __future__ import print_function
 
 import os
 import platform
+import re
 import subprocess
 import sys
 import time
@@ -72,6 +73,8 @@ class Getent(CLI):
         # special case to make all following args belong to the passed in command and not to this program
         #self._CLI__parser.disable_interspersed_args()
         self._CLI__parser.set_usage('{prog} [options] <command> <args> ...'.format(prog=self._prog))
+        # for Mac to convert to 'x' same as Linux
+        self.star_regex = re.compile('^\*+$')
 
     def timeout_handler(self, signum, frame): # pylint: disable=unused-argument
         for child in psutil.Process().children():
@@ -151,21 +154,31 @@ class Getent(CLI):
         (output, returncode) = self.cmd(command)
         user = password = uid = gid = name = homedir = shell = ''
         #log.info('parsing output for passwd conversion')
-        for line in output.split('\n'):
+        output = output.split('\n')
+        for (index, line) in enumerate(output):
             tokens = line.split()
-            if len(tokens) < 2:
+            if len(tokens) < 1:
                 continue
             field = tokens[0]
-            value = tokens[1]
+            if len(tokens) < 2:
+                value = ''
+            else:
+                value = tokens[1]
             if field == 'RecordName:':
                 user = value
             elif field == 'Password:':
                 password = value
+                if self.star_regex.match(password):
+                    password = 'x'
             elif field == 'UniqueID:':
                 uid = value
             elif field == 'PrimaryGroupID:':
                 gid = value
             elif field == 'RealName:':
+                name = value
+                if not value and len(output) > index + 1 and output[index+1].startswith(' '):
+                    name = output[index+1].strip()
+            elif not name and field == 'RecordName:':
                 name = value
             elif field == 'NFSHomeDirectory:':
                 homedir = value
@@ -225,6 +238,8 @@ class Getent(CLI):
                 gid = value
             elif field == 'Password:':
                 password = value
+                if self.star_regex.match(password):
+                    password = 'x'
             elif field == 'RealName:':
                 name = value
                 if not value and len(output) > index + 1 and output[index+1].startswith(' '):
