@@ -99,7 +99,7 @@ class Getent(CLI):
         elif operating_system == 'Linux':
             log.info('detected system as Linux')
             log.info('calling %s %s', command, args_string)
-            sys.exit(subprocess.call(command, args, shell=False))
+            sys.exit(subprocess.call(['getent', command] + args, shell=False))
         else:
             die("operating system '{operating_system}' is not one of the supported Linux or Darwin (Mac)"\
                 .format(operating_system=operating_system))
@@ -111,10 +111,10 @@ class Getent(CLI):
 #        elif command == 'group':
 #            (output, returncode) = self.cmd(command, args)
 #            formatted_output = self.mac_getent_group(output)
-#        elif command == 'host':
+#        elif command == 'hosts':
 #            (output, returncode) = self.cmd(command, args)
 #            formatted_output = self.mac_getent_host(output)
-        if command in ('passwd', 'group'): #, 'host'):
+        if command in ('passwd', 'group'): #, 'hosts'):
             # might be too clever to dynamically determine the method to reduce code dup
             (formatted_output, returncode) = getattr(self, 'mac_getent_{command}'.format(command=command))(args)
         else:
