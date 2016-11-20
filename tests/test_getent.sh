@@ -21,14 +21,21 @@ cd "$srcdir/.."
 
 . ./bash-tools/utils.sh
 
-if [ `uname -s` = Darwin ]; then
-    section "Getent (Mac)"
+section "Getent"
+
+system=`uname -s`
+echo "system = $system"
+hr
+if [ "$system" = "Linux" -o "$system" = Darwin ]; then
     ./getent.py passwd
     hr
-    ./getent.py passwd $USER
+    # $USER isn't always available in docker containers, use 'id' instead
+    ./getent.py passwd `id -un`
     hr
     ./getent.py group
     hr
-    ./getent.py group $(id -gn)
+    ./getent.py group `id -gn`
     hr
+else
+    echo "system is not Linux or Mac, skipping..."
 fi
