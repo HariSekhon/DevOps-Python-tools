@@ -21,6 +21,7 @@ nose>=1.3.7
 numpy>=1.8.0rc1
 psutil>=4.3.0
 py>=1.4.31
+pylint==1.5.2
 #pyhs2>=0.6.0
 pytest>=3.0.0
 #python-jenkins>=0.4.13
