@@ -46,9 +46,10 @@ Example:
 Specifying --blueprint is optional for --create-cluster if blueprint is specified in the hostmappings file. If given
 --blueprint it overrides field in the hostmappings for convenience than having to re-edit host templates
 
-See the adjacent ambari_blueprints directory for sample templates.
+See the adjacent ambari_blueprints/ directory for sample templates.
 
-See also validate_json.py adjacent program in PyTools for validating Ambari blueprint templates when hand editing them.
+See also the validate_json.py program in this same PyTools repo for validating Ambari blueprint templates
+to make hand editing them safer.
 
 Ambari Blueprints documentation
 
