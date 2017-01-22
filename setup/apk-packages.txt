@@ -23,7 +23,7 @@ libffi-dev
 linux-headers
 make
 openssl-dev
-py-pip
+py2-pip
 python
 python-dev
 snappy-dev
