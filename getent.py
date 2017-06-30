@@ -34,6 +34,12 @@ from __future__ import division
 from __future__ import print_function
 #from __future__ import unicode_literals
 
+# getent module doesn't parse correctly on Mac:
+#
+# dict(getent.passwd('root'))
+#
+# returns 'System Administrator' for shell field
+
 import os
 import platform
 import re
