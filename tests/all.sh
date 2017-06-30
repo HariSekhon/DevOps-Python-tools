@@ -27,9 +27,6 @@ cd "$srcdir";
 
 . utils.sh
 
-#./syntax.sh
-./pylint.sh
-
 #./python3.sh
 
 ../bash-tools/python_compile.sh ..
