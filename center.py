@@ -42,7 +42,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 class Center(CLI):
 
@@ -90,6 +90,9 @@ class Center(CLI):
                 line = line.lstrip(char)
             elif len(line) > 1 and isChars(line[0:1], '/'):
                 char = '//'
+                line = line.lstrip(char)
+            elif len(line) > 1 and isChars(line[0:1], '-'):
+                char = '--'
                 line = line.lstrip(char)
         if self.get_opt('space'):
             line = self.space(line)
