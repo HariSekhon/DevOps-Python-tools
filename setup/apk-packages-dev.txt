@@ -19,7 +19,8 @@ gcc
 krb5-dev
 libffi-dev
 linux-headers
-openssl-dev
+#openssl-dev
+libressl-dev
 python-dev
 snappy-dev
 wget

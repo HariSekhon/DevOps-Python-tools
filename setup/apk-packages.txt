@@ -22,7 +22,8 @@ krb5-dev
 libffi-dev
 linux-headers
 make
-openssl-dev
+#openssl-dev
+libressl-dev
 py2-pip
 python
 python-dev
