@@ -20,7 +20,7 @@ YAML Validator Tool
 
 Validates each file passed as an argument
 
-Directories are recursed, checking all files ending in a .yaml suffix.
+Directories are recursed, checking all files ending in a .yml / .yaml suffix.
 
 Works like a standard unix filter program - if no files are passed as arguments or '-' is given then reads
 from standard input
