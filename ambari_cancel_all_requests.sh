@@ -21,15 +21,31 @@ AMBARI_PORT="${2:-${AMBARI_PORT:-8080}}"
 AMBARI_USER="${3:-${AMBARI_USER:-admin}}"
 AMBARI_PASSWORD="${4:-${AMBARI_PASSWORD:-admin}}"
 AMBARI_CLUSTER="${5:-${AMBARI_CLUSTER:-Sandbox}}"
+PROTOCOL="http"
+if [ -n "${SSL:-}" ]; then
+    PROTOCOL="https"
+    if [ "$AMBARI_PORT" = "8080" ]; then
+        AMBARI_PORT=8443
+    fi
+fi
 
 usage(){
-    echo "Very simple script to cancel all Ambari op requests
+    echo "Simple script to cancel all Ambari op requests
 
-usage: ${0##*/} <ambari_host> <ambari_port> <username> <password> <cluster_name>"
+usage: ${0##*/} <ambari_host> <ambari_port> <username> <password> <cluster_name>
+
+Prefer using the following environment variables instead of arguments in order to not expose the Ambari admin credentials in the process list:
+
+AMBARI_HOST         (default: localhost)
+AMBARI_PORT         (default: 8080)
+AMBARI_USER         (default: admin)
+AMBARI_PASSWORD     (default: admin)
+AMBARI_CLUSTER      (default: Sandbox)
+"
     exit 1
 }
 
-if [ $# -gt 0 ]; then
+if [ $# -gt 5 ]; then
     usage
 fi
 
@@ -39,5 +55,5 @@ grep id |
 awk '{print $3}' |
 while read id; do
     echo "requesting cancellation of request $id"
-    curl -u "$AMBARI_USER:$AMBARI_PASSWORD" -i -H "X-Requested-By: $AMBARI_USER ($USER)" -X PUT -d '{"Requests":{"request_status":"ABORTED","abort_reason":"Aborted by user"}}' "http://$AMBARI_HOST:$AMBARI_PORT/api/v1/clusters/$AMBARI_CLUSTER/requests/$id"
+    curl -u "$AMBARI_USER:$AMBARI_PASSWORD" -i -H "X-Requested-By: $AMBARI_USER ($USER)" -X PUT -d '{"Requests":{"request_status":"ABORTED","abort_reason":"Aborted by user"}}' "$PROTOCOL://$AMBARI_HOST:$AMBARI_PORT/api/v1/clusters/$AMBARI_CLUSTER/requests/$id"
 done
