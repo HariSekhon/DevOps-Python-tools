@@ -41,6 +41,7 @@ AMBARI_PORT         (default: 8080)
 AMBARI_USER         (default: admin)
 AMBARI_PASSWORD     (default: admin)
 AMBARI_CLUSTER      (default: Sandbox)
+SSL                 (default: blank, any value enables SSL)
 "
     exit 1
 }
