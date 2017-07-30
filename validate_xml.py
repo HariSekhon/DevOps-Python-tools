@@ -40,6 +40,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
+    import xml.etree.ElementTree as ET
     from harisekhon.utils import die, ERRORS, isXml, log_option, uniq_list_ordered
     from harisekhon import CLI
 except ImportError as _:
@@ -49,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.4'
+__version__ = '0.7.5'
 
 class XmlValidatorTool(CLI):
 
@@ -98,7 +99,7 @@ class XmlValidatorTool(CLI):
                 continue
             if not os.path.exists(arg):
                 print("'%s' not found" % arg)
-                sys.exit(ERRORS['WARNING'])
+                sys.exit(ERRORS['CRITICAL'])
             if os.path.isfile(arg):
                 log_option('file', arg)
             elif os.path.isdir(arg):
