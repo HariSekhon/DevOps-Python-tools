@@ -1,0 +1,5 @@
+{
+    'name': 'Hari Sekhon',
+    'age':  21,
+    'description': 'single quotes with embedded "double quotes"'
+}
