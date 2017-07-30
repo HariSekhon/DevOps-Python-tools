@@ -54,12 +54,12 @@ for SPARK_VERSION in $SPARK_VERSIONS; do
     # resolved, was due to Spark 1.4+ requiring pyspark-shell for PYSPARK_SUBMIT_ARGS
 
     rm -fr "test-header-$dir.parquet"
-    ../spark_csv_to_parquet.py -c data/test_header.csv --has-header -p "test-header-$dir.parquet" &&
+    ../spark_csv_to_parquet.py -c data/header.csv --has-header -p "test-header-$dir.parquet" &&
         echo "SUCCEEDED with header with Spark $SPARK_VERSION" ||
         { echo "FAILED with header with Spark $SPARK_VERSION"; exit 1; }
 
     rm -fr "test-header-schemaoverride-$dir.parquet"
-    ../spark_csv_to_parquet.py -c data/test_header.csv -p "test-header-schemaoverride-$dir.parquet" --has-header -s Year:String,Make,Model,Length:float &&
+    ../spark_csv_to_parquet.py -c data/header.csv -p "test-header-schemaoverride-$dir.parquet" --has-header -s Year:String,Make,Model,Length:float &&
         echo "SUCCEEDED with header and schema override with Spark $SPARK_VERSION" ||
         { echo "FAILED with header and schema override with Spark $SPARK_VERSION"; exit 1; }
 
