@@ -95,7 +95,7 @@ rm -fr "$broken_dir"
 echo
 
 echo "checking for non-existent file"
-check_broken nonexistentfile 1
+check_broken nonexistentfile 2
 echo
 
 rm -v "$data_dir/test.avro"
