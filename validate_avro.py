@@ -87,7 +87,7 @@ class AvroValidatorTool(CLI):
                 continue
             if not os.path.exists(arg):
                 print("'%s' not found" % arg)
-                sys.exit(ERRORS['WARNING'])
+                sys.exit(ERRORS['CRITICAL'])
             if os.path.isfile(arg):
                 log_option('file', arg)
             elif os.path.isdir(arg):
