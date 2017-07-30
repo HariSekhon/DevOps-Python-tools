@@ -54,7 +54,8 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.0'
+__version__ = '0.8.1'
+
 
 class JsonValidatorTool(CLI):
 
@@ -137,7 +138,7 @@ class JsonValidatorTool(CLI):
         # as failing
         elif isJson(content.replace("'", '"')):
             log.debug('valid json (single quotes)')
-            # self.single_quotes_detectedsingle_quotes_detected = True
+            # self.single_quotes_detected = True
             if self.permit_single_quotes:
                 self.msg = self.valid_json_msg_single_quotes
                 self.print(content)
@@ -152,6 +153,8 @@ class JsonValidatorTool(CLI):
                 self.iostream.seek(0)
                 if self.check_multirecord_json():
                     return True
+                if not self.passthru:
+                    die(self.invalid_json_msg)
             # pointless since it would simply return 'ValueError: No JSON object could be decoded'
             # if self.verbose > 2:
             #     try:
@@ -189,7 +192,7 @@ class JsonValidatorTool(CLI):
                 continue
             if not os.path.exists(arg):
                 print("'%s' not found" % arg)
-                sys.exit(ERRORS['WARNING'])
+                sys.exit(ERRORS['CRITICAL'])
             if os.path.isfile(arg):
                 log_option('file', arg)
             elif os.path.isdir(arg):
