@@ -60,6 +60,14 @@ cp -iv "$(find "${1:-.}" -iname '*.json' | grep -v -e '/spark-.*-bin-hadoop.*/' 
 ./json_docs_to_bulk_multiline.py -t 1 "$broken_dir/no_extension_testfile" > "$stdout"
 echo
 
+echo "checking json with embedded double quotes"
+./json_docs_to_bulk_multiline.py "$data_dir/embedded_double_quotes.json" > "$stdout"
+echo
+
+echo "checking multirecord json with blank lines"
+./json_docs_to_bulk_multiline.py "tests/data/multirecord_with_blank_lines.json" > "$stdout"
+echo
+
 echo "testing regular json doc"
 ./json_docs_to_bulk_multiline.py "$data_dir/test.json" > "$stdout"
 echo "testing multiline json doc "
@@ -82,7 +90,7 @@ check_broken(){
     filename="$1"
     expected_exitcode="${2:-2}"
     set +e
-    ./json_docs_to_bulk_multiline.py "$filename" ${@:3}
+    ./json_docs_to_bulk_multiline.py "$filename" ${@:3} 2> "$stderr" > "$stdout"
     exitcode=$?
     set -e
     if [ $exitcode = $expected_exitcode ]; then
@@ -117,15 +125,27 @@ set -o pipefail
 echo
 
 echo "checking --permit-single-quotes mode works"
-./json_docs_to_bulk_multiline.py -s "$data_dir/single_quotes.notjson"
+./json_docs_to_bulk_multiline.py -s "$data_dir/single_quotes.notjson" > "$stdout"
+echo
+
+echo "checking --permit-single-quotes mode works with multirecord"
+./json_docs_to_bulk_multiline.py -s "$data_dir/multirecord_single_quotes.notjson" > "$stdout"
 echo
 
 echo "checking --permit-single-quotes mode works with embedded double quotes"
-./json_docs_to_bulk_multiline.py -s "$data_dir/single_quotes_embedded_double_quotes.notjson"
+./json_docs_to_bulk_multiline.py -s "$data_dir/single_quotes_embedded_double_quotes.notjson" > "$stdout"
+echo
+
+echo "checking --permit-single-quotes mode works with embedded double quotes with multirecord"
+./json_docs_to_bulk_multiline.py -s "$data_dir/multirecord_single_quotes_embedded_double_quotes.notjson" > "$stdout"
 echo
 
 echo "checking --permit-single-quotes mode works with non-escaped embedded double quotes"
-./json_docs_to_bulk_multiline.py -s "$data_dir/single_quotes_embedded_double_quotes_nonescaped.notjson"
+./json_docs_to_bulk_multiline.py -s "$data_dir/single_quotes_embedded_double_quotes_nonescaped.notjson" > "$stdout"
+echo
+
+echo "checking --permit-single-quotes mode works with non-escaped embedded double quotes with multirecord"
+./json_docs_to_bulk_multiline.py -s "$data_dir/multirecord_single_quotes_embedded_double_quotes_nonescaped.notjson" > "$stdout"
 echo
 
 echo "testing output contents"
