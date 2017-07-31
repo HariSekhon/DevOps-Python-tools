@@ -176,5 +176,6 @@ else
     echo "Got:      '$result'"
     exit 1
 fi
-
+echo
 hr
+echo
