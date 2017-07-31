@@ -177,5 +177,4 @@ else
     exit 1
 fi
 echo
-hr
 echo
