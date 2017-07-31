@@ -35,7 +35,8 @@ or further manipulated easily in shell pipelines, eg. piped in to HDFS or underg
 Broken json documents are printed to standard error for collecting to an error log
 
 Single quoted JSON while not technically valid is supported as some systems like MongoDB permit it, and it has handling
-which permits detecting and escaping embedded double quotes if necessary
+which permits detecting and escaping embedded double quotes if necessary, as well as skipping blank lines in
+multi-record json for convenience
 
 """
 
