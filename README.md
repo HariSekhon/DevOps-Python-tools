@@ -69,6 +69,7 @@ Some common options also support optional environment variables for convenience 
 - ```pig-text-to-elasticsearch.pig``` / ```pig-text-to-solr.pig``` - bulk indexes unstructured files in Hadoop to Elasticsearch or Solr/SolrCloud clusters
 - ```pig_udfs.jy``` - Pig Jython UDFs for Hadoop
 - ```ipython-notebook-pyspark.py``` - per-user authenticated IPython Notebook + PySpark integration to allow each user to auto-create their own password protected IPython Notebook running Spark
+- ```json_docs_to_bulk_multiline.py``` - converts json files to bulk multi-record one-line-per-json-document format for pre-processing and loading to big data systems like Hadoop and MongoDB, can recurse directory trees, and mix files and/or standard input, outputs to standard output for convenient command line chaining and redirection, optionally continues on error, collects broken records to standard error for logging and later reprocessing for bulk batch jobs, even supports single quoted json while not technically valid is used by MongoDB and even handles embedded double quotes in 'single quoted json'
 - ```spark_avro_to_parquet.py``` - PySpark Avro => Parquet converter
 - ```spark_parquet_to_avro.py``` - PySpark Parquet => Avro converter
 - ```spark_csv_to_avro.py``` - PySpark CSV => Avro converter, supports both inferred and explicit schemas
