@@ -42,7 +42,7 @@ these options then the others will not run unless also explicitly specified.
 Caveats:
 
 - The limitation of the checksum approach is that it can't determine files as duplicates if there is any
-slight imperfection in one of the files (eg. multimedia files) as that would result in a differing checksums.
+slight imperfection in one of the files (eg. multimedia files) as that would result in differing checksums.
 
 - By default this program will short-circuit to stop processing a file as soon as it is determined to be a duplicate
 file via one of the above methods in that order for efficiency. This means that if 2 files have duplicate names,
