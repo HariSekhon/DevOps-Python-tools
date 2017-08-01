@@ -65,7 +65,7 @@ echo "checking json with embedded double quotes"
 echo
 
 echo "checking multirecord json with blank lines"
-./json_docs_to_bulk_multiline.py "tests/data/multirecord_with_blank_lines.json" > "$stdout"
+./json_docs_to_bulk_multiline.py "$data_dir/multirecord_with_blank_lines.json" > "$stdout"
 echo
 
 echo "testing regular json doc"
