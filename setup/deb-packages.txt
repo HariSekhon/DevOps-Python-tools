@@ -24,6 +24,10 @@ unzip
 wget
 zip
 
+# either of these should do to ensure ping command is present for find_active_server.py's ping mode
+iputils-ping
+#inetutils-ping
+
 # needed to build python-snappy for avro module
 libsnappy-dev
 
