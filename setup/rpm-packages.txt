@@ -23,6 +23,9 @@ unzip
 wget
 zip
 
+# for ping mode of find_active_server.py
+iputils
+
 # needed to build pyhs2
 # libgsasl-devel saslwrapper-devel
 #cyrus-sasl-devel
