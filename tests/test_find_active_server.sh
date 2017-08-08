@@ -42,6 +42,10 @@ unset HOST
 # 0.0.0.1 ping => connect: Invalid argument
 # 4.4.4.4 ping => no response
 
+# sometimes Yahoo http is a bit slow
+export REQUEST_TIMEOUT=5
+export TIMEOUT=20
+
 opts="-v"
 
 # Travis CI seems to fail to find things online when they clearly are available, perhaps it's the network delay, increasing
@@ -49,7 +53,7 @@ opts="-v"
 if is_CI; then
     # too much output, causes Travis CI to fail job
     unset DEBUG
-    opts="$opts -v --request-timeout 5 --timeout 30"
+    opts="$opts -v --request-timeout 10 --timeout 30"
 fi
 
 echo "testing socket ordering result consistency"
@@ -104,7 +108,7 @@ echo "testing http ordering result consistency"
 echo
 
 # Google's server latency is so much less than yahoo's that giving -n3 will allow google.com to overtake yahoo.com, limit to 2 so that yahoo gets the next available slot
-check_output "yahoo.com" ./find_active_server.py $opts -n2 --http 0.0.0.1 4.4.4.4 yahoo.com google.com
+check_output "yahoo.com" ./find_active_server.py $opts -n1 --http 0.0.0.1 4.4.4.4 yahoo.com google.com
 
 hr
 echo "testing https ordering result consistency"
@@ -112,7 +116,7 @@ echo
 
 check_output "yahoo.com" ./find_active_server.py $opts -n1 --https yahoo.com google.com
 
-check_output "google.com" ./find_active_server.py $opts -n3 --https 0.0.0.1 google.com yahoo.com
+check_output "google.com" ./find_active_server.py $opts -n1 --https 0.0.0.1 google.com yahoo.com
 
 echo
 echo "testing blank result for localhost 9999"
