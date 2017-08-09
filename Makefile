@@ -166,6 +166,7 @@ clean:
 	@find . -type d -ipath '*/tests/*' -iname 'test-*spark*.avro' | xargs rm -rf
 	@find . -type d -ipath '*/tests/*' -iname 'test-*spark*.parquet' | xargs rm -rf
 	@rm -f parquet-tools-$(PARQUET_VERSION)-bin.zip
+	@if test -f /.dockerenv; then echo "detected running in Docker, removing Spark tarballs for space efficiency" && rm -fr tests/spark-*-bin-hadoop*; fi
 
 .PHONY: spark-deps
 spark-deps:
