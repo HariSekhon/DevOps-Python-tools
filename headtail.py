@@ -65,7 +65,9 @@ class HeadTail(CLI):
         #self.timeout_default = 300
         self.add_opt('-n', '--num', metavar='number_of_lines',
                      type=int, default=self.num_lines,
-                     help='Number of lines to show (default: {0})'.format(self.default_num_lines)
+                     help='Number of lines to show of the head/tail of the output ' + \
+                          '(defaults to half the length of current terminal: {0})'\
+                          .format(self.default_num_lines)
                      .format(self.default_num_lines))
         self.add_opt('-q', '--quiet', action='store_true',
                      default=False, help="Don't print separators in output")
