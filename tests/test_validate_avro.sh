@@ -39,6 +39,10 @@ broken_dir="tests/avro_broken"
 rm -f "$data_dir/test.avro"
 cp -v "$(find . -type f -iname '*.avro' | head -n1)" "$data_dir/test.avro"
 
+if is_inside_docker; then
+    export TIMEOUT=120
+fi
+
 rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
 ./validate_avro.py -vvv $(
