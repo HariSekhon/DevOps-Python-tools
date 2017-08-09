@@ -77,14 +77,14 @@ try:
     # pylint: disable=wrong-import-position
     from harisekhon.utils import log, log_option, die, code_error, uniq_list_ordered
     from harisekhon.utils import validate_hostport_list, validate_port, validate_int, validate_regex
-    from harisekhon.utils import isPort, isStr, isTuple
+    from harisekhon.utils import isPort, isInt, isStr, isTuple, UnknownError
     from harisekhon import CLI
 except ImportError as _:
     print(traceback.format_exc(), end='')
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.5'
 
 
 class FindActiveServer(CLI):
@@ -100,7 +100,7 @@ class FindActiveServer(CLI):
         self.protocol = None
         self.url_path = None
         self.regex = None
-        self.request_timeout = 1
+        self.request_timeout = None
         self.num_threads = 10
         self.que = Queue.Queue()
         self.pool = None
@@ -122,8 +122,9 @@ class FindActiveServer(CLI):
                      '(for use with --num-threads=1)')
         self.add_opt('-q', '--quiet', action='store_true', help='Returns no output instead of NO_AVAILABLE_SERVER '\
                                                               + '(convenience for scripting)')
-        self.add_opt('-T', '--request-timeout', metavar='secs', type='int',
-                     help='Timeout for each individual server request in seconds (default: 1 second)')
+        self.add_opt('-T', '--request-timeout', metavar='secs', type='int', default=os.getenv('REQUEST_TIMEOUT', 2),
+                     help='Timeout for each individual server request in seconds, you may need to increase this if ' \
+                        + '--http/--https pages are a touch slow to load ($REQUEST_TIMEOUT, default: 2 secs)')
 
     def process_options(self):
         hosts = self.get_opt('host')
@@ -161,6 +162,7 @@ class FindActiveServer(CLI):
                 self.protocol = 'http'
             elif self.protocol == 'ping':
                 self.usage('cannot specify --url-path with --ping, mutually exclusive options!')
+        validate_int(self.request_timeout, 'request timeout', 1, 60)
         self.validate_options()
 
     def validate_options(self):
@@ -253,14 +255,24 @@ class FindActiveServer(CLI):
         sys.exit(0)
 
     @staticmethod
-    def check_ping(host, count=1, wait=1):
+    def check_ping(host, count=None, wait=None):
+        if count is None:
+            count = 1
+        if wait is None:
+            wait = 3
+        if not isInt(count):
+            raise UnknownError("passed invalid count '{0}' to check_ping method, must be a valid integer!"\
+                               .format(count))
+        if not isInt(wait):
+            raise UnknownError("passed invalid wait '{0}' to check_ping method, must be a valid integer!"\
+                               .format(wait))
         log.info("pinging host '%s' (count=%s, wait=%s)", host, count, wait)
         ping_count = '-c {0}'.format(count)
         if platform.system().lower() == 'windows':
-            ping_count = '-n 1'
+            ping_count = '-n {0}'.format(wait)
         ping_wait = '-w {0}'.format(wait)
         if platform.system().lower() == 'darwin':
-            ping_wait = '-W 1'
+            ping_wait = '-W {0}'.format(wait)
         try:
             exitcode = subprocess.call(["ping", ping_count, ping_wait, host],
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
