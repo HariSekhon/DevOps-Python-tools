@@ -20,12 +20,13 @@ srcdir="$(cd "$(dirname "$0")" && pwd)"
 cd "$srcdir/.."
 
 . "bash-tools/docker.sh"
+. "bash-tools/utils.sh"
 
 section "Docker Image"
 
 export DOCKER_IMAGE="harisekhon/pytools"
 
-if is_docker_available; then
+if is_CI && is_docker_available; then
     docker pull "$DOCKER_IMAGE"
     docker run "$DOCKER_IMAGE" welcome.py
     #docker run -e CI=1 "$DOCKER_IMAGE" tests/all.sh
