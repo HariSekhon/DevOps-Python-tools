@@ -40,6 +40,7 @@ rm -f "$data_dir/test.parquet"
 cp -v "$(find . -type f -iname '*.parquet' | head -n1)" "$data_dir/test.parquet"
 
 export exclude='/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+$|broken|error'
+
 if is_inside_docker; then
     export TIMEOUT=200
     export EXCLUDE="$exclude"
