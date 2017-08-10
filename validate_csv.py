@@ -53,7 +53,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import die, ERRORS, log_option, uniq_list_ordered, log, isChars
+    from harisekhon.utils import die, ERRORS, log_option, uniq_list_ordered, log, isChars, validate_regex
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -62,7 +62,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.6'
+__version__ = '0.8.1'
 
 class CsvValidatorTool(CLI):
 
@@ -82,6 +82,31 @@ class CsvValidatorTool(CLI):
         self.valid_csv_msg = '<unknown> => CSV OK'
         self.invalid_csv_msg = '<unknown> => CSV INVALID'
         self.failed = False
+        self.exclude = None
+
+    def add_options(self):
+        self.add_opt('-d', '--delimiter', default=self.delimiter,
+                     help='Delimiter to test (default: None, infers per file)')
+        self.add_opt('-q', '--quotechar', default=self.quotechar,
+                     help='Quotechar to test (default: None)')
+    #   self.add_opt('-p', '--print', action='store_true',
+    #                help='Print the CSV lines(s) which are valid, else print nothing (useful for shell ' +
+    #                'pipelines). Exit codes are still 0 for success, or %s for failure'
+    #                % ERRORS['CRITICAL'])
+        self.add_opt('-e', '--exclude', metavar='regex', default=os.getenv('EXCLUDE'),
+                     help='Regex of file / directory paths to exclude from checking ($EXCLUDE)')
+
+    def process_options(self):
+        self.exclude = self.get_opt('exclude')
+        if self.exclude:
+            validate_regex(self.exclude, 'exclude')
+            self.exclude = re.compile(self.exclude, re.I)
+
+    def is_excluded(self, path):
+        if self.exclude and self.exclude.search(path):
+            log.debug("excluding path: %s", path)
+            return True
+        return False
 
     def process_csv(self, filehandle):
         csvreader = None
@@ -143,16 +168,6 @@ class CsvValidatorTool(CLI):
                 # die(self.invalid_csv_msg)
             die(self.invalid_csv_msg)
 
-    def add_options(self):
-        self.add_opt('-d', '--delimiter', default=self.delimiter,
-                     help='Delimiter to test (default: None, infers per file)')
-        self.add_opt('-q', '--quotechar', default=self.quotechar,
-                     help='Quotechar to test (default: None)')
-    #   self.add_opt('-p', '--print', action='store_true',
-    #                help='Print the CSV lines(s) which are valid, else print nothing (useful for shell ' +
-    #                'pipelines). Exit codes are still 0 for success, or %s for failure'
-    #                % ERRORS['CRITICAL'])
-
     def run(self):
         self.delimiter = self.get_opt('delimiter')
         self.quotechar = self.get_opt('quotechar')
@@ -182,14 +197,24 @@ class CsvValidatorTool(CLI):
         if path == '-' or os.path.isfile(path):
             self.check_file(path)
         elif os.path.isdir(path):
-            for item in os.listdir(path):
-                subpath = os.path.join(path, item)
-                if os.path.isdir(subpath):
-                    self.check_path(subpath)
-                elif self.re_csv_suffix.match(item):
-                    self.check_file(subpath)
+            self.walk(path)
         else:
-            die("failed to determine if path '{0}' is file or directory".format(path))
+            die("failed to determine if path '%s' is file or directory" % path)
+
+    # don't need to recurse when using walk generator
+    def walk(self, path):
+        if self.is_excluded(path):
+            return
+        for root, dirs, files in os.walk(path, topdown=True):
+            # modify dirs in place to prune descent for increased efficiency
+            # requires topdown=True
+            # calling is_excluded() on joined root/dir so that things like
+            #   '/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+' will match
+            dirs[:] = [d for d in dirs if not self.is_excluded(os.path.join(root, d))]
+            for filename in files:
+                file_path = os.path.join(root, filename)
+                if self.re_csv_suffix.match(file_path):
+                    self.check_file(file_path)
 
     def check_file(self, filename):
         self.filename = filename
