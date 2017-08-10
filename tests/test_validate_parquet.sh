@@ -39,18 +39,16 @@ broken_dir="tests/parquet_broken"
 rm -f "$data_dir/test.parquet"
 cp -v "$(find . -type f -iname '*.parquet' | head -n1)" "$data_dir/test.parquet"
 
+export exclude='/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+$|broken|error'
 if is_inside_docker; then
     export TIMEOUT=200
-    export EXCLUDE='/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+/'
+    export EXCLUDE="$exclude"
 fi
 
 rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
-./validate_parquet.py -vvv $(
-find "${1:-.}" -type f -iname '*.parquet' |
-grep -v '/spark-.*-bin-hadoop.*/' |
-grep -v -e 'broken' -e 'error' -e ' '
-)
+
+./validate_parquet.py -vvv --exclude "$exclude" .
 echo
 
 echo
