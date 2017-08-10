@@ -53,6 +53,11 @@ grep -v -e 'broken' -e 'error' -e ' '
 echo
 
 echo
+echo "checking directory recursion with --exclude"
+./validate_avro.py -vvv --exclude '/tests/spark-\d+\.\d+\.\d+-bin-hadoop\d+\.\d+/' .
+echo
+
+echo
 echo "checking directory recursion (mixed with explicit file given)"
 ./validate_avro.py -vvv "$data_dir/test.avro" .
 echo
