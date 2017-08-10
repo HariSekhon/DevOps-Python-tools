@@ -51,7 +51,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.0'
+__version__ = '0.8.1'
 
 
 class AvroValidatorTool(CLI):
@@ -75,6 +75,12 @@ class AvroValidatorTool(CLI):
         if self.exclude:
             validate_regex(self.exclude, 'exclude')
             self.exclude = re.compile(self.exclude, re.I)
+
+    def is_excluded(self, path):
+        if self.exclude and self.exclude.search(path):
+            log.debug("excluding path: %s", path)
+            return True
+        return False
 
     def check_avro(self, filehandle):
         try:
@@ -119,18 +125,21 @@ class AvroValidatorTool(CLI):
 
     # don't need to recurse when using walk generator
     def walk(self, path):
-        if self.exclude and self.exclude.search(path):
-            log.debug("excluding path: %s", path)
+        if self.is_excluded(path):
             return
-        for root, _, files in os.walk(path):
+        for root, dirs, files in os.walk(path, topdown=True):
+            # modify dirs in place to prune descent for increased efficiency
+            # requires topdown=True
+            # calling is_excluded() on joined root/dir so that things like
+            #   '/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+' will match
+            dirs[:] = [d for d in dirs if not self.is_excluded(os.path.join(root, d))]
             for filename in files:
                 file_path = os.path.join(root, filename)
                 if self.re_avro_suffix.match(file_path):
                     self.check_file(file_path)
 
     def check_file(self, filename):
-        if self.exclude and self.exclude.search(filename):
-            log.debug("excluding file: %s", filename)
+        if self.is_excluded(filename):
             return
         if filename == '-':
             filename = '<STDIN>'
