@@ -138,6 +138,7 @@ class ParquetValidatorTool(CLI):
     # don't need to recurse when using walk generator
     def walk(self, path):
         if self.exclude and self.exclude.search(path):
+            log.debug("excluding path: %s", path)
             return
         for root, _, files in os.walk(path):
             for filename in files:
@@ -147,6 +148,7 @@ class ParquetValidatorTool(CLI):
 
     def check_file(self, filename):
         if self.exclude and self.exclude.search(filename):
+            log.debug("excluding file: %s", filename)
             return
         if filename == '-':
             filename = '<STDIN>'
