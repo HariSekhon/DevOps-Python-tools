@@ -80,7 +80,7 @@ class ParquetValidatorTool(CLI):
             os.environ['PATH'] += ':' + os.path.abspath(_)
 
     def add_options(self):
-        self.add_opt('-e', '--exclude', metavar='regex', default=os.getenv('EXCLUDE', None),
+        self.add_opt('-e', '--exclude', metavar='regex', default=os.getenv('EXCLUDE'),
                      help='Regex of file / directory paths to exclude from checking ($EXCLUDE)')
 
     def process_options(self):
