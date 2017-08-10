@@ -40,7 +40,7 @@ rm -f "$data_dir/test.parquet"
 cp -v "$(find . -type f -iname '*.parquet' | head -n1)" "$data_dir/test.parquet"
 
 if is_inside_docker; then
-    export TIMEOUT=120
+    export TIMEOUT=200
 fi
 
 rm -fr "$broken_dir" || :
