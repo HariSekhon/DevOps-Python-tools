@@ -60,7 +60,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.0'
+__version__ = '0.8.1'
 
 
 class ParquetValidatorTool(CLI):
@@ -135,20 +135,29 @@ class ParquetValidatorTool(CLI):
 #            elif self.re_parquet_suffix.match(item):
 #                self.check_file(subpath)
 
-    # don't need to recurse when using walk generator
-    def walk(self, path):
+    def is_excluded(self, path):
         if self.exclude and self.exclude.search(path):
             log.debug("excluding path: %s", path)
+            return True
+        return False
+
+    # don't need to recurse when using walk generator
+    def walk(self, path):
+        if self.is_excluded(path):
             return
-        for root, _, files in os.walk(path):
+        for root, dirs, files in os.walk(path, topdown=True):
+            # modify dirs in place to prune descent for increased efficiency
+            # requires topdown=True
+            # calling is_excluded() on joined root/dir so that things like
+            #   '/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+' will match
+            dirs[:] = [d for d in dirs if not self.is_excluded(os.path.join(root, d))]
             for filename in files:
                 file_path = os.path.join(root, filename)
                 if self.re_parquet_suffix.match(file_path):
                     self.check_file(file_path)
 
     def check_file(self, filename):
-        if self.exclude and self.exclude.search(filename):
-            log.debug("excluding file: %s", filename)
+        if self.is_excluded(filename):
             return
         if filename == '-':
             filename = '<STDIN>'
