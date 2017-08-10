@@ -39,17 +39,16 @@ broken_dir="tests/avro_broken"
 rm -f "$data_dir/test.avro"
 cp -v "$(find . -type f -iname '*.avro' | head -n1)" "$data_dir/test.avro"
 
+export exclude='/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+$|broken|error'
+
 if is_inside_docker; then
     export TIMEOUT=120
 fi
 
 rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
-./validate_avro.py -vvv $(
-find "${1:-.}" -type f -iname '*.avro' |
-grep -v '/spark-.*-bin-hadoop.*/' |
-grep -v -e 'broken' -e 'error' -e ' '
-)
+
+./validate_avro.py -vvv --exclude "$exclude" .
 echo
 
 echo
@@ -69,7 +68,7 @@ rm "$data_dir/testlink.avro"
 echo
 
 echo "checking avro file without an extension"
-cp -iv "$(find "${1:-.}" -type f -iname '*.avro' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
+cp -iv "$(find "${1:-.}" -type f -iname '*.avro' | grep -v -e '/spark-.*-bin-hadoop.*/' | head -n1)" "$broken_dir/no_extension_testfile"
 ./validate_avro.py -vvv -t 1 "$broken_dir/no_extension_testfile"
 echo
 
