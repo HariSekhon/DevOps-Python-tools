@@ -89,6 +89,12 @@ class ParquetValidatorTool(CLI):
             validate_regex(self.exclude, 'exclude')
             self.exclude = re.compile(self.exclude, re.I)
 
+    def is_excluded(self, path):
+        if self.exclude and self.exclude.search(path):
+            log.debug("excluding path: %s", path)
+            return True
+        return False
+
     def check_parquet(self, filename):
         stderr = subprocess.PIPE
         if self.verbose > 2:
@@ -134,12 +140,6 @@ class ParquetValidatorTool(CLI):
 #                self.check_path(subpath)
 #            elif self.re_parquet_suffix.match(item):
 #                self.check_file(subpath)
-
-    def is_excluded(self, path):
-        if self.exclude and self.exclude.search(path):
-            log.debug("excluding path: %s", path)
-            return True
-        return False
 
     # don't need to recurse when using walk generator
     def walk(self, path):
