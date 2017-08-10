@@ -36,13 +36,12 @@ done
 data_dir="tests/data"
 broken_dir="tests/csv_broken"
 
+exclude='/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+$|broken|error'
+
 rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
-./validate_csv.py -vvv $(
-find "${1:-.}" -iname '*.csv' |
-grep -v '/spark-.*-bin-hadoop.*/' |
-grep -v -e 'broken' -e 'error' -e ' '
-)
+
+./validate_csv.py -vvv --exclude "$exclude" .
 echo
 
 echo
