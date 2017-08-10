@@ -42,7 +42,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import die, ERRORS, log_option, uniq_list_ordered
+    from harisekhon.utils import log, die, ERRORS, log_option, uniq_list_ordered, validate_regex
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -51,7 +51,8 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.4'
+__version__ = '0.8.0'
+
 
 class AvroValidatorTool(CLI):
 
@@ -63,6 +64,17 @@ class AvroValidatorTool(CLI):
         self.re_avro_suffix = re.compile(r'.*\.avro$', re.I)
         self.valid_avro_msg = '<unknown> => Avro OK'
         self.invalid_avro_msg = '<unknown> => Avro INVALID'
+        self.exclude = None
+
+    def add_options(self):
+        self.add_opt('-e', '--exclude', metavar='regex', default=os.getenv('EXCLUDE'),
+                     help='Regex of file / directory paths to exclude from checking ($EXCLUDE)')
+
+    def process_options(self):
+        self.exclude = self.get_opt('exclude')
+        if self.exclude:
+            validate_regex(self.exclude, 'exclude')
+            self.exclude = re.compile(self.exclude, re.I)
 
     def check_avro(self, filehandle):
         try:
@@ -101,16 +113,25 @@ class AvroValidatorTool(CLI):
         if path == '-' or os.path.isfile(path):
             self.check_file(path)
         elif os.path.isdir(path):
-            for item in os.listdir(path):
-                subpath = os.path.join(path, item)
-                if os.path.isdir(subpath):
-                    self.check_path(subpath)
-                elif self.re_avro_suffix.match(item):
-                    self.check_file(subpath)
+            self.walk(path)
         else:
             die("failed to determine if path '%s' is file or directory" % path)
 
+    # don't need to recurse when using walk generator
+    def walk(self, path):
+        if self.exclude and self.exclude.search(path):
+            log.debug("excluding path: %s", path)
+            return
+        for root, _, files in os.walk(path):
+            for filename in files:
+                file_path = os.path.join(root, filename)
+                if self.re_avro_suffix.match(file_path):
+                    self.check_file(file_path)
+
     def check_file(self, filename):
+        if self.exclude and self.exclude.search(filename):
+            log.debug("excluding file: %s", filename)
+            return
         if filename == '-':
             filename = '<STDIN>'
         self.valid_avro_msg = '%s => Avro OK' % filename
