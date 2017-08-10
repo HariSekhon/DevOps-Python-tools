@@ -155,6 +155,7 @@ class ParquetValidatorTool(CLI):
         if filename == '<STDIN>':
             try:
                 tmp = tempfile.NamedTemporaryFile()
+                log.debug('created tmp file from stdin: %s', tmp.name)
                 tmp.write(sys.stdin.read())
                 tmp.seek(0)
                 self.check_parquet(tmp.name)
