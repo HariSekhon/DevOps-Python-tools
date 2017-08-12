@@ -17,15 +17,11 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "
-# ======================== #
-# Testing validate_xml.py
-# ======================== #
-"
-
 cd "$srcdir/..";
 
 . ./tests/utils.sh
+
+section "Testing validate_xml.py"
 
 until [ $# -lt 1 ]; do
     case $1 in
@@ -41,7 +37,7 @@ broken_dir="tests/broken_xml"
 rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
 
-./validate_xml.py --exclude "$exclude"
+./validate_xml.py --exclude "$exclude" .
 echo
 
 echo "checking directory recursion (mixed with explicit file given)"
