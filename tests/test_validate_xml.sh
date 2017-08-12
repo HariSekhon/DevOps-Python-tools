@@ -33,20 +33,19 @@ until [ $# -lt 1 ]; do
     esac
 done
 
+exclude='/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+$|broken|error'
+
 data_dir="tests/data"
 broken_dir="tests/broken_xml"
 
 rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
-./validate_xml.py -vvv $(
-find "${1:-.}" -iname '*.xml' |
-grep -v '/spark-.*-bin-hadoop.*/' |
-grep -v -e 'broken' -e 'error' -e ' '
-)
+
+./validate_xml.py --exclude "$exclude"
 echo
 
 echo "checking directory recursion (mixed with explicit file given)"
-./validate_xml.py -vvv "$data_dir/simple.xml" .
+./validate_xml.py "$data_dir/simple.xml" .
 echo
 
 echo "checking symlink handling"
@@ -57,7 +56,7 @@ echo
 
 echo "checking xml file without an extension"
 cp -iv "$(find "${1:-.}" -iname '*.xml' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
-./validate_xml.py -vvv -t 1 "$broken_dir/no_extension_testfile"
+./validate_xml.py -t 1 "$broken_dir/no_extension_testfile"
 echo
 
 echo "testing stdin"
@@ -76,7 +75,7 @@ check_broken(){
     filename="$1"
     expected_exitcode="${2:-2}"
     set +e
-    ./validate_xml.py -vvv "$filename" ${@:3}
+    ./validate_xml.py "$filename" ${@:3}
     exitcode=$?
     set -e
     if [ $exitcode = $expected_exitcode ]; then
