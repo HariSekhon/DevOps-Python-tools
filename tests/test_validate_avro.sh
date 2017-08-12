@@ -44,17 +44,17 @@ fi
 rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
 
-./validate_avro.py -vvv --exclude "$exclude" .
+./validate_avro.py --exclude "$exclude" .
 echo
 
 echo
 echo "checking directory recursion with --exclude"
-./validate_avro.py -vvv --exclude '/tests/spark-\d+\.\d+\.\d+-bin-hadoop\d+\.\d+/' .
+./validate_avro.py --exclude '/tests/spark-\d+\.\d+\.\d+-bin-hadoop\d+\.\d+/' .
 echo
 
 echo
 echo "checking directory recursion (mixed with explicit file given)"
-./validate_avro.py -vvv "$data_dir/test.avro" .
+./validate_avro.py "$data_dir/test.avro" .
 echo
 
 echo "checking symlink handling"
@@ -65,7 +65,7 @@ echo
 
 echo "checking avro file without an extension"
 cp -iv "$(find "${1:-.}" -type f -iname '*.avro' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
-./validate_avro.py -vvv -t 1 "$broken_dir/no_extension_testfile"
+./validate_avro.py -t 1 "$broken_dir/no_extension_testfile"
 echo
 
 echo "testing stdin"
@@ -80,7 +80,7 @@ check_broken(){
     filename="$1"
     expected_exitcode="${2:-2}"
     set +e
-    ./validate_avro.py -vvv -t 1 "$filename" ${@:3}
+    ./validate_avro.py -t 1 "$filename" ${@:3}
     exitcode=$?
     set -e
     if [ $exitcode = $expected_exitcode ]; then
