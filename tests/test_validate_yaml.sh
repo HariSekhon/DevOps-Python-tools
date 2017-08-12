@@ -17,15 +17,11 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "
-# ======================== #
-# Testing validate_yaml.py
-# ======================== #
-"
-
 cd "$srcdir/..";
 
 . ./tests/utils.sh
+
+section "Testing validate_yaml.py"
 
 until [ $# -lt 1 ]; do
     case $1 in
@@ -36,18 +32,17 @@ done
 data_dir="tests/data"
 broken_dir="tests/yaml_broken"
 
+exclude='/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+$|broken|error'
+
 rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
-./validate_yaml.py -vvv $(
-find "${1:-.}" -iname '*.yaml' |
-grep -v '/spark-.*-bin-hadoop.*/' |
-grep -v -e 'broken' -e 'error' -e ' '
-) "$data_dir/test.json" # json is an official subset, "inline-style"
+
+./validate_yaml.py --exclude "$exclude" .
 echo
 
 echo
 echo "checking directory recursion (mixed with explicit file given)"
-./validate_yaml.py -vvv "$data_dir/test.yaml" .
+./validate_yaml.py "$data_dir/test.yaml" .
 echo
 
 echo "checking symlink handling"
@@ -58,7 +53,7 @@ echo
 
 echo "checking yaml file without an extension"
 cp -iv "$(find "${1:-.}" -iname '*.yaml' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
-./validate_yaml.py -vvv -t 1 "$broken_dir/no_extension_testfile"
+./validate_yaml.py -t 1 "$broken_dir/no_extension_testfile"
 echo
 
 echo "testing stdin"
@@ -78,7 +73,7 @@ check_broken(){
     filename="$1"
     expected_exitcode="${2:-2}"
     set +e
-    ./validate_yaml.py -vvv -t 1 "$filename" ${@:3}
+    ./validate_yaml.py -t 1 "$filename" ${@:3}
     exitcode=$?
     set -e
     if [ $exitcode = $expected_exitcode ]; then
