@@ -37,27 +37,39 @@ exclude='/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+$|broken|error'
 rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
 
-./validate_json.py -vvv --exclude "$exclude" .
+./validate_json.py --exclude "$exclude" .
 echo
 
 echo "checking directory recursion (mixed with explicit file given)"
-./validate_json.py -vvv "$data_dir/test.json" .
+./validate_json.py "$data_dir/test.json" .
 echo
 
 echo "checking json file without an extension"
 cp -iv "$(find "${1:-.}" -iname '*.json' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
-./validate_json.py -vvv -t 1 "$broken_dir/no_extension_testfile"
+./validate_json.py -t 1 "$broken_dir/no_extension_testfile"
 echo
 
-echo "checking json with embedded double quotes"
+echo "checking single quoted json"
+./validate_json.py -s "$data_dir/single_quotes.notjson"
+echo
+
+echo "checking multirecord single quoted json multirecord"
+./validate_json.py -s "$data_dir/single_quotes_multirecord.notjson"
+echo
+
+echo "checking multirecord single quoted json with mixed quoting"
+./validate_json.py -s "$data_dir/single_quotes_multirecord_mixed_quotes.notjson"
+echo
+
+echo "checking multirecord single quoted json with embedded double quotes"
 ./validate_json.py -s "$data_dir/single_quotes_embedded_double_quotes.notjson"
 echo
 
-echo "checking json with embedded double quotes"
+echo "checking multirecord single quoted json with embedded double quotes"
 ./validate_json.py -s "$data_dir/single_quotes_embedded_double_quotes.notjson"
 echo
 
-echo "checking json with embedded non-escaped double quotes"
+echo "checking multirecord json with embedded non-escaped double quotes"
 ./validate_json.py -s "$data_dir/single_quotes_embedded_double_quotes_unescaped.notjson"
 echo
 
@@ -117,12 +129,6 @@ check_broken "$data_dir/single_quotes.notjson"
 check_broken "$data_dir/single_quotes_multirecord.notjson"
 check_broken "$data_dir/single_quotes_multirecord_embedded_double_quotes.notjson"
 check_broken "$data_dir/single_quotes_multirecord_embedded_double_quotes_unescaped.notjson"
-
-echo "checking invalid single quote detection"
-set +o pipefail
-./validate_json.py "$data_dir/single_quotes.notjson" 2>&1 | grep --color 'JSON INVALID.*found single quotes not double quotes' || { echo "Failed to find single quote message in output"; exit 1; }
-set -o pipefail
-echo
 
 echo "checking --permit-single-quotes mode works"
 ./validate_json.py -s "$data_dir/single_quotes.notjson"
