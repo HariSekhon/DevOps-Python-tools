@@ -17,15 +17,11 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "
-# ======================== #
-# Testing validate_avro.py
-# ======================== #
-"
-
 cd "$srcdir/..";
 
 . ./tests/utils.sh
+
+section "Testing validate_avro.py"
 
 until [ $# -lt 1 ]; do
     case $1 in
