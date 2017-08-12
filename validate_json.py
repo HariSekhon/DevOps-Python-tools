@@ -8,8 +8,8 @@
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
-#  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback
-#  to help improve or steer this or other code I publish
+#  If you're using my code you're welcome to connect with me on LinkedIn
+#  and optionally send me feedback to help improve or steer this or other code I publish
 #
 #  https://www.linkedin.com/in/harisekhon
 #
@@ -26,6 +26,9 @@ First tries each file contents as a whole json document, if that fails validatio
 it assumes the file contains Big Data / MongoDB data with one json document per line and tries independent
 validation of each line as a separate json document.
 
+Even supports 'single quoted JSON' which while isn't technically valid is used by some systems like MongoDB and will
+work with single quoted json with embedded double quotes even if the double quotes are not escaped.
+
 Works like a standard unix filter program - if no files are passed as arguments or '-' is passed then reads from
 standard input (--multi-line must be specified explicitly if feeding to stdin as can't rewind the standard input
 stream to test for multi-line on a second pass).
@@ -40,11 +43,12 @@ from __future__ import print_function
 import os
 import re
 import sys
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
+srcdir = os.path.abspath(os.path.dirname(__file__))
+libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import isJson, die, ERRORS, log_option, uniq_list_ordered
+    from harisekhon.utils import isJson, die, ERRORS, log_option, uniq_list_ordered, validate_regex
     from harisekhon.utils import log
     from harisekhon import CLI
 except ImportError as _:
@@ -54,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.1'
+__version__ = '0.9.0'
 
 
 class JsonValidatorTool(CLI):
@@ -69,15 +73,17 @@ class JsonValidatorTool(CLI):
         # these msgs get reset with the correct filename in check_file further down()
         self.valid_json_msg = '<UNKNOWN_FILENAME> => JSON OK'
         self.invalid_json_msg = '<UNKNOWN_FILENAME> => JSON INVALID'
-        single_quotes = '(found single quotes not double quotes)'
-        self.valid_json_msg_single_quotes = '%s %s' % (self.valid_json_msg, single_quotes)
-        self.invalid_json_msg_single_quotes = '%s %s' % (self.invalid_json_msg, single_quotes)
+        single_quotes = 'single quoted'
+        self.valid_json_msg_single_quotes = '%s (%s)' % (self.valid_json_msg, single_quotes)
+        self.valid_json_msg_single_quotes2 = '%s (%s, double quotes not escaped)' % (self.valid_json_msg, single_quotes)
+        self.invalid_json_msg_single_quotes = '%s (%s)' % (self.invalid_json_msg, single_quotes)
         self.permit_single_quotes = False
         self.passthru = False
         # self.multi_record_detected = False
         # self.single_quotes_detected = False
         self.msg = None
         self.failed = False
+        self.exclude = None
 
     def add_options(self):
         self.add_opt('-m', '--multi-record', action='store_true',
@@ -91,35 +97,66 @@ class JsonValidatorTool(CLI):
         self.add_opt('-s', '--permit-single-quotes', dest='permit_single_quotes', action='store_true',
                      help='Accept single quotes as valid (JSON standard requires double quotes but some' +
                      ' systems like MongoDB are ok with single quotes)')
+        self.add_opt('-e', '--exclude', metavar='regex', default=os.getenv('EXCLUDE'),
+                     help='Regex of file / directory paths to exclude from checking ($EXCLUDE)')
+
+    def process_options(self):
+        self.exclude = self.get_opt('exclude')
+        if self.exclude:
+            validate_regex(self.exclude, 'exclude')
+            self.exclude = re.compile(self.exclude, re.I)
+
+    def is_excluded(self, path):
+        if self.exclude and self.exclude.search(path):
+            log.debug("excluding path: %s", path)
+            return True
+        return False
 
     def check_multirecord_json(self):
         log.debug('check_multirecord_json()')
+        normal_json = False
+        single_quoted = False
         for line in self.iostream:
             if isJson(line):
+                normal_json = True
                 # can't use self.print() here, don't want to print valid for every line of a file / stdin
                 if self.passthru:
                     print(line, end='')
-            elif isJson(line.replace("'", '"')):
-                if self.permit_single_quotes:
-                    log.debug('valid multirecord json (single quoted)')
-                    # self.single_quotes_detected = True
-                    if self.passthru:
-                        print(line, end='')
-                else:
-                    log.debug('invalid multirecord json (single quoted)')
-                    self.failed = True
-                    if not self.passthru:
-                        die('%s (multi-record format)' % self.invalid_json_msg_single_quotes)
-                    return False
+                continue
+            elif self.permit_single_quotes and self.check_json_line_single_quoted(line):
+                single_quoted = True
+                if self.passthru:
+                    print(line, end='')
+                continue
             else:
                 log.debug('invalid multirecord json')
                 self.failed = True
+                if not self.passthru:
+                    die(self.invalid_json_msg)
                 return False
         # self.multi_record_detected = True
         log.debug('multirecord json (all lines passed)')
+        extra_info = ''
+        if single_quoted:
+            extra_info = ' single quoted'
+            if normal_json:
+                extra_info += ' mixed with normal json!'
+                log.warning('mixture of normal and single quoted json detected, ' + \
+                            'may cause issues for data processing engines')
         if not self.passthru:
-            print('%s (multi-record format)' % self.valid_json_msg)
+            print('{0} (multi-record format{1})'.format(self.valid_json_msg, extra_info))
         return True
+
+    def check_json_line_single_quoted(self, line):
+        json_single_quoted = self.convert_single_quoted(line)
+        if isJson(json_single_quoted):
+            #log.debug('valid multirecord json (single quoted)')
+            return True
+        json_single_quoted_escaped = self.convert_single_quoted_escaped(line)
+        if isJson(json_single_quoted_escaped):
+            #log.debug('valid multirecord json (single quoted escaped)')
+            return True
+        return False
 
     def print(self, content):
         if self.passthru:
@@ -127,45 +164,65 @@ class JsonValidatorTool(CLI):
         else:
             print(self.msg)
 
+    @staticmethod
+    def convert_single_quoted(content):
+        return content.replace("'", '"')
+
+    def convert_single_quoted_escaped(self, content):
+        return self.convert_single_quoted(content.replace('"', r'\"'))
+
     def check_json(self, content):
         log.debug('check_json()')
         if isJson(content):
             log.debug('valid json')
             self.msg = self.valid_json_msg
             self.print(content)
-        # XXX: Limitation this may not work with JSON with double quotes embedded within single quotes as
-        # that may lead to unbalanced quoting, although that is still a data problem so might be ok for it to be flagged
-        # as failing
-        elif isJson(content.replace("'", '"')):
-            log.debug('valid json (single quotes)')
-            # self.single_quotes_detected = True
-            if self.permit_single_quotes:
+        # check if it's regular single quoted JSON a la MongoDB
+        elif self.permit_single_quotes:
+            log.debug('checking for single quoted JSON')
+            json_single_quoted = self.convert_single_quoted(content)
+            if isJson(json_single_quoted):
+                # self.single_quotes_detected = True
+                log.debug('valid json (single quotes)')
                 self.msg = self.valid_json_msg_single_quotes
                 self.print(content)
-            else:
-                self.failed = True
-                self.msg = self.invalid_json_msg_single_quotes
-                if not self.passthru:
-                    die(self.msg)
+                return True
+            log.debug('single quoted JSON check failed, trying with pre-escaping double quotes')
+            # check if it's single quoted JSON with double quotes that aren't escaped,
+            # by pre-escaping them before converting single quotes to doubles for processing
+            json_single_quoted_escaped = self.convert_single_quoted_escaped(content)
+            if isJson(json_single_quoted_escaped):
+                #log.debug("found single quoted json with non-escaped double quotes in '%s'", filename)
+                self.msg = self.valid_json_msg_single_quotes2
+                self.print(content)
+                return True
+            log.debug('single quoted JSON check failed even with pre-escaping any double quotes')
+            if self.rewind_check_multirecord_json():
+                return True
+            self.failed = True
+            if not self.passthru:
+                die(self.self.invalid_json_msg_single_quotes)
         else:
             log.debug('not valid json')
-            if self.iostream is not sys.stdin:
-                self.iostream.seek(0)
-                if self.check_multirecord_json():
-                    return True
-                if not self.passthru:
-                    die(self.invalid_json_msg)
+            if self.rewind_check_multirecord_json():
+                return True
             # pointless since it would simply return 'ValueError: No JSON object could be decoded'
             # if self.verbose > 2:
             #     try:
             #         json.loads(content)
-            #     except Exception, e:
-            #         print(e)
-            else:
-                self.failed = True
-                self.msg = self.invalid_json_msg
-                if not self.passthru:
-                    die(self.msg)
+            #     except Exception as _:
+            #         print(_)
+            self.failed = True
+            if not self.passthru:
+                die(self.invalid_json_msg)
+        return False
+
+    def rewind_check_multirecord_json(self):
+        if self.iostream is not sys.stdin:
+            self.iostream.seek(0)
+            if self.check_multirecord_json():
+                return True
+        return False
 
     # looks like this does a .read() anyway, not buying any efficiency enhancement
     #
@@ -208,14 +265,24 @@ class JsonValidatorTool(CLI):
         if path == '-' or os.path.isfile(path):
             self.check_file(path)
         elif os.path.isdir(path):
-            for item in os.listdir(path):
-                subpath = os.path.join(path, item)
-                if os.path.isdir(subpath):
-                    self.check_path(subpath)
-                elif self.re_json_suffix.match(item):
-                    self.check_file(subpath)
+            self.walk(path)
         else:
             die("failed to determine if path '%s' is file or directory" % path)
+
+    # don't need to recurse when using walk generator
+    def walk(self, path):
+        if self.is_excluded(path):
+            return
+        for root, dirs, files in os.walk(path, topdown=True):
+            # modify dirs in place to prune descent for increased efficiency
+            # requires topdown=True
+            # calling is_excluded() on joined root/dir so that things like
+            #   '/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+' will match
+            dirs[:] = [d for d in dirs if not self.is_excluded(os.path.join(root, d))]
+            for filename in files:
+                file_path = os.path.join(root, filename)
+                if self.re_json_suffix.match(file_path):
+                    self.check_file(file_path)
 
     def check_file(self, filename):
         if filename == '-':
