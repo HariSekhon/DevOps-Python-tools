@@ -40,7 +40,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import die, ERRORS, isYaml, log_option, uniq_list_ordered
+    from harisekhon.utils import log, die, ERRORS, isYaml, log_option, uniq_list_ordered, validate_regex
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -49,7 +49,8 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.5'
+__version__ = '0.8.1'
+
 
 class YamlValidatorTool(CLI):
 
@@ -62,14 +63,27 @@ class YamlValidatorTool(CLI):
         self.valid_yaml_msg = '<unknown> => YAML OK'
         self.invalid_yaml_msg = '<unknown> => YAML INVALID'
         self.failed = False
+        self.exclude = None
 
-    # def check_multiline_yaml(self):
-    #         self.f.seek(0)
-    #         for line in self.f:
-    #             if not isYaml(line):
-    #                 die(self.invalid_yaml_msg)
-    #         print('%s (multi-record format)' % self.valid_yaml_msg)
-    #         return True
+    def add_options(self):
+        self.add_opt('-p', '--print', action='store_true',
+                     help='Print the YAML document(s) if valid, else print nothing (useful for shell ' +
+                     'pipelines). Exit codes are still 0 for success, or %s for failure'
+                     % ERRORS['CRITICAL'])
+        self.add_opt('-e', '--exclude', metavar='regex', default=os.getenv('EXCLUDE'),
+                     help='Regex of file / directory paths to exclude from checking ($EXCLUDE)')
+
+    def process_options(self):
+        self.exclude = self.get_opt('exclude')
+        if self.exclude:
+            validate_regex(self.exclude, 'exclude')
+            self.exclude = re.compile(self.exclude, re.I)
+
+    def is_excluded(self, path):
+        if self.exclude and self.exclude.search(path):
+            log.debug("excluding path: %s", path)
+            return True
+        return False
 
     def check_yaml(self, content):
         if isYaml(content):
@@ -89,12 +103,6 @@ class YamlValidatorTool(CLI):
                     except yaml.YAMLError as _:
                         print(_)
                 die(self.invalid_yaml_msg)
-
-    def add_options(self):
-        self.add_opt('-p', '--print', action='store_true',
-                     help='Print the YAML document(s) if valid, else print nothing (useful for shell ' +
-                     'pipelines). Exit codes are still 0 for success, or %s for failure'
-                     % ERRORS['CRITICAL'])
 
     def run(self):
         if not self.args:
@@ -121,14 +129,24 @@ class YamlValidatorTool(CLI):
         if path == '-' or os.path.isfile(path):
             self.check_file(path)
         elif os.path.isdir(path):
-            for item in os.listdir(path):
-                subpath = os.path.join(path, item)
-                if os.path.isdir(subpath):
-                    self.check_path(subpath)
-                elif self.re_yaml_suffix.match(item):
-                    self.check_file(subpath)
+            self.walk(path)
         else:
             die("failed to determine if path '%s' is file or directory" % path)
+
+    # don't need to recurse when using walk generator
+    def walk(self, path):
+        if self.is_excluded(path):
+            return
+        for root, dirs, files in os.walk(path, topdown=True):
+            # modify dirs in place to prune descent for increased efficiency
+            # requires topdown=True
+            # calling is_excluded() on joined root/dir so that things like
+            #   '/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+' will match
+            dirs[:] = [d for d in dirs if not self.is_excluded(os.path.join(root, d))]
+            for filename in files:
+                file_path = os.path.join(root, filename)
+                if self.re_yaml_suffix.match(file_path):
+                    self.check_file(file_path)
 
     def check_file(self, filename):
         if filename == '-':
