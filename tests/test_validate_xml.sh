@@ -72,7 +72,7 @@ check_broken(){
     local expected_exitcode="${2:-2}"
     local options="${@:3}"
     set +e
-    ./validate_xml.py $options "$filename"
+    ./validate_xml.py -t 1 $options "$filename"
     exitcode=$?
     set -e
     if [ $exitcode = $expected_exitcode ]; then
