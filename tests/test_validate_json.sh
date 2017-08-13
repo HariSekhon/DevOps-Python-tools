@@ -67,7 +67,7 @@ echo "testing stdin"
 ./validate_json.py < "$data_dir/test.json"
 echo "testing stdin and file mix"
 ./validate_json.py "$data_dir/test.json" - < "$data_dir/test.json"
-echo "testing stdin with multi-record"
+echo "testing stdin with multirecord"
 ./validate_json.py -m - < "$data_dir/multirecord.json"
 echo
 
@@ -149,7 +149,7 @@ echo "checking --permit-single-quotes mode works with embedded double quotes"
 echo
 
 echo "checking --permit-single-quotes mode works with unescaped embedded double quotes"
-./validate_json.py -s "$data_dir/single_quotes_embedded_double_quotes_unescaped.notjson" -vvv
+./validate_json.py -s "$data_dir/single_quotes_embedded_double_quotes_unescaped.notjson"
 echo
 
 # ==================================================
@@ -215,7 +215,7 @@ hr2
 
 echo "testing print mode"
 [ "$(./validate_json.py -p "$data_dir/test.json" | cksum)" = "$(cksum < "$data_dir/test.json")" ] || { echo "print test failed!"; exit 1; }
-echo "successfully passed out test json to stdout"
+echo "successfully passed test json to stdout"
 echo
 
 echo "testing print mode failed"
@@ -228,30 +228,34 @@ set -e
 echo "successfully passed test of print mode failure"
 echo
 
-echo "testing print mode with multi-record"
+echo "testing print mode with multirecord"
 [ "$(./validate_json.py -mp "$data_dir/multirecord.json" | cksum)" = "$(cksum < "$data_dir/multirecord.json")" ] ||
-    { echo "print multi-record test failed!"; exit 1; }
-echo "successfully passed out multi-record json to stdout"
+    { echo "print multirecord test failed!"; exit 1; }
+echo "successfully passed multirecord json to stdout"
 echo
 
 echo "testing print mode with --permit-single-quotes"
 [ "$(./validate_json.py -sp "$data_dir/single_quotes.notjson" | cksum)" = "$(cksum < "$data_dir/single_quotes.notjson")" ] ||
     { echo "print single quote json test failed!"; exit 1; }
+echo "successfully passed single quoted json to stdout"
 echo
 
 echo "testing print mode with --permit-single-quotes multirecord"
 [ "$(./validate_json.py -sp "$data_dir/multirecord_single_quotes.notjson" | cksum)" = "$(cksum < "$data_dir/multirecord_single_quotes.notjson")" ] ||
-    { echo "print single quote multirecord json test failed!"; exit 1; }
+    { echo "print single quote multirecord singled quoted json test failed!"; exit 1; }
+echo "successfully passed multirecord single quoted json stdout test"
 echo
 
 echo "testing print mode with --permit-single-quotes multirecord with embedded double quotes"
 [ "$(./validate_json.py -sp "$data_dir/multirecord_single_quotes_embedded_double_quotes.notjson" | cksum)" = "$(cksum < "$data_dir/multirecord_single_quotes_embedded_double_quotes.notjson")" ] ||
     { echo "print single quote multirecord json with embedded double quotes test failed!"; exit 1; }
+echo "successfully passed multirecord single quoted with embedded double quotes to stdout"
 echo
 
 echo "testing print mode with --permit-single-quotes multirecord with unescaped embedded double quotes"
 [ "$(./validate_json.py -sp "$data_dir/multirecord_single_quotes_embedded_double_quotes_unescaped.notjson" | cksum)" = "$(cksum < "$data_dir/multirecord_single_quotes_embedded_double_quotes_unescaped.notjson")" ] ||
     { echo "print single quote multirecord json with unescaped embedded double quotes test failed!"; exit 1; }
+echo "successfully passed multirecord single quoted with embedded unescaped double quotes to stdout"
 echo
 
 echo
@@ -277,19 +281,15 @@ hr2
 echo "checking blank content is invalid"
 echo > "$broken_dir/blank.json"
 check_broken "$broken_dir/blank.json"
-echo
 
 echo "checking blank content is invalid for multirecord"
 check_broken "$broken_dir/blank.json" 2 -m
-echo
 
 echo "checking blank content is invalid via stdin"
 check_broken - 2 < "$broken_dir/blank.json"
-echo
 
 echo "checking blank content is invalid for multirecord via stdin"
 check_broken - 2 -m < "$broken_dir/blank.json"
-echo
 
 echo "checking blank content is invalid for multirecord via stdin piped from /dev/null"
 cat /dev/null | check_broken - 2 -m
