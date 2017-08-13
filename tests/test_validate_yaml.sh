@@ -70,10 +70,11 @@ echo
 
 echo "Now trying non-yaml files to detect successful failure:"
 check_broken(){
-    filename="$1"
-    expected_exitcode="${2:-2}"
+    local filename="$1"
+    local expected_exitcode="${2:-2}"
+    local options="${@:3}"
     set +e
-    ./validate_yaml.py -t 1 "$filename" ${@:3}
+    ./validate_yaml.py -t 1 $options "$filename"
     exitcode=$?
     set -e
     if [ $exitcode = $expected_exitcode ]; then
