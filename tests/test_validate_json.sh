@@ -81,11 +81,11 @@ echo
 
 echo "Now trying broken / non-json files to test failure detection:"
 check_broken(){
-    filename="$1"
-    expected_exitcode="${2:-2}"
-    options="${3:-}"
+    local filename="$1"
+    local expected_exitcode="${2:-2}"
+    local options="${@:3}"
     set +e
-    ./validate_json.py $options "$filename" ${@:3}
+    ./validate_json.py $options "$filename"
     exitcode=$?
     set -e
     if [ $exitcode = $expected_exitcode ]; then
@@ -149,7 +149,7 @@ echo "checking --permit-single-quotes mode works with embedded double quotes"
 echo
 
 echo "checking --permit-single-quotes mode works with unescaped embedded double quotes"
-./validate_json.py -s "$data_dir/single_quotes_embedded_double_quotes_unescaped.notjson"
+./validate_json.py -s "$data_dir/single_quotes_embedded_double_quotes_unescaped.notjson" -vvv
 echo
 
 # ==================================================
@@ -266,12 +266,36 @@ check_broken README.md
 cat "$data_dir/test.json" >> "$broken_dir/multi-broken.json"
 cat "$data_dir/test.json" >> "$broken_dir/multi-broken.json"
 check_broken "$broken_dir/multi-broken.json"
-rm -fr "$broken_dir"
 echo
 
 echo "checking for non-existent file"
 check_broken nonexistentfile 2
 echo
+
+# ==================================================
+hr2
+echo "checking blank content is invalid"
+echo > "$broken_dir/blank.json"
+check_broken "$broken_dir/blank.json"
+echo
+
+echo "checking blank content is invalid for multirecord"
+check_broken "$broken_dir/blank.json" 2 -m
+echo
+
+echo "checking blank content is invalid via stdin"
+check_broken - 2 < "$broken_dir/blank.json"
+echo
+
+echo "checking blank content is invalid for multirecord via stdin"
+check_broken - 2 -m < "$broken_dir/blank.json"
+echo
+
+echo "checking blank content is invalid for multirecord via stdin piped from /dev/null"
+cat /dev/null | check_broken - 2 -m
+echo
+
+rm -fr "$broken_dir"
 
 echo "======="
 echo "SUCCESS"
