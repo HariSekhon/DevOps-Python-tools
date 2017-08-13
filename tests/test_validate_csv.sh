@@ -106,6 +106,12 @@ check_broken README.md
 
 # ==================================================
 hr2
+echo "checking single word text file is not valid CSV"
+echo blah > "$broken_dir/single_field.csv"
+check_broken "$broken_dir/single_field.csv" 2
+
+# ==================================================
+hr2
 echo "checking for non-existent file"
 check_broken nonexistentfile 2
 
