@@ -1,2 +1,0 @@
-{ 'name': 'Hari', 'age':  21, 'description': 'single quotes multirecord \"embedded double quotes\" ' }
-{ 'name': 'Sekhon', 'age':  22, 'description': 'single quotes multirecord \"embedded double quotes\" ' }
