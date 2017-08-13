@@ -62,7 +62,8 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.1'
+__version__ = '0.9.0'
+
 
 class CsvValidatorTool(CLI):
 
@@ -85,8 +86,10 @@ class CsvValidatorTool(CLI):
         self.exclude = None
 
     def add_options(self):
-        self.add_opt('-d', '--delimiter', default=self.delimiter,
-                     help='Delimiter to test (default: None, infers per file)')
+        # do not leave as None to infer per line, it'll split a single word line like 'blah' => ['b', 'ah']
+        # and there is no way to detect it only had one field
+        self.add_opt('-d', '--delimiter', default=',',
+                     help='Delimiter to test (default: comma)')
         self.add_opt('-q', '--quotechar', default=self.quotechar,
                      help='Quotechar to test (default: None)')
     #   self.add_opt('-p', '--print', action='store_true',
@@ -124,30 +127,35 @@ class CsvValidatorTool(CLI):
                 filehandle.seek(0)
                 csvreader = csv.reader(filehandle, dialect)
         except csv.Error  as _:
-            if self.verbose > 2:
-                print('file {0}: {1}'.format(self.filename, _))
+            log.warning('file %s: %s', self.filename, _)
             return False
+        count = 0
         try:
             # csvreader doesn't seem to generate any errors ever :-(
             # csv module allows entire lines of json/xml/yaml to go in as a single field
             # Adding some invalidations manually
-            for _ in csvreader:
+            for field_list in csvreader:
+                # list of fields with no separator information
                 # log.debug("line: %s", _)
                 # make it fail if there is only a single field on any line
-                if len(_) < 2:
+                if len(field_list) < 2:
                     return False
                 # it's letting JSON through :-/
-                if _[0] == '{':
+                if field_list[0] == '{':
                     return False
                 # extra protection along the same lines as anti-json:
                 # the first char of field should be alphanumeric, not syntax
                 # however instead of isAlnum allow quotes for quoted CSVs to pass validation
-                if not isChars(_[0][0], 'A-Za-z0-9\'"'):
+                if not isChars(field_list[0][0], 'A-Za-z0-9\'"'):
                     return False
+                count += 1
         except csv.Error  as _:
-            if self.verbose > 2:
-                print('file {0}, line {1}: {2}'.format(self.filename, csvreader.line_num, _))
+            log.warning('file %s, line %s: %s', self.filename, csvreader.line_num, _)
             return False
+        if count == 0:
+            log.debug('zero lines detected, blank input is not valid CSV')
+            return False
+        log.debug('%s CSV lines passed', count)
         return True
 
     def check_csv(self, filehandle):
