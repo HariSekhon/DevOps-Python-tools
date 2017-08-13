@@ -112,7 +112,7 @@ check_broken "$data_dir/single_quotes.notjson"
 
 check_broken "$data_dir/single_quotes_embedded_double_quotes.notjson"
 
-check_broken "$data_dir/single_quotes_embedded_double_quotes_nonescaped.notjson"
+check_broken "$data_dir/single_quotes_embedded_double_quotes_unescaped.notjson"
 
 echo "testing stdin breaks on multi-record"
 check_broken - < "$data_dir/multirecord.json" 2
@@ -141,11 +141,11 @@ echo "checking --permit-single-quotes mode works with embedded double quotes wit
 echo
 
 echo "checking --permit-single-quotes mode works with non-escaped embedded double quotes"
-./json_docs_to_bulk_multiline.py -s "$data_dir/single_quotes_embedded_double_quotes_nonescaped.notjson" > "$stdout"
+./json_docs_to_bulk_multiline.py -s "$data_dir/single_quotes_embedded_double_quotes_unescaped.notjson" > "$stdout"
 echo
 
 echo "checking --permit-single-quotes mode works with non-escaped embedded double quotes with multirecord"
-./json_docs_to_bulk_multiline.py -s "$data_dir/multirecord_single_quotes_embedded_double_quotes_nonescaped.notjson" > "$stdout"
+./json_docs_to_bulk_multiline.py -s "$data_dir/multirecord_single_quotes_embedded_double_quotes_unescaped.notjson" > "$stdout"
 echo
 
 echo "testing output contents"
