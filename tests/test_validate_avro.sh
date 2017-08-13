@@ -77,9 +77,9 @@ echo
 
 echo "Now trying non-avro files to detect successful failure:"
 check_broken(){
-    filename="$1"
-    expected_exitcode="${2:-2}"
-    options="${@:3}"
+    local filename="$1"
+    local expected_exitcode="${2:-2}"
+    local options="${@:3}"
     set +e
     ./validate_avro.py -t 1 $options "$filename"
     exitcode=$?
