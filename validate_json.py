@@ -58,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.9.0'
+__version__ = '0.10.0'
 
 
 class JsonValidatorTool(CLI):
@@ -70,13 +70,14 @@ class JsonValidatorTool(CLI):
         # super().__init__()
         self.iostream = None
         self.re_json_suffix = re.compile(r'.*\.json$', re.I)
-        # these msgs get reset with the correct filename in check_file further down()
-        self.valid_json_msg = '<UNKNOWN_FILENAME> => JSON OK'
-        self.invalid_json_msg = '<UNKNOWN_FILENAME> => JSON INVALID'
+        self.filename = None
+        self.valid_json_msg = ' => JSON OK'
+        self.invalid_json_msg = ' => JSON INVALID'
         single_quotes = 'single quoted'
-        self.valid_json_msg_single_quotes = '%s (%s)' % (self.valid_json_msg, single_quotes)
-        self.valid_json_msg_single_quotes2 = '%s (%s, double quotes not escaped)' % (self.valid_json_msg, single_quotes)
-        self.invalid_json_msg_single_quotes = '%s (%s)' % (self.invalid_json_msg, single_quotes)
+        self.valid_json_msg_single_quotes = '{0} ({1})'.format(self.valid_json_msg, single_quotes)
+        self.valid_json_msg_single_quotes2 = '{0} ({1}, double quotes not escaped)'\
+                                             .format(self.valid_json_msg, single_quotes)
+        self.invalid_json_msg_single_quotes = '{0} ({1})'.format(self.invalid_json_msg, single_quotes)
         self.permit_single_quotes = False
         self.passthru = False
         # self.multi_record_detected = False
@@ -116,17 +117,20 @@ class JsonValidatorTool(CLI):
         log.debug('check_multirecord_json()')
         normal_json = False
         single_quoted = False
+        count = 0
         for line in self.iostream:
             if isJson(line):
                 normal_json = True
                 # can't use self.print() here, don't want to print valid for every line of a file / stdin
                 if self.passthru:
                     print(line, end='')
+                count += 1
                 continue
             elif self.permit_single_quotes and self.check_json_line_single_quoted(line):
                 single_quoted = True
                 if self.passthru:
                     print(line, end='')
+                count += 1
                 continue
             else:
                 log.debug('invalid multirecord json')
@@ -134,8 +138,12 @@ class JsonValidatorTool(CLI):
                 if not self.passthru:
                     die(self.invalid_json_msg)
                 return False
+        if count == 0:
+            log.debug('blank input, detected zero lines while multirecord checking')
+            self.failed = True
+            return False
         # self.multi_record_detected = True
-        log.debug('multirecord json (all lines passed)')
+        log.debug('multirecord json (all %s lines passed)', count)
         extra_info = ''
         if single_quoted:
             extra_info = ' single quoted'
@@ -144,7 +152,7 @@ class JsonValidatorTool(CLI):
                 log.warning('mixture of normal and single quoted json detected, ' + \
                             'may cause issues for data processing engines')
         if not self.passthru:
-            print('{0} (multi-record format{1})'.format(self.valid_json_msg, extra_info))
+            print('{0} (multi-record format{1}, {2} records)'.format(self.valid_json_msg, extra_info, count))
         return True
 
     def check_json_line_single_quoted(self, line):
@@ -162,7 +170,8 @@ class JsonValidatorTool(CLI):
         if self.passthru:
             print(content, end='')
         else:
-            print(self.msg)
+            # intentionally concatenating so it'll blow up if self.filename is still set to None
+            print(self.filename + self.msg)
 
     @staticmethod
     def convert_single_quoted(content):
@@ -263,7 +272,7 @@ class JsonValidatorTool(CLI):
 
     def check_path(self, path):
         if path == '-' or os.path.isfile(path):
-            self.check_file(path)
+            self.check(path)
         elif os.path.isdir(path):
             self.walk(path)
         else:
@@ -282,17 +291,17 @@ class JsonValidatorTool(CLI):
             for filename in files:
                 file_path = os.path.join(root, filename)
                 if self.re_json_suffix.match(file_path):
-                    self.check_file(file_path)
+                    self.check(file_path)
 
-    def check_file(self, filename):
+    def check(self, filename):
         if filename == '-':
             filename = '<STDIN>'
-        self.valid_json_msg = '%s => JSON OK' % filename
-        self.invalid_json_msg = '%s => JSON INVALID' % filename
+        self.filename = filename
+        self.valid_json_msg = '{0} => JSON OK'.format(filename)
+        self.invalid_json_msg = '{0} => JSON INVALID'.format(filename)
         single_quotes = '(found single quotes not double quotes)'
-        self.valid_json_msg_single_quotes = '%s %s' % (self.valid_json_msg, single_quotes)
-        self.invalid_json_msg_single_quotes = '%s %s' % (self.invalid_json_msg, single_quotes)
-        mem_err = "file '%s', assuming Big Data multi-record json and re-trying validation line-by-line" % filename
+        self.valid_json_msg_single_quotes = '{0} {1}'.format(self.valid_json_msg, single_quotes)
+        self.invalid_json_msg_single_quotes = '{0} {1}'.format(self.invalid_json_msg, single_quotes)
         if filename == '<STDIN>':
             self.iostream = sys.stdin
             if self.get_opt('multi_record'):
@@ -304,31 +313,35 @@ class JsonValidatorTool(CLI):
             else:
                 self.check_json(sys.stdin.read())
         else:
-            try:
-                with open(filename) as self.iostream:
-                    if self.get_opt('multi_record'):
-                        self.check_multirecord_json()
-                    else:
-                        # most JSON files are fine to slurp like this
-                        # Big Data / MongoDB JSON data files are json multi-record and can be large
-                        # may throw exception after running out of RAM in which case try handling line-by-line
-                        # (json document-per-line)
-                        try:
-                            content = self.iostream.read()
-                            try:
-                                self.check_json(content)
-                            except MemoryError:
-                                print("memory error validating contents from %s" % mem_err)
-                                self.iostream.seek(0)
-                                self.check_multirecord_json()
-                        except MemoryError:
-                            print("memory error reading %s" % mem_err)
-                            self.iostream.seek(0)
-                            self.check_multirecord_json()
-            except IOError as _:
-                die("ERROR: %s" % _)
+            self.check_file(filename)
         if self.failed:
             sys.exit(2)
+
+    def check_file(self, filename):
+        mem_err = "file '%s', assuming Big Data multi-record json and re-trying validation line-by-line" % filename
+        try:
+            with open(filename) as self.iostream:
+                if self.get_opt('multi_record'):
+                    self.check_multirecord_json()
+                else:
+                    # most JSON files are fine to slurp like this
+                    # Big Data / MongoDB JSON data files are json multi-record and can be large
+                    # may throw exception after running out of RAM in which case try handling line-by-line
+                    # (json document-per-line)
+                    try:
+                        content = self.iostream.read()
+                        try:
+                            self.check_json(content)
+                        except MemoryError:
+                            print("memory error validating contents from %s" % mem_err)
+                            self.iostream.seek(0)
+                            self.check_multirecord_json()
+                    except MemoryError:
+                        print("memory error reading %s" % mem_err)
+                        self.iostream.seek(0)
+                        self.check_multirecord_json()
+        except IOError as _:
+            die("ERROR: %s" % _)
 
 
 if __name__ == '__main__':
