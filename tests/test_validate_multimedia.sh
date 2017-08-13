@@ -87,7 +87,7 @@ check_broken(){
     local expected_exitcode="${2:-2}"
     local options="${@:3}"
     set +e
-    ./validate_multimedia.py -vvv -t 1 $options "$filename"
+    ./validate_multimedia.py -t 1 $options "$filename"
     exitcode=$?
     set -e
     if [ $exitcode = $expected_exitcode ]; then
