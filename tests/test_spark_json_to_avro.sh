@@ -61,5 +61,10 @@ for SPARK_VERSION in $SPARK_VERSIONS; do
         echo "SUCCEEDED with header with Spark $SPARK_VERSION" ||
         { echo "FAILED with header with Spark $SPARK_VERSION"; exit 1; }
 
+    #../spark_json_to_avro.py -j data/multirecord.json -a "test-$dir.avro" -s Year:String,Make,Model,Dimension.0.Length:float &&
+    #    echo "SUCCEEDED with header with Spark $SPARK_VERSION" ||
+    #    { echo "FAILED with header with Spark $SPARK_VERSION"; exit 1; }
+    # TODO: test using downloaded avro tools getschema or extend validate_avro.py + validate_parquet.py to have schema type checking
+
 done
 echo "SUCCESS"
