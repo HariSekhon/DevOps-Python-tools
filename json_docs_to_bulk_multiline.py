@@ -53,7 +53,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import isJson, die, printerr, ERRORS, log_option, uniq_list_ordered
+    from harisekhon.utils import isJson, die, printerr, ERRORS, log_option, uniq_list_ordered, validate_regex
     from harisekhon.utils import log
     from harisekhon import CLI
 except ImportError as _:
@@ -63,8 +63,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
-
+__version__ = '0.6.0'
 
 # TODO: unify all validate_* and this programs in to a class hierarchy as a lot of the code is similar
 
@@ -82,6 +81,7 @@ class JsonDocsToBulkMultiline(CLI):
         self.failed = False
         self.continue_on_error = False
         self.single_quotes_detected = False
+        self.exclude = None
 
     def add_options(self):
         self.add_opt('-s', '--permit-single-quotes', dest='permit_single_quotes', action='store_true', default=False,
@@ -91,6 +91,20 @@ class JsonDocsToBulkMultiline(CLI):
                      help='Continue on errors, do not exit early, will still omit a warning error code of 1 ' + \
                           'at the end instead of dying with critical error code 2 immediately, either way '   + \
                           'broken documents are printed to standard error for collection redirect to an error log')
+        self.add_opt('-e', '--exclude', metavar='regex', default=os.getenv('EXCLUDE'),
+                     help='Regex of file / directory paths to exclude from checking ($EXCLUDE)')
+
+    def process_options(self):
+        self.exclude = self.get_opt('exclude')
+        if self.exclude:
+            validate_regex(self.exclude, 'exclude')
+            self.exclude = re.compile(self.exclude, re.I)
+
+    def is_excluded(self, path):
+        if self.exclude and self.exclude.search(path):
+            log.debug("excluding path: %s", path)
+            return True
+        return False
 
     def run(self):
         self.permit_single_quotes = self.get_opt('permit_single_quotes')
@@ -185,6 +199,8 @@ class JsonDocsToBulkMultiline(CLI):
     #         die(self.invalid_json_msg)
 
     def process_path(self, path):
+        if self.is_excluded(path):
+            return
         if path == '-' or os.path.isfile(path):
             self.process_file(path)
         elif os.path.isdir(path):
@@ -194,13 +210,20 @@ class JsonDocsToBulkMultiline(CLI):
 
     # don't need to recurse when using this - so only process os.path.join(root, filename)
     def walk(self, path):
-        for root, _, files in os.walk(path):
+        for root, dirs, files in os.walk(path, topdown=True):
+            # modify dirs in place to prune descent for increased efficiency
+            # requires topdown=True
+            # calling is_excluded() on joined root/dir so that things like
+            #   '/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+' will match
+            dirs[:] = [d for d in dirs if not self.is_excluded(os.path.join(root, d))]
             for filename in files:
                 file_path = os.path.join(root, filename)
                 if self.re_json_suffix.match(file_path):
                     self.process_file(file_path)
 
     def process_file(self, filename):
+        if self.is_excluded(filename):
+            return
         if filename == '-':
             self.iostream = sys.stdin
             self.process_json(sys.stdin.read(), '<STDIN>')
