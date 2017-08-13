@@ -37,25 +37,33 @@ exclude='/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+$|broken|error'
 rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
 
-./validate_csv.py -vvv --exclude "$exclude" .
+./validate_csv.py --exclude "$exclude" .
 echo
 
+# ==================================================
+hr2
 echo
 echo "checking directory recursion (mixed with explicit file given)"
-./validate_csv.py -vvv "$data_dir/test.csv" "$data_dir"
+./validate_csv.py "$data_dir/test.csv" "$data_dir"
 echo
 
+# ==================================================
+hr2
 echo "checking symlink handling"
 ln -sfv "test.csv" "$data_dir/testlink.csv"
 ./validate_csv.py "$data_dir/testlink.csv"
 rm "$data_dir/testlink.csv"
 echo
 
+# ==================================================
+hr2
 echo "checking csv file without an extension"
 cp -iv "$(find "${1:-.}" -iname '*.csv' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
-./validate_csv.py -vvv -t 1 "$broken_dir/no_extension_testfile"
+./validate_csv.py -t 1 "$broken_dir/no_extension_testfile"
 echo
 
+# ==================================================
+hr2
 echo "testing stdin"
 ./validate_csv.py - < "$data_dir/test.csv"
 ./validate_csv.py < "$data_dir/test.csv"
@@ -68,6 +76,8 @@ echo
 #echo "successfully passed out test csv to stdout"
 #echo
 
+# ==================================================
+hr2
 echo "Now trying non-csv files to detect successful failure:"
 check_broken(){
     local filename="$1"
@@ -93,12 +103,26 @@ check_broken "$data_dir/test.yaml"
 check_broken "$data_dir/simple.xml"
 check_broken "$data_dir/multirecord.json"
 check_broken README.md
-rm -fr "$broken_dir"
-echo
 
+# ==================================================
+hr2
 echo "checking for non-existent file"
 check_broken nonexistentfile 2
+
+# ==================================================
+hr2
+echo "checking blank content is invalid"
+echo > "$broken_dir/blank.csv"
+check_broken "$broken_dir/blank.csv"
+
+echo "checking blank content is invalid via stdin"
+check_broken - 2 < "$broken_dir/blank.csv"
+
+echo "checking blank content is invalid via stdin piped from /dev/null"
+cat /dev/null | check_broken - 2
 echo
+
+rm -fr "$broken_dir"
 
 echo "======="
 echo "SUCCESS"
