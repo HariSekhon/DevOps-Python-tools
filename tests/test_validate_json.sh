@@ -140,6 +140,15 @@ check_broken "$data_dir/multirecord_single_quotes_embedded_double_quotes_unescap
 
 # ==================================================
 hr2
+# TODO: make this check pass again - the problem is it'll be more expensive to run this check just to give better feedback to the user
+#echo "checking invalid single quote detection"
+#set +o pipefail
+#./validate_json.py "$data_dir/single_quotes.notjson" 2>&1 |
+#   grep --color 'JSON INVALID.*single quotes detected' ||
+#       { echo "Failed to find single quote message in output"; exit 1; }
+#set -o pipefail
+#echo
+
 echo "checking --permit-single-quotes mode works"
 ./validate_json.py -s "$data_dir/single_quotes.notjson"
 echo
