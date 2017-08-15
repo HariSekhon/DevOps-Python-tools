@@ -13,7 +13,7 @@ Hari Sekhon PyTools
 
 A few of the Hadoop, Spark & Linux tools I've written over the years. All programs have `--help` to list the available options.
 
-For many more tools see the [Tools](//github.com/harisekhon/tools) and [Advanced Nagios Plugins Collection](//github.com/harisekhon/nagios-plugins) repos which contains many Hadoop, NoSQL, Web and infrastructure tools and Nagios plugins.
+For many more tools see the [Tools](https://github.com/harisekhon/tools) and [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) repos which contains many Hadoop, NoSQL, Web and infrastructure tools and Nagios plugins.
 
 Hari Sekhon
 
