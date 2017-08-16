@@ -18,7 +18,7 @@
 -- must download LucidWorks connector for Hadoop from here (the Hortonworks link is much bigger as it contains a full HDP Search including Solr, Banana and Tika pipeline as well as this connector):
 --
 -- https://lucidworks.com/product/integrations/hadoop/
--- 
+--
 -- hadoop fs -put hadoop-lws-job.jar
 --
 -- pig -p path=/data/logs -p collection=LOGS -p zkhost=<zookeeper_list>/solr pig-text-to-solr.pig
@@ -64,7 +64,7 @@ set mapred.map.tasks.speculative.execution false;
 set mapred.reduce.tasks.speculative.execution false;
 
 lines  = LOAD '$path' USING PigStorage('\n', '-tagPath') AS (path:chararray, line:chararray);
--- this causes out of heap errors in Solr because some files may be too large to handle this way - it doesn't scale 
+-- this causes out of heap errors in Solr because some files may be too large to handle this way - it doesn't scale
 --lines2 = FOREACH (GROUP lines BY path) GENERATE $0 AS path, BagToString($0, ' ') AS line:chararray;
 --lines_final = FOREACH lines2 GENERATE UniqueId() AS id, 'path_s', path, 'line_s', line;
 
