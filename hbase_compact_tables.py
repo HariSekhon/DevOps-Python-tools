@@ -69,7 +69,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.4.1'
 
 
 class HBaseCompactTables(CLI):
@@ -99,6 +99,8 @@ class HBaseCompactTables(CLI):
         self.port = self.get_opt('port')
         validate_host(self.host)
         validate_port(self.port)
+        # happybase socket requires an integer type
+        self.port = int(self.port)
         regex = self.get_opt('regex')
         if regex:
             validate_regex(regex)
