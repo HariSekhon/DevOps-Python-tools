@@ -19,7 +19,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "
 # ================== #
-# Testing JSON Files 
+# Testing JSON Files
 # ================== #
 "
 
