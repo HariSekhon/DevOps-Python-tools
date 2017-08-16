@@ -47,7 +47,7 @@ export HBASE_TEST_PORTS="$ZOOKEEPER_PORT $HBASE_THRIFT_PORT"
 export HBASE_VERSIONS="${@:-1.0 1.1 1.2}"
 
 export DOCKER_IMAGE="harisekhon/hbase-dev"
-export DOCKER_CONTAINER="hbase-test"
+export DOCKER_CONTAINER="hbase-test-pytools"
 
 export MNTDIR=/pytools
 
