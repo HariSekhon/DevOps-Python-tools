@@ -18,7 +18,7 @@
 -- must download Elasticsearch connector for Hadoop from here:
 --
 -- https://www.elastic.co/downloads/hadoop
--- 
+--
 -- hadoop fs -put elasticsearch-hadoop.jar
 --
 -- pig -p path=/data/logs -p index=logs -p type=myType pig-text-to-elasticsearch.pig
