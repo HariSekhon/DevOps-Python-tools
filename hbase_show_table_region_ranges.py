@@ -73,7 +73,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
+__version__ = '0.5.1'
 
 
 class HBaseShowTableRegionRanges(CLI):
@@ -119,6 +119,8 @@ class HBaseShowTableRegionRanges(CLI):
         self.table = self.get_opt('table')
         validate_host(self.host)
         validate_port(self.port)
+        # happybase socket requires an integer
+        self.port = int(self.port)
         if not self.get_opt('list_tables'):
             validate_chars(self.table, 'hbase table', 'A-Za-z0-9:._-')
         self.short_region_name = self.get_opt('short_region_name')
