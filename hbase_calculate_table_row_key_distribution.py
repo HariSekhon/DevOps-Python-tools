@@ -72,7 +72,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.0'
+__version__ = '0.6.1'
 
 
 class HBaseCalculateTableRegionRowDistribution(CLI):
@@ -127,6 +127,8 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
         self.sort_desc = self.get_opt('desc')
         validate_host(self.host)
         validate_port(self.port)
+        # happybase socket requires an integer
+        self.port = int(self.port)
         if not self.get_opt('list_tables'):
             validate_chars(self.table, 'hbase table', 'A-Za-z0-9:._-')
             validate_int(self.prefix_length, 'row key prefix length', 1, 10)

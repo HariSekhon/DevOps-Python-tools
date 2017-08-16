@@ -69,7 +69,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 
 
 class HBaseGenerateData(CLI):
@@ -129,6 +129,8 @@ class HBaseGenerateData(CLI):
         self.port = self.get_opt('port')
         validate_host(self.host)
         validate_port(self.port)
+        # happybase socket requires an integer
+        self.port = int(self.port)
 
         self.table = self.get_opt('table')
         self.num_rows = self.get_opt('num')
