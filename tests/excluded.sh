@@ -25,9 +25,13 @@ isExcluded(){
     [[ "$prog" =~ ^\* ]] && return 0
     #[[ $prog =~ ipython-notebook ]] && return 0
     #[[ $prog =~ ambari_blueprints.py ]] && return 0
-    commit="$(git log "$prog" | head -n1 | grep 'commit')"
-    if [ -z "$commit" ]; then
-        return 0
+    # this external git check is expensive, skip it when in CI as using fresh git checkouts
+    is_CI && return 1
+    if which git &>/dev/null; then
+        commit="$(git log "$prog" | head -n1 | grep 'commit')"
+        if [ -z "$commit" ]; then
+            return 0
+        fi
     fi
     return 1
 }
