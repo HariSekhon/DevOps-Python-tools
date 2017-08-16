@@ -55,11 +55,11 @@ fi
 
 rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
-./validate_multimedia.py -vvv "$test_file" 
+./validate_multimedia.py -vvv "$test_file"
 echo
 
 echo "checking quick mode"
-./validate_multimedia.py -vvv --quick "$test_file" 
+./validate_multimedia.py -vvv --quick "$test_file"
 echo
 
 echo "checking directory recursion (mixed with explicit file given)"
