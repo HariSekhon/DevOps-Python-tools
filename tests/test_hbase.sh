@@ -53,7 +53,9 @@ export MNTDIR="/pytools"
 startupwait=50
 
 docker_exec(){
-    docker exec -i docker_hbase_1 /bin/bash <<-EOF
+    # gets ValueError: file descriptor cannot be a negative integer (-1), -T should be the workaround but hangs
+    #docker-compose exec -T "$DOCKER_SERVICE" /bin/bash <<-EOF
+    docker exec -i "${COMPOSE_PROJECT_NAME:-docker}_${DOCKER_SERVICE}_1" /bin/bash <<-EOF
     export JAVA_HOME=/usr
     $MNTDIR/$@
 EOF
@@ -74,7 +76,9 @@ test_hbase(){
     #when_ports_available $startupwait $HBASE_HOST $HBASE_TEST_PORTS
     echo "setting up test tables"
     uniq_val=$(< /dev/urandom tr -dc 'a-zA-Z0-9' 2>/dev/null | head -c32 || :)
-    docker-compose exec "$DOCKER_SERVICE" /bin/bash <<-EOF
+    # gets ValueError: file descriptor cannot be a negative integer (-1), -T should be the workaround but hangs
+    #docker-compose exec -T "$DOCKER_SERVICE" /bin/bash <<-EOF
+    docker exec -i "${COMPOSE_PROJECT_NAME:-docker}_${DOCKER_SERVICE}_1" /bin/bash <<-EOF
         export JAVA_HOME=/usr
         /hbase/bin/hbase shell <<-EOF2
             create 't1', 'cf1', { 'REGION_REPLICATION' => 1 }
