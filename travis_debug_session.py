@@ -100,7 +100,7 @@ class TravisDebugSession(CLI):
                      help='Travis CI repo to find last failed build and re-execute a job from it ($TRAVIS_REPO)' + \
                           ', easier alternative to specifying a specific --job-id' + \
                           ', convenient if working with the same repo over and over and don\'t want to copy the ' + \
-                          'job id each time (--job-id takes priority if given as it\'s more specific).' + \
+                          'job id each time (--job-id takes priority if given as it\'s more specific). ' + \
                           'Be aware if running this quickly in succession you will get older and older failed ' + \
                           'builds as the last one will still be running, will only re-trigger finished failed builds')
         self.add_opt('-i', '--ignore-running', action='store_true',
