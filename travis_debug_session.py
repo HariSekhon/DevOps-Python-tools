@@ -20,8 +20,8 @@ Tool to automate initiating a Travis CI interactive debug build session via the 
 
 Tracks the creation of the debug build and drops you in to an SSH shell as soon as it's available
 
-If you get an access denied error but are sure your Travis API token is correct then it could be because the repo
-hasn't been enabled for debugging yet (you may need to contact Travis support for them to enable it for you)
+If you get an access denied error but are sure your Travis API token is correct then it could be because the repo hasn't
+been enabled for debugging yet (you may need to contact Travis at support@travis-ci.com for them to enable it for you)
 
 If specifying a --repo be aware the API is case sensitive for repo names
 
