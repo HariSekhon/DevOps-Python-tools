@@ -25,6 +25,10 @@ been enabled for debugging yet (you may need to contact Travis at support@travis
 
 If specifying a --repo be aware the API is case sensitive for repo names
 
+As a convenience you may supply either --job-id or --repo as an argument without the switch and if the argument
+contains a forward slash (/) it'll be inferred as a --repo, otherwise a --job-id, but the switch versions will
+take priority
+
 """
 
 from __future__ import absolute_import
@@ -59,7 +63,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.4'
 
 
 class TravisDebugSession(CLI):
@@ -118,6 +122,14 @@ class TravisDebugSession(CLI):
         #if travis_token is None:
         #    self.usage('--travis-token option or ' +
         #               '$TRAVIS_TOKEN environment variable required to authenticate to the API')
+        if self.args:
+            if '/' in self.args[0]:
+                if not self.repo:
+                    log.info('using argument as --repo')
+                    self.repo = self.args[0]
+            elif not self.job_id:
+                log.info('using argument as --job-id')
+                self.job_id = self.args[0]
         if self.job_id:
             validate_chars(self.job_id, 'job id', '0-9')
         elif self.repo:
