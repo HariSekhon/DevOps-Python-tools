@@ -84,8 +84,7 @@ apk-packages:
 	if [ -f /lib/libc.musl-x86_64.so.1 ]; then [ -e /lib/ld-linux-x86-64.so.2 ] || ln -sv /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2; fi
 
 # for validate_multimedia.py
-# Ubuntu 16.04 Xenial onwards, not available in Ubuntu 14.04 Trusty
-# Debian 9 Stretch onwards, not available in Debian 8 Jessie
+# available in Alpine 2.6, 2.7 and 3.x
 .PHONY: apk-packages-multimedia
 apk-packages-multimedia:
 	$(SUDO) apk update
@@ -104,6 +103,8 @@ apt-packages:
 	which java || $(SUDO) apt-get install -y openjdk-8-jdk || $(SUDO) apt-get install -y openjdk-7-jdk
 
 # for validate_multimedia.py
+# Ubuntu 16.04 Xenial onwards, not available in Ubuntu 14.04 Trusty
+# Debian 9 Stretch onwards, not available in Debian 8 Jessie
 .PHONY: apt-packages-multimedia
 apt-packages-multimedia:
 	$(SUDO) apt-get update
