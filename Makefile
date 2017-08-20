@@ -83,6 +83,7 @@ apk-packages:
 	# Spark Java Py4J gets java linking error without this
 	if [ -f /lib/libc.musl-x86_64.so.1 ]; then [ -e /lib/ld-linux-x86-64.so.2 ] || ln -sv /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2; fi
 
+# for validate_multimedia.py
 .PHONY: apk-packages-multimedia
 apk-packages-multimedia:
 	$(SUDO) apk update
@@ -111,6 +112,7 @@ apt-packages-remove:
 	cd pylib && make apt-packages-remove
 	$(SUDO) apt-get purge -y `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/deb-packages-dev.txt`
 
+# for validate_multimedia.py
 .PHONY: yum-packages-multimedia
 yum-packages:
 	@echo "This requires 3rd party rpm repos which could result in rpm hell, please handle this manually yourself so you understand what you're doing"
