@@ -23,6 +23,8 @@ cd "$srcdir/..";
 
 section "Testing validate_avro.py"
 
+export TIMEOUT=3
+
 if [ $# -gt 0 ]; then
     echo "validate_avro.py $@"
     ./validate_avro.py $@
