@@ -24,7 +24,7 @@ cd "$srcdir/..";
 section "Testing validate_parquet.py"
 
 # validating parquet is relatively slow
-export TIMEOUT=10
+#export TIMEOUT=10
 
 if [ $# -gt 0 ]; then
     echo "validate_parquet.py $@"
