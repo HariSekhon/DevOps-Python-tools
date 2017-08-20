@@ -23,6 +23,8 @@ cd "$srcdir/..";
 
 section "Testing validate_multimedia.py"
 
+export TIMEOUT=3
+
 if ! which ffmpeg &>/dev/null; then
     # repos are broken on both Ubuntu until 15 and RHEL/CentOS :-(
     # not gonna cause major compilation for this when it works on my dev systems
