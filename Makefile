@@ -83,6 +83,11 @@ apk-packages:
 	# Spark Java Py4J gets java linking error without this
 	if [ -f /lib/libc.musl-x86_64.so.1 ]; then [ -e /lib/ld-linux-x86-64.so.2 ] || ln -sv /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2; fi
 
+.PHONY: apk-packages-multimedia
+apk-packages-multimedia:
+	$(SUDO) apk update
+	$(SUDO) apk add ffmpeg
+
 .PHONY: apk-packages-remove
 apk-packages-remove:
 	cd pylib && make apk-packages-remove
@@ -106,16 +111,10 @@ apt-packages-remove:
 	cd pylib && make apt-packages-remove
 	$(SUDO) apt-get purge -y `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/deb-packages-dev.txt`
 
-.PHONY: yum-packages
+.PHONY: yum-packages-multimedia
 yum-packages:
-	# python-pip requires EPEL, so try to get the correct EPEL rpm
-	rpm -q wget || $(SUDO) yum install -y wget
-	rpm -q epel-release      || yum install -y epel-release || { wget -t 100 --retry-connrefused -O /tmp/epel.rpm "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`grep -o '[[:digit:]]' /etc/*release | head -n1`.noarch.rpm" && $(SUDO) rpm -ivh /tmp/epel.rpm && rm -f /tmp/epel.rpm; }
-	
-	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages.txt`; do rpm -q $$x || $(SUDO) yum install -y $$x; done
-	
-	which java || $(SUDO) yum install -y java
-
+	@echo "This requires 3rd party rpm repos which could result in rpm hell, please handle this manually yourself so you understand what you're doing"
+	exit 1
 
 .PHONY: yum-packages-remove
 yum-packages-remove:
