@@ -31,6 +31,9 @@ iputils-ping
 # needed to build python-snappy for avro module
 libsnappy-dev
 
+# installs 343MB of dependencies - install by hand if needed
+#ffmpeg
+
 # IPython Notebook fails and leave apt broken
 # The following packages have unmet dependencies:
 #  python-zmq : Depends: libzmq1 but it is not going to be installed
