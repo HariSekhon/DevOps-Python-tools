@@ -23,6 +23,8 @@ cd "$srcdir/..";
 
 section "Testing validate_csv.py"
 
+export TIMEOUT=3
+
 if [ $# -gt 0 ]; then
     echo "validate_csv.py $@"
     ./validate_csv.py $@
