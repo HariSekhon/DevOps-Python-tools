@@ -23,11 +23,13 @@ cd "$srcdir/..";
 
 section "Testing validate_json.py"
 
-until [ $# -lt 1 ]; do
-    case $1 in
-        -*) shift
-    esac
-done
+export TIMEOUT=3
+
+if [ $# -gt 0 ]; then
+    echo "validate_json.py $@"
+    ./validate_json.py $@
+    echo
+fi
 
 data_dir="tests/data"
 broken_dir="$data_dir/broken_json_data"
