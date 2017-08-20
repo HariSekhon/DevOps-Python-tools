@@ -17,21 +17,11 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "
-# ======================== #
-# Testing validate_multimedia.py
-# ======================== #
-"
-
 cd "$srcdir/..";
 
 . ./tests/utils.sh
 
-until [ $# -lt 1 ]; do
-    case $1 in
-        -*) shift
-    esac
-done
+section "Testing validate_multimedia.py"
 
 if ! which ffmpeg &>/dev/null; then
     # repos are broken on both Ubuntu until 15 and RHEL/CentOS :-(
@@ -43,6 +33,12 @@ if ! which ffmpeg &>/dev/null; then
     elif which yum &>/dev/null; then
         echo "WARNING: cannot auto-install ffmpeg on RHEL/CentOS, the 3rd party repos and deps are seriously broken"
     fi
+fi
+
+if [ $# -gt 0 ]; then
+    echo "validate_multimedia.py $@"
+    ./validate_multimedia.py $@
+    echo
 fi
 
 data_dir="tests/data"
