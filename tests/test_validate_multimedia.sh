@@ -51,19 +51,19 @@ fi
 
 rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
-./validate_multimedia.py -vvv "$test_file"
+./validate_multimedia.py "$test_file"
 echo
 
 echo "checking quick mode"
-./validate_multimedia.py -vvv --quick "$test_file"
+./validate_multimedia.py --quick "$test_file"
 echo
 
 echo "checking directory recursion (mixed with explicit file given)"
-./validate_multimedia.py -vvv "$test_file" .
+./validate_multimedia.py "$test_file" .
 echo
 
 echo "checking regex with directory recursion"
-./validate_multimedia.py -vvv "$test_file" -r '\.mp3$' .
+./validate_multimedia.py "$test_file" -r '\.mp3$' .
 echo
 
 echo "checking symlink handling"
@@ -74,7 +74,7 @@ echo
 
 echo "checking media file without an extension"
 cp -iv "$(find "${1:-.}" -iname '*.mp3' | grep -v -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
-./validate_multimedia.py -vvv "$broken_dir/no_extension_testfile"
+./validate_multimedia.py "$broken_dir/no_extension_testfile"
 echo
 
 echo "Now trying non-media files to detect successful failure:"
@@ -110,7 +110,7 @@ echo "Checking catches broken regex"
 check_broken . 3 -r "*.mp3"
 echo
 echo "checking regex with directory recursion will skip broken file"
-./validate_multimedia.py -vvv -r 'sample.mp3' .
+./validate_multimedia.py -r 'sample.mp3' .
 echo
 rm -fr "$broken_dir"
 
