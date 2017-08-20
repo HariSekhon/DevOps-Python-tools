@@ -23,11 +23,11 @@ cd "$srcdir/..";
 
 section "Testing validate_csv.py"
 
-until [ $# -lt 1 ]; do
-    case $1 in
-        -*) shift
-    esac
-done
+if [ $# -gt 0 ]; then
+    echo "validate_csv.py $@"
+    ./validate_csv.py $@
+    echo
+fi
 
 data_dir="tests/data"
 broken_dir="tests/csv_broken"
