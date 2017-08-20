@@ -23,11 +23,13 @@ cd "$srcdir/..";
 
 section "Testing validate_parquet.py"
 
-until [ $# -lt 1 ]; do
-    case $1 in
-        -*) shift
-    esac
-done
+export TIMEOUT=3
+
+if [ $# -gt 0 ]; then
+    echo "validate_parquet.py $@"
+    ./validate_parquet.py $@
+    echo
+fi
 
 data_dir="tests/data"
 broken_dir="tests/parquet_broken"
