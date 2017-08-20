@@ -42,7 +42,7 @@ services:
   - docker
 
 install:
-  - make build apt-packages-multimedia
+  - make
   #- pip install --upgrade ndg-httpsclient
   - pip uninstall -y certifi && pip install certifi==2015.04.28
 
