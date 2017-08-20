@@ -23,11 +23,13 @@ cd "$srcdir/..";
 
 section "Testing validate_xml.py"
 
-until [ $# -lt 1 ]; do
-    case $1 in
-        -*) shift
-    esac
-done
+export TIMEOUT=3
+
+if [ $# -gt 0 ]; then
+    echo "validate_xml.py $@"
+    ./validate_xml.py $@
+    echo
+fi
 
 exclude='/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+$|broken|error'
 
