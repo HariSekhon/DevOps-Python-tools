@@ -95,6 +95,12 @@ apt-packages:
 	$(SUDO) apt-get install -y `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/deb-packages.txt`
 	which java || $(SUDO) apt-get install -y openjdk-8-jdk || $(SUDO) apt-get install -y openjdk-7-jdk
 
+# for validate_multimedia.py
+.PHONY: apt-packages-multimedia
+apt-packages-multimedia:
+	$(SUDO) apt-get update
+	$(SUDO) apt-get install -y --no-install-recommends ffmpeg
+
 .PHONY: apt-packages-remove
 apt-packages-remove:
 	cd pylib && make apt-packages-remove
