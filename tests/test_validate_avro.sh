@@ -23,11 +23,11 @@ cd "$srcdir/..";
 
 section "Testing validate_avro.py"
 
-until [ $# -lt 1 ]; do
-    case $1 in
-        -*) shift
-    esac
-done
+if [ $# -gt 0 ]; then
+    echo "validate_avro.py $@"
+    ./validate_avro.py $@
+    echo
+fi
 
 data_dir="tests/data"
 broken_dir="tests/avro_broken"
