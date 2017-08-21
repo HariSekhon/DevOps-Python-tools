@@ -36,6 +36,10 @@ PARQUET_VERSION=1.5.0
 
 .PHONY: build
 build:
+	@echo =============
+	@echo PyTools Build
+	@echo =============
+
 	if [ -x /sbin/apk ];        then make apk-packages; fi
 	if [ -x /usr/bin/apt-get ]; then make apt-packages; fi
 	if [ -x /usr/bin/yum ];     then make yum-packages; fi
