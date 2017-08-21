@@ -30,6 +30,10 @@ endif
 
 PARQUET_VERSION=1.5.0
 
+# bootstrap command:
+#
+# apt-get update && apt-get install -y make git && git clone https://github.com/harisekhon/pytools && cd pytools && make
+
 .PHONY: build
 build:
 	if [ -x /sbin/apk ];        then make apk-packages; fi
