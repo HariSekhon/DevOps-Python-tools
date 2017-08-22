@@ -107,8 +107,8 @@ hr
 echo "testing http ordering result consistency"
 echo
 
-# Google's server latency is so much less than yahoo's that giving -n3 will allow google.com to overtake yahoo.com, limit to 2 so that yahoo gets the next available slot
-check_output "yahoo.com" ./find_active_server.py $opts -n1 --http 0.0.0.1 4.4.4.4 yahoo.com google.com
+# Google's server latency is so much less than yahoo's that giving -n2 will allow google.com to overtake yahoo.com, limit to 1 so that yahoo gets the next available slot
+check_output "yahoo.com" ./find_active_server.py $opts -n1 --http 0.0.0.1 yahoo.com google.com
 
 hr
 echo "testing https ordering result consistency"
