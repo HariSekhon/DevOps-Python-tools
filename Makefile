@@ -30,9 +30,22 @@ endif
 
 PARQUET_VERSION=1.5.0
 
-# bootstrap command:
+# ===================
+# bootstrap commands:
+
+# Alpine:
 #
-# apt-get update && apt-get install -y make git && git clone https://github.com/harisekhon/pytools && cd pytools && make
+#   apk add --no-cache git make && git clone https://github.com/harisekhon/pytools && cd pytools && make
+
+# Debian / Ubuntu:
+#
+#   apt-get update && apt-get install -y make git && git clone https://github.com/harisekhon/pytools && cd pytools && make
+
+# RHEL / CentOS:
+#
+#   yum install -y make git && git clone https://github.com/harisekhon/pytools && cd pytools && make
+
+# ===================
 
 .PHONY: build
 build:
