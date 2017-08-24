@@ -157,7 +157,13 @@ If you update often and want to just quickly git pull + submodule update but ski
 - integration tests of the top level programs using the libraries for things like option parsing
 - [functional tests](https://github.com/HariSekhon/pytools/tree/master/tests) for the top level programs using local test data and [Dockerized containers](https://hub.docker.com/u/harisekhon/)
 
-Running ```make test``` will trigger all tests, starting with the underlying libraries and then moving on to integration and functional tests using local input and docker containers if docker is available.
+To trigger all tests run:
+
+```
+make test
+```
+
+which will start with the underlying libraries, then move on to top level integration tests and functional tests using docker containers if docker is available.
 
 ### Contributions ###
 
