@@ -164,10 +164,31 @@ echo "testing random socket select 10 times contains both google and yahoo resul
 echo
 
 # Google's servers are consistenly so much faster / lower latency that I end up with all 10 as google here, must restrict to single threaded random to allow yahoo to succeed
-output="$(for x in {1..10}; do ./find_active_server.py -n1 --random --port 80 google.com yahoo.com; done)"
-grep "google.com" <<< "$output" &&
-grep "yahoo.com" <<< "$output" ||
-    die "FAILED: --random google + yahoo test, didn't return both results for 10 random runs"
+#output="$(for x in {1..10}; do ./find_active_server.py -n1 --random --port 80 google.com yahoo.com; done)"
+#grep "google.com" <<< "$output" &&
+#grep "yahoo.com" <<< "$output" ||
+#    die "FAILED: --random google + yahoo test, didn't return both results for 10 random runs"
+# more efficient - stop as soon as both results are returned, typically 2-3 runs rather than 10 runs
+count_socket_attempts=0
+found_google_socket=0
+found_yahoo_socket=0
+for x in {1..10}; do
+    echo -n .
+    let count_socket_attempts+=1
+    output="$(./find_active_server.py -n1 --random --port 80 google.com yahoo.com)"
+    if [ "$output" = "google.com" ]; then
+        found_google_socket=1
+    elif [ "$output" = "yahoo.com" ]; then
+        found_yahoo_socket=1
+    fi
+    [ $found_google_socket -eq 1 -a $found_yahoo_socket -eq 1 ] && break
+done
+echo
+if [ $found_google_socket -eq 1 -a $found_yahoo_socket -eq 1 ]; then
+    echo "Found both google.com and yahoo.com in results from $count_socket_attempts --random runs"
+else
+    die "Failed to return both google.com and yahoo.com in results from $count_socket_attempts --random runs"
+fi
 echo
 
 # ============================================================================ #
@@ -182,25 +203,25 @@ echo
 #echo
 #
 # more efficient - stop as soon as both results are returned, typically 2-3 runs rather than 10 runs
-count=0
-found_google=0
-found_yahoo=0
+count_http_attempts=0
+found_google_http=0
+found_yahoo_http=0
 for x in {1..10}; do
     echo -n .
-    let count+=1
+    let count_http_attempts+=1
     output="$(./find_active_server.py -n1 --http --random google.com yahoo.com)"
     if [ "$output" = "google.com" ]; then
-        found_google=1
+        found_google_http=1
     elif [ "$output" = "yahoo.com" ]; then
-        found_yahoo=1
+        found_yahoo_http=1
     fi
-    [ $found_google -eq 1 -a $found_yahoo -eq 1 ] && break
+    [ $found_google_http -eq 1 -a $found_yahoo_http -eq 1 ] && break
 done
 echo
-if [ $found_google -eq 1 -a $found_yahoo -eq 1 ]; then
-    echo "Found both google.com and yahoo.com in results from $count --random runs"
+if [ $found_google_http -eq 1 -a $found_yahoo_http -eq 1 ]; then
+    echo "Found both google.com and yahoo.com in results from $count_http_attempts --random runs"
 else
-    die "Failed to return both google.com and yahoo.com in results from $count --random runs"
+    die "Failed to return both google.com and yahoo.com in results from $count_http_attempts --random runs"
 fi
 
 echo
