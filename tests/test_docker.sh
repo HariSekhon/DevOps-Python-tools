@@ -29,5 +29,5 @@ export DOCKER_IMAGE="harisekhon/pytools"
 if is_CI && is_docker_available; then
     docker pull "$DOCKER_IMAGE"
     docker run "$DOCKER_IMAGE" welcome.py
-    #docker run -e CI=1 "$DOCKER_IMAGE" tests/all.sh
+    docker run -e CI=1 "$DOCKER_IMAGE" tests/all.sh
 fi
