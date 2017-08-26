@@ -84,7 +84,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
+__version__ = '0.6'
 
 
 class FindActiveServer(CLI):
@@ -267,15 +267,26 @@ class FindActiveServer(CLI):
             raise UnknownError("passed invalid wait '{0}' to check_ping method, must be a valid integer!"\
                                .format(wait))
         log.info("pinging host '%s' (count=%s, wait=%s)", host, count, wait)
-        ping_count = '-c {0}'.format(count)
+        count_switch = '-c'
         if platform.system().lower() == 'windows':
-            ping_count = '-n {0}'.format(wait)
-        ping_wait = '-w {0}'.format(wait)
+            count_switch = '-n'
+        wait_switch = '-w'
         if platform.system().lower() == 'darwin':
-            ping_wait = '-W {0}'.format(wait)
+            wait_switch = '-W'
+        # causes hang if count / wait are not cast to string
+        cmd = ['ping', count_switch, '{0}'.format(count), wait_switch, '{0}'.format(wait), host]
+        log.debug('cmd: %s', ' '.join(cmd))
+        #log.debug('args: %s', cmd)
         try:
-            exitcode = subprocess.call(["ping", ping_count, ping_wait, host],
-                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            #log.debug('communicating')
+            (stdout, stderr) = process.communicate()
+            #log.debug('waiting for child process')
+            process.wait()
+            exitcode = process.returncode
+            log.debug('stdout: %s', stdout)
+            log.debug('stderr: %s', stderr)
+            log.debug('exitcode: %s', exitcode)
             if exitcode == 0:
                 log.info("host '%s' responded to ping", host)
                 return host
