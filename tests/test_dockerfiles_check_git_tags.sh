@@ -23,7 +23,7 @@ cd "$srcdir/.."
 
 . "bash-tools/utils.sh"
 
-section "Testing DockerfileS Check Git Tags"
+section "Testing Dockerfiles Check Git Tags"
 
 if which git &>dev/null; then
     if ! [ -d Dockerfiles ]; then
