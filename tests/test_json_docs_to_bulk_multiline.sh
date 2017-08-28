@@ -134,8 +134,17 @@ echo
 # ==================================================
 hr2
 echo "checking invalid single quote detection"
+# Alpine's busybox grep doesn't have color
+if grep --help 2>&1 | grep -q -- --color; then
+    grep_opts="--color"
+else
+    grep_opts="-o"
+fi
 set +o pipefail
-./json_docs_to_bulk_multiline.py -vvv "$data_dir/single_quotes.notjson" 2>&1 | tee "$stderr" | grep --color ' - ERROR - invalid json detected in ' || { echo "Failed to find single quote message in output"; exit 1; }
+./json_docs_to_bulk_multiline.py -vvv "$data_dir/single_quotes.notjson" 2>&1 |
+    tee "$stderr" |
+        grep $grep_opts -- ' - ERROR - invalid json detected in ' ||
+            { echo "Failed to find single quote message in output"; exit 1; }
 set -o pipefail
 echo
 
