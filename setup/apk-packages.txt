@@ -15,6 +15,8 @@
 
 alpine-sdk
 bash
+# without this arguments to mktemp fail in json tests
+coreutils
 cyrus-sasl-dev
 gcc
 git
