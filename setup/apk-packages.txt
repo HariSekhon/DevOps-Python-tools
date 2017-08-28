@@ -18,6 +18,7 @@ bash
 cyrus-sasl-dev
 gcc
 git
+grep
 krb5-dev
 libffi-dev
 linux-headers
