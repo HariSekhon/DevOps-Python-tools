@@ -28,6 +28,9 @@ zip
 iputils-ping
 #inetutils-ping
 
+# needed for serf test's 'uptime' command
+procps
+
 # needed to build python-snappy for avro module
 libsnappy-dev
 
