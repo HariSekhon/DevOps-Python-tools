@@ -68,6 +68,7 @@ class DockerHubSearch(CLI):
         # super().__init__()
         self._CLI__parser.usage = '{0} [options] TERM'.format(prog)
         self.timeout_default = 30
+        self.quiet = False
 
     def add_options(self):
         self.add_opt('-n', '--num', '--limit', default=50,
