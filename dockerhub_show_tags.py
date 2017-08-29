@@ -68,7 +68,7 @@ class DockerHubTags(CLI):
 
     def add_options(self):
         self.add_opt('-q', '--quiet', action='store_true', default=False,
-                     help='Output only the tags, one per line (useful for shell tricks)')
+                     help='Output only the tags, one per line (useful for shell scripting)')
 
     def run(self):
         if not self.args:
