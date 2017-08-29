@@ -84,7 +84,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6'
+__version__ = '0.6.1'
 
 
 class FindActiveServer(CLI):
@@ -102,7 +102,7 @@ class FindActiveServer(CLI):
         self.regex = None
         self.request_timeout = None
         self.num_threads = 10
-        self.que = Queue.Queue()
+        self.queue = Queue.Queue()
         self.pool = None
 
     def add_options(self):
@@ -218,12 +218,12 @@ class FindActiveServer(CLI):
         #async_result = pool.apply_async(self.check_ping, (host,))
         #return_val = async_result.get()
         #
-        self.pool.apply_async(lambda *args: self.que.put(func(*args)), args)
+        self.pool.apply_async(lambda *args: self.queue.put(func(*args)), args)
 
     def collect_results(self):
         return_val = None
         for _ in self.host_list:
-            return_val = self.que.get()
+            return_val = self.queue.get()
             if return_val:
                 break
         if return_val:
