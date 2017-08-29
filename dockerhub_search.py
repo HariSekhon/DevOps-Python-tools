@@ -56,7 +56,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.5'
 
 
 class DockerHubSearch(CLI):
@@ -72,12 +72,15 @@ class DockerHubSearch(CLI):
     def add_options(self):
         self.add_opt('-n', '--num', '--limit', default=50,
                      help='Number of results to return (default: 50)')
+        self.add_opt('-q', '--quiet', action='store_true',
+                     help='Output only the image names, one per line (useful for shell scripting)')
 
     def run(self):
         if not self.args:
             self.usage('no search term given as args')
         if len(self.args) > 1:
             self.usage('only single search term argument may be given')
+        self.quiet = self.get_opt('quiet')
         term = self.args[0]
         log.info('term: %s', term)
         num = self.get_opt('num')
@@ -110,8 +113,9 @@ class DockerHubSearch(CLI):
             die('failed to parse results fields from data returned by DockerHub ' +
                 '(format may have changed?): {0}'.format(_))
         # mimicking out spacing from 'docker search' command
-        print('{0:{5}s}   {1:45s}   {2:7s}   {3:8s}   {4:10s}'.
-              format('NAME', 'DESCRIPTION', 'STARS', 'OFFICIAL', 'AUTOMATED', longest_name))
+        if not self.quiet:
+            print('{0:{5}s}   {1:45s}   {2:7s}   {3:8s}   {4:10s}'.
+                  format('NAME', 'DESCRIPTION', 'STARS', 'OFFICIAL', 'AUTOMATED', longest_name))
 
         def truncate(mystr, length):
             if len(mystr) > length:
@@ -120,13 +124,16 @@ class DockerHubSearch(CLI):
 
         for star in reversed(sorted(results)):
             for name in sorted(results[star]):
-                desc = truncate(results[star][name]['description'], 45)
-                print('{0:{5}s}   {1:45s}   {2:<7d}   {3:8s}   {4:10s}'.
-                      format(name.encode('utf-8'), desc.encode('utf-8'), star,
-                             results[star][name]['official'],
-                             results[star][name]['automated'],
-                             longest_name))
-        if self.verbose:
+                if self.quiet:
+                    print(name.encode('utf-8'))
+                else:
+                    desc = truncate(results[star][name]['description'], 45)
+                    print('{0:{5}s}   {1:45s}   {2:<7d}   {3:8s}   {4:10s}'.
+                          format(name.encode('utf-8'), desc.encode('utf-8'), star,
+                                 results[star][name]['official'],
+                                 results[star][name]['automated'],
+                                 longest_name))
+        if self.verbose and not self.quiet:
             try:
                 print('\nResults Shown: {0}\nTotal Results: {1}'.format(len(data['results']), data['num_results']))
             except KeyError as _:
