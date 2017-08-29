@@ -53,7 +53,11 @@ opts="-v"
 if is_CI; then
     # too much output, causes Travis CI to fail job
     unset DEBUG
-    opts="$opts -v --request-timeout 10 --timeout 30"
+    #opts="$opts -v --request-timeout 10 --timeout 30"
+    # these options are all supported via environment now
+    export VERBOSE=2
+    export REQUEST_TIMEOUT=10
+    export TIMEOUT=30
 fi
 
 echo "testing socket ordering result consistency"
@@ -116,6 +120,8 @@ echo
 
 check_output "yahoo.com" ./find_active_server.py $opts -n1 --https yahoo.com google.com
 
+# there is an bug somewhere in Alpine Linux's libraries where only --https doesn't limit concurrency and the yahoo result is often faster on https, breaking this test
+# works fine on normal Linux distributions like Centos, Debian and Ubuntu
 check_output "google.com" ./find_active_server.py $opts -n1 --https 0.0.0.1 google.com yahoo.com
 
 echo
