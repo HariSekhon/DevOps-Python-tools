@@ -57,7 +57,7 @@ from pyspark import SparkConf       # pylint: disable=wrong-import-position,impo
 from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.2'
+__version__ = '0.8.0'
 
 
 class SparkAvroToParquet(CLI):
@@ -99,6 +99,8 @@ class SparkAvroToParquet(CLI):
 
         conf = SparkConf().setAppName('HS PySpark Avro => Parquet')
         sc = SparkContext(conf=conf) # pylint: disable=invalid-name
+        if self.verbose < 3:
+            sc.setLogLevel('WARN')
         sqlContext = SQLContext(sc)  # pylint: disable=invalid-name
         spark_version = sc.version
         log.info('Spark version detected as %s' % spark_version)
