@@ -64,7 +64,8 @@ from pyspark.sql.types import *     # pylint: disable=wrong-import-position,impo
 from pyspark.sql.types import StructType, StructField  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.3'
+__version__ = '0.8.0'
+
 
 class SparkCSVToAvro(CLI):
 
@@ -155,6 +156,8 @@ class SparkCSVToAvro(CLI):
 
         conf = SparkConf().setAppName('HS PySpark CSV => Avro')
         sc = SparkContext(conf=conf) # pylint: disable=invalid-name
+        if self.verbose < 3:
+            sc.setLogLevel('WARN')
         sqlContext = SQLContext(sc)  # pylint: disable=invalid-name
         spark_version = sc.version
         log.info('Spark version detected as %s' % spark_version)
