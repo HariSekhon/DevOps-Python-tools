@@ -30,6 +30,7 @@ if is_docker_available; then
     [ -n "${NO_DOCKER:-}" ] && exit 0
     [ -n "${NO_PULL:-}" ] ||
         docker pull "$DOCKER_IMAGE"
-    #docker run --rm "$DOCKER_IMAGE" welcome.py
-    docker run --rm -e DEBUG="${DEBUG:-}" "$DOCKER_IMAGE" tests/all.sh
+    docker run --rm "$DOCKER_IMAGE" welcome.py
+    # this is too heavy and tests/all.sh is run as part of build
+    #docker run --rm -e DEBUG="${DEBUG:-}" "$DOCKER_IMAGE" tests/all.sh
 fi
