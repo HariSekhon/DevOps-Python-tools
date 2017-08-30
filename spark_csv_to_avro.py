@@ -156,6 +156,8 @@ class SparkCSVToAvro(CLI):
 
         conf = SparkConf().setAppName('HS PySpark CSV => Avro')
         sc = SparkContext(conf=conf) # pylint: disable=invalid-name
+        if self.verbose < 3 and 'setLogLevel' in dir(sc):
+            sc.setLogLevel('WARN')
         sqlContext = SQLContext(sc)  # pylint: disable=invalid-name
         spark_version = sc.version
         log.info('Spark version detected as %s' % spark_version)
@@ -166,8 +168,6 @@ class SparkCSVToAvro(CLI):
         #  pylint: disable=invalid-name
         df = None
         if isMinVersion(spark_version, 1.4):
-            if self.verbose < 3:
-                sc.setLogLevel('WARN')
             if has_header and not schema:
                 log.info('inferring schema from CSV headers')
                 df = sqlContext.read.format('com.databricks.spark.csv')\
