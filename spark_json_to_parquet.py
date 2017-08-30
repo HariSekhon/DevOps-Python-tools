@@ -89,14 +89,14 @@ class SparkJsonToParquet(CLI):
 
         conf = SparkConf().setAppName('HS PySpark JSON => Parquet')
         sc = SparkContext(conf=conf) # pylint: disable=invalid-name
+        if self.verbose < 3 and 'setLogLevel' in dir(sc):
+            sc.setLogLevel('WARN')
         sqlContext = SQLContext(sc)  # pylint: disable=invalid-name
         spark_version = sc.version
         log.info('Spark version detected as %s' % spark_version)
         if not isVersionLax(spark_version):
             die("Spark version couldn't be determined. " + support_msg('pytools'))
         if isMinVersion(spark_version, 1.4):
-            if self.verbose < 3:
-                sc.setLogLevel('WARN')
             df = sqlContext.read.json(json_file) # pylint: disable=invalid-name
             df.write.parquet(parquet_dir)
         else:
