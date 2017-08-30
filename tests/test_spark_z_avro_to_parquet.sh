@@ -52,7 +52,7 @@ for SPARK_VERSION in $SPARK_VERSIONS; do
     echo
     export SPARK_HOME="$dir"
     rm -fr "test-$dir.parquet"
-    ../spark_avro_to_parquet.py -a "test-header-$dir.avro" -p "test-$dir.parquet" $@ &&
+    ../spark_avro_to_parquet.py -a "test-header-$dir.avro" -p "test-$dir.parquet" &&
         echo "SUCCEEDED with Spark $SPARK_VERSION" ||
         { echo "FAILED test with Spark $SPARK_VERSION"; exit 1; }
 done
