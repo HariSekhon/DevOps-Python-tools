@@ -148,6 +148,8 @@ class SparkCSVToParquet(CLI):
 
         conf = SparkConf().setAppName('HS PySpark CSV => Parquet')
         sc = SparkContext(conf=conf) # pylint: disable=invalid-name
+        if self.verbose < 3 and 'setLogLevel' in dir(sc):
+            sc.setLogLevel('WARN')
         sqlContext = SQLContext(sc)  # pylint: disable=invalid-name
         spark_version = sc.version
         log.info('Spark version detected as %s' % spark_version)
@@ -159,8 +161,6 @@ class SparkCSVToParquet(CLI):
 
         df = None
         if isMinVersion(spark_version, 1.4):
-            if self.verbose < 3:
-                sc.setLogLevel('WARN')
             if has_header and not schema:
                 log.info('inferring schema from CSV headers')
                 df = sqlContext.read.format('com.databricks.spark.csv')\
