@@ -99,6 +99,8 @@ class SparkJSONToAvro(CLI):
 
         conf = SparkConf().setAppName('HS PySpark Json => Avro')
         sc = SparkContext(conf=conf) # pylint: disable=invalid-name
+        if self.verbose < 3 and 'setLogLevel' in dir(sc):
+            sc.setLogLevel('WARN')
         sqlContext = SQLContext(sc)  # pylint: disable=invalid-name
         spark_version = sc.version
         log.info('Spark version detected as %s' % spark_version)
@@ -109,8 +111,6 @@ class SparkJSONToAvro(CLI):
         #  pylint: disable=invalid-name
         df = None
         if isMinVersion(spark_version, 1.4):
-            if self.verbose < 3:
-                sc.setLogLevel('WARN')
             df = sqlContext.read.json(json_file)
         else:
             die('Spark <= 1.3 is not supported due to avro dependency, sorry! ' + \
