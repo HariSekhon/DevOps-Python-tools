@@ -99,6 +99,8 @@ class SparkJSONToAvro(CLI):
 
         conf = SparkConf().setAppName('HS PySpark Json => Avro')
         sc = SparkContext(conf=conf) # pylint: disable=invalid-name
+        if self.verbose < 3:
+            sc.setLogLevel('WARN')
         sqlContext = SQLContext(sc)  # pylint: disable=invalid-name
         spark_version = sc.version
         log.info('Spark version detected as %s' % spark_version)
