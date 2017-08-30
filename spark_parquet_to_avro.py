@@ -99,8 +99,6 @@ class SparkParquetToAvro(CLI):
 
         conf = SparkConf().setAppName('HS PySpark Parquet => Avro')
         sc = SparkContext(conf=conf) # pylint: disable=invalid-name
-        if self.verbose < 3:
-            sc.setLogLevel('WARN')
         sqlContext = SQLContext(sc)  # pylint: disable=invalid-name
         spark_version = sc.version
         log.info('Spark version detected as %s' % spark_version)
@@ -110,6 +108,8 @@ class SparkParquetToAvro(CLI):
 
         #  pylint: disable=invalid-name
         if isMinVersion(spark_version, 1.4):
+            if self.verbose < 3:
+                sc.setLogLevel('WARN')
             # this doesn't work in Spark <= 1.3 - github docs don't mention the older .method() for writing avro
             df = sqlContext.read.parquet(parquet_file)
             df.write.format('com.databricks.spark.avro').save(avro_dir)
