@@ -53,9 +53,9 @@ opts="-v"
 if is_CI; then
     # too much output, causes Travis CI to fail job
     unset DEBUG
+    export VERBOSE=0
     #opts="$opts -v --request-timeout 10 --timeout 30"
     # these options are all supported via environment now
-    export VERBOSE=2
     export REQUEST_TIMEOUT=10
     export TIMEOUT=30
 fi
