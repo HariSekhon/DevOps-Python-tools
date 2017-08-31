@@ -13,26 +13,15 @@
 #                          Alpine Package Requirements
 # ============================================================================ #
 
-alpine-sdk
 bash
 # without this arguments to mktemp fail in json tests
 coreutils
-cyrus-sasl-dev
-gcc
 git
 grep
-krb5-dev
-libffi-dev
-linux-headers
 make
-#openssl-dev
-libressl-dev
 py2-pip
 python
-python-dev
 snappy-dev
-wget
-zip
 
 # needed for tests/test_spark* and ambari_cancel_all_requests.sh
 curl

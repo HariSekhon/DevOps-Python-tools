@@ -13,15 +13,9 @@
 #                          RPM Package Requirements
 # ============================================================================ #
 
-gcc
-gcc-c++
 git
-python-devel
 python-pip
 python-setuptools
-unzip
-wget
-zip
 
 # needed for tests/test_spark* and ambari_cancel_all_requests.sh
 curl

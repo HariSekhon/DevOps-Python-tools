@@ -16,7 +16,6 @@
 # needed to fetch the library submodule at end of build
 git
 
-build-essential
 python
 python-pip
 python-setuptools

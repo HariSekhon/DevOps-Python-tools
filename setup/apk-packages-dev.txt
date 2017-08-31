@@ -14,14 +14,13 @@
 # ============================================================================ #
 
 alpine-sdk
-cyrus-sasl-dev
 gcc
+cyrus-sasl-dev
 krb5-dev
 libffi-dev
 linux-headers
 #openssl-dev
 libressl-dev
 python-dev
-snappy-dev
 wget
 zip
