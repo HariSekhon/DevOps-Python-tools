@@ -23,6 +23,9 @@ unzip
 wget
 zip
 
+# needed for tests/test_spark* and ambari_cancel_all_requests.sh
+curl
+
 # for ping mode of find_active_server.py
 iputils
 

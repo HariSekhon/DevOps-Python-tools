@@ -34,6 +34,9 @@ snappy-dev
 wget
 zip
 
+# needed for tests/test_spark* and ambari_cancel_all_requests.sh
+curl
+
 #which java || $(SUDO) apk add openjdk8-jre-base
 
 # Spark Java Py4J gets java linking error without this
