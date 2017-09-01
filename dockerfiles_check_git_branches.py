@@ -364,7 +364,7 @@ class DockerfileGitBranchCheckTool(CLI):
         if not isVersion(branch_version.lstrip('jdk').lstrip('jre')):
             die("unrecognized branch version '{0}' for branch_base '{1}'"
                 .format(branch_version, branch_base))
-        #if branch_version == found_version or branch_version == found_version.split('.', 2)[0]:
+        #if branch_version == found_version or branch_version == found_version.split('.', 1)[0]:
         if found_version[0:len(branch_version)] == branch_version:
             log.info("{0} version '{1}' matches {2}".
                      format(self.valid_git_branches_msg, branch_version, arg_version))
