@@ -36,7 +36,7 @@ Return first web server to respond:
 
     cat host_list.txt | xargs ./find_active_server.py --http
 
-Example of finding Hadoop's active NameNode:
+Find Hadoop Active NameNode:
 
     ./find_active_server.py --http --port 50070 --url 'jmx' --regex '"State"\s*:\s*"active"'  namenode1 namenode2
 
@@ -44,7 +44,7 @@ Example of finding Hadoop's active NameNode:
 
     ./find_active_hadoop_namenode.py  namenode1 namenode2
 
-Example of extending an Elasticsearch check from the Advanced Nagios Plugins Collection:
+Target a Nagios plugin to first available cluster node, eg. Elasticsearch from the Advanced Nagios Plugins Collection:
 
     ./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py -v --http --port 9200 node1 node2 node3)
 
