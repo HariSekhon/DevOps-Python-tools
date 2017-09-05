@@ -14,7 +14,7 @@
 #  https://www.linkedin.com/in/harisekhon
 #
 
-"""
+r"""
 
 Tool to return the first available healthy server or active master from a given list
 
@@ -40,9 +40,9 @@ Example of finding Hadoop's active NameNode:
 
     ./find_active_server.py --http --port 50070 --url 'jmx' --regex '"State"\s*:\s*"active"'  namenode1 namenode2
 
-    or you can use the simplified subclassed program find_active_namenode.py which has the correct settings auto-populated:
+    or use the simplified program subclassed wrapper program find_active_namenode.py:
 
-    ./find_active_hadoop_namenode.py namenode1 namenode2
+    ./find_active_hadoop_namenode.py  namenode1 namenode2
 
 Example of extending an Elasticsearch check from the Advanced Nagios Plugins Collection:
 
