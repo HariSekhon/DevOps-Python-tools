@@ -124,7 +124,8 @@ class FindActiveServer(CLI):
                      help='Fetch web page over HTTPS protocol instead of doing a socket test ' +
                      '(overrides --http, changes port 80 to 443)')
         self.add_opt('-u', '--url', help='URL path to fetch (implies --http)')
-        self.add_opt('-r', '--regex', help='Regex to search for in http content (optional)')
+        self.add_opt('-r', '--regex', help='Regex to search for in http content (optional). Case sensitive by default ' +
+                                           'for better targeting, wrap with (?i:...) modifier for case insensitivity')
         self.add_opt('-n', '--num-threads', default=self.num_threads, type='int',
                      help='Number or parallel threads to speed up processing (default: 10, ' +
                      'use -n=1 for deterministic host preference order [slower])')
