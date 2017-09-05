@@ -24,19 +24,29 @@ Can mix and match between a comma separated list of hosts (--host server1,server
 environment variable if not specified) and general free-form space separated arguments, which is useful if piping
 a host list through xargs.
 
-eg. return the first web server to respond:
-
-cat host_list.txt | xargs ./find_active_server.py --http
-
 Multi-threaded for speed and exits upon first available host response to minimize delay to ~ 1 second or less.
 
 Useful for pre-determining a server to be passed to tools that only take a single --host argument but for which the
 technology has later added multi-master support or active-standby masters (eg. Hadoop, HBase) or where you want to
 query cluster wide information available from any online peer (eg. Elasticsearch).
 
+Examples:
+
+Return first web server to respond:
+
+    cat host_list.txt | xargs ./find_active_server.py --http
+
+Example of finding Hadoop's active NameNode:
+
+    ./find_active_server.py --http --port 50070 --url 'jmx' --regex '"State"\s*:\s*"active"'  namenode1 namenode2
+
+    or you can use the simplified subclassed program find_active_namenode.py which has the correct settings auto-populated:
+
+    ./find_active_hadoop_namenode.py namenode1 namenode2
+
 Example of extending an Elasticsearch check from the Advanced Nagios Plugins Collection:
 
-./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py -v --http --port 9200 node1 node2 node3)
+    ./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py -v --http --port 9200 node1 node2 node3)
 
 By default checks the same --port on all servers. Hosts may have optional :<port> suffixes added to individually
 override each one.
