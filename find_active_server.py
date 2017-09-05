@@ -40,7 +40,7 @@ Find Hadoop Active NameNode:
 
     ./find_active_server.py --http --port 50070 --url 'jmx' --regex '"State"\s*:\s*"active"'  namenode1 namenode2
 
-    or use the simplified subclassed wrapper program find_active_hadoop_namenode.py:
+    or use the simplified subclassed program find_active_hadoop_namenode.py:
 
     ./find_active_hadoop_namenode.py  namenode1 namenode2
 
