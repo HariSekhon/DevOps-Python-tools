@@ -51,8 +51,8 @@ Example of extending an Elasticsearch check from the Advanced Nagios Plugins Col
 By default checks the same --port on all servers. Hosts may have optional :<port> suffixes added to individually
 override each one.
 
-Exits with return code 1 and no output if none of the supplied servers pass the test criteria, --verbose mode will
-output the token NO_AVAILABLE_SERVER.
+Exits with return code 1 and NO_AVAILABLE_SERVER if none of the supplied servers pass the test criteria,
+--quiet mode will return blank output and exit code 1 in that case.
 
 """
 
