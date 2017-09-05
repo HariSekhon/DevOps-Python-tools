@@ -40,11 +40,11 @@ Find Hadoop Active NameNode:
 
     ./find_active_server.py --http --port 50070 --url 'jmx' --regex '"State"\s*:\s*"active"'  namenode1 namenode2
 
-    or use the simplified program subclassed wrapper program find_active_namenode.py:
+    or use the simplified subclassed wrapper program find_active_hadoop_namenode.py:
 
     ./find_active_hadoop_namenode.py  namenode1 namenode2
 
-Target a Nagios plugin to first available cluster node, eg. Elasticsearch from the Advanced Nagios Plugins Collection:
+Target a Nagios Plugin to first available cluster node, eg. Elasticsearch check from Advanced Nagios Plugins Collection:
 
     ./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py -v --http --port 9200 node1 node2 node3)
 
