@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.4.1'
 
 
 class DockerHubTags(CLI):
@@ -94,7 +94,7 @@ class DockerHubTags(CLI):
     def get_tags(self, repo):
         namespace = 'library'
         if '/' in repo:
-            (namespace, repo) = repo.split('/', 2)
+            (namespace, repo) = repo.split('/', 1)
         # there is another endpoint but it requires authentication
         url = 'https://registry.hub.docker.com/v2/repositories/{0}/{1}/tags/'\
               .format(urllib.quote_plus(namespace), urllib.quote_plus(repo))

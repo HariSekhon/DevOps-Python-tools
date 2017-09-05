@@ -18,7 +18,6 @@ gcc
 gcc-c++
 git
 python-devel
-snappy-devel
 unzip
 wget
 zip

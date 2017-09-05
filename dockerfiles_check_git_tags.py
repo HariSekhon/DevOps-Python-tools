@@ -232,7 +232,7 @@ class DockerfileGitTagCheckTool(CLI):
                         if not isVersion(tag_version):
                             die("unrecognized tag version '{0}' for tag_base '{1}'".format(tag_version, tag_base))
                         found_version = argversion.group(2)
-                        #if tag_version == found_version or tag_version == found_version.split('.', 2)[0]:
+                        #if tag_version == found_version or tag_version == found_version.split('.', 1)[0]:
                         if found_version[0:len(tag_version)] == tag_version:
                             log.info("{0} (tag version '{1}' matches arg version '{2}')".
                                      format(self.valid_git_tags_msg, tag_version, found_version))

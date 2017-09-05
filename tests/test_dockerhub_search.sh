@@ -29,7 +29,7 @@ check './dockerhub_search.py centos' "DockerHub Search for CentOS"
 check './dockerhub_search.py harisekhon' "DockerHub Search for harisekhon"
 check './dockerhub_search.py harisekhon -n 30' "DockerHub Search for harisekhon -n 30"
 check './dockerhub_search.py harisekhon/hadoop-dev | grep harisekhon/hadoop-dev' "DockerHub Search for harisekhon/hadoop-dev"
-check '[ $(./dockerhub_search.py -q harisekhon | head -n 40 | grep "^harisekhon/[A-Za-z0-9-]*$" | wc -l) = 40 ]' "DockerHub Search quiet mode for shell scripting"
+check '[ $(./dockerhub_search.py -q harisekhon | head -n 40 | grep "^harisekhon/[A-Za-z0-9_-]*$" | wc -l) = 40 ]' "DockerHub Search quiet mode for shell scripting"
 
 echo
 echo
