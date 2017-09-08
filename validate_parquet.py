@@ -47,6 +47,11 @@ import re
 import subprocess
 import sys
 import tempfile
+#try:
+#    import pyarrow.parquet as pq
+#except ImportError as _:
+#    print('module import failed: %s' % _, file=sys.stderr)
+#    sys.exit(4)
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
@@ -102,6 +107,9 @@ class ParquetValidatorTool(CLI):
         if not which('parquet-cat'):
             die('parquet-cat not found in $PATH')
         if subprocess.call(['parquet-cat', filename], stdout=subprocess.PIPE, stderr=stderr, shell=False) == 0:
+        # not very tolerant, get exception with this error:
+        # pyarrow.lib.ArrowNotImplementedError: No support for reading columns of type list<array: int32 not null>
+        #if pq.read_table(filename):
             print(self.valid_parquet_msg)
         else:
             die(self.invalid_parquet_msg)
