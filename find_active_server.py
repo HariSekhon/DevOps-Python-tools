@@ -44,6 +44,14 @@ Find Hadoop Active NameNode:
 
     ./find_active_hadoop_namenode.py  namenode1 namenode2
 
+Find Hadoop Active Yarn Resource Manager:
+
+    ./find_active_server.py --http --port 8088 --url /ws/v1/cluster --regex '"haState"\s*:\s*"ACTIVE"'  resourcemanager1 resourcemanager2
+
+    of use the simplified subclassed program find_active_hadoop_yarn_resource_manager.py:
+
+    find_active_hadoop_yarn_resource_manager.py  resourcemanager1 resourcemanager2
+
 Target a Nagios Plugin to first available cluster node, eg. Elasticsearch check from Advanced Nagios Plugins Collection:
 
     ./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py -v --http --port 9200 node1 node2 node3)
