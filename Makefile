@@ -163,10 +163,19 @@ jython-install:
 sonar:
 	sonar-scanner
 
+.PHONY: lib-test
+lib-test:
+	cd pylib && make test
+
 .PHONY: test
 test:
-	cd pylib && make test
+	make lib-test
 	tests/all.sh
+
+.PHONY: basic-test
+basic-test:
+	make lib-test
+	bash-tools/all.sh
 
 .PHONY: test2
 test2:
