@@ -23,7 +23,7 @@ protocol / compat / transport settings will need to be adjusted.
 
 Prints a dot for every 100 rows sent to let you know it's still working.
 
-Tested on Hortonworks HDP 2.3 (HBase 1.1.2) and Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2
+Tested on Hortonworks HDP 2.3 (HBase 1.1.2) and Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2, 1.3.1
 
 """
 
