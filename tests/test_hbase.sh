@@ -25,25 +25,23 @@ cd "$srcdir2/.."
 
 srcdir="$srcdir2"
 
-echo "
-# ============================================================================ #
-#                                   H B a s e
-# ============================================================================ #
-"
+section "H B a s e"
 
 HBASE_HOST="${DOCKER_HOST:-${HBASE_HOST:-${HOST:-localhost}}}"
 HBASE_HOST="${HBASE_HOST##*/}"
 HBASE_HOST="${HBASE_HOST%%:*}"
 export HBASE_HOST
-export HBASE_STARGATE_PORT=8080
-export HBASE_THRIFT_PORT=9090
-export ZOOKEEPER_PORT=2181
-export HBASE_PORTS="$ZOOKEEPER_PORT $HBASE_STARGATE_PORT 8085 $HBASE_THRIFT_PORT 9095 16000 16010 16201 16301"
-export HBASE_TEST_PORTS="$ZOOKEEPER_PORT $HBASE_THRIFT_PORT"
+export HBASE_STARGATE_PORT_DEFAULT=8080
+export HBASE_THRIFT_PORT_DEFAULT=9090
+export ZOOKEEPER_PORT_DEFAULT=2181
+export HBASE_PORTS="$ZOOKEEPER_PORT_DEFAULT $HBASE_STARGATE_PORT_DEFAULT 8085 $HBASE_THRIFT_PORT_DEFAULT 9095 16000 16010 16201 16301"
+#export HBASE_TEST_PORTS="$ZOOKEEPER_PORT $HBASE_THRIFT_PORT"
 
-export HBASE_VERSIONS="${@:-0.96 0.98 1.0 1.1 1.2 latest}"
+export HBASE_VERSIONS="${@:-0.96 0.98 1.0 1.1 1.2 1.3 latest}"
 
 check_docker_available
+
+trap_debug_env hbase
 
 export MNTDIR="/pytools"
 
@@ -64,15 +62,15 @@ test_hbase(){
     #local DOCKER_OPTS="-v $srcdir/..:$MNTDIR"
     #launch_container "$DOCKER_IMAGE:$version" "$DOCKER_CONTAINER" 2181 8080 8085 9090 9095 16000 16010 16201 16301
     VERSION="$version" docker-compose up -d
-    if [ "$version" = "0.96" ]; then
-        local HBASE_PORTS="$ZOOKEEPER_PORT $HBASE_STARGATE_PORT 8085 $HBASE_THRIFT_PORT 9095 16000 60010 60201 60301"
-    fi
-    local HBASE_STARGATE_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_STARGATE_PORT" | sed 's/.*://'`"
-    local HBASE_THRIFT_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_THRIFT_PORT" | sed 's/.*://'`"
-    local ZOOKEEPER_PORT="`docker-compose port "$DOCKER_SERVICE" "$ZOOKEEPER_PORT" | sed 's/.*://'`"
+    export HBASE_STARGATE_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_STARGATE_PORT_DEFAULT" | sed 's/.*://'`"
+    export HBASE_THRIFT_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_THRIFT_PORT_DEFAULT" | sed 's/.*://'`"
+    export ZOOKEEPER_PORT="`docker-compose port "$DOCKER_SERVICE" "$ZOOKEEPER_PORT_DEFAULT" | sed 's/.*://'`"
     #hbase_ports=`{ for x in $HBASE_PORTS; do docker-compose port "$DOCKER_SERVICE" "$x"; done; } | sed 's/.*://'`
-    hbase_ports="$HBASE_STARGATE_PORT $HBASE_THRIFT_PORT $ZOOKEEPER_PORT"
-    when_ports_available "$startupwait" "$HBASE_HOST" $hbase_ports
+    export HBASE_PORTS="$HBASE_STARGATE_PORT $HBASE_THRIFT_PORT $ZOOKEEPER_PORT"
+    if [ "$version" = "0.96" ]; then
+        export HBASE_PORTS="$ZOOKEEPER_PORT $HBASE_STARGATE_PORT 8085 $HBASE_THRIFT_PORT 9095 16000 60010 60201 60301"
+    fi
+    when_ports_available "$startupwait" "$HBASE_HOST" $HBASE_PORTS
     #when_ports_available $startupwait $HBASE_HOST $HBASE_TEST_PORTS
     echo "setting up test tables"
     uniq_val=$(< /dev/urandom tr -dc 'a-zA-Z0-9' 2>/dev/null | head -c32 || :)
@@ -210,8 +208,4 @@ EOF
     echo
 }
 
-for version in $HBASE_VERSIONS; do
-    test_hbase $version
-done
-echo "All HBase Tests Succeeded"
-echo
+run_test_versions HBase
