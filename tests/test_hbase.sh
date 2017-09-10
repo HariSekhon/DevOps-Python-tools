@@ -50,6 +50,10 @@ startupwait=50
 docker_exec(){
     # gets ValueError: file descriptor cannot be a negative integer (-1), -T should be the workaround but hangs
     #docker-compose exec -T "$DOCKER_SERVICE" /bin/bash <<-EOF
+    echo "docker exec -i "${COMPOSE_PROJECT_NAME:-docker}_${DOCKER_SERVICE}_1" /bin/bash <<-EOF
+    export JAVA_HOME=/usr
+    $MNTDIR/$@
+EOF"
     docker exec -i "${COMPOSE_PROJECT_NAME:-docker}_${DOCKER_SERVICE}_1" /bin/bash <<-EOF
     export JAVA_HOME=/usr
     $MNTDIR/$@
@@ -97,36 +101,47 @@ EOF
     fi
     export HBASE_THRIFT_SERVER_PORT="$HBASE_THRIFT_PORT"
     hr
+    echo "./hbase_generate_data.py -n 10"
     ./hbase_generate_data.py -n 10
     hr
     set +e
+    echo "./hbase_generate_data.py -n 10"
     ./hbase_generate_data.py -n 10
     check_exit_code 2
     set -e
     hr
     set +e
     echo "trying to send generated data to DisabledTable (times out):"
+    echo "./hbase_generate_data.py -n 10 -T DisabledTable -X"
     ./hbase_generate_data.py -n 10 -T DisabledTable -X
     check_exit_code 2
     set -e
     hr
+    echo "./hbase_generate_data.py -n 10 -d"
     ./hbase_generate_data.py -n 10 -d
     hr
+    echo "./hbase_generate_data.py -n 10 -d -s"
     ./hbase_generate_data.py -n 10 -d -s
     hr
+    echo "./hbase_generate_data.py -n 10000 -X -s --pc 50 -T UniformSplitTable"
     ./hbase_generate_data.py -n 10000 -X -s --pc 50 -T UniformSplitTable
     hr
+    echo "./hbase_generate_data.py -n 10000 -X -T HexStringSplitTable"
     ./hbase_generate_data.py -n 10000 -X -T HexStringSplitTable
     hr
     set +e
+    echo "./hbase_compact_tables.py --list-tables"
     ./hbase_compact_tables.py --list-tables
     check_exit_code 3
     set -e
     hr
+    echo "./hbase_compact_tables.py -H $HBASE_HOST"
     ./hbase_compact_tables.py -H $HBASE_HOST
     hr
+    echo "./hbase_compact_tables.py -r DisabledTable"
     ./hbase_compact_tables.py -r DisabledTable
     hr
+    echo "./hbase_compact_tables.py --regex .1"
     ./hbase_compact_tables.py --regex .1
     hr
     set +e
@@ -139,67 +154,87 @@ EOF
     docker_exec hbase_flush_tables.py -r Disabled.*
     hr
     set +e
+    echo "./hbase_show_table_region_ranges.py --list-tables"
     ./hbase_show_table_region_ranges.py --list-tables
     check_exit_code 3
     set -e
     hr
     echo "checking hbase_show_table_region_ranges.py against DisabledTable"
+    echo "./hbase_show_table_region_ranges.py -T DisabledTable -vvv"
     ./hbase_show_table_region_ranges.py -T DisabledTable -vvv
     hr
     echo "checking hbase_show_table_region_ranges.py against EmptyTable"
+    echo "./hbase_show_table_region_ranges.py -T EmptyTable -vvv"
     ./hbase_show_table_region_ranges.py -T EmptyTable -vvv
     hr
+    echo "./hbase_show_table_region_ranges.py -T HexStringSplitTable -v --short-region-name"
     ./hbase_show_table_region_ranges.py -T HexStringSplitTable -v --short-region-name
     hr
+    echo "./hbase_show_table_region_ranges.py -T UniformSplitTable -v"
     ./hbase_show_table_region_ranges.py -T UniformSplitTable -v
     hr
     set +e
+    echo "./hbase_calculate_table_region_row_distribution.py --list-tables"
     ./hbase_calculate_table_region_row_distribution.py --list-tables
     check_exit_code 3
     set -e
     hr
     echo "checking hbase_calculate_table_region_row_distribution.py against DisabledTable"
     set +e
+    echo "./hbase_calculate_table_region_row_distribution.py -T DisabledTable -vvv"
     ./hbase_calculate_table_region_row_distribution.py -T DisabledTable -vvv
     check_exit_code 2
     set -e
     hr
     echo "checking hbase_calculate_table_region_row_distribution.py against EmptyTable"
     set +e
+    echo "./hbase_calculate_table_region_row_distribution.py -T EmptyTable -vvv"
     ./hbase_calculate_table_region_row_distribution.py -T EmptyTable -vvv
     check_exit_code 2
     set -e
     hr
+    echo "./hbase_calculate_table_region_row_distribution.py -T UniformSplitTable -v --no-region-name"
     ./hbase_calculate_table_region_row_distribution.py -T UniformSplitTable -v --no-region-name
     hr
+    echo "./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable"
     ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable
     hr
+    echo "./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -vv --short-region-name --sort server"
     ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -vv --short-region-name --sort server
     hr
+    echo "./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort server --desc"
     ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort server --desc
     hr
+    echo "./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count"
     ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count
     hr
+    echo "./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc"
     ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc
     hr
     echo "checking hbase_calculate_table_row_key_distribution.py against DisabledTable"
     set +e
+    echo "./hbase_calculate_table_row_key_distribution.py -T DisabledTable -vvv"
     ./hbase_calculate_table_row_key_distribution.py -T DisabledTable -vvv
     check_exit_code 2
     set -e
     hr
     echo "checking hbase_calculate_table_row_key_distribution.py against EmptyTable"
     set +e
+    echo "./hbase_calculate_table_row_key_distribution.py -T EmptyTable -vvv"
     ./hbase_calculate_table_row_key_distribution.py -T EmptyTable -vvv
     check_exit_code 2
     set -e
     hr
+    echo "./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2"
     ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2
     hr
+    echo "./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable --sort"
     ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable --sort
     hr
+    echo "./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable --sort --desc"
     ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable --sort --desc
     hr
+    echo "./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable"
     ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
     hr
 
