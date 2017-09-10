@@ -27,7 +27,7 @@ number of regions hosted across region servers to make sure there is a spread.
 - hbase_calculate_table_region_row_distribution.py (in this PyTools repo) to see the row distribution across regions
 - hbase_calcualte_table_row_key_distribution.py (in this PyTools repo) to see the row key distribution / data skew
 
-Tested on Hortonworks HDP 2.5 (HBase 1.1.2) and Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2
+Tested on Hortonworks HDP 2.5 (HBase 1.1.2) and Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2, 1.3.1
 
 """
 
