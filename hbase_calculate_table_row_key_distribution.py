@@ -25,7 +25,7 @@ region-by-region full table scan operation ie. O(n). Tested with 50M data points
 This may time out on HBase tables with very large regions such as wide row opentsdb tables,
 in which case you should instead consider using Spark, Hive or Phoenix instead.
 
-Tested on Hortonworks HDP 2.5 (HBase 1.1.2) and Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2
+Tested on Hortonworks HDP 2.5 (HBase 1.1.2) and Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2, 1.3.1
 
 """
 
