@@ -12,6 +12,15 @@
 #ifdef VIRTUAL_ENV
 # Travis has custom python install earlier in $PATH even in Perl builds so need to install PyPI modules to non-system python otherwise they're not found by programs.
 # Better than modifying $PATH to put /usr/bin first which is likely to affect many other things including potentially not finding the perlbrew installation first
+ifndef VIRTUAL_ENV
+	VIRTUAL_ENV = ''
+endif
+ifndef CONDA_DEFAULT_ENV
+	CONDA_DEFAULT_ENV = ''
+endif
+ifndef TRAVIS
+	TRAVIS = ''
+endif
 ifneq '$(VIRTUAL_ENV)$(CONDA_DEFAULT_ENV)$(TRAVIS)' ''
 	SUDO2 =
 else
@@ -163,10 +172,19 @@ jython-install:
 sonar:
 	sonar-scanner
 
+.PHONY: lib-test
+lib-test:
+	cd pylib && make test
+
 .PHONY: test
 test:
-	cd pylib && make test
+	make lib-test
 	tests/all.sh
+
+.PHONY: basic-test
+basic-test:
+	make lib-test
+	bash-tools/all.sh
 
 .PHONY: test2
 test2:
