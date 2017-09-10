@@ -179,15 +179,15 @@ EOF
     check_exit_code 3
     set -e
     hr
-    echo "checking hbase_calculate_table_region_row_distribution.py against DisabledTable"
     set +e
+    echo "checking hbase_calculate_table_region_row_distribution.py against DisabledTable"
     echo "./hbase_calculate_table_region_row_distribution.py -T DisabledTable -vvv"
     ./hbase_calculate_table_region_row_distribution.py -T DisabledTable -vvv
     check_exit_code 2
     set -e
     hr
-    echo "checking hbase_calculate_table_region_row_distribution.py against EmptyTable"
     set +e
+    echo "checking hbase_calculate_table_region_row_distribution.py against EmptyTable"
     echo "./hbase_calculate_table_region_row_distribution.py -T EmptyTable -vvv"
     ./hbase_calculate_table_region_row_distribution.py -T EmptyTable -vvv
     check_exit_code 2
@@ -211,15 +211,15 @@ EOF
     echo "./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc"
     ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc
     hr
-    echo "checking hbase_calculate_table_row_key_distribution.py against DisabledTable"
     set +e
+    echo "checking hbase_calculate_table_row_key_distribution.py against DisabledTable"
     echo "./hbase_calculate_table_row_key_distribution.py -T DisabledTable -vvv"
     ./hbase_calculate_table_row_key_distribution.py -T DisabledTable -vvv
     check_exit_code 2
     set -e
     hr
-    echo "checking hbase_calculate_table_row_key_distribution.py against EmptyTable"
     set +e
+    echo "checking hbase_calculate_table_row_key_distribution.py against EmptyTable"
     echo "./hbase_calculate_table_row_key_distribution.py -T EmptyTable -vvv"
     ./hbase_calculate_table_row_key_distribution.py -T EmptyTable -vvv
     check_exit_code 2
