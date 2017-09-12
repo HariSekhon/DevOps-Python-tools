@@ -45,7 +45,7 @@ libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log, die, prog, isJson, jsonpp
+    from harisekhon.utils import log, die, prog, isJson, jsonpp, support_msg_api
     from harisekhon import CLI
 except ImportError as _:
     print(traceback.format_exc(), end='')
@@ -148,6 +148,8 @@ class DockerHubTags(CLI):
             # Docker Registry returns like this
             elif 'tags' in json_data:
                 tag_list = json_data['tags']
+            else:
+                raise UnknownError('failed to parse response, found neither results nor tags fields. {0}'.format(support_msg_api()))
             # could perhaps stack overflow in some scenario
             # not as functional programming 'cool' but will do own tail recursion and just while loop instead
             next_page_url = None
