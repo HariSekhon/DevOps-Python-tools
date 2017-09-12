@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.1'
+__version__ = '0.5.0'
 
 
 class DockerHubTags(CLI):
@@ -65,6 +65,8 @@ class DockerHubTags(CLI):
         self._CLI__parser.usage = '{0} [options] repo1 repo2 ...'.format(prog)
         self.quiet = False
         self.timeout_default = 30
+        self.url_base = 'https://registry.hub.docker.com/v2/repositories'
+        self.url = self.url_base
 
     def add_options(self):
         self.add_opt('-q', '--quiet', action='store_true', default=False,
@@ -75,7 +77,7 @@ class DockerHubTags(CLI):
             self.usage('no repos given as args')
         self.quiet = self.get_opt('quiet')
         if not self.quiet:
-            print('\nDockerHub\n')
+            print('\nDocker\n')
         for arg in self.args:
             self.print_tags(arg)
 
@@ -96,8 +98,13 @@ class DockerHubTags(CLI):
         if '/' in repo:
             (namespace, repo) = repo.split('/', 1)
         # there is another endpoint but it requires authentication
-        url = 'https://registry.hub.docker.com/v2/repositories/{0}/{1}/tags/'\
-              .format(urllib.quote_plus(namespace), urllib.quote_plus(repo))
+        url = '{url_base}/{namespace}/{repo}/tags'\
+              .format(url_base=self.url_base,
+                      namespace=urllib.quote_plus(namespace),
+                      repo=urllib.quote_plus(repo))
+        # Docker Registry needs /list on end but DockerHub doesn't support this
+        if 'dockerhub' not in prog:
+            url += '/list'
         tag_list = []
         while True:
             (tags, url) = self.query(url)
@@ -128,21 +135,28 @@ class DockerHubTags(CLI):
         if req.status_code != 200:
             die("%s %s" % (req.status_code, req.reason))
         if not isJson(req.content):
-            die('invalid non-JSON response from DockerHub!')
+            die('invalid non-JSON response from Docker Registry!')
         if log.isEnabledFor(logging.DEBUG):
             print(jsonpp(req.content))
             print('='*80)
         tag_list = []
         try:
-            j = json.loads(req.content)
-            tag_list = [_['name'] for _ in j['results']]
+            json_data = json.loads(req.content)
+            # DockerHub returns like this
+            if 'results' in json_data:
+                tag_list = [_['name'] for _ in json_data['results']]
+            # Docker Registry returns like this
+            elif 'tags' in json_data:
+                tag_list = json_data['tags']
             # could perhaps stack overflow in some scenario
             # not as functional programming 'cool' but will do own tail recursion and just while loop instead
-            #if 'next' in j and j['next']:
-            #    tag_list += self.query(j['next'])
-            return (tag_list, j['next'])
+            next_page_url = None
+            if 'next' in json_data and json_data['next']:
+            #    tag_list += self.query(json_data['next'])
+                next_page_url = json_data['next']
+            return (tag_list, next_page_url)
         except KeyError as _:
-            die('failed to parse output from DockerHub (format may have changed?): {0}'.format(_))
+            die('failed to parse output from Docker Registry (format may have changed?): {0}'.format(_))
 
 
 if __name__ == '__main__':
