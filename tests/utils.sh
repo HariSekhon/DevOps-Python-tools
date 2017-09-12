@@ -23,10 +23,6 @@ srcdir2="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 srcdir="$srcdir2"
 
-hr(){
-    echo "================================================================================"
-}
-
 if [ -n "${TRAVIS:-}" ]; then
     sudo=sudo
 else
