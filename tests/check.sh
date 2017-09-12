@@ -20,9 +20,9 @@ check(){
     cmd=$1
     msg=$2
     echo
-    hr
+    hr2
     echo $msg
-    hr
+    hr2
     echo
     echo cmd:  $cmd
     echo
