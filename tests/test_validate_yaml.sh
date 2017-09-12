@@ -23,7 +23,10 @@ cd "$srcdir/..";
 
 section "Testing validate_yaml.py"
 
-export TIMEOUT=3
+export TIMEOUT=5
+if is_inside_docker; then
+    export TIMEOUT=10
+fi
 
 if [ $# -gt 0 ]; then
     echo "validate_yaml.py $@"
