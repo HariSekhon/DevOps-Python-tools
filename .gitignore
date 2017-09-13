@@ -17,3 +17,6 @@ tests/spark-*-bin-hadoop*
 tests/test-spark-*-bin-hadoop*.parquet
 parquet-tools-*
 parquet-tools-*-bin.zip
+tests/docker/registry.crt
+tests/docker/registry.csr
+tests/docker/registry.key
