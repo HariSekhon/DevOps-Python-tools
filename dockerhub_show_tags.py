@@ -98,7 +98,7 @@ class DockerHubTags(CLI):
     def get_tags(self, repo):
         namespace = 'library'
         if ':' in repo:
-            raise UnknownException('colon detected in repo \'{0}\', did you forget tag suffix in it'.format(repo))
+            raise UnknownError('colon detected in repo \'{0}\', did you forget tag suffix in it'.format(repo))
         if '/' in repo:
             (namespace, repo) = repo.split('/', 1)
         # there is another endpoint but it requires authentication
