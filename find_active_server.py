@@ -46,7 +46,7 @@ Target a Nagios Plugin to first available cluster node, eg. Elasticsearch check 
 
 Find Hadoop Active NameNode:
 
-    ./find_active_server.py --http --port 50070 --url 'jmx' --regex '"State"\s*:\s*"active"'  namenode1 namenode2
+    ./find_active_server.py --http --port 50070 --url 'jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus' --regex '"State"\s*:\s*"active"'  namenode1 namenode2
 
     or use the simplified subclassed program find_active_hadoop_namenode.py:
 
