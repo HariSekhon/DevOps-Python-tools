@@ -25,8 +25,6 @@ cd "$srcdir/.."
 
 section "Testing Docker Registry Show Tags"
 
-exit 0
-
 check_docker_available
 
 export DOCKER_REGISTRY_HOST="${DOCKER_HOST:-localhost}"
@@ -42,16 +40,47 @@ max_secs=30
 
 #name="registry-docker-show-tags-test"
 
-cd "$srcdir/docker"
-openssl genrsa -out registry.key 2048
-yes "" | openssl req -new -key registry.key -out registry.csr || :
-openssl x509 -req -days 3650 -in registry.csr -signkey registry.key -out registry.crt
-cd "$srcdir/../.."
+# SSL trust is annoying, going back to insecure registries
+if is_travis; then
+    if sudo grep insecure-registries /etc/docker/daemon.json; then
+        echo "insecure registries setting already found in /etc/docker/daemon.json, you may need to modify this manually otherwise tests may fail"
+    else
+        echo "addeding insecure registries localhost:5000 to /etc/docker/daemon.json"
+        sudo bash <<EOF
+        echo '{ "insecure-registries":["localhost:5000"] }' >> /etc/docker/daemon.json
+EOF
+        echo "restarting Docker"
+        sudo service docker restart
+    fi
+fi
+echo
 
+cd "$srcdir/docker"
+private_key="registry.key"
+certificate="registry.crt"
+csr="registry.csr"
+#if ! [ -f "$private_key" -a -f "$certificate" ]; then
+if false; then
+    echo "Generating sample SSL certificates:"
+    echo
+    openssl genrsa -out "$private_key" 2048
+    echo
+    yes "" | openssl req -new -key "$private_key" -out "$csr" || :
+    echo
+    openssl x509 -req -days 3650 -in "$csr" -signkey "$private_key" -out "$certificate"
+    echo
+fi
+cd "$srcdir/.."
+
+echo "Bringing up Docker Registry container:"
+echo
 #docker run -d --name "$name" -p 5000:5000 registry:2
-docker-compose --verbose up -d
+docker-compose up -d
+echo
 
 when_ports_available "$max_secs" "$DOCKER_REGISTRY_HOST" "$DOCKER_REGISTRY_PORT"
+
+echo
 
 #export DOCKER_REGISTRY_PORT="$(docker-compose port "docker_${DOCKER_SERVICE}_1" "$DOCKER_REGISTRY_PORT" | sed 's/.*://')"
 export DOCKER_REGISTRY_PORT="$(docker port "docker_${DOCKER_SERVICE}_1" "$DOCKER_REGISTRY_PORT" | sed 's/.*://')"
@@ -65,16 +94,24 @@ tag="0.7"
 repo1="harisekhon/nagios-plugin-kafka"
 repo2="harisekhon/consul:$tag"
 
+echo
 for image in $repo1 $repo2; do
+    echo "Pulling image $image"
     docker pull "$image"
+    echo
+    echo "Tagging image $image => $DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT/$image"
     docker tag "$image" "$DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT/$image"
     # cannot specify http:// or https:// - docker will infer the respository from the tag prefix
+    echo
+    echo "Pushing image $image to Docker Registry $DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT:"
     docker push "$DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT/$image"
+    echo
 done
+echo
 
-check "./docker_registry_show_tags.py $repo1 $repo2 harisekhon/centos-java" "Docker Registry Show Tags for $repo1 & $repo2"
-check "./docker_registry_show_tags.py $repo2" "Docker Registry Show Tags for $repo2"
-check "./docker_registry_show_tags.py $repo2 | grep '$tag'" "Docker Registry Show Tags search for $repo2 tag $tag"
+check "./docker_registry_show_tags.py $repo1 $repo2" "Docker Registry Show Tags for $repo1 & $repo2"
+check "./docker_registry_show_tags.py ${repo2/:*}" "Docker Registry Show Tags for $repo2"
+check "./docker_registry_show_tags.py ${repo2/:*} | grep '$tag'" "Docker Registry Show Tags search for $repo2 tag $tag"
 
 #docker rm -f "$name"
 #docker-compose down
