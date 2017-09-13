@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 
 
 class DockerHubTags(CLI):
@@ -82,6 +82,8 @@ class DockerHubTags(CLI):
             self.print_tags(arg)
 
     def print_tags(self, repo):
+        # strip any accidental tag suffixes for convenience
+        repo = repo.split(':')[0]
         if not self.quiet:
             print('repo: {0}'.format(repo))
             print('tags: ', end='')
@@ -95,6 +97,8 @@ class DockerHubTags(CLI):
 
     def get_tags(self, repo):
         namespace = 'library'
+        if ':' in repo:
+            raise UnknownException('colon detected in repo \'{0}\', did you forget tag suffix in it'.format(repo))
         if '/' in repo:
             (namespace, repo) = repo.split('/', 1)
         # there is another endpoint but it requires authentication

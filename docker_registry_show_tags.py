@@ -22,6 +22,8 @@ Written for convenience as Docker CLI doesn't currently support this:
 
 See https://github.com/docker/docker/issues/17238
 
+Will strip docker image tag suffix from args for convenience
+
 See also dockerhub_show_tags.py
 
 """
