@@ -124,7 +124,7 @@ check "./docker_registry_show_tags.py -S ${repo2/:*}" "Docker Registry Show Tags
 check "./docker_registry_show_tags.py -S ${repo2/:*} | grep '$tag'" "Docker Registry Show Tags search for $repo2 tag $tag"
 
 #docker rm -f "$name"
-#docker-compose down
+docker-compose down
 
 echo
 echo "Docker Registry Show Tags tests passed successfully"
