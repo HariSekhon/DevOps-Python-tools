@@ -131,6 +131,9 @@ class DockerHubTags(CLI):
             # workaround for Travis CI and older pythons - we're not exchanging secret data so this is ok
             #if os.getenv('TRAVIS'):
             #    verify = False
+            if os.getenv('SSL_NOVERIFY') == '1':
+                log.warn('disabling SSL verification')
+                verify = False
             req = requests.get(url, verify=verify)
         except requests.exceptions.RequestException as _:
             die(_)
