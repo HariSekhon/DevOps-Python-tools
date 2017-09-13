@@ -57,7 +57,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.7.0'
 
 
 class FindActiveHadoopNamenode(FindActiveServer):
@@ -70,7 +70,7 @@ class FindActiveHadoopNamenode(FindActiveServer):
         self.default_port = 50070
         self.port = self.default_port
         self.protocol = 'http'
-        self.url_path = 'jmx'
+        self.url_path = 'jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus'
         self.regex = r'"State"\s*:\s*"active"'
 
     def add_options(self):
