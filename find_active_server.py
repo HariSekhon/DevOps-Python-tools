@@ -30,11 +30,19 @@ Useful for pre-determining a server to be passed to tools that only take a singl
 technology has later added multi-master support or active-standby masters (eg. Hadoop, HBase) or where you want to
 query cluster wide information available from any online peer (eg. Elasticsearch).
 
+
 Examples:
+
 
 Return first web server to respond:
 
     cat host_list.txt | xargs ./find_active_server.py --http
+
+
+Target a Nagios Plugin to first available cluster node, eg. Elasticsearch check from Advanced Nagios Plugins Collection:
+
+    ./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py -v --http --port 9200 node1 node2 node3)
+
 
 Find Hadoop Active NameNode:
 
@@ -44,17 +52,24 @@ Find Hadoop Active NameNode:
 
     ./find_active_hadoop_namenode.py  namenode1 namenode2
 
+
 Find Hadoop Active Yarn Resource Manager:
 
     ./find_active_server.py --http --port 8088 --url /ws/v1/cluster --regex '"haState"\s*:\s*"ACTIVE"'  resourcemanager1 resourcemanager2
 
     of use the simplified subclassed program find_active_hadoop_yarn_resource_manager.py:
 
-    find_active_hadoop_yarn_resource_manager.py  resourcemanager1 resourcemanager2
+    ./find_active_hadoop_yarn_resource_manager.py  resourcemanager1 resourcemanager2
 
-Target a Nagios Plugin to first available cluster node, eg. Elasticsearch check from Advanced Nagios Plugins Collection:
 
-    ./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py -v --http --port 9200 node1 node2 node3)
+Find HBase Active Master:
+
+    ./find_active_server.py --http --port 16010 --url '/jmx?qry=Hadoop:service=HBase,name=Master,sub=Server' --regex '"tag.isActiveMaster" : "true"'  hmaster1 hmaster2
+
+    or use the simplified subclassed program find_active_hbase_master.py
+
+    ./find_active_hbase_master.py  hmaster1 hmaster2
+
 
 By default checks the same --port on all servers. Hosts may have optional :<port> suffixes added to individually
 override each one.
