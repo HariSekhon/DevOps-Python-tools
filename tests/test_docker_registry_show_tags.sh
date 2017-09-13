@@ -40,38 +40,36 @@ max_secs=30
 
 #name="registry-docker-show-tags-test"
 
-# SSL trust is annoying, going back to insecure registries
-if is_travis; then
-    if sudo grep insecure-registries /etc/docker/daemon.json; then
-        echo "insecure registries setting already found in /etc/docker/daemon.json, you may need to modify this manually otherwise tests may fail"
-    else
-        echo "addeding insecure registries localhost:5000 to /etc/docker/daemon.json"
-        if [ -s /etc/docker/daemon.json ]; then
-            sudo perl -e 's/}/, "insecure-registries": ["localhost:5000"] }/' /etc/docker/daemon.json
-        else
-            sudo bash <<EOF
-            echo '{ "insecure-registries": ["localhost:5000"] }' >> /etc/docker/daemon.json
-EOF
-        fi
-        echo
-        echo "restarting Docker"
-        sudo service docker restart
-    fi
-else
-    echo "WARNING: you may need to enable insecure registries setting in /etc/docker/daemon.json in order for this test to pass:
-
-    { "insecure-registries": ["localhost:5000"] }
-
-"
-fi
-echo
+#if is_travis; then
+#    if sudo grep insecure-registries /etc/docker/daemon.json; then
+#        echo "insecure registries setting already found in /etc/docker/daemon.json, you may need to modify this manually otherwise tests may fail"
+#    else
+#        echo "addeding insecure registries localhost:5000 to /etc/docker/daemon.json"
+#        if [ -s /etc/docker/daemon.json ]; then
+#            sudo perl -e 's/}/, "insecure-registries": ["localhost:5000"] }/' /etc/docker/daemon.json
+#        else
+#            sudo bash <<EOF
+#            echo '{ "insecure-registries": ["localhost:5000"] }' >> /etc/docker/daemon.json
+#EOF
+#        fi
+#        echo
+#        echo "restarting Docker"
+#        sudo service docker restart
+#    fi
+#else
+#    echo "WARNING: you may need to enable insecure registries setting in /etc/docker/daemon.json in order for this test to pass:
+#
+#    { "insecure-registries": ["localhost:5000"] }
+#
+#"
+#fi
+#echo
 
 cd "$srcdir/docker"
 private_key="registry.key"
 certificate="registry.crt"
 csr="registry.csr"
-#if ! [ -f "$private_key" -a -f "$certificate" ]; then
-if false; then
+if ! [ -f "$private_key" -a -f "$certificate" ]; then
     echo "Generating sample SSL certificates:"
     echo
     openssl genrsa -out "$private_key" 2048
@@ -120,9 +118,10 @@ for image in $repo1 $repo2; do
 done
 echo
 
-check "./docker_registry_show_tags.py $repo1 $repo2" "Docker Registry Show Tags for $repo1 & $repo2"
-check "./docker_registry_show_tags.py ${repo2/:*}" "Docker Registry Show Tags for $repo2"
-check "./docker_registry_show_tags.py ${repo2/:*} | grep '$tag'" "Docker Registry Show Tags search for $repo2 tag $tag"
+export SSL_NOVERIFY=1
+check "./docker_registry_show_tags.py -S $repo1 $repo2" "Docker Registry Show Tags for $repo1 & $repo2"
+check "./docker_registry_show_tags.py -S ${repo2/:*}" "Docker Registry Show Tags for $repo2"
+check "./docker_registry_show_tags.py -S ${repo2/:*} | grep '$tag'" "Docker Registry Show Tags search for $repo2 tag $tag"
 
 #docker rm -f "$name"
 #docker-compose down
