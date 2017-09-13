@@ -47,16 +47,22 @@ if is_travis; then
     else
         echo "addeding insecure registries localhost:5000 to /etc/docker/daemon.json"
         if [ -s /etc/docker/daemon.json ]; then
-            sudo perl -e 's/}/, "insecure-registries":["localhost:5000"] }/' /etc/docker/daemon.json
+            sudo perl -e 's/}/, "insecure-registries": ["localhost:5000"] }/' /etc/docker/daemon.json
         else
             sudo bash <<EOF
-            echo '{ "insecure-registries":["localhost:5000"] }' >> /etc/docker/daemon.json
+            echo '{ "insecure-registries": ["localhost:5000"] }' >> /etc/docker/daemon.json
 EOF
         fi
         echo
         echo "restarting Docker"
         sudo service docker restart
     fi
+else
+    echo "WARNING: you may need to enable insecure registries setting in /etc/docker/daemon.json in order for this test to pass:
+
+    { "insecure-registries": ["localhost:5000"] }
+
+"
 fi
 echo
 
