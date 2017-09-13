@@ -52,6 +52,7 @@ if is_travis; then
             sudo bash <<EOF
             echo '{ "insecure-registries":["localhost:5000"] }' >> /etc/docker/daemon.json
 EOF
+        fi
         echo
         echo "restarting Docker"
         sudo service docker restart
