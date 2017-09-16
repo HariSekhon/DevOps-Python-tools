@@ -79,7 +79,6 @@ cp -iv "$(find "${1:-.}" -iname '*.mp3' | grep -v -e 'broken' -e 'error' | head 
 ./validate_multimedia.py "$broken_dir/no_extension_testfile"
 echo
 
-echo "Now trying non-media files to detect successful failure:"
 check_broken(){
     local filename="$1"
     local expected_exitcode="${2:-2}"
@@ -114,6 +113,9 @@ echo
 echo "checking regex with directory recursion will skip broken file"
 ./validate_multimedia.py -r 'sample.mp3' .
 echo
+
+check_broken_sample_files mp3
+
 rm -fr "$broken_dir"
 
 echo
