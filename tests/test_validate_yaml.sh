@@ -93,19 +93,27 @@ check_broken(){
         exit 1
     fi
 }
-check_broken "$data_dir/multirecord.json"
 cat > "$broken_dir/broken_tabs.yaml" <<EOF
 ---
 name:	Hari Sekhon
 age:	21
 ...
 EOF
+
 check_broken "$broken_dir/broken_tabs.yaml"
-check_broken README.md
+
 cat "$data_dir/test.yaml" >> "$broken_dir/multi-broken.yaml"
 cat "$data_dir/test.yaml" >> "$broken_dir/multi-broken.yaml"
+
 check_broken "$broken_dir/multi-broken.yaml"
+
+# csv, ini, json and ldif all pass Python's yaml parser
+check_broken_sample_files yaml csv ini json ldif
+
+check_broken README.md
+
 rm -fr "$broken_dir"
+
 echo
 
 echo "checking for non-existent file"
