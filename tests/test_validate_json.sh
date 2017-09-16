@@ -81,7 +81,6 @@ ln -sfv "test.json" "$data_dir/testlink.json"
 rm "$data_dir/testlink.json"
 echo
 
-echo "Now trying broken / non-json files to test failure detection:"
 check_broken(){
     local filename="$1"
     local expected_exitcode="${2:-2}"
@@ -312,6 +311,8 @@ check_broken - 2 -m < "$broken_dir/blank.json"
 echo "checking blank content is invalid for multirecord via stdin piped from /dev/null"
 cat /dev/null | check_broken - 2 -m
 echo
+
+check_broken_sample_files json
 
 rm -fr "$broken_dir"
 
