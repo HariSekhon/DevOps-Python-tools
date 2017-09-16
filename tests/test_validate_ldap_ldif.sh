@@ -79,8 +79,6 @@ echo "testing stdin print mode"
 echo "successfully passed out stdin test ldif to stdout"
 echo
 
-echo "Now trying non-ldif files to detect successful failure:"
-echo
 check_broken(){
     local filename="$1"
     local expected_exitcode="${2:-2}"
@@ -108,10 +106,8 @@ sed 's/^dn:/replaceddn:/' "$data_dir/add_ou.ldif" > "$broken_dir/missing_dn.ldif
 check_broken "$broken_dir/missing_dn.ldif"
 { echo "notdnfirst: test"; sed 's/#.*//' "$data_dir/add_ou.ldif"; } > "$broken_dir/first_entry_not_dn.ldif"
 check_broken "$broken_dir/first_entry_not_dn.ldif"
-check_broken "$data_dir/test.yaml"
-check_broken "$data_dir/test.json"
-check_broken "$data_dir/simple.xml"
-check_broken README.md
+
+check_broken_sample_files ldif
 
 echo "checking for non-existent file"
 check_broken nonexistentfile 2
