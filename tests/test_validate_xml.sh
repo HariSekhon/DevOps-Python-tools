@@ -93,13 +93,16 @@ check_broken(){
 # break one from tag
 sed -n 's/from/blah/; 2,$p' "$data_dir/simple.xml" > "$broken_dir/simple.xml"
 check_broken "$broken_dir/simple.xml"
-check_broken "$data_dir/test.yaml"
-check_broken "$data_dir/test.json"
-check_broken README.md
+
+check_broken_sample_files xml
+
 cat "$data_dir/simple.xml" >> "$broken_dir/multi-broken.xml"
 cat "$data_dir/simple.xml" >> "$broken_dir/multi-broken.xml"
+
 check_broken "$broken_dir/multi-broken.xml"
+
 rm -fr "$broken_dir"
+
 echo
 
 echo "checking for non-existent file"
