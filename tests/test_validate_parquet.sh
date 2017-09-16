@@ -74,7 +74,6 @@ echo "testing stdin mixed with filename"
 ./validate_parquet.py "$data_dir/test.parquet" - < "$data_dir/test.parquet"
 echo
 
-echo "Now trying non-parquet files to detect successful failure:"
 check_broken(){
     local filename="$1"
     local expected_exitcode="${2:-2}"
@@ -94,8 +93,12 @@ check_broken(){
         exit 1
     fi
 }
-check_broken "$data_dir/multirecord.json"
+
+
+check_broken_sample_files parquet
+
 rm -fr "$broken_dir"
+
 echo
 
 echo "checking for non-existent file"
