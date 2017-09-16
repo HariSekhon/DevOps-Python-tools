@@ -80,7 +80,6 @@ echo
 
 # ==================================================
 hr2
-echo "Now trying non-csv files to detect successful failure:"
 check_broken(){
     local filename="$1"
     local expected_exitcode="${2:-2}"
@@ -100,11 +99,8 @@ check_broken(){
         exit 1
     fi
 }
-check_broken "$data_dir/test.json"
-check_broken "$data_dir/test.yaml"
-check_broken "$data_dir/simple.xml"
-check_broken "$data_dir/multirecord.json"
-check_broken README.md
+
+check_broken_sample_files csv
 
 # ==================================================
 hr2
