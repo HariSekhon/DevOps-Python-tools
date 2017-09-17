@@ -191,7 +191,7 @@ class IniValidatorTool(CLI):
         if variable_count < 1:
             return False
         count = variable_count + comment_count + blank_count
-        log.debug('%s INI lines passed (%s variables, %s comments, %s blank lines', \
+        log.debug('%s INI lines passed (%s variables, %s comments, %s blank lines)', \
                   count, variable_count, comment_count, blank_count)
         return True
 
