@@ -62,7 +62,7 @@ echo
 hr2
 echo "checking ini file without an extension"
 cp -iv "$(find "${1:-.}" -iname '*.ini' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
-./validate_ini.py --allow-hash-comments -t 1 "$broken_dir/no_extension_testfile"
+./validate_ini.py -t 1 "$broken_dir/no_extension_testfile"
 echo
 
 # ==================================================
@@ -120,13 +120,13 @@ echo "checking ini with colons passes with --allow-colon-delimiters:"
 echo
 
 hr2
-echo "checking ini with hashes comments fails:"
-check_broken "$data_dir/test.ini-hashes"
+echo "checking ini with hashes comments passes:"
+./validate_ini.py "$data_dir/test.ini-hashes"
 echo
 
 hr2
-echo "checking ini with hash comments passes with --allow-hash-comments :"
-./validate_ini.py --allow-hash-comments "$data_dir/test.ini-hashes"
+echo "checking ini with hash comments fails with --no-hash-comments:"
+check_broken "$data_dir/test.ini-hashes" 2 --no-hash-comments
 echo
 
 hr2
