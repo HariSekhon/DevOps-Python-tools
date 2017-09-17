@@ -75,6 +75,10 @@ class IniValidatorTool(CLI):
         self.opts = {}
         self.failed = False
         self.exclude = None
+        # global section is represented by blank key
+        self.sections = {
+            '': {}
+        }
 
     def add_options(self):
         self.add_opt('-a', '--no-hash-comments', action='store_true',
@@ -126,13 +130,24 @@ class IniValidatorTool(CLI):
             comment_count += 1
         return (line, comment_count)
 
+    def process_key_value(self, line, section, key, value):
+        if not self.re_ini_key.match(key):
+            log.debug("failing ini due to invalid key '%s' in line: %s", key, line)
+            return False
+        # always enforce no duplicates
+        elif key in self.sections[section].keys():
+            log.debug("failing ini due to duplicate key '%s' in section '%s' " +
+                      "detected in line: %s", key, section, line)
+            return False
+        self.sections[section][key] = value
+        return True
+
     def process_ini(self, filehandle):
         variable_count = 0
         comment_count = 0
         blank_count = 0
         section = ''
-        sections = {
-            # global section is represented by blank key
+        self.sections = {
             '': {}
         }
         for line in filehandle:
@@ -148,39 +163,25 @@ class IniValidatorTool(CLI):
             # short circuit on more common key=value first before trying [section]
             #if self.re_ini_key_value.match(line):
             #    pass
-            # XXX: potential BUG: how to differentiate colon format INI lines with equals in value
+            # must differentiate colon format INI lines with equals symbol in value
             # (since .+ is valid for ini values)
-            if '=' in line:
+            if not self.opts['allow_colons'] and '=' in line:
                 (key, value) = line.split('=', 1)
-                if not self.re_ini_key.match(key):
-                    log.debug("failing ini due to invalid key '%s' in line: %s", key, line)
+                if not self.process_key_value(line, section, key, value):
                     return False
-                # always enforce no duplicates
-                elif key in sections[section]:
-                    log.debug("failing ini due to duplicate key '%s' in section '%s' " +
-                              "detected in line: %s", key, section, line)
-                    return False
-                sections[section][key] = value
             elif self.opts['allow_colons'] and ':' in line:
                 (key, value) = line.split(':', 1)
-                if not self.re_ini_key.match(key):
-                    log.debug("failing ini due to invalid key '%s' in colon separated ini line: %s", key, line)
+                if not self.process_key_value(line, section, key, value):
                     return False
-                # always enforce no duplicates
-                if key in sections[section]:
-                    log.debug("failing ini due to duplicate key '%s' in section '%s' " +
-                              "of colon separated ini line: %s", key, section, line)
-                    return False
-                sections[section][key] = value
             elif '[' in line:
                 match = self.re_ini_section.match(line)
                 if match:
                     section = match.group(1)
-                    if section in sections:
+                    if section in self.sections:
                         log.debug("failing ini due to duplicate sections '%s'", section)
                         return False
                     # valid [section] and not duplicate if reaches this point
-                    sections[section] = {}
+                    self.sections[section] = {}
                 else:
                     log.debug('failing ini due to invalid section')
                     return False
