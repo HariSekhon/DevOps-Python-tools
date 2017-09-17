@@ -64,7 +64,7 @@ class IniValidatorTool(CLI):
         # Python 3.x
         # super().__init__()
         self.filename = None
-        self.re_ini_suffix = re.compile(r'\.(?:ini|properties)$', re.I)
+        self.re_ini_suffix = re.compile(r'.*\.(?:ini|properties)$', re.I)
         # In Windows ini key cannot contain equals sign = or semicolon ;
         #                                   key=val or [section]
         self.re_ini_section = re.compile(r'^\s*\[([\w=\:\.-]+)\]\s*$')
