@@ -43,7 +43,7 @@ mkdir "$broken_dir"
 echo
 
 echo "checking directory recursion (mixed with explicit file given)"
-./validate_xml.py "$data_dir/simple.xml" .
+./validate_xml.py "$data_dir/plant_catalog.xml" .
 echo
 
 echo "checking symlink handling"
