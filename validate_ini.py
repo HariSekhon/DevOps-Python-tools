@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.0'
+__version__ = '0.6.0'
 
 
 # could consider using ConfigParser in Python2 / configparser in Python3
@@ -77,8 +77,8 @@ class IniValidatorTool(CLI):
         self.exclude = None
 
     def add_options(self):
-        self.add_opt('-a', '--allow-hash-comments', action='store_true',
-                     help='Allow hash comments as well as semicolons')
+        self.add_opt('-a', '--no-hash-comments', action='store_true',
+                     help="Disallow hash comments (default is to allow because they're so common in unix files)")
         self.add_opt('-c', '--allow-colon-delimiters', action='store_true',
                      help='Allow colons as delimiters instead of equals signs')
         # this should never be valid, always enforce no duplicates
@@ -97,7 +97,7 @@ class IniValidatorTool(CLI):
 
     def process_options(self):
         self.opts = {
-            'allow_hashes': self.get_opt('allow_hash_comments'),
+            'no_hashes': self.get_opt('no_hash_comments'),
             'allow_colons': self.get_opt('allow_colon_delimiters'),
             #'disallow_inline_comments': self.get_opt('disallow_inline_comments'),
             'disallow_blanks': self.get_opt('no_blanks'),
@@ -119,7 +119,7 @@ class IniValidatorTool(CLI):
         if ';' in line:
             line = line.split(';', 1)[0]
             found_comment = True
-        if self.opts['allow_hashes'] and '#' in line:
+        if not self.opts['no_hashes'] and '#' in line:
             line = line.split('#', 1)[0]
             found_comment = True
         if found_comment:
