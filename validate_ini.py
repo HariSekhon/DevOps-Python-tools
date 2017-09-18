@@ -27,6 +27,11 @@ from standard input
 
 Also checks for duplicate sections and keys within a section in INI and Java property files
 
+Written to be able to test Presto, Drill and Ambari property files for Continuous Integration and tested against a wide
+variety of different ini and properties files both in this repo (see tests/) and in the master Dockerfiles repo which
+contains lots of DockerHub image source builds and configurations for a wide variety of official Big Data open source
+technologies
+
 """
 
 from __future__ import absolute_import
