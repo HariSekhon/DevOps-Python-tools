@@ -90,12 +90,13 @@ Some common options also support optional environment variables for convenience 
 - ```validate_*.py``` - validate files, directory trees and/or standard input streams for the following file types:
     - Avro
     - CSV
+    - INI (also detects duplicate sections and keys within sections)
     - JSON (both normal and json-doc-per-line bulk / big data format as found in MongoDB and Hadoop json data files)
     - LDAP LDIF
     - Parquet
     - XML
     - YAML
-  - directories are recursed, testing any files with relevant matching extensions (```.avro```, ```.csv```, ```.json```, ```.parquet```, ```.ldif```, ```.xml```, ```.yml```/```.yaml```)
+  - directories are recursed, testing any files with relevant matching extensions (`.avro`, `.csv`, `json`, `parquet`, `.ini`/`.properties`, `.ldif`, `.xml`, `.yml`/`.yaml`)
 
 #### Manual Setup ####
 
