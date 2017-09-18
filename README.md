@@ -97,6 +97,7 @@ Some common options also support optional environment variables for convenience 
     - XML
     - YAML
   - directories are recursed, testing any files with relevant matching extensions (`.avro`, `.csv`, `json`, `parquet`, `.ini`/`.properties`, `.ldif`, `.xml`, `.yml`/`.yaml`)
+  - used for Continuous Integration tests of various adjacent spark data converts as well as configuration files for things like Presto, Ambari, Apache Drill etc found in my [DockerHub master repo](https://github.com/HariSekhon/Dockerfiles] containing docker builds for many open source Big Data & Linux technologies
 
 #### Manual Setup ####
 
