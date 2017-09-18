@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.0'
+__version__ = '0.7.0'
 
 
 # could consider using ConfigParser in Python2 / configparser in Python3
@@ -75,6 +75,7 @@ class IniValidatorTool(CLI):
         self.opts = {}
         self.failed = False
         self.exclude = None
+        self.section = ''
         # global section is represented by blank key
         self.sections = {
             '': {}
@@ -130,23 +131,48 @@ class IniValidatorTool(CLI):
             comment_count += 1
         return (line, comment_count)
 
-    def process_key_value(self, line, section, key, value):
+    def get_key_value(self, line):
+        key = None
+        value = None
+        # must differentiate colon format INI lines with equals symbol in value
+        # (since .+ is valid for ini values)
+        if not self.opts['allow_colons']:
+            if '=' in line:
+                (key, value) = line.split('=', 1)
+        else:
+            if ':' in line:
+                (key, value) = line.split(':', 1)
+        return (key, value)
+
+    def process_section(self, line):
+        match = self.re_ini_section.match(line)
+        if match:
+            self.section = match.group(1)
+            if self.section in self.sections:
+                log.debug("failing ini due to duplicate sections '%s'", self.section)
+                raise AssertionError()
+            # valid [section] and not duplicate if reaches this point
+            self.sections[self.section] = {}
+        else:
+            log.debug("failing ini due to invalid section on line: %s", line)
+            raise AssertionError()
+
+    def process_key_value(self, line, key, value):
         if not self.re_ini_key.match(key):
             log.debug("failing ini due to invalid key '%s' in line: %s", key, line)
-            return False
+            raise AssertionError()
         # always enforce no duplicates
-        elif key in self.sections[section].keys():
+        elif key in self.sections[self.section].keys():
             log.debug("failing ini due to duplicate key '%s' in section '%s' " +
-                      "detected in line: %s", key, section, line)
-            return False
-        self.sections[section][key] = value
-        return True
+                      "detected in line: %s", key, self.section, line)
+            raise AssertionError()
+        self.sections[self.section][key] = value
 
     def process_ini(self, filehandle):
         variable_count = 0
         comment_count = 0
         blank_count = 0
-        section = ''
+        self.section = ''
         self.sections = {
             '': {}
         }
@@ -154,56 +180,37 @@ class IniValidatorTool(CLI):
             if not line.strip():
                 if self.opts['disallow_blanks']:
                     log.debug('failing ini due to blank line detected')
-                    return False
+                    raise AssertionError()
                 blank_count += 1
                 continue
             (line, comment_count) = self.strip_comments(line, comment_count)
             if not line.strip():
                 continue
             # short circuit on more common key=value first before trying [section]
-            #if self.re_ini_key_value.match(line):
-            #    pass
-            # must differentiate colon format INI lines with equals symbol in value
-            # (since .+ is valid for ini values)
-            if not self.opts['allow_colons'] and '=' in line:
-                (key, value) = line.split('=', 1)
-                if not self.process_key_value(line, section, key, value):
-                    return False
-            elif self.opts['allow_colons'] and ':' in line:
-                (key, value) = line.split(':', 1)
-                if not self.process_key_value(line, section, key, value):
-                    return False
+            (key, value) = self.get_key_value(line)
+            if key:
+                self.process_key_value(line, key, value)
             elif '[' in line:
-                match = self.re_ini_section.match(line)
-                if match:
-                    section = match.group(1)
-                    if section in self.sections:
-                        log.debug("failing ini due to duplicate sections '%s'", section)
-                        return False
-                    # valid [section] and not duplicate if reaches this point
-                    self.sections[section] = {}
-                else:
-                    log.debug('failing ini due to invalid section')
-                    return False
+                self.process_section(line)
             else:
                 log.debug('failing ini due to no key or section detected for line: %s', line)
-                return False
+                raise AssertionError()
             variable_count += 1
         if variable_count < 1:
-            return False
+            raise AssertionError()
         count = variable_count + comment_count + blank_count
         log.debug('%s INI lines passed (%s variables, %s comments, %s blank lines)', \
                   count, variable_count, comment_count, blank_count)
-        return True
 
     def check_ini(self, filehandle):
-        if self.process_ini(filehandle):
+        try:
+            self.process_ini(filehandle)
             if self.opts['print']:
                 filehandle.seek(0)
                 print(filehandle.read(), end='')
             else:
                 print(self.valid_ini_msg)
-        else:
+        except AssertionError:
             self.failed = True
             if not self.opts['print']:
                 die(self.invalid_ini_msg)
