@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.2'
+__version__ = '0.5.3'
 
 
 class DockerHubTags(CLI):
@@ -64,7 +64,7 @@ class DockerHubTags(CLI):
         # super().__init__()
         self._CLI__parser.usage = '{0} [options] repo1 repo2 ...'.format(prog)
         self.quiet = False
-        self.timeout_default = 30
+        self.timeout_default = 60
         self.url_base = 'https://registry.hub.docker.com/v2/repositories'
         self.url = self.url_base
 
