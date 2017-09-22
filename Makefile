@@ -177,13 +177,11 @@ lib-test:
 	cd pylib && make test
 
 .PHONY: test
-test:
-	make lib-test
+test: lib-test
 	tests/all.sh
 
 .PHONY: basic-test
-basic-test:
-	make lib-test
+basic-test: lib-test
 	bash-tools/all.sh
 
 .PHONY: test2
@@ -196,13 +194,12 @@ install:
 	@echo "No installation needed, just add '$(PWD)' to your \$$PATH"
 
 .PHONY: update
-update:
-	make update2
-	make
+update: update2 build
+	:
 
 .PHONY: update2
-update2:
-	make update-no-recompile
+update2: update-no-recompile
+	:
 
 .PHONY: update-no-recompile
 update-no-recompile:
@@ -243,8 +240,8 @@ docker-mount:
 	docker run -ti --rm -v $$PWD:/py harisekhon/pytools bash -c "cd /py; exec bash"
 
 .PHONY: mount
-mount:
-	make docker-mount
+mount: docker-mount
+	:
 
 .PHONY: push
 push:
