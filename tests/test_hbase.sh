@@ -83,6 +83,7 @@ test_hbase(){
     uniq_val=$(< /dev/urandom tr -dc 'a-zA-Z0-9' 2>/dev/null | head -c32 || :)
     # gets ValueError: file descriptor cannot be a negative integer (-1), -T should be the workaround but hangs
     #docker-compose exec -T "$DOCKER_SERVICE" /bin/bash <<-EOF
+    if [ -z "${NOSETUP:-}" ]; then
     docker exec -i "${COMPOSE_PROJECT_NAME:-docker}_${DOCKER_SERVICE}_1" /bin/bash <<-EOF
         export JAVA_HOME=/usr
         /hbase/bin/hbase shell <<-EOF2
@@ -99,13 +100,18 @@ EOF2
         # the above may fail, ensure we continue to try the tests
         exit 0
 EOF
+    fi
     if [ -n "${NOTESTS:-}" ]; then
         return
     fi
     hr
-    check_output "NO_AVAILABLE_SERVER" ./find_active_hbase_master.py 127.0.0.2 127.0.0.3 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT"
+    # will otherwise pick up HBASE_HOST and use default port and return the real HBase Master
+    HBASE_HOST='' HOST='' \
+        check_output "NO_AVAILABLE_SERVER" ./find_active_hbase_master.py 127.0.0.2 127.0.0.3 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT"
     hr
-    check_output "$HBASE_HOST:$HBASE_MASTER_PORT" ./find_active_hbase_master.py 127.0.0.2 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT" 127.0.0.3 "$HBASE_HOST:$HBASE_MASTER_PORT"
+    # if HBASE_PORT / --port is set to same as suffix then only outputs host not host:port
+    HBASE_HOST='' HOST='' HBASE_MASTER_PORT="$HBASE_MASTER_PORT_DEFAULT" \
+        check_output "$HBASE_HOST:$HBASE_MASTER_PORT" ./find_active_hbase_master.py 127.0.0.2 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT" 127.0.0.3 "$HBASE_HOST:$HBASE_MASTER_PORT"
     hr
     export HBASE_THRIFT_SERVER_PORT="$HBASE_THRIFT_PORT"
     hr
