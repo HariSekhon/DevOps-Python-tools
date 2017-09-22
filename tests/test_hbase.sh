@@ -31,11 +31,11 @@ HBASE_HOST="${DOCKER_HOST:-${HBASE_HOST:-${HOST:-localhost}}}"
 HBASE_HOST="${HBASE_HOST##*/}"
 HBASE_HOST="${HBASE_HOST%%:*}"
 export HBASE_HOST
+export HBASE_MASTER_PORT_DEFAULT=16010
+export HBASE_REGIONSERVER_PORT_DEFAULT=16301
 export HBASE_STARGATE_PORT_DEFAULT=8080
 export HBASE_THRIFT_PORT_DEFAULT=9090
 export ZOOKEEPER_PORT_DEFAULT=2181
-export HBASE_PORTS="$ZOOKEEPER_PORT_DEFAULT $HBASE_STARGATE_PORT_DEFAULT 8085 $HBASE_THRIFT_PORT_DEFAULT 9095 16000 16010 16201 16301"
-#export HBASE_TEST_PORTS="$ZOOKEEPER_PORT $HBASE_THRIFT_PORT"
 
 export HBASE_VERSIONS="${@:-latest 0.96 0.98 1.0 1.1 1.2 1.3}"
 
@@ -66,14 +66,17 @@ test_hbase(){
     #local DOCKER_OPTS="-v $srcdir/..:$MNTDIR"
     #launch_container "$DOCKER_IMAGE:$version" "$DOCKER_CONTAINER" 2181 8080 8085 9090 9095 16000 16010 16201 16301
     VERSION="$version" docker-compose up -d
+    if [ "$version" = "0.96" ]; then
+        local export HBASE_MASTER_PORT_DEFAULT=60010
+        local export HBASE_REGIONSERVER_PORT_DEFAULT=60301
+    fi
+    export HBASE_MASTER_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_MASTER_PORT_DEFAULT" | sed 's/.*://'`"
+    export HBASE_REGIONSERVER_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_REGIONSERVER_PORT_DEFAULT" | sed 's/.*://'`"
     export HBASE_STARGATE_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_STARGATE_PORT_DEFAULT" | sed 's/.*://'`"
     export HBASE_THRIFT_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_THRIFT_PORT_DEFAULT" | sed 's/.*://'`"
     export ZOOKEEPER_PORT="`docker-compose port "$DOCKER_SERVICE" "$ZOOKEEPER_PORT_DEFAULT" | sed 's/.*://'`"
     #hbase_ports=`{ for x in $HBASE_PORTS; do docker-compose port "$DOCKER_SERVICE" "$x"; done; } | sed 's/.*://'`
-    export HBASE_PORTS="$HBASE_STARGATE_PORT $HBASE_THRIFT_PORT $ZOOKEEPER_PORT"
-    if [ "$version" = "0.96" ]; then
-        export HBASE_PORTS="$ZOOKEEPER_PORT $HBASE_STARGATE_PORT 8085 $HBASE_THRIFT_PORT 9095 16000 60010 60201 60301"
-    fi
+    export HBASE_PORTS="$HBASE_MASTER_PORT $HBASE_REGIONSERVER_PORT $HBASE_STARGATE_PORT $HBASE_THRIFT_PORT $ZOOKEEPER_PORT"
     when_ports_available "$startupwait" "$HBASE_HOST" $HBASE_PORTS
     #when_ports_available $startupwait $HBASE_HOST $HBASE_TEST_PORTS
     echo "setting up test tables"
@@ -99,6 +102,11 @@ EOF
     if [ -n "${NOTESTS:-}" ]; then
         return
     fi
+    hr
+    check_output "NO_AVAILABLE_SERVER" ./find_active_hbase_master.py 127.0.0.2 127.0.0.3 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT"
+    hr
+    check_output "$HBASE_HOST:$HBASE_MASTER_PORT" ./find_active_hbase_master.py 127.0.0.2 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT" 127.0.0.3 "$HBASE_HOST:$HBASE_MASTER_PORT"
+    hr
     export HBASE_THRIFT_SERVER_PORT="$HBASE_THRIFT_PORT"
     hr
     echo "./hbase_generate_data.py -n 10"
