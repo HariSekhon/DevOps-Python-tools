@@ -115,9 +115,9 @@ EOFCOMMENTED
 #        exit 1
 #    fi
     hr
-    check_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_namenode.py 127.0.0.2 127.0.0.3
+    check_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_namenode.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_DATANODE_PORT"
     hr
-    check_output "$HADOOP_HOST:$HADOOP_NAMENODE_PORT" ./find_active_hadoop_namenode.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_NAMENODE_PORT"
+    check_output "$HADOOP_HOST:$HADOOP_NAMENODE_PORT" ./find_active_hadoop_namenode.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_NAMENODE_PORT"
     hr
     #echo "waiting 10 secs for Yarn RM to come up to test version"
     #sleep 10
@@ -137,9 +137,9 @@ EOFCOMMENTED
         sleep 1
     done
     hr
-    check_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 127.0.0.3
+    check_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT"
     hr
-    check_output "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT"
+    check_output "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT"
     hr
     #delete_container
     docker-compose down
