@@ -44,6 +44,7 @@ from __future__ import print_function
 import os
 import sys
 import traceback
+#from random import shuffle
 srcdir = os.path.abspath(os.path.dirname(__file__))
 libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
@@ -71,12 +72,18 @@ class FindActiveHadoopYarnResourceManager(FindActiveServer):
         self.port = self.default_port
         self.protocol = 'http'
         self.url_path = '/ws/v1/cluster'
+        self.num_threads = 2
         self.regex = r'"haState"\s*:\s*"ACTIVE"'
 
     def add_options(self):
         self.add_hostoption(name='Yarn Resource Manager', default_port=self.default_port)
         self.add_opt('-S', '--ssl', action='store_true',
                      help='Use SSL to Namenode UI')
+        #self.add_opt('-n', '--num-threads', default=self.num_threads, type='int',
+        #             help='Number or parallel threads to speed up processing (default: 2, ' +
+        #             'use -n=1 for deterministic host preference order [slower])')
+        #self.add_opt('-R', '--random', action='store_true', help='Randomize order of hosts tested ' +
+        #             '(for use with --num-threads=1)')
         self.add_opt('-q', '--quiet', action='store_true', help='Returns no output instead of NO_AVAILABLE_SERVER '\
                                                               + '(convenience for scripting)')
         self.add_opt('-T', '--request-timeout', metavar='secs', type='int', default=os.getenv('REQUEST_TIMEOUT', 2),
@@ -89,6 +96,10 @@ class FindActiveHadoopYarnResourceManager(FindActiveServer):
             self.host_list = [host.strip() for host in hosts.split(',') if host]
         self.host_list += self.args
         self.host_list = uniq_list_ordered(self.host_list)
+        #self.num_threads = self.get_opt('num_threads')
+        #if self.get_opt('random'):
+        #    log_option('random', True)
+        #    shuffle(self.host_list)
         if self.get_opt('ssl'):
             self.protocol = 'https'
             log_option('SSL', 'true')
