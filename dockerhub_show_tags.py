@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.3'
+__version__ = '0.6.0'
 
 
 class DockerHubTags(CLI):
@@ -67,6 +67,8 @@ class DockerHubTags(CLI):
         self.timeout_default = 60
         self.url_base = 'https://registry.hub.docker.com/v2/repositories'
         self.url = self.url_base
+        self.user = None
+        self.password = None
 
     def add_options(self):
         self.add_opt('-q', '--quiet', action='store_true', default=False,
@@ -123,8 +125,7 @@ class DockerHubTags(CLI):
             pass
         return tag_list
 
-    @staticmethod
-    def query(url):
+    def query(self, url):
         log.debug('GET %s' % url)
         try:
             verify = True
@@ -134,7 +135,11 @@ class DockerHubTags(CLI):
             if os.getenv('SSL_NOVERIFY') == '1':
                 log.warn('disabling SSL verification')
                 verify = False
-            req = requests.get(url, verify=verify)
+            auth = None
+            if self.user or self.password:
+                auth = (self.user, self.password)
+                log.debug('setting basic HTTP authenication using username: %s, password: <omitted>', self.user)
+            req = requests.get(url, auth=auth, verify=verify)
         except requests.exceptions.RequestException as _:
             die(_)
         log.debug("response: %s %s", req.status_code, req.reason)
@@ -151,7 +156,7 @@ class DockerHubTags(CLI):
             json_data = json.loads(req.content)
             # DockerHub returns like this
             if 'results' in json_data:
-                tag_list = [_['name'] for _ in json_data['results']]
+                tag_list = [result['name'] for result in json_data['results']]
             # Docker Registry returns like this
             elif 'tags' in json_data:
                 tag_list = json_data['tags']
