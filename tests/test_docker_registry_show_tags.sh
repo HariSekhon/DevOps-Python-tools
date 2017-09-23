@@ -115,7 +115,7 @@ echo "docker login to registry $DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT ..."
 docker login -e root@localhost -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASSWORD" "$DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT"
 
 tag="0.7"
-repo1="alpine"
+repo1="library/alpine"
 repo2="harisekhon/consul:$tag"
 
 echo
