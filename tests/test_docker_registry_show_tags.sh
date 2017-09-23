@@ -33,6 +33,9 @@ export DOCKER_REGISTRY_HOST="${DOCKER_REGISTRY_HOST/:*}"
 
 export DOCKER_REGISTRY_PORT=5000
 
+export DOCKER_REGISTRY_USER="docker_user"
+export DOCKER_REGISTRY_PASSWORD="docker_password"
+
 export DOCKER_SERVICE="pytools-registry-test"
 export COMPOSE_FILE="$srcdir/docker/registry-docker-compose.yml"
 
@@ -68,6 +71,7 @@ max_secs=30
 cd "$srcdir/docker"
 private_key="registry.key"
 certificate="registry.crt"
+htpasswd="registry.htpasswd"
 csr="registry.csr"
 if ! [ -f "$private_key" -a -f "$certificate" ]; then
     echo "Generating sample SSL certificates:"
@@ -79,6 +83,14 @@ if ! [ -f "$private_key" -a -f "$certificate" ]; then
     openssl x509 -req -days 3650 -in "$csr" -signkey "$private_key" -out "$certificate"
     echo
 fi
+#if ! [ -f "$htpasswd" ]; then
+    echo "generating htpasswd auth file"
+    # -B - becrypt - docker registry ignores entries that don't use very secure Becrypt
+    # -b - take password from cli instead of prompting
+    # -c - create htpasswd file
+    htpasswd -B -b -c "$htpasswd" "$DOCKER_REGISTRY_USER" "$DOCKER_REGISTRY_PASSWORD"
+    echo
+#fi
 cd "$srcdir/.."
 
 echo "Bringing up Docker Registry container:"
@@ -99,8 +111,11 @@ if [ -z "$DOCKER_REGISTRY_PORT" ]; then
     exit 1
 fi
 
+echo "docker login to registry $DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT ..."
+docker login -e root@localhost -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASSWORD" "$DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT"
+
 tag="0.7"
-repo1="harisekhon/nagios-plugin-kafka"
+repo1="alpine"
 repo2="harisekhon/consul:$tag"
 
 echo
