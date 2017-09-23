@@ -23,6 +23,9 @@ curl
 # for ping mode of find_active_server.py
 iputils
 
+# for htpasswd for docker registry authenticated checks
+https-tools
+
 # needed to build pyhs2
 # libgsasl-devel saslwrapper-devel
 #cyrus-sasl-devel
