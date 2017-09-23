@@ -91,7 +91,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.4'
+__version__ = '0.6.5'
 
 class DockerfileGitBranchCheckTool(CLI):
 
@@ -187,10 +187,13 @@ class DockerfileGitBranchCheckTool(CLI):
         self.selected_branches = branches
         #if log.isEnabledFor(logging.DEBUG):
         log.debug('\n\nbranches for target %s:\n\n%s\n', target, '\n'.join(branches))
-        original_checkout = 'master'
+        # in Travis CI there is no original branch and master branch does not exist, so falling back to assuming master
+        # causes failure, better to not check out original branch if you don't know
+        #original_branch = 'master'
+        original_branch = None
         try:
             try:
-                original_checkout = repo.active_branch.name
+                original_branch = repo.active_branch.name
             except TypeError as _:
                 pass
             for branch in branches:
@@ -205,8 +208,9 @@ class DockerfileGitBranchCheckTool(CLI):
             traceback.print_exc()
             sys.exit(1)
         finally:
-            log.debug("returning to original checkout '%s'", original_checkout)
-            repo.git.checkout(original_checkout)
+            if original_branch != None:
+                log.debug("checking out original branch '%s'", original_branch)
+                repo.git.checkout(original_branch)
 
     def branch_version(self, branch):
         branch_base = None
