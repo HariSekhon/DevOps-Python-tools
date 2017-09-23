@@ -106,7 +106,7 @@ EOF
     fi
     hr
     # will otherwise pick up HBASE_HOST and use default port and return the real HBase Master
-    HBASE_HOST='' HOST='' \
+    HBASE_HOST='' HOST='' HBASE_MASTER_PORT="$HBASE_MASTER_PORT_DEFAULT" \
         check_output "NO_AVAILABLE_SERVER" ./find_active_hbase_master.py 127.0.0.2 127.0.0.3 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT"
     hr
     # if HBASE_PORT / --port is set to same as suffix then only outputs host not host:port
