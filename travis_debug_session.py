@@ -63,7 +63,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.5'
 
 
 class TravisDebugSession(CLI):
@@ -253,7 +253,7 @@ class TravisDebugSession(CLI):
             job = json.loads(req.content)
             if log.isEnabledFor(logging.DEBUG):
                 log.debug("job id %s status:\n%s", _id, jsonpp(job))
-            if job['state'] == 'finished' and job['status'] in (None, '1'):
+            if job['state'] == 'finished' and job['status'] in (None, 1, '1'):
                 return _id
         raise UnknownError('no failed job found in build {0}'.format(build['id']))
 
