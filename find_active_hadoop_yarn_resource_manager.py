@@ -32,7 +32,7 @@ override each one.
 Exits with return code 1 and NO_AVAILABLE_SERVER if none of the namenodes are active, --quiet mode will not print
 NO_AVAILABLE_SERVER.
 
-Tested on Hadoop 2.7.3 on HDP 2.6.1
+Tested on Hadoop 2.7.3 on HDP 2.6.1 and Apache Hadoop 2.5, 2.6, 2.7
 
 """
 
