@@ -41,14 +41,14 @@ libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log_option, validate_host, validate_port
+    from harisekhon.utils import log_option, validate_host, validate_port, validate_user, validate_password
     from dockerhub_show_tags import DockerHubTags
 except ImportError as _:
     print(traceback.format_exc(), end='')
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.1'
+__version__ = '0.5.0'
 
 
 class DockerRegistryTags(DockerHubTags):
@@ -60,9 +60,12 @@ class DockerRegistryTags(DockerHubTags):
         # super().__init__()
         self.url_base = None
         self.protocol = 'http'
+        self.user = None
+        self.password = None
 
     def add_options(self):
         self.add_hostoption(name='Docker Registry', default_port=5000)
+        self.add_useroption(name='Docker Registry')
         self.add_ssl_option()
         self.add_opt('-q', '--quiet', action='store_true', default=False,
                      help='Output only the tags, one per line (useful for shell scripting)')
@@ -70,8 +73,13 @@ class DockerRegistryTags(DockerHubTags):
     def process_options(self):
         host = self.get_opt('host')
         port = self.get_opt('port')
+        self.user = self.get_opt('user')
+        self.password = self.get_opt('password')
         validate_host(host)
         validate_port(port)
+        if self.user is not None or self.password is not None:
+            validate_user(self.user)
+            validate_password(self.password)
         if self.get_opt('ssl'):
             log_option('ssl', 'True')
             self.protocol = 'https'
