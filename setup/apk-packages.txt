@@ -26,6 +26,9 @@ snappy-dev
 # needed for tests/test_spark* and ambari_cancel_all_requests.sh
 curl
 
+# for htpasswd for docker registry authenticated checks
+apache2-utils
+
 #which java || $(SUDO) apk add openjdk8-jre-base
 
 # Spark Java Py4J gets java linking error without this
