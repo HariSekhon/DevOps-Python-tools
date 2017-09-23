@@ -13,6 +13,7 @@ spark-deps.zip
 .DS_Store
 htmlcov/
 tests/data/opentsdb_data.txt
+tests/docker/registry.htpasswd
 tests/spark-*-bin-hadoop*
 tests/test-spark-*-bin-hadoop*.parquet
 parquet-tools-*
