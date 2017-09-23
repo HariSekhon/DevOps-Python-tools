@@ -30,6 +30,9 @@ curl
 iputils-ping
 #inetutils-ping
 
+# for htpasswd for docker registry authenticated checks
+apache2-utils
+
 # needed for serf test's 'uptime' command
 procps
 
