@@ -53,7 +53,7 @@ test_elasticsearch(){
     non_es_node1="127.0.0.1:1025"
     non_es_node2="127.0.0.1:1026"
     when_ports_available "$startupwait" "$ELASTICSEARCH_HOST" "$ELASTICSEARCH_PORT"
-    when_url_content 40 "$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT" "lucene_version"
+    when_url_content "$startupwait" "http://$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT" "lucene_version"
     hr
     ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT_DEFAULT" check_output "NO_AVAILABLE_SERVER" ./find_active_elasticsearch_node.py $non_es_node1 $non_es_node2
     hr
