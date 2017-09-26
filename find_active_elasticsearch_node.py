@@ -2,7 +2,7 @@
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
-#  Date: Wed Sep  6 14:44:38 CEST 2017
+#  Date: Tue Sep  5 10:49:49 CEST 2017
 #
 #  https://github.com/harisekhon/pytools
 #
@@ -16,7 +16,7 @@
 
 """
 
-Tool to return the active Hadoop Yarn Resource Manager from an argument list of hosts
+Tool to return first available Elasticsearch node from an argument list of hosts
 
 Can mix and match between a comma separated list of hosts (--host server1,server2 or contents of the $HOST
 environment variable if not specified) and general free-form space separated arguments, which is useful if piping
@@ -24,7 +24,8 @@ a host list through xargs.
 
 Multi-threaded for speed and exits upon first available host response to minimize delay to ~ 1 second or less.
 
-Useful for simplying scripting or generically extending tools that don't directly support Yarn High Availability
+Useful for simplying scripting or generically extending tools that only take a single --host option but want to query
+cluster status from any node (eg. check_elasticsearch_cluster_status.pl from Advanced Nagios Plugins Collection)
 
 By default checks the same --port on all servers. Hosts may have optional :<port> suffixes added to individually
 override each one.
@@ -32,7 +33,7 @@ override each one.
 Exits with return code 1 and NO_AVAILABLE_SERVER if none of the namenodes are active, --quiet mode will not print
 NO_AVAILABLE_SERVER.
 
-Tested on Hadoop 2.7.3 on HDP 2.6.1 and Apache Hadoop 2.5, 2.6, 2.7
+Tested on Elasticsearch 1.4 1.5 1.6 1.7 2.0 2.2 2.3 2.4 5.0
 
 """
 
@@ -44,7 +45,6 @@ from __future__ import print_function
 import os
 import sys
 import traceback
-#from random import shuffle
 srcdir = os.path.abspath(os.path.dirname(__file__))
 libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
@@ -58,31 +58,24 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.7.0'
 
 
-class FindActiveHadoopYarnResourceManager(FindActiveServer):
+class FindActiveElasticsearchNode(FindActiveServer):
 
     def __init__(self):
         # Python 2.x
-        super(FindActiveHadoopYarnResourceManager, self).__init__()
+        super(FindActiveElasticsearchNode, self).__init__()
         # Python 3.x
         # super().__init__()
-        self.default_port = 8088
+        self.default_port = 9200
         self.port = self.default_port
         self.protocol = 'http'
-        self.url_path = '/ws/v1/cluster'
-        self.num_threads = 2
-        self.regex = r'"haState"\s*:\s*"ACTIVE"'
+        self.regex = 'lucene_version'
 
     def add_options(self):
-        self.add_hostoption(name='Yarn Resource Manager', default_port=self.default_port)
+        self.add_hostoption(name='Elasticsearch', default_port=self.default_port)
         self.add_opt('-S', '--ssl', action='store_true', help='Use SSL')
-        #self.add_opt('-n', '--num-threads', default=self.num_threads, type='int',
-        #             help='Number or parallel threads to speed up processing (default: 2, ' +
-        #             'use -n=1 for deterministic host preference order [slower])')
-        #self.add_opt('-R', '--random', action='store_true', help='Randomize order of hosts tested ' +
-        #             '(for use with --num-threads=1)')
         self.add_opt('-q', '--quiet', action='store_true', help='Returns no output instead of NO_AVAILABLE_SERVER '\
                                                               + '(convenience for scripting)')
         self.add_opt('-T', '--request-timeout', metavar='secs', type='int', default=os.getenv('REQUEST_TIMEOUT', 2),
@@ -95,10 +88,6 @@ class FindActiveHadoopYarnResourceManager(FindActiveServer):
             self.host_list = [host.strip() for host in hosts.split(',') if host]
         self.host_list += self.args
         self.host_list = uniq_list_ordered(self.host_list)
-        #self.num_threads = self.get_opt('num_threads')
-        #if self.get_opt('random'):
-        #    log_option('random', True)
-        #    shuffle(self.host_list)
         if self.get_opt('ssl'):
             self.protocol = 'https'
             log_option('SSL', 'true')
@@ -110,4 +99,4 @@ class FindActiveHadoopYarnResourceManager(FindActiveServer):
 
 
 if __name__ == '__main__':
-    FindActiveHadoopYarnResourceManager().main()
+    FindActiveElasticsearchNode().main()

@@ -1,7 +1,7 @@
 #  vim:ts=2:sts=2:sw=2:et
 #
 #  Author: Hari Sekhon
-#  Date: 2016-12-09 21:25:07 +0000 (Fri, 09 Dec 2016)
+#  Date: 2016-12-13 14:01:04 +0000 (Tue, 13 Dec 2016)
 #
 #  https://github.com/harisekhon/pytools
 #
@@ -14,20 +14,14 @@
 
 version: '2.2'
 services:
-  hadoop:
+  solrcloud:
     extends:
       file: common.yml
       service: common
-    image: harisekhon/hadoop:${VERSION:-latest}
+    # using my own Docker images now as official solr doesn't have builds < 5
+    user: solr
+    image: harisekhon/solrcloud-dev:${VERSION:-latest}
     ports:
-      #- 8020
-      - 8042
-      - 8088
-      #- 9000
-      #- 10020
-      - 19888
-      - 50010
-      - 50020
-      - 50070
-      - 50075
-      - 50090
+      - 8983
+      - 8984
+      - 9983

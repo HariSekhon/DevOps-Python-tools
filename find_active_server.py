@@ -39,34 +39,41 @@ Return first web server to respond:
     cat host_list.txt | xargs ./find_active_server.py --http
 
 
+More specific examples follow, and they have more specialised subclassed programs in each example so you don't need
+to use all the switches from find_active_server.py
+
+
 Target a Nagios Plugin to first available cluster node, eg. Elasticsearch check from Advanced Nagios Plugins Collection:
 
-    ./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py -v --http --port 9200 node1 node2 node3)
+    ./check_elasticsearch_cluster_status.pl --host $(./find_active_server.py -v --http --port 9200  node1 node2 node3)
+
+    ./find_active_elasticsearch_node.py  node1 node2 node3
 
 
-Find Hadoop Active NameNode:
+Find a SolrCloud node:
+
+    ./find_active_server.py --http --url /solr/ --regex 'Solr Admin'  node1 node2
+
+    ./find_active_solrcloud_node.py  node1 node2
+
+
+Find the active Hadoop NameNode in a High Availability cluster:
 
     ./find_active_server.py --http --port 50070 --url 'jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus' --regex '"State"\s*:\s*"active"'  namenode1 namenode2
-
-    or use the simplified subclassed program find_active_hadoop_namenode.py:
 
     ./find_active_hadoop_namenode.py  namenode1 namenode2
 
 
-Find Hadoop Active Yarn Resource Manager:
+Find the active Hadoop Yarn Resource Manager in a High Availability cluster:
 
     ./find_active_server.py --http --port 8088 --url /ws/v1/cluster --regex '"haState"\s*:\s*"ACTIVE"'  resourcemanager1 resourcemanager2
-
-    of use the simplified subclassed program find_active_hadoop_yarn_resource_manager.py:
 
     ./find_active_hadoop_yarn_resource_manager.py  resourcemanager1 resourcemanager2
 
 
-Find HBase Active Master:
+Find the active HBase Master in a High Availability cluster:
 
     ./find_active_server.py --http --port 16010 --url '/jmx?qry=Hadoop:service=HBase,name=Master,sub=Server' --regex '"tag.isActiveMaster" : "true"'  hmaster1 hmaster2
-
-    or use the simplified subclassed program find_active_hbase_master.py
 
     ./find_active_hbase_master.py  hmaster1 hmaster2
 
