@@ -77,8 +77,7 @@ class FindActiveHadoopNamenode(FindActiveServer):
 
     def add_options(self):
         self.add_hostoption(name='Namenode', default_port=self.default_port)
-        self.add_opt('-S', '--ssl', action='store_true',
-                     help='Use SSL to Namenode UI')
+        self.add_opt('-S', '--ssl', action='store_true', help='Use SSL')
         #self.add_opt('-n', '--num-threads', default=self.num_threads, type='int',
         #             help='Number or parallel threads to speed up processing (default: 2, ' +
         #             'use -n=1 for deterministic host preference order [slower])')
