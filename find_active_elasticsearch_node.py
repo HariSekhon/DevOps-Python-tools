@@ -16,7 +16,7 @@
 
 """
 
-Tool to return first available Elasticsearch ndoe from an argument list of hosts
+Tool to return first available Elasticsearch node from an argument list of hosts
 
 Can mix and match between a comma separated list of hosts (--host server1,server2 or contents of the $HOST
 environment variable if not specified) and general free-form space separated arguments, which is useful if piping
