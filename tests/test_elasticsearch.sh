@@ -40,7 +40,7 @@ startupwait 20
 
 test_elasticsearch(){
     local version="$1"
-    echo "Setting up Elasticsearch $version test container"
+    section2 "Setting up Elasticsearch $version test container"
     #launch_container "$DOCKER_IMAGE:$version" "$DOCKER_CONTAINER" $ELASTICSEARCH_PORT
     VERSION="$version" docker-compose up -d
     echo "getting Elasticsearch dynamic port mappings"
@@ -53,6 +53,7 @@ test_elasticsearch(){
     non_es_node1="127.0.0.1:1025"
     non_es_node2="127.0.0.1:1026"
     when_ports_available "$startupwait" "$ELASTICSEARCH_HOST" "$ELASTICSEARCH_PORT"
+    when_url_content 40 "$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT" "lucene_version"
     hr
     ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT_DEFAULT" check_output "NO_AVAILABLE_SERVER" ./find_active_elasticsearch_node.py $non_es_node1 $non_es_node2
     hr
