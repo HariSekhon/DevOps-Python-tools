@@ -54,9 +54,9 @@ test_elasticsearch(){
     non_es_node2="127.0.0.1:1026"
     when_ports_available "$startupwait" "$ELASTICSEARCH_HOST" "$ELASTICSEARCH_PORT"
     hr
-    check_output "NO_AVAILABLE_SERVER" ./find_active_elasticsearch_node.py $non_es_node1 $non_es_node2
+    ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT_DEFAULT" check_output "NO_AVAILABLE_SERVER" ./find_active_elasticsearch_node.py $non_es_node1 $non_es_node2
     hr
-    check_output "$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT" ./find_active_elasticsearch_node.py $non_es_node1 $non_es_node2 "$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT"
+    ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT_DEFAULT" check_output "$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT" ./find_active_elasticsearch_node.py $non_es_node1 $non_es_node2 "$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT"
     hr
     #delete_container
     docker-compose down
