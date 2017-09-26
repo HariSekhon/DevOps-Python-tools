@@ -74,9 +74,9 @@ class FindActiveElasticsearchNode(FindActiveServer):
         self.regex = 'lucene_version'
 
     def add_options(self):
-        self.add_hostoption(name='Namenode', default_port=self.default_port)
+        self.add_hostoption(name='Elasticsearch', default_port=self.default_port)
         self.add_opt('-S', '--ssl', action='store_true',
-                     help='Use SSL to Namenode UI')
+                     help='Use SSL')
         self.add_opt('-q', '--quiet', action='store_true', help='Returns no output instead of NO_AVAILABLE_SERVER '\
                                                               + '(convenience for scripting)')
         self.add_opt('-T', '--request-timeout', metavar='secs', type='int', default=os.getenv('REQUEST_TIMEOUT', 2),
