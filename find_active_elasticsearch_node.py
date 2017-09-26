@@ -33,7 +33,7 @@ override each one.
 Exits with return code 1 and NO_AVAILABLE_SERVER if none of the namenodes are active, --quiet mode will not print
 NO_AVAILABLE_SERVER.
 
-Tested on Elasticsearch
+Tested on Elasticsearch 1.4 1.5 1.6 1.7 2.0 2.2 2.3 2.4 5.0
 
 """
 
