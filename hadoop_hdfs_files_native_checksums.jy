@@ -23,7 +23,7 @@ import getopt
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import *
+    from harisekhon.utils import jython_only, die, printerr, ERRORS, isJavaOOM, java_oom_fix_msg, log_jython_exception, get_jython_exception
 except ImportError, e:
     print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
