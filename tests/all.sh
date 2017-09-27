@@ -17,26 +17,19 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "
-# =================== #
-# Running PyTools ALL
-# =================== #
-"
+. "$srcdir/utils.sh"
 
-cd "$srcdir";
+. "$srcdir/../bash-tools/utils.sh"
 
-. utils.sh
+export PROJECT=pytools
 
-#./python3.sh
+section "Running PyTools ALL"
 
-../bash-tools/python_compile.sh ..
+# runs against . by default
+cd "$srcdir/..";
+bash-tools/all.sh
 
-../bash-tools/python_find_quit.sh ..
-
-../bash-tools/run_tests.sh
+bash-tools/run_tests.sh
 
 # do help afterwards for Spark to be downloaded, and then help will find and use downloaded spark for SPARK_HOME
-./help.sh
-
-cd "$srcdir/.."
-bash-tools/all.sh
+tests/help.sh
