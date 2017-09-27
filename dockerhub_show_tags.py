@@ -123,6 +123,7 @@ class DockerHubTags(CLI):
             if not url:
                 break
         tag_list.sort()
+        #tag_list.reverse()
         # put latest to the top of the list
         try:
             tag_list.insert(0, tag_list.pop(tag_list.index('latest')))
