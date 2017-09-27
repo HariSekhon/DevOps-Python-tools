@@ -29,7 +29,7 @@ else
     sudo=""
 fi
 
-export SPARK_HOME="$(ls -d tests/spark-*-bin-hadoop* | head -n 1)"
+export SPARK_HOME="$(ls -d tests/spark-*-bin-hadoop* 2>/dev/null | head -n 1)"
 
 . "$srcdir/excluded.sh"
 
