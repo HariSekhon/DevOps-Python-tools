@@ -79,6 +79,7 @@ test_hbase(){
     export HBASE_PORTS="$HBASE_MASTER_PORT $HBASE_REGIONSERVER_PORT $HBASE_STARGATE_PORT $HBASE_THRIFT_PORT $ZOOKEEPER_PORT"
     when_ports_available "$startupwait" "$HBASE_HOST" $HBASE_PORTS
     #when_ports_available $startupwait $HBASE_HOST $HBASE_TEST_PORTS
+    hr
     echo "setting up test tables"
     uniq_val=$(< /dev/urandom tr -dc 'a-zA-Z0-9' 2>/dev/null | head -c32 || :)
     # gets ValueError: file descriptor cannot be a negative integer (-1), -T should be the workaround but hangs
