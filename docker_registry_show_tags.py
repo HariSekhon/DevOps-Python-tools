@@ -48,7 +48,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 
 
 class DockerRegistryTags(DockerHubTags):
@@ -77,8 +77,9 @@ class DockerRegistryTags(DockerHubTags):
         self.password = self.get_opt('password')
         validate_host(host)
         validate_port(port)
-        if self.user is not None or self.password is not None:
+        if self.user is not None:
             validate_user(self.user)
+        if self.password is not None:
             validate_password(self.password)
         if self.get_opt('ssl'):
             log_option('ssl', 'True')
