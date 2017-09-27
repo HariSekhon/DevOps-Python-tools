@@ -15,13 +15,15 @@
 
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
-srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+srcdir2="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-cd "$srcdir/.."
+cd "$srcdir2/.."
 
 . "tests/utils.sh"
 
 . "bash-tools/utils.sh"
+
+srcdir="$srcdir2"
 
 section "Testing Docker Registry Show Tags"
 
