@@ -136,7 +136,7 @@ class DockerHubTags(CLI):
                 log.warn('disabling SSL verification')
                 verify = False
             auth = None
-            if self.user or self.password:
+            if self.user and self.password:
                 auth = (self.user, self.password)
                 log.debug('setting basic HTTP authenication using username: %s, password: <omitted>', self.user)
             req = requests.get(url, auth=auth, verify=verify)
