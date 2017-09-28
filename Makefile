@@ -9,18 +9,21 @@
 #  https://www.linkedin.com/in/harisekhon
 #
 
-#ifdef VIRTUAL_ENV
 # Travis has custom python install earlier in $PATH even in Perl builds so need to install PyPI modules to non-system python otherwise they're not found by programs.
 # Better than modifying $PATH to put /usr/bin first which is likely to affect many other things including potentially not finding the perlbrew installation first
-ifndef VIRTUAL_ENV
-	VIRTUAL_ENV = ''
-endif
-ifndef CONDA_DEFAULT_ENV
-	CONDA_DEFAULT_ENV = ''
-endif
-ifndef TRAVIS
-	TRAVIS = ''
-endif
+
+# silences warnings but breaks logic
+#
+#ifndef VIRTUAL_ENV
+#	VIRTUAL_ENV = ''
+#endif
+#ifndef CONDA_DEFAULT_ENV
+#	CONDA_DEFAULT_ENV = ''
+#endif
+#ifndef TRAVIS
+#	TRAVIS = ''
+#endif
+
 ifneq '$(VIRTUAL_ENV)$(CONDA_DEFAULT_ENV)$(TRAVIS)' ''
 	SUDO2 =
 else
