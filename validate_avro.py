@@ -109,7 +109,7 @@ class AvroValidatorTool(CLI):
             if os.path.isfile(arg):
                 log_option('file', arg)
             elif os.path.isdir(arg):
-                log_option('directory', arg)
+                log_option('directory', os.path.abspath(arg))
             else:
                 die("path '%s' could not be determined as either a file or directory" % arg)
         for arg in args:
