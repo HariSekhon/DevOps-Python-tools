@@ -36,11 +36,11 @@ ifdef CONDA_DEFAULT_ENV
 	#$(info CONDA_DEFAULT_ENV environment variable detected, not using sudo)
 	SUDO_PIP :=
 endif
-ifdef TRAVIS
+#ifdef TRAVIS
 	# this breaks before first target
 	#$(info TRAVIS environment variable detected, not using sudo)
-	SUDO_PIP :=
-endif
+#	SUDO_PIP :=
+#endif
 
 # must come after to reset SUDO_PIP to blank if root
 # EUID /  UID not exported in Make
