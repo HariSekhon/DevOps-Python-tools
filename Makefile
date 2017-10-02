@@ -12,7 +12,7 @@
 # Travis has custom python install earlier in $PATH even in Perl builds so need to install PyPI modules to non-system python otherwise they're not found by programs.
 # Better than modifying $PATH to put /usr/bin first which is likely to affect many other things including potentially not finding the perlbrew installation first
 
-# silences warnings but breaks logic
+# silences warnings but breaks ifneq '$(VIRTUAL_ENV)$(CONDA_DEFAULT_ENV)$(TRAVIS)' ''
 #
 #ifndef VIRTUAL_ENV
 #	VIRTUAL_ENV = ''
@@ -24,20 +24,31 @@
 #	TRAVIS = ''
 #endif
 
-ifneq '$(VIRTUAL_ENV)$(CONDA_DEFAULT_ENV)$(TRAVIS)' ''
-	SUDO2 =
-else
-	SUDO2 = sudo -H
+SUDO  := sudo -H
+SUDO_PIP := sudo -H
+
+ifdef VIRTUAL_ENV
+	# breaks as command before first target
+	#$(info VIRTUAL_ENV environment variable detected, not using sudo)
+	SUDO_PIP :=
+endif
+ifdef CONDA_DEFAULT_ENV
+	#$(info CONDA_DEFAULT_ENV environment variable detected, not using sudo)
+	SUDO_PIP :=
+endif
+ifdef TRAVIS
+	# this breaks before first target
+	#$(info TRAVIS environment variable detected, not using sudo)
+	SUDO_PIP :=
 endif
 
-# must come after to reset SUDO2 to blank if root
+# must come after to reset SUDO_PIP to blank if root
 # EUID /  UID not exported in Make
 # USER not populated in Docker
 ifeq '$(shell id -u)' '0'
-	SUDO =
-	SUDO2 =
-else
-	SUDO = sudo -H
+	#$(info UID = 0 detected, not using sudo)
+	SUDO :=
+	SUDO_PIP :=
 endif
 
 PARQUET_VERSION=1.5.0
@@ -78,24 +89,24 @@ build:
 	[ -d "parquet-tools-$(PARQUET_VERSION)" ] || unzip "parquet-tools-$(PARQUET_VERSION)-bin.zip"
 	
 	# json module built-in to Python >= 2.6, backport not available via pypi
-	#$(SUDO2) pip install json
+	#$(SUDO_PIP) pip install json
 	
 	# for impyla
-	$(SUDO2) pip install --upgrade setuptools || :
-	$(SUDO2) pip install --upgrade -r requirements.txt
+	$(SUDO_PIP) pip install --upgrade setuptools || :
+	$(SUDO_PIP) pip install --upgrade -r requirements.txt
 	# prevents https://urllib3.readthedocs.io/en/latest/security.html#insecureplatformwarning
-	$(SUDO2) pip install --upgrade ndg-httpsclient
+	$(SUDO_PIP) pip install --upgrade ndg-httpsclient
 	# for ipython-notebook-pyspark.py
-	#$(SUDO2) pip install jinja2
+	#$(SUDO_PIP) pip install jinja2
 	# HiveServer2
-	#$(SUDO2) pip install pyhs2
+	#$(SUDO_PIP) pip install pyhs2
 	# Impala
-	#$(SUDO2) pip install impyla
+	#$(SUDO_PIP) pip install impyla
 	# must downgrade happybase library to work on Python 2.6
-	if [ "$$(python -c 'import sys; sys.path.append("pylib"); import harisekhon; print(harisekhon.utils.getPythonVersion())')" = "2.6" ]; then $(SUDO2) pip install --upgrade "happybase==0.9"; fi
+	if [ "$$(python -c 'import sys; sys.path.append("pylib"); import harisekhon; print(harisekhon.utils.getPythonVersion())')" = "2.6" ]; then $(SUDO_PIP) pip install --upgrade "happybase==0.9"; fi
 	
 	# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
-	$(SUDO2) pip install "ipython[notebook]" || :
+	$(SUDO_PIP) pip install "ipython[notebook]" || :
 	@echo
 	bash-tools/python_compile.sh
 	@echo
