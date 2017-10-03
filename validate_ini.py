@@ -55,7 +55,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.0'
+__version__ = '0.9.0'
 
 
 # could consider using ConfigParser in Python2 / configparser in Python3
@@ -91,9 +91,12 @@ class IniValidatorTool(CLI):
                      help="Disallow hash comments (default is to allow because they're so common in unix files)")
         self.add_opt('-c', '--allow-colon-delimiters', action='store_true',
                      help='Allow colons as delimiters instead of equals signs')
-        # this should never be valid, always enforce no duplicates
-        #self.add_opt('-d', '--no-duplicate-keys', action='store_true',
-        #             help='Do not allow duplicate sections or duplicate keys inside the same section')
+        # Refused to enable this options until upstream zookeeper 3.4.8 log4j.properties ended up with duplicate keys
+        # better than --exclude entirely
+        self.add_opt('-s', '--ignore-duplicate-sections', action='store_true',
+                     help='Ignore duplicate sections (sloppy and not recommended but better than --exclude somtimes)')
+        self.add_opt('-k', '--ignore-duplicate-keys', action='store_true',
+                     help='Ignore duplicate keys inside the same section (not recommended but better than --exclude)')
         #self.add_opt('-i', '--no-inline-comments', action='store_true',
         #             help='Do not allow inline comments, must be on their own lines (WinAPI function reqires this)')
         self.add_opt('-b', '--no-blanks', action='store_true',
@@ -110,6 +113,8 @@ class IniValidatorTool(CLI):
             'no_hashes': self.get_opt('no_hash_comments'),
             'allow_colons': self.get_opt('allow_colon_delimiters'),
             #'disallow_inline_comments': self.get_opt('disallow_inline_comments'),
+            'ignore_duplicate_sections': self.get_opt('ignore_duplicate_sections'),
+            'ignore_duplicate_keys': self.get_opt('ignore_duplicate_keys'),
             'disallow_blanks': self.get_opt('no_blanks'),
             'print': self.get_opt('print')
         }
@@ -153,11 +158,12 @@ class IniValidatorTool(CLI):
         match = self.re_ini_section.match(line)
         if match:
             self.section = match.group(1)
-            if self.section in self.sections:
+            if self.section in self.sections and not self.opts['ignore_duplicate_sections']:
                 log.debug("failing ini due to duplicate sections '%s'", self.section)
                 raise AssertionError()
-            # valid [section] and not duplicate if reaches this point
-            self.sections[self.section] = {}
+            # be careful here as we may now optionally allow duplicate sections
+            if self.section not in self.sections:
+                self.sections[self.section] = {}
         else:
             log.debug("failing ini due to invalid section on line: %s", line)
             raise AssertionError()
@@ -166,8 +172,7 @@ class IniValidatorTool(CLI):
         if not self.re_ini_key.match(key):
             log.debug("failing ini due to invalid key '%s' in line: %s", key, line)
             raise AssertionError()
-        # always enforce no duplicates
-        elif key in self.sections[self.section].keys():
+        elif key in self.sections[self.section].keys() and not self.opts['ignore_duplicate_keys']:
             log.debug("failing ini due to duplicate key '%s' in section '%s' " +
                       "detected in line: %s", key, self.section, line)
             raise AssertionError()
