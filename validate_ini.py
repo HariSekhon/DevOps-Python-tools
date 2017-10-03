@@ -55,7 +55,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.0'
+__version__ = '0.8.0'
 
 
 # could consider using ConfigParser in Python2 / configparser in Python3
@@ -275,6 +275,8 @@ class IniValidatorTool(CLI):
             # TODO: should technically write to temp file to be able to seek(0) for print mode
             self.check_ini(sys.stdin)
         else:
+            if self.is_excluded(filename):
+                return
             log.debug('checking %s', self.filename)
             try:
                 with open(self.filename) as iostream:
