@@ -51,7 +51,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.1'
+__version__ = '0.9.0'
 
 
 class AvroValidatorTool(CLI):
@@ -139,8 +139,6 @@ class AvroValidatorTool(CLI):
                     self.check_file(file_path)
 
     def check_file(self, filename):
-        if self.is_excluded(filename):
-            return
         if filename == '-':
             filename = '<STDIN>'
         self.valid_avro_msg = '%s => Avro OK' % filename
@@ -148,6 +146,8 @@ class AvroValidatorTool(CLI):
         if filename == '<STDIN>':
             self.check_avro(sys.stdin)
         else:
+            if self.is_excluded(filename):
+                return
             try:
                 with open(filename) as avrohandle:
                     self.check_avro(avrohandle)
