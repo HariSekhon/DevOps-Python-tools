@@ -58,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.10.0'
+__version__ = '0.11.0'
 
 
 class JsonValidatorTool(CLI):
@@ -318,6 +318,8 @@ class JsonValidatorTool(CLI):
             sys.exit(2)
 
     def check_file(self, filename):
+        if self.is_excluded(filename):
+            return
         mem_err = "file '%s', assuming Big Data multi-record json and re-trying validation line-by-line" % filename
         try:
             with open(filename) as self.iostream:

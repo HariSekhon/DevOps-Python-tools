@@ -65,7 +65,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.1'
+__version__ = '0.9.0'
 
 
 class ParquetValidatorTool(CLI):
@@ -165,8 +165,6 @@ class ParquetValidatorTool(CLI):
                     self.check_file(file_path)
 
     def check_file(self, filename):
-        if self.is_excluded(filename):
-            return
         if filename == '-':
             filename = '<STDIN>'
         self.valid_parquet_msg = '%s => Parquet OK' % filename
@@ -182,6 +180,8 @@ class ParquetValidatorTool(CLI):
             except IOError as _:
                 die("ERROR: %s" % _)
         else:
+            if self.is_excluded(filename):
+                return
             try:
                 self.check_parquet(filename)
             except IOError as _:

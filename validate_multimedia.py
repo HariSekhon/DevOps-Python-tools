@@ -164,6 +164,8 @@ class MediaValidatorTool(CLI):
             die("failed to determine if path '%s' is file or directory" % path)
 
     def check_media_file(self, filename):
+        if self.is_excluded(filename):
+            return
         valid_media_msg = '%s => OK' % filename
         invalid_media_msg = '%s => INVALID' % filename
         cmd = self.validate_cmd

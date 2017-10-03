@@ -49,7 +49,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.1'
+__version__ = '0.9.0'
 
 
 class YamlValidatorTool(CLI):
@@ -156,6 +156,8 @@ class YamlValidatorTool(CLI):
         if filename == '<STDIN>':
             self.check_yaml(sys.stdin.read())
         else:
+            if self.is_excluded(filename):
+                return
             try:
                 with open(filename) as iostream:
                     self.check_yaml(iostream.read())

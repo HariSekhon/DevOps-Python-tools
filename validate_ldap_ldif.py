@@ -57,7 +57,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
+__version__ = '0.6'
 
 
 class LdifValidatorTool(CLI):
@@ -192,6 +192,8 @@ class LdifValidatorTool(CLI):
             #self.check_ldif(sys.stdin.read())
             self.check_ldif(sys.stdin)
         else:
+            if self.is_excluded(filename):
+                return
             try:
                 log.debug("checking '%s'", filename)
                 with open(filename, 'rb') as iostream:
