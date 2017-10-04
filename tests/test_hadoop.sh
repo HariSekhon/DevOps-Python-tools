@@ -45,7 +45,7 @@ export HADOOP_YARN_NODE_MANAGER_PORT_DEFAULT="8042"
 #export DOCKER_IMAGE="harisekhon/hadoop"
 #export MNTDIR="/py"
 
-# NN comes up, but RM is really slow to come up, need this 80 secs not 30
+# NN comes up, but RM is really slow to come up, give 80 secs not 50
 startupwait 80
 
 check_docker_available
@@ -115,23 +115,9 @@ EOFCOMMENTED
 #        echo 'Failed to determine hostname of container via docker-compose exec, cannot continue with tests!'
 #        exit 1
 #    fi
-    #echo "waiting 10 secs for Yarn RM to come up to test version"
-    #sleep 10
-    local count=0
-    local max_tries=20
-    while true; do
-        echo "waiting for Yarn RM cluster page to come up to test for active resource manager..."
-        # intentionally being a bit loose here, if content has changed I would rather it be flagged as up and the plugin fail to parse which is more a more accurate error
-        if curl -s "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT/ws/v1/cluster" | grep -qi hadoop; then
-            break
-        fi
-        let count+=1
-        if [ $count -ge 20 ]; then
-            echo "giving up after $max_tries tries"
-            break
-        fi
-        sleep 1
-    done
+    echo "waiting for Yarn RM cluster page to come up before testing for active resource manager:"
+    # intentionally being a bit loose here, if content has changed I would rather it be flagged as up and the plugin fail to parse which is more a more accurate error
+    when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT/ws/v1/cluster" hadoop
     hr
     check_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_namenode.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_DATANODE_PORT"
     hr
