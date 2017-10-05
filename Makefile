@@ -144,7 +144,7 @@ apk-packages-remove:
 apt-packages:
 	$(SUDO) apt-get update
 	$(SUDO) apt-get install -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/deb-packages.txt setup/deb-packages-dev.txt`
-	if [ -z "$(NOJAVA)" ]; which java || $(SUDO) apt-get install -y openjdk-8-jdk || $(SUDO) apt-get install -y openjdk-7-jdk; fi
+	if [ -z "$(NOJAVA)" ]; then which java || $(SUDO) apt-get install -y openjdk-8-jdk || $(SUDO) apt-get install -y openjdk-7-jdk; fi
 
 # for validate_multimedia.py
 # Ubuntu 16.04 Xenial onwards, not available in Ubuntu 14.04 Trusty
@@ -165,7 +165,7 @@ yum-packages:
 	rpm -q wget || $(SUDO) yum install -y wget
 	rpm -q epel-release || yum install -y epel-release || { wget -t 100 --retry-connrefused -O /tmp/epel.rpm "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`grep -o '[[:digit:]]' /etc/*release | head -n1`.noarch.rpm" && $(SUDO) rpm -ivh /tmp/epel.rpm && rm -f /tmp/epel.rpm; }
 	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' setup/rpm-packages.txt setup/rpm-packages-dev.txt`; do rpm -q $$x || $(SUDO) yum install -y $$x; done
-	if [ -z "$(NOJAVA)" ]; which java || $(SUDO) yum install -y java; fi
+	if [ -z "$(NOJAVA)" ]; then which java || $(SUDO) yum install -y java; fi
 
 # for validate_multimedia.py
 .PHONY: yum-packages-multimedia
