@@ -91,7 +91,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.5'
+__version__ = '0.6.6'
 
 class DockerfileGitBranchCheckTool(CLI):
 
@@ -201,7 +201,7 @@ class DockerfileGitBranchCheckTool(CLI):
                 self.branches_checked += 1
                 try:
                     repo.git.checkout(branch)
-                except git.exc.GitCommandError as _:
+                except git.GitError as _:
                     die(_)
                 self.check_path(target, branch)
         except Exception as _:  # pylint: disable=broad-except

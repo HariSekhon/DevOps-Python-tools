@@ -81,7 +81,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
+__version__ = '0.5.1'
 
 class DockerfileGitTagCheckTool(CLI):
 
@@ -148,7 +148,7 @@ class DockerfileGitTagCheckTool(CLI):
                 log.debug("checking tag '%s' Dockerfiles for target '%s'", tag, target)
                 try:
                     repo.git.checkout(tag)
-                except git.exc.GitCommandError as _:
+                except git.GitError as _:
                     die(_)
                 self.check_path(target, tag)
         except Exception as _:  # pylint: disable=broad-except
