@@ -178,9 +178,12 @@ yum-packages-remove:
 	cd pylib && make yum-packages-remove
 	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages-dev.txt`; do rpm -q $$x && $(SUDO) yum remove -y $$x; done
 
-.PHONY: jython-install
-jython-install:
-	./jython_install.sh
+.PHONY: jython
+jython:
+	if [ -x /sbin/apk ];        then apk add --no-cache wget expect; fi
+	if [ -x /usr/bin/apt-get ]; then apt-get install -y wget expect; fi
+	if [ -x /usr/bin/yum ];     then yum install -y wget expect; fi
+	sh jython_install.sh
 
 .PHONY: sonar
 sonar:
