@@ -229,12 +229,17 @@ updatem:
 
 .PHONY: clean
 clean:
+	cd pylib && make clean
 	@# the xargs option to ignore blank input doesn't work on Mac
 	@find . -maxdepth 3 -iname '*.py[co]' -o -iname '*.jy[co]' | xargs rm -f
 	@find . -type d -ipath '*/tests/*' -iname 'test-*spark*.avro' | xargs rm -rf
 	@find . -type d -ipath '*/tests/*' -iname 'test-*spark*.parquet' | xargs rm -rf
 	@rm -f parquet-tools-$(PARQUET_VERSION)-bin.zip
 	@if test -f /.dockerenv; then echo "detected running in Docker, removing Spark tarballs for space efficiency" && rm -fr tests/spark-*-bin-hadoop*; fi
+
+.PHONY: deep-clean
+deep-clean: clean
+	cd pylib && make deep-clean
 
 .PHONY: spark-deps
 spark-deps:
