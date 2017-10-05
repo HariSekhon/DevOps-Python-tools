@@ -25,9 +25,10 @@ been enabled for debugging yet (you may need to contact Travis at support@travis
 
 If specifying a --repo be aware the API is case sensitive for repo names
 
-As a convenience you may supply either --job-id or --repo as an argument without the switch and if the argument
-contains a forward slash (/) it'll be inferred as a --repo, otherwise a --job-id, but the switch versions will
-take priority
+As a convenience you may supply either job id or repo as an argument without any switch and it'll infer it as a repo if
+if contains a slash but no url (eg. HariSekhon/nagios-plugins) or a job id, strip any leading URL so you can simply
+paste the path to a failing build and it'll just work. The switch versions of --job-id and --repo take priority as
+they're more explicit
 
 """
 
@@ -63,7 +64,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
+__version__ = '0.6.0'
 
 
 class TravisDebugSession(CLI):
@@ -123,7 +124,9 @@ class TravisDebugSession(CLI):
         #    self.usage('--travis-token option or ' +
         #               '$TRAVIS_TOKEN environment variable required to authenticate to the API')
         if self.args:
-            if '/' in self.args[0]:
+            # assume arg is a repo in form of HariSekhon/nagios-plugins but do not use url which we are more likely to
+            # have pasted a travis-ci url to a job, see a few lines further down
+            if '/' in self.args[0] and not '://' in self.args[0]:
                 if not self.repo:
                     log.info('using argument as --repo')
                     self.repo = self.args[0]
@@ -131,6 +134,9 @@ class TravisDebugSession(CLI):
                 log.info('using argument as --job-id')
                 self.job_id = self.args[0]
         if self.job_id:
+            # convenience to be able to lazily paste a URL like the following and still have it extract the job_id
+            # https://travis-ci.org/HariSekhon/nagios-plugins/jobs/283840596#L1079
+            self.job_id = self.job_id.split('/')[-1].split('#')[0]
             validate_chars(self.job_id, 'job id', '0-9')
         elif self.repo:
             validate_chars(self.repo, 'repo', r'\/\w\.-')
