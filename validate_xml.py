@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.1'
+__version__ = '0.9.0'
 
 
 class XmlValidatorTool(CLI):
@@ -119,7 +119,7 @@ class XmlValidatorTool(CLI):
             if os.path.isfile(arg):
                 log_option('file', arg)
             elif os.path.isdir(arg):
-                log_option('directory', arg)
+                log_option('directory', os.path.abspath(arg))
             else:
                 die("path '%s' could not be determined as either a file or directory" % arg)
         for arg in args:
@@ -158,6 +158,8 @@ class XmlValidatorTool(CLI):
         if filename == '<STDIN>':
             self.check_xml(sys.stdin.read())
         else:
+            if self.is_excluded(filename):
+                return
             try:
                 with open(filename) as iostream:
                     self.check_xml(iostream.read())

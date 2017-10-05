@@ -56,7 +56,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
+__version__ = '0.6'
 
 
 class DockerHubSearch(CLI):
@@ -110,13 +110,18 @@ class DockerHubSearch(CLI):
                 #result['trusted'] = result['is_trusted']
                 result['automated'] = '[OK]' if item['is_automated'] else ''
                 results[star][name] = result
+            # mimicking out spacing from 'docker search' command
+            if not self.quiet:
+                print('{0:{5}s}   {1:45s}   {2:7s}   {3:8s}   {4:10s}'.
+                      format('NAME', 'DESCRIPTION', 'STARS', 'OFFICIAL', 'AUTOMATED', longest_name))
         except KeyError as _:
             die('failed to parse results fields from data returned by DockerHub ' +
                 '(format may have changed?): {0}'.format(_))
-        # mimicking out spacing from 'docker search' command
-        if not self.quiet:
-            print('{0:{5}s}   {1:45s}   {2:7s}   {3:8s}   {4:10s}'.
-                  format('NAME', 'DESCRIPTION', 'STARS', 'OFFICIAL', 'AUTOMATED', longest_name))
+        except IOError as _:
+            if str(_) == '[Errno 32] Broken pipe':
+                pass
+            else:
+                raise
 
         def truncate(mystr, length):
             if len(mystr) > length:
@@ -160,8 +165,8 @@ class DockerHubSearch(CLI):
         if not isJson(req.content):
             die('invalid non-JSON response from DockerHub!')
         if log.isEnabledFor(logging.DEBUG):
-            print(jsonpp(req.content))
-            print('='*80)
+            print(jsonpp(req.content), file=sys.stderr)
+            print('='*80, file=sys.stderr)
         try:
             data = json.loads(req.content)
         except KeyError as _:

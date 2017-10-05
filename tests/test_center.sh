@@ -24,10 +24,7 @@ cd "$srcdir/.."
 
 . "bash-tools/utils.sh"
 
-hr
-echo "Testing center.py"
-hr
-echo
+section "Testing center.py"
 
 expected="                                <this is a  test>"
 

@@ -62,7 +62,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.9.0'
+__version__ = '0.10.0'
 
 
 class CsvValidatorTool(CLI):
@@ -193,7 +193,7 @@ class CsvValidatorTool(CLI):
             if os.path.isfile(arg):
                 log_option('file', arg)
             elif os.path.isdir(arg):
-                log_option('directory', arg)
+                log_option('directory', os.path.abspath(arg))
             else:
                 die("path '{0}' could not be determined as either a file or directory".format(arg))
         for arg in args:
@@ -234,6 +234,8 @@ class CsvValidatorTool(CLI):
             log.debug('checking stdin')
             self.check_csv(sys.stdin)
         else:
+            if self.is_excluded(filename):
+                return
             log.debug('checking %s', self.filename)
             try:
                 with open(self.filename) as iostream:

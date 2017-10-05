@@ -28,8 +28,9 @@ python:
 
 sudo: required
 
-#env:
+env:
 #  - DEBUG=1
+  - PYTHONUNBUFFERED=1
 
 notifications:
   email: false
