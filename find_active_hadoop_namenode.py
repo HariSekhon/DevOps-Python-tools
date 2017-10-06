@@ -58,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 
 class FindActiveHadoopNamenode(FindActiveServer):
@@ -76,7 +76,7 @@ class FindActiveHadoopNamenode(FindActiveServer):
         self.regex = r'"State"\s*:\s*"active"'
 
     def add_options(self):
-        self.add_hostoption(name='Namenode', default_port=self.default_port)
+        self.add_hostoption(name='Hadoop Namenode', default_port=self.default_port)
         self.add_opt('-S', '--ssl', action='store_true', help='Use SSL')
         #self.add_opt('-n', '--num-threads', default=self.num_threads, type='int',
         #             help='Number or parallel threads to speed up processing (default: 2, ' +
