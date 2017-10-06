@@ -17,22 +17,22 @@ set -eu
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "
-# ===================== #
-# Spark JSON => Avro
-# ===================== #
-"
+cd "$srcdir";
+
+. ./utils.sh
+
+section "Spark JSON => Avro"
+
+if is_inside_docker; then
+    echo "detected running inside docker, skipping test..."
+    return 0 &>/dev/null || :
+    exit 0
+fi
 
 # don't support Spark <= 1.3 due to difference in databricks avro dependency
 export SPARK_VERSIONS="${@:-1.4.0 1.5.1 1.6.2}"
 # requires upgrade to spark-avro 3.0.0
 #export SPARK_VERSIONS="${@:-2.0.0}"
-
-cd "$srcdir/..";
-
-. ./tests/utils.sh
-
-cd "$srcdir"
 
 for SPARK_VERSION in $SPARK_VERSIONS; do
     dir="spark-$SPARK_VERSION-bin-hadoop2.6"
