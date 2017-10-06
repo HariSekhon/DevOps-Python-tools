@@ -58,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 
 
 class FindActiveHadoopYarnResourceManager(FindActiveServer):
@@ -76,7 +76,8 @@ class FindActiveHadoopYarnResourceManager(FindActiveServer):
         self.regex = r'"haState"\s*:\s*"ACTIVE"'
 
     def add_options(self):
-        self.add_hostoption(name='Yarn Resource Manager', default_port=self.default_port)
+        self.add_hostoption(name=['Hadoop Yarn Resource Manager', 'Yarn Resource Manager'],
+                            default_port=self.default_port)
         self.add_opt('-S', '--ssl', action='store_true', help='Use SSL')
         #self.add_opt('-n', '--num-threads', default=self.num_threads, type='int',
         #             help='Number or parallel threads to speed up processing (default: 2, ' +
