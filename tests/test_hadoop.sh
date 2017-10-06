@@ -81,6 +81,18 @@ test_hadoop(){
     export HADOOP_PORTS="$HADOOP_NAMENODE_PORT $HADOOP_DATANODE_PORT $HADOOP_YARN_RESOURCE_MANAGER_PORT $HADOOP_YARN_NODE_MANAGER_PORT"
     when_ports_available "$startupwait" "$HADOOP_HOST" $HADOOP_PORTS
     hr
+    echo "waiting for NN page to come up before testing for active namenode:"
+    when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_NAMENODE_PORT/dfshealth.html" 'NameNode Journal Status'
+    hr
+#    echo "waiting for DN page to come up:"
+#    when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 'Datanode on'
+#    hr
+    echo "waiting for RM cluster page to come up before testing for active resource manager:"
+    when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT/ws/v1/cluster" ResourceManager
+    hr
+#    echo "waiting for NM cluster page to come up:"
+#    when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT/node" 'Node Manager Version'
+#    hr
 cat >/dev/null <<EOFCOMMENTED
     echo "setting up HDFS for tests"
     #docker-compose exec "$DOCKER_SERVICE" /bin/bash <<-EOF
@@ -115,17 +127,16 @@ EOFCOMMENTED
 #        echo 'Failed to determine hostname of container via docker-compose exec, cannot continue with tests!'
 #        exit 1
 #    fi
-    echo "waiting for Yarn RM cluster page to come up before testing for active resource manager:"
-    # intentionally being a bit loose here, if content has changed I would rather it be flagged as up and the plugin fail to parse which is more a more accurate error
-    when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT/ws/v1/cluster" hadoop
     hr
-    check_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_namenode.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_DATANODE_PORT"
+    # Docker maps all these 127.0.0.2, 127.0.0.3 etc to go to docker port mappings so is there is a container running it finds it accidentally
+    # therefore reset the HADOOP PORTS to point to something that should get connection refused like port 1 and so that the failure hosts still fail and return only the expected correct host
+    HADOOP_NAMENODE_PORT=1 check_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_namenode.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_DATANODE_PORT"
     hr
-    check_output "$HADOOP_HOST:$HADOOP_NAMENODE_PORT" ./find_active_hadoop_namenode.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_NAMENODE_PORT"
+    HADOOP_NAMENODE_PORT=1 check_output "$HADOOP_HOST:$HADOOP_NAMENODE_PORT" ./find_active_hadoop_namenode.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_NAMENODE_PORT"
     hr
-    check_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT"
+    HADOOP_YARN_RESOURCE_MANAGER_PORT=1 check_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT"
     hr
-    check_output "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT"
+    HADOOP_YARN_RESOURCE_MANAGER_PORT=1 check_output "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT"
     hr
     #delete_container
     docker-compose down
