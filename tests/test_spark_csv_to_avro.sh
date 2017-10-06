@@ -17,21 +17,21 @@ set -eu
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "
-# ===================== #
-# Spark CSV => Avro
-# ===================== #
-"
+cd "$srcdir"
+
+. ./utils.sh
+
+section "Spark CSV => Avro"
+
+if is_inside_docker; then
+    echo "detected running inside docker, skipping test..."
+    return 0 &>/dev/null || :
+    exit 0
+fi
 
 export SPARK_VERSIONS="${@:-1.4.0 1.5.1 1.6.2}"
 # requires using spark-avro 3.0.0+
 #export SPARK_VERSIONS="${@:-2.0.0}"
-
-cd "$srcdir/..";
-
-. ./tests/utils.sh
-
-cd "$srcdir"
 
 # don't support Spark <= 1.3 due to difference in databricks avro dependency
 for SPARK_VERSION in $SPARK_VERSIONS; do
