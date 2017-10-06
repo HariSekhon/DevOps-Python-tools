@@ -227,8 +227,8 @@ update-no-recompile:
 update-submodules:
 	git submodule update --init --remote
 .PHONY: updatem
-updatem:
-	make update-submodules
+updatem: update-submodules
+	:
 
 .PHONY: clean
 clean:
