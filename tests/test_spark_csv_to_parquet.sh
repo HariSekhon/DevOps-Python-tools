@@ -17,19 +17,19 @@ set -eu
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "
-# ===================== #
-# Spark CSV => Parquet
-# ===================== #
-"
+cd "$srcdir";
+
+. ./utils.sh
+
+section "Spark CSV => Parquet"
+
+if is_inside_docker; then
+    echo "detected running inside docker, skipping test..."
+    return 0 &>/dev/null || :
+    exit 0
+fi
 
 export SPARK_VERSIONS="${@:-1.3.1 1.4.0 1.5.1 1.6.2 2.0.0}"
-
-cd "$srcdir/..";
-
-. ./tests/utils.sh
-
-cd "$srcdir"
 
 for SPARK_VERSION in $SPARK_VERSIONS; do
     dir="spark-$SPARK_VERSION-bin-hadoop2.6"
