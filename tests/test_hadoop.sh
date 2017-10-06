@@ -81,17 +81,17 @@ test_hadoop(){
     export HADOOP_PORTS="$HADOOP_NAMENODE_PORT $HADOOP_DATANODE_PORT $HADOOP_YARN_RESOURCE_MANAGER_PORT $HADOOP_YARN_NODE_MANAGER_PORT"
     when_ports_available "$startupwait" "$HADOOP_HOST" $HADOOP_PORTS
     hr
-    echo "waiting for NN page to come up before testing for active namenode:"
+    echo "waiting for NN dfshealth page to come up before testing for active namenode:"
     when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_NAMENODE_PORT/dfshealth.html" 'NameNode Journal Status'
     hr
-#    echo "waiting for DN page to come up:"
-#    when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 'Datanode on'
-#    hr
     echo "waiting for RM cluster page to come up before testing for active resource manager:"
     when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT/ws/v1/cluster" ResourceManager
     hr
-#    echo "waiting for NM cluster page to come up:"
+#    echo "waiting for NM node page to come up:"
 #    when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT/node" 'Node Manager Version'
+#    hr
+#    echo "waiting for DN page to come up:"
+#    when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 'Datanode on'
 #    hr
 cat >/dev/null <<EOFCOMMENTED
     echo "setting up HDFS for tests"
