@@ -27,6 +27,10 @@ isExcluded(){
     #[[ $prog =~ ambari_blueprints.py ]] && return 0
     # this external git check is expensive, skip it when in CI as using fresh git checkouts
     is_CI && return 1
+    # we no longer include spark inside pytools docker image due to bloat, so skip tests
+    if is_inside_docker && [[ "$prog" =~ spark_* ]]; then
+        return 1
+    fi
     if which git &>/dev/null; then
         commit="$(git log "$prog" | head -n1 | grep 'commit')"
         if [ -z "$commit" ]; then
