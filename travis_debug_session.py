@@ -64,7 +64,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.0'
+__version__ = '0.7.0'
 
 
 class TravisDebugSession(CLI):
@@ -285,6 +285,11 @@ class TravisDebugSession(CLI):
             raise CriticalError(_)
         log.debug("response: %s %s", req.status_code, req.reason)
         log.debug("content:\n%s\n%s\n%s", '=' * 80, req.content.strip(), '=' * 80)
+        # Travis CI behaviour has changed from 200 with no content indicating build log empty, not started yet
+        # to now returning "500 Internal Server Error", content: "Sorry, we experienced an error."
+        if req.status_code == 500:
+            log.info('500 internal server error, build not started yet')
+            return None
         if req.status_code != 200:
             error_message = self.parse_travis_error(req)
             raise CriticalError('{0} {1}: {2}'.format(req.status_code, req.reason, error_message))
