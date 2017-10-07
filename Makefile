@@ -85,8 +85,11 @@ build:
 	
 	cd pylib && make
 	
-	[ -d "parquet-tools-$(PARQUET_VERSION)" ] || wget -t 100 --retry-connrefused -c -O "parquet-tools-$(PARQUET_VERSION)-bin.zip" "http://search.maven.org/remotecontent?filepath=com/twitter/parquet-tools/$(PARQUET_VERSION)/parquet-tools-$(PARQUET_VERSION)-bin.zip"
-	[ -d "parquet-tools-$(PARQUET_VERSION)" ] || unzip "parquet-tools-$(PARQUET_VERSION)-bin.zip"
+	# don't pull parquet tools in to docker image by default, will bloat it
+	# can fetch separately by running 'make parquet-tools' if you really want to
+	if ! [ -f /.dockerenv ]; then \
+		make parquet-tools; \
+	fi
 	
 	# json module built-in to Python >= 2.6, backport not available via pypi
 	#$(SUDO_PIP) pip install json
@@ -118,6 +121,13 @@ build:
 .PHONY: quick
 quick:
 	QUICK=1 make
+
+.PHONY: parquet-tools
+parquet-tools:
+	if ! [ -d "parquet-tools-$(PARQUET_VERSION)" ]; then \
+		wget -t 100 --retry-connrefused -c -O "parquet-tools-$(PARQUET_VERSION)-bin.zip" "http://search.maven.org/remotecontent?filepath=com/twitter/parquet-tools/$(PARQUET_VERSION)/parquet-tools-$(PARQUET_VERSION)-bin.zip"; \
+		unzip "parquet-tools-$(PARQUET_VERSION)-bin.zip"; \
+	fi
 
 .PHONY: apk-packages
 apk-packages:
