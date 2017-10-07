@@ -315,7 +315,7 @@ class TravisDebugSession(CLI):
             raise CriticalError(last_line)
 
         ssh_address = None
-        regex_ssh = re.compile(r'^ssh\s+(\w+\@{host_regex})\s*$'.format(host_regex=host_regex))
+        regex_ssh = re.compile(r'^\s*ssh\s+(\w+\@{host_regex})\s*$'.format(host_regex=host_regex), re.I)
         for line in content.split('\n'):
             match = regex_ssh.match(line)
             if match:
