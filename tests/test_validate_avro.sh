@@ -35,7 +35,12 @@ data_dir="tests/data"
 broken_dir="tests/avro_broken"
 # this relies on being run after the Spark => Avro tests to generate these files as I don't store avro files in this repo
 rm -f "$data_dir/test.avro"
-cp -v "$(find . -type f -iname '*.avro' | head -n1)" "$data_dir/test.avro"
+sample_avro_file="$(find . -type f -iname '*.avro' | head -n1)"
+if [ -z "$sample_avro_file" ] && is_inside_docker; then
+    echo "No sample avro file found and running inside docker, skipping validate_avro.py tests"
+    exit 0
+fi
+cp -v "$sample_avro_file" "$data_dir/test.avro"
 
 exclude='/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+$|broken|error'
 
