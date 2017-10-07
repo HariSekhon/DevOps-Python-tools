@@ -33,10 +33,10 @@ export DOCKER_REGISTRY_HOST="${DOCKER_HOST:-localhost}"
 export DOCKER_REGISTRY_HOST="${DOCKER_REGISTRY_HOST/*:\/\/}"
 export DOCKER_REGISTRY_HOST="${DOCKER_REGISTRY_HOST/:*}"
 
-export DOCKER_REGISTRY_PORT=5000
+export DOCKER_REGISTRY_PORT_DEFAULT=5000
 
-export DOCKER_REGISTRY_USER="docker_user"
-export DOCKER_REGISTRY_PASSWORD="docker_password"
+export DOCKER_REGISTRY_USER="${DOCKER_REGISTRY_USER:-docker_user}"
+export DOCKER_REGISTRY_PASSWORD="${DOCKER_REGISTRY_PASSWORD:-docker_password}"
 
 export DOCKER_SERVICE="pytools-registry-test"
 export COMPOSE_FILE="$srcdir/docker/registry-docker-compose.yml"
@@ -101,17 +101,20 @@ echo
 docker-compose up -d
 echo
 
-when_ports_available "$max_secs" "$DOCKER_REGISTRY_HOST" "$DOCKER_REGISTRY_PORT"
-
-echo
-
 #export DOCKER_REGISTRY_PORT="$(docker-compose port "docker_${DOCKER_SERVICE}_1" "$DOCKER_REGISTRY_PORT" | sed 's/.*://')"
-export DOCKER_REGISTRY_PORT="$(docker port "docker_${DOCKER_SERVICE}_1" "$DOCKER_REGISTRY_PORT" | sed 's/.*://')"
+export DOCKER_REGISTRY_PORT="$(docker port "docker_${DOCKER_SERVICE}_1" "$DOCKER_REGISTRY_PORT_DEFAULT" | sed 's/.*://')"
 
 if [ -z "$DOCKER_REGISTRY_PORT" ]; then
     echo "DOCKER_REGISTRY_PORT not found from running container, did container fail to start up properly?"
     exit 1
 fi
+
+hr
+when_ports_available "$max_secs" "$DOCKER_REGISTRY_HOST" "$DOCKER_REGISTRY_PORT"
+hr
+when_url_content "$max_secs" "https://$DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT/v2/_catalog" repositories -u "$DOCKER_REGISTRY_USER":"$DOCKER_REGISTRY_PASSWORD"
+hr
+echo
 
 echo "docker login to registry $DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT ..."
 docker login -e root@localhost -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASSWORD" "$DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT"
