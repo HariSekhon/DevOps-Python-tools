@@ -36,7 +36,10 @@ data_dir="tests/data"
 broken_dir="tests/parquet_broken"
 # this relies on being run after the Spark => parquet tests to generate these files as I don't store parquet files in this repo
 rm -f "$data_dir/test.parquet"
+# find will exit non-zero due to broken pipe caused by head
+set +o pipefail
 sample_parquet_file="$(find . -type f -iname '*.parquet' | head -n1)"
+set -o pipefail
 if [ -z "$sample_parquet_file" ] && is_inside_docker; then
     echo "No sample parquet file found and running inside docker, skipping validate_parquet.py tests"
     exit 0
