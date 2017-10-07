@@ -288,7 +288,9 @@ class TravisDebugSession(CLI):
         # Travis CI behaviour has changed from 200 with no content indicating build log empty, not started yet
         # to now returning "500 Internal Server Error", content: "Sorry, we experienced an error."
         if req.status_code == 500:
-            log.info('500 internal server error, build not started yet')
+            # don't output 500 it will confuse users in to thinking there is a real error which 500 usually indicates
+            #log.info('500 internal server error, build not started yet')
+            log.info('build not started yet')
             return None
         if req.status_code != 200:
             error_message = self.parse_travis_error(req)
