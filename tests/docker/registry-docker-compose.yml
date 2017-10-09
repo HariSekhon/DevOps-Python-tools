@@ -27,3 +27,8 @@ services:
       - REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm
     volumes:
       - .:/certs
+    networks:
+      - docker_registry
+
+networks:
+  docker_registry:
