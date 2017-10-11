@@ -54,7 +54,8 @@ docker_exec(){
     export JAVA_HOME=/usr
     $MNTDIR/$@
 EOF"
-    run docker exec -i "${COMPOSE_PROJECT_NAME:-docker}_${DOCKER_SERVICE}_1" /bin/bash <<-EOF
+    run++
+    docker exec -i "${COMPOSE_PROJECT_NAME:-docker}_${DOCKER_SERVICE}_1" /bin/bash <<-EOF
     export JAVA_HOME=/usr
     $MNTDIR/$@
 EOF
@@ -131,6 +132,7 @@ EOF
     hr
     run ./hbase_generate_data.py -n 10
     hr
+    echo "checking generate data fails with exit code 2 when table already exists on second run"
     run_fail 2 ./hbase_generate_data.py -n 10
     hr
     set +e
