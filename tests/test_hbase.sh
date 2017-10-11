@@ -54,7 +54,7 @@ docker_exec(){
     export JAVA_HOME=/usr
     $MNTDIR/$@
 EOF"
-    docker exec -i "${COMPOSE_PROJECT_NAME:-docker}_${DOCKER_SERVICE}_1" /bin/bash <<-EOF
+    run docker exec -i "${COMPOSE_PROJECT_NAME:-docker}_${DOCKER_SERVICE}_1" /bin/bash <<-EOF
     export JAVA_HOME=/usr
     $MNTDIR/$@
 EOF
@@ -63,20 +63,30 @@ EOF
 test_hbase(){
     local version="$1"
     section2 "Setting up HBase $version test container"
-    #local DOCKER_OPTS="-v $srcdir/..:$MNTDIR"
-    #launch_container "$DOCKER_IMAGE:$version" "$DOCKER_CONTAINER" 2181 8080 8085 9090 9095 16000 16010 16201 16301
     VERSION="$version" docker-compose up -d
+    echo "getting HBase dynamic port mappings:"
     if [ "$version" = "0.96" ]; then
         local export HBASE_MASTER_PORT_DEFAULT=60010
         local export HBASE_REGIONSERVER_PORT_DEFAULT=60301
     fi
+    printf "getting HBase Master port       => "
     export HBASE_MASTER_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_MASTER_PORT_DEFAULT" | sed 's/.*://'`"
+    echo "$HBASE_MASTER_PORT"
+    printf "getting HBase RegionServer port => "
     export HBASE_REGIONSERVER_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_REGIONSERVER_PORT_DEFAULT" | sed 's/.*://'`"
+    echo "$HBASE_REGIONSERVER_PORT"
+    printf "getting HBase Stargate port     => "
     export HBASE_STARGATE_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_STARGATE_PORT_DEFAULT" | sed 's/.*://'`"
+    echo "$HBASE_STARGATE_PORT"
+    printf "getting HBase Thrift port       => "
     export HBASE_THRIFT_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_THRIFT_PORT_DEFAULT" | sed 's/.*://'`"
+    echo "$HBASE_THRIFT_PORT"
+    printf "getting HBase ZooKeeper port    => "
     export ZOOKEEPER_PORT="`docker-compose port "$DOCKER_SERVICE" "$ZOOKEEPER_PORT_DEFAULT" | sed 's/.*://'`"
+    echo "$ZOOKEEPER_PORT"
     #hbase_ports=`{ for x in $HBASE_PORTS; do docker-compose port "$DOCKER_SERVICE" "$x"; done; } | sed 's/.*://'`
     export HBASE_PORTS="$HBASE_MASTER_PORT $HBASE_REGIONSERVER_PORT $HBASE_STARGATE_PORT $HBASE_THRIFT_PORT $ZOOKEEPER_PORT"
+    hr
     when_ports_available "$startupwait" "$HBASE_HOST" $HBASE_PORTS
     hr
     when_url_content "$startupwait" "http://$HBASE_HOST:$HBASE_MASTER_PORT/master-status" hbase
@@ -111,56 +121,37 @@ EOF
     hr
     # will otherwise pick up HBASE_HOST and use default port and return the real HBase Master
     HBASE_HOST='' HOST='' HBASE_MASTER_PORT="$HBASE_MASTER_PORT_DEFAULT" \
-        check_output "NO_AVAILABLE_SERVER" ./find_active_hbase_master.py 127.0.0.2 127.0.0.3 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT"
+        run_output "NO_AVAILABLE_SERVER" ./find_active_hbase_master.py 127.0.0.2 127.0.0.3 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT"
     hr
     # if HBASE_PORT / --port is set to same as suffix then only outputs host not host:port
     HBASE_HOST='' HOST='' HBASE_MASTER_PORT="$HBASE_MASTER_PORT_DEFAULT" \
-        check_output "$HBASE_HOST:$HBASE_MASTER_PORT" ./find_active_hbase_master.py 127.0.0.2 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT" 127.0.0.3 "$HBASE_HOST:$HBASE_MASTER_PORT"
+        run_output "$HBASE_HOST:$HBASE_MASTER_PORT" ./find_active_hbase_master.py 127.0.0.2 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT" 127.0.0.3 "$HBASE_HOST:$HBASE_MASTER_PORT"
     hr
     export HBASE_THRIFT_SERVER_PORT="$HBASE_THRIFT_PORT"
     hr
-    echo "./hbase_generate_data.py -n 10"
-    ./hbase_generate_data.py -n 10
+    run ./hbase_generate_data.py -n 10
     hr
-    set +e
-    echo "./hbase_generate_data.py -n 10"
-    ./hbase_generate_data.py -n 10
-    check_exit_code 2
-    set -e
+    run_fail 2 ./hbase_generate_data.py -n 10
     hr
     set +e
     echo "trying to send generated data to DisabledTable (times out):"
-    echo "./hbase_generate_data.py -n 10 -T DisabledTable -X"
-    ./hbase_generate_data.py -n 10 -T DisabledTable -X
-    check_exit_code 2
-    set -e
+    run_fail 2 ./hbase_generate_data.py -n 10 -T DisabledTable --use-existing-table
     hr
-    echo "./hbase_generate_data.py -n 10 -d"
-    ./hbase_generate_data.py -n 10 -d
+    run ./hbase_generate_data.py -n 10 --drop-table
     hr
-    echo "./hbase_generate_data.py -n 10 -d -s"
-    ./hbase_generate_data.py -n 10 -d -s
+    run ./hbase_generate_data.py -n 10 --drop-table --skew
     hr
-    echo "./hbase_generate_data.py -n 10000 -X -s --pc 50 -T UniformSplitTable"
-    ./hbase_generate_data.py -n 10000 -X -s --pc 50 -T UniformSplitTable
+    run ./hbase_generate_data.py -n 10000 --use-existing-table --skew --skew-percent 50 -T UniformSplitTable
     hr
-    echo "./hbase_generate_data.py -n 10000 -X -T HexStringSplitTable"
-    ./hbase_generate_data.py -n 10000 -X -T HexStringSplitTable
+    run ./hbase_generate_data.py -n 10000 --use-existing-table -T HexStringSplitTable
     hr
-    set +e
-    echo "./hbase_compact_tables.py --list-tables"
-    ./hbase_compact_tables.py --list-tables
-    check_exit_code 3
-    set -e
+    run_fail 3 ./hbase_compact_tables.py --list-tables
     hr
-    echo "./hbase_compact_tables.py -H $HBASE_HOST"
-    ./hbase_compact_tables.py -H $HBASE_HOST
+    run ./hbase_compact_tables.py -H $HBASE_HOST
     hr
-    echo "./hbase_compact_tables.py -r DisabledTable"
-    ./hbase_compact_tables.py -r DisabledTable
+    run ./hbase_compact_tables.py -r DisabledTable
     hr
-    echo "./hbase_compact_tables.py --regex .1"
-    ./hbase_compact_tables.py --regex .1
+    run ./hbase_compact_tables.py --regex .1
     hr
     set +e
     docker_exec hbase_flush_tables.py --list-tables
@@ -171,92 +162,53 @@ EOF
     hr
     docker_exec hbase_flush_tables.py -r Disabled.*
     hr
-    set +e
-    echo "./hbase_show_table_region_ranges.py --list-tables"
-    ./hbase_show_table_region_ranges.py --list-tables
-    check_exit_code 3
-    set -e
+    run_fail 3 ./hbase_show_table_region_ranges.py --list-tables
     hr
-    echo "checking hbase_show_table_region_ranges.py against DisabledTable"
-    echo "./hbase_show_table_region_ranges.py -T DisabledTable -vvv"
-    ./hbase_show_table_region_ranges.py -T DisabledTable -vvv
+    echo "checking hbase_show_table_region_ranges.py against DisabledTable:"
+    run ./hbase_show_table_region_ranges.py -T DisabledTable -vvv
     hr
-    echo "checking hbase_show_table_region_ranges.py against EmptyTable"
-    echo "./hbase_show_table_region_ranges.py -T EmptyTable -vvv"
-    ./hbase_show_table_region_ranges.py -T EmptyTable -vvv
+    echo "checking hbase_show_table_region_ranges.py against EmptyTable:"
+    run ./hbase_show_table_region_ranges.py -T EmptyTable -vvv
     hr
-    echo "./hbase_show_table_region_ranges.py -T HexStringSplitTable -v --short-region-name"
-    ./hbase_show_table_region_ranges.py -T HexStringSplitTable -v --short-region-name
+    run ./hbase_show_table_region_ranges.py -T HexStringSplitTable -v --short-region-name
     hr
-    echo "./hbase_show_table_region_ranges.py -T UniformSplitTable -v"
-    ./hbase_show_table_region_ranges.py -T UniformSplitTable -v
+    run ./hbase_show_table_region_ranges.py -T UniformSplitTable -v
     hr
-    set +e
-    echo "./hbase_calculate_table_region_row_distribution.py --list-tables"
-    ./hbase_calculate_table_region_row_distribution.py --list-tables
-    check_exit_code 3
-    set -e
+    run_fail 3 ./hbase_calculate_table_region_row_distribution.py --list-tables
     hr
-    set +e
-    echo "checking hbase_calculate_table_region_row_distribution.py against DisabledTable"
-    echo "./hbase_calculate_table_region_row_distribution.py -T DisabledTable -vvv"
-    ./hbase_calculate_table_region_row_distribution.py -T DisabledTable -vvv
-    check_exit_code 2
-    set -e
+    echo "checking hbase_calculate_table_region_row_distribution.py against DisabledTable:"
+    run_fail 2 ./hbase_calculate_table_region_row_distribution.py -T DisabledTable -vvv
     hr
-    set +e
-    echo "checking hbase_calculate_table_region_row_distribution.py against EmptyTable"
-    echo "./hbase_calculate_table_region_row_distribution.py -T EmptyTable -vvv"
-    ./hbase_calculate_table_region_row_distribution.py -T EmptyTable -vvv
-    check_exit_code 2
-    set -e
+    echo "checking hbase_calculate_table_region_row_distribution.py against EmptyTable:"
+    run_fail 2 ./hbase_calculate_table_region_row_distribution.py -T EmptyTable -vvv
     hr
-    echo "./hbase_calculate_table_region_row_distribution.py -T UniformSplitTable -v --no-region-name"
-    ./hbase_calculate_table_region_row_distribution.py -T UniformSplitTable -v --no-region-name
+    run ./hbase_calculate_table_region_row_distribution.py -T UniformSplitTable -v --no-region-name
     hr
-    echo "./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable"
-    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable
+    run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable
     hr
-    echo "./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -vv --short-region-name --sort server"
-    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -vv --short-region-name --sort server
+    run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -vv --short-region-name --sort server
     hr
-    echo "./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort server --desc"
-    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort server --desc
+    run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort server --desc
     hr
-    echo "./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count"
-    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count
+    run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count
     hr
-    echo "./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc"
-    ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc
+    run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc
     hr
-    set +e
-    echo "checking hbase_calculate_table_row_key_distribution.py against DisabledTable"
-    echo "./hbase_calculate_table_row_key_distribution.py -T DisabledTable -vvv"
-    ./hbase_calculate_table_row_key_distribution.py -T DisabledTable -vvv
-    check_exit_code 2
-    set -e
+    echo "checking hbase_calculate_table_row_key_distribution.py against DisabledTable:"
+    run_fail 2 ./hbase_calculate_table_row_key_distribution.py -T DisabledTable -vvv
     hr
-    set +e
-    echo "checking hbase_calculate_table_row_key_distribution.py against EmptyTable"
-    echo "./hbase_calculate_table_row_key_distribution.py -T EmptyTable -vvv"
-    ./hbase_calculate_table_row_key_distribution.py -T EmptyTable -vvv
-    check_exit_code 2
-    set -e
+    echo "checking hbase_calculate_table_row_key_distribution.py against EmptyTable:"
+    run_fail 2 ./hbase_calculate_table_row_key_distribution.py -T EmptyTable -vvv
     hr
-    echo "./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2"
-    ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2
+    run ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2
     hr
-    echo "./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable --sort"
-    ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable --sort
+    run ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable --sort
     hr
-    echo "./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable --sort --desc"
-    ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable --sort --desc
+    run ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable --sort --desc
     hr
-    echo "./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable"
-    ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
+    run ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
     hr
 
-    #delete_container
     docker-compose down
     echo
 }
