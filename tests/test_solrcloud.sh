@@ -60,18 +60,15 @@ test_solrcloud(){
         export SOLR_COLLECTION="gettingstarted"
     fi
     section2 "Setting up SolrCloud $version docker test container"
-    #DOCKER_OPTS="-v $srcdir/..:$MNTDIR"
-    #launch_container "$DOCKER_IMAGE:$version" "$DOCKER_CONTAINER" $SOLR_PORTS
     VERSION="$version" docker-compose up -d
-    echo "getting SolrCloud dynamic port mappings"
-    printf "getting Solr HTTP port => "
+    echo "getting SolrCloud dynamic port mappings:"
+    printf "Solr HTTP port => "
     export SOLR_PORT="`docker-compose port "$DOCKER_SERVICE" "$SOLR_PORT_DEFAULT" | sed 's/.*://'`"
     echo "$SOLR_PORT"
-    printf "getting ZooKeeper port => "
+    printf "ZooKeeper port => "
     export SOLR_ZOOKEEPER_PORT="`docker-compose port "$DOCKER_SERVICE" "$SOLR_ZOOKEEPER_PORT_DEFAULT" | sed 's/.*://'`"
     echo "$SOLR_ZOOKEEPER_PORT"
-    #solr_ports=`{ for x in $SOLR_PORTS; do docker-compose port "$DOCKER_SERVICE" "$x"; done; } | sed 's/.*://'`
-    #local SOLR_PORTS="$solr_ports"
+    hr
     when_ports_available "$startupwait" "$SOLR_HOST" "$SOLR_PORT" "$SOLR_ZOOKEEPER_PORT"
     hr
     when_url_content "$startupwait" "http://$SOLR_HOST:$SOLR_PORT/solr/" "Solr Admin"
@@ -84,11 +81,10 @@ test_solrcloud(){
     non_solr_node1="127.0.0.1:1025"
     non_solr_node2="127.0.0.1:1026"
     hr
-    SOLR_PORT="$SOLR_PORT_DEFAULT" check_output "NO_AVAILABLE_SERVER" ./find_active_solrcloud_node.py $non_solr_node1 $non_solr_node2
+    SOLR_PORT="$SOLR_PORT_DEFAULT" run_output "NO_AVAILABLE_SERVER" ./find_active_solrcloud_node.py $non_solr_node1 $non_solr_node2
     hr
-    SOLR_PORT="$SOLR_PORT_DEFAULT" check_output "$SOLR_HOST:$SOLR_PORT" ./find_active_solrcloud_node.py $non_solr_node1 $non_solr_node2 "$SOLR_HOST:$SOLR_PORT"
+    SOLR_PORT="$SOLR_PORT_DEFAULT" run_output "$SOLR_HOST:$SOLR_PORT" ./find_active_solrcloud_node.py $non_solr_node1 $non_solr_node2 "$SOLR_HOST:$SOLR_PORT"
     hr
-    #delete_container
     docker-compose down
     hr
     echo
