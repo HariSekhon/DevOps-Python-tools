@@ -61,10 +61,8 @@ docker_exec(){
 test_hadoop(){
     local version="$1"
     section2 "Setting up Hadoop $version test container"
-    #DOCKER_OPTS="-v $srcdir2/..:$MNTDIR"
-    #launch_container "$DOCKER_IMAGE:$version" "$DOCKER_CONTAINER" $HADOOP_PORTS
     VERSION="$version" docker-compose up -d
-    echo "getting Hadoop dynamic port mappings"
+    echo "getting Hadoop dynamic port mappings:"
     printf "getting HDFS NN port => "
     export HADOOP_NAMENODE_PORT="`docker-compose port "$DOCKER_SERVICE" "$HADOOP_NAMENODE_PORT_DEFAULT" | sed 's/.*://'`"
     echo "$HADOOP_NAMENODE_PORT"
@@ -79,6 +77,7 @@ test_hadoop(){
     echo "$HADOOP_YARN_NODE_MANAGER_PORT"
     #local hadoop_ports=`{ for x in $HADOOP_PORTS; do docker-compose port "$DOCKER_SERVICE" "$x"; done; } | sed 's/.*://'`
     export HADOOP_PORTS="$HADOOP_NAMENODE_PORT $HADOOP_DATANODE_PORT $HADOOP_YARN_RESOURCE_MANAGER_PORT $HADOOP_YARN_NODE_MANAGER_PORT"
+    hr
     when_ports_available "$startupwait" "$HADOOP_HOST" $HADOOP_PORTS
     hr
     echo "waiting for NN dfshealth page to come up before testing for active namenode:"
@@ -130,15 +129,14 @@ EOFCOMMENTED
     hr
     # Docker maps all these 127.0.0.2, 127.0.0.3 etc to go to docker port mappings so is there is a container running it finds it accidentally
     # therefore reset the HADOOP PORTS to point to something that should get connection refused like port 1 and so that the failure hosts still fail and return only the expected correct host
-    HADOOP_NAMENODE_PORT=1 check_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_namenode.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_DATANODE_PORT"
+    HADOOP_NAMENODE_PORT=1 run_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_namenode.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_DATANODE_PORT"
     hr
-    HADOOP_NAMENODE_PORT=1 check_output "$HADOOP_HOST:$HADOOP_NAMENODE_PORT" ./find_active_hadoop_namenode.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_NAMENODE_PORT"
+    HADOOP_NAMENODE_PORT=1 run_output "$HADOOP_HOST:$HADOOP_NAMENODE_PORT" ./find_active_hadoop_namenode.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_NAMENODE_PORT"
     hr
-    HADOOP_YARN_RESOURCE_MANAGER_PORT=1 check_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT"
+    HADOOP_YARN_RESOURCE_MANAGER_PORT=1 run_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT"
     hr
-    HADOOP_YARN_RESOURCE_MANAGER_PORT=1 check_output "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT"
+    HADOOP_YARN_RESOURCE_MANAGER_PORT=1 run_output "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT"
     hr
-    #delete_container
     docker-compose down
     echo
     echo
