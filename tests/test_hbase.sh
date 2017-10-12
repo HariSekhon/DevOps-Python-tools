@@ -85,7 +85,6 @@ test_hbase(){
     printf "getting HBase ZooKeeper port    => "
     export ZOOKEEPER_PORT="`docker-compose port "$DOCKER_SERVICE" "$ZOOKEEPER_PORT_DEFAULT" | sed 's/.*://'`"
     echo "$ZOOKEEPER_PORT"
-    #hbase_ports=`{ for x in $HBASE_PORTS; do docker-compose port "$DOCKER_SERVICE" "$x"; done; } | sed 's/.*://'`
     export HBASE_PORTS="$HBASE_MASTER_PORT $HBASE_REGIONSERVER_PORT $HBASE_STARGATE_PORT $HBASE_THRIFT_PORT $ZOOKEEPER_PORT"
     hr
     when_ports_available "$startupwait" "$HBASE_HOST" $HBASE_PORTS
