@@ -75,16 +75,15 @@ test_hadoop(){
     printf "getting Yarn NM port => "
     export HADOOP_YARN_NODE_MANAGER_PORT="`docker-compose port "$DOCKER_SERVICE" "$HADOOP_YARN_NODE_MANAGER_PORT_DEFAULT" | sed 's/.*://'`"
     echo "$HADOOP_YARN_NODE_MANAGER_PORT"
-    #local hadoop_ports=`{ for x in $HADOOP_PORTS; do docker-compose port "$DOCKER_SERVICE" "$x"; done; } | sed 's/.*://'`
     export HADOOP_PORTS="$HADOOP_NAMENODE_PORT $HADOOP_DATANODE_PORT $HADOOP_YARN_RESOURCE_MANAGER_PORT $HADOOP_YARN_NODE_MANAGER_PORT"
     hr
-    when_ports_available "$startupwait" "$HADOOP_HOST" $HADOOP_PORTS
+    when_ports_available "$HADOOP_HOST" $HADOOP_PORTS
     hr
     echo "waiting for NN dfshealth page to come up before testing for active namenode:"
-    when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_NAMENODE_PORT/dfshealth.html" 'NameNode Journal Status'
+    when_url_content "$HADOOP_HOST:$HADOOP_NAMENODE_PORT/dfshealth.html" 'NameNode Journal Status'
     hr
     echo "waiting for RM cluster page to come up before testing for active resource manager:"
-    when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT/ws/v1/cluster" resourceManager
+    when_url_content "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT/ws/v1/cluster" resourceManager
     hr
 #    echo "waiting for NM node page to come up:"
 #    when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT/node" 'Node Manager Version'
