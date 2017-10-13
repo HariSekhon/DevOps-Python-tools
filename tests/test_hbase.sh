@@ -54,8 +54,7 @@ docker_exec(){
     export JAVA_HOME=/usr
     $MNTDIR/$@
 EOF"
-    run++
-    docker exec -i "${COMPOSE_PROJECT_NAME:-docker}_${DOCKER_SERVICE}_1" /bin/bash <<-EOF
+    run docker exec -i "${COMPOSE_PROJECT_NAME:-docker}_${DOCKER_SERVICE}_1" /bin/bash <<-EOF
     export JAVA_HOME=/usr
     $MNTDIR/$@
 EOF
@@ -64,6 +63,7 @@ EOF
 test_hbase(){
     local version="$1"
     section2 "Setting up HBase $version test container"
+    VERSION="$version" docker-compose down || :
     VERSION="$version" docker-compose up -d
     echo "getting HBase dynamic port mappings:"
     if [ "$version" = "0.96" ]; then
@@ -87,11 +87,11 @@ test_hbase(){
     echo "$ZOOKEEPER_PORT"
     export HBASE_PORTS="$HBASE_MASTER_PORT $HBASE_REGIONSERVER_PORT $HBASE_STARGATE_PORT $HBASE_THRIFT_PORT $ZOOKEEPER_PORT"
     hr
-    when_ports_available "$startupwait" "$HBASE_HOST" $HBASE_PORTS
+    when_ports_available "$HBASE_HOST" $HBASE_PORTS
     hr
-    when_url_content "$startupwait" "http://$HBASE_HOST:$HBASE_MASTER_PORT/master-status" hbase
+    when_url_content "http://$HBASE_HOST:$HBASE_MASTER_PORT/master-status" hbase
     hr
-    when_url_content "$startupwait" "http://$HBASE_HOST:$HBASE_REGIONSERVER_PORT/rs-status" hbase
+    when_url_content "http://$HBASE_HOST:$HBASE_REGIONSERVER_PORT/rs-status" hbase
     hr
     echo "setting up test tables"
     uniq_val=$(< /dev/urandom tr -dc 'a-zA-Z0-9' 2>/dev/null | head -c32 || :)
@@ -131,6 +131,8 @@ EOF
     hr
     run ./hbase_generate_data.py -n 10
     hr
+    run_conn_refused ./hbase_generate_data.py -n 10
+    hr
     echo "checking generate data fails with exit code 2 when table already exists on second run"
     run_fail 2 ./hbase_generate_data.py -n 10
     hr
@@ -148,22 +150,23 @@ EOF
     hr
     run_fail 3 ./hbase_compact_tables.py --list-tables
     hr
-    run ./hbase_compact_tables.py -H $HBASE_HOST
+    run ./hbase_compact_tables.py -H "$HBASE_HOST"
+    hr
+    run_conn_refused ./hbase_compact_tables.py
     hr
     run ./hbase_compact_tables.py -r DisabledTable
     hr
     run ./hbase_compact_tables.py --regex .1
     hr
-    set +e
-    docker_exec hbase_flush_tables.py --list-tables
-    check_exit_code 3
-    set -e
+    FAIL=3 docker_exec hbase_flush_tables.py --list-tables
     hr
     docker_exec hbase_flush_tables.py
     hr
     docker_exec hbase_flush_tables.py -r Disabled.*
     hr
     run_fail 3 ./hbase_show_table_region_ranges.py --list-tables
+    hr
+    run_conn_refused ./hbase_show_table_region_ranges.py --list-tables
     hr
     echo "checking hbase_show_table_region_ranges.py against DisabledTable:"
     run ./hbase_show_table_region_ranges.py -T DisabledTable -vvv
@@ -176,6 +179,8 @@ EOF
     run ./hbase_show_table_region_ranges.py -T UniformSplitTable -v
     hr
     run_fail 3 ./hbase_calculate_table_region_row_distribution.py --list-tables
+    hr
+    run_conn_refused ./hbase_calculate_table_region_row_distribution.py --list-tables
     hr
     echo "checking hbase_calculate_table_region_row_distribution.py against DisabledTable:"
     run_fail 2 ./hbase_calculate_table_region_row_distribution.py -T DisabledTable -vvv
@@ -195,6 +200,8 @@ EOF
     hr
     run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc
     hr
+    run_fail 3 ./hbase_calculate_table_row_key_distribution.py -T DisabledTable --list-tables
+    hr
     echo "checking hbase_calculate_table_row_key_distribution.py against DisabledTable:"
     run_fail 2 ./hbase_calculate_table_row_key_distribution.py -T DisabledTable -vvv
     hr
@@ -208,6 +215,8 @@ EOF
     run ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable --sort --desc
     hr
     run ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
+    hr
+    run_conn_refused ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
     hr
 
     docker-compose down
