@@ -39,6 +39,8 @@ branches:
   only:
     - master
 
+cache: pip
+
 services:
   - docker
 
