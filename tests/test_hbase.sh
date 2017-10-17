@@ -45,7 +45,7 @@ trap_debug_env hbase
 
 export MNTDIR="/pytools"
 
-startupwait=50
+startupwait=30
 
 docker_exec(){
     # gets ValueError: file descriptor cannot be a negative integer (-1), -T should be the workaround but hangs
@@ -63,29 +63,21 @@ EOF
 test_hbase(){
     local version="$1"
     section2 "Setting up HBase $version test container"
-    VERSION="$version" docker-compose down || :
+    if [ -z "${KEEPDOCKER:-}" ]; then
+        VERSION="$version" docker-compose down || :
+    fi
     VERSION="$version" docker-compose up -d
-    echo "getting HBase dynamic port mappings:"
     if [ "$version" = "0.96" ]; then
         local export HBASE_MASTER_PORT_DEFAULT=60010
         local export HBASE_REGIONSERVER_PORT_DEFAULT=60301
     fi
-    printf "getting HBase Master port       => "
-    export HBASE_MASTER_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_MASTER_PORT_DEFAULT" | sed 's/.*://'`"
-    echo "$HBASE_MASTER_PORT"
-    printf "getting HBase RegionServer port => "
-    export HBASE_REGIONSERVER_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_REGIONSERVER_PORT_DEFAULT" | sed 's/.*://'`"
-    echo "$HBASE_REGIONSERVER_PORT"
-    printf "getting HBase Stargate port     => "
-    export HBASE_STARGATE_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_STARGATE_PORT_DEFAULT" | sed 's/.*://'`"
-    echo "$HBASE_STARGATE_PORT"
-    printf "getting HBase Thrift port       => "
-    export HBASE_THRIFT_PORT="`docker-compose port "$DOCKER_SERVICE" "$HBASE_THRIFT_PORT_DEFAULT" | sed 's/.*://'`"
-    echo "$HBASE_THRIFT_PORT"
-    printf "getting HBase ZooKeeper port    => "
-    export ZOOKEEPER_PORT="`docker-compose port "$DOCKER_SERVICE" "$ZOOKEEPER_PORT_DEFAULT" | sed 's/.*://'`"
-    echo "$ZOOKEEPER_PORT"
-    export HBASE_PORTS="$HBASE_MASTER_PORT $HBASE_REGIONSERVER_PORT $HBASE_STARGATE_PORT $HBASE_THRIFT_PORT $ZOOKEEPER_PORT"
+    echo "getting HBase dynamic port mappings:"
+    docker_compose_port HBASE_MASTER_PORT "HBase Master"
+    docker_compose_port HBASE_REGIONSERVER_PORT "HBase RegionServer"
+    docker_compose_port HBASE_STARGATE_PORT "HBase Stargate"
+    docker_compose_port HBASE_THRIFT_PORT "HBase Thrift"
+    #docker_compose_port ZOOKEEPER_PORT "HBase ZooKeeper"
+    export HBASE_PORTS="$HBASE_MASTER_PORT $HBASE_REGIONSERVER_PORT $HBASE_STARGATE_PORT $HBASE_THRIFT_PORT"
     hr
     when_ports_available "$HBASE_HOST" $HBASE_PORTS
     hr
@@ -99,7 +91,7 @@ test_hbase(){
     # gets ValueError: file descriptor cannot be a negative integer (-1), -T should be the workaround but hangs
     #docker-compose exec -T "$DOCKER_SERVICE" /bin/bash <<-EOF
     if [ -z "${NOSETUP:-}" ]; then
-    docker exec -i "${COMPOSE_PROJECT_NAME:-docker}_${DOCKER_SERVICE}_1" /bin/bash <<-EOF
+    docker exec -i "$DOCKER_CONTAINER" /bin/bash <<-EOF
         export JAVA_HOME=/usr
         /hbase/bin/hbase shell <<-EOF2
             create 't1', 'cf1', { 'REGION_REPLICATION' => 1 }
