@@ -93,6 +93,7 @@ test_hbase(){
     hr
     when_url_content "http://$HBASE_HOST:$HBASE_REGIONSERVER_PORT/rs-status" hbase
     hr
+    # ============================================================================ #
     echo "setting up test tables"
     uniq_val=$(< /dev/urandom tr -dc 'a-zA-Z0-9' 2>/dev/null | head -c32 || :)
     # gets ValueError: file descriptor cannot be a negative integer (-1), -T should be the workaround but hangs
@@ -115,6 +116,7 @@ EOF2
         exit 0
 EOF
     fi
+    # ============================================================================ #
     if [ -n "${NOTESTS:-}" ]; then
         return
     fi
@@ -129,6 +131,7 @@ EOF
     hr
     export HBASE_THRIFT_SERVER_PORT="$HBASE_THRIFT_PORT"
     hr
+    # ============================================================================ #
     run ./hbase_generate_data.py -n 10
     hr
     run_conn_refused ./hbase_generate_data.py -n 10
@@ -148,6 +151,7 @@ EOF
     hr
     run ./hbase_generate_data.py -n 10000 --use-existing-table -T HexStringSplitTable
     hr
+    # ============================================================================ #
     run_fail 3 ./hbase_compact_tables.py --list-tables
     hr
     run ./hbase_compact_tables.py -H "$HBASE_HOST"
@@ -158,12 +162,14 @@ EOF
     hr
     run ./hbase_compact_tables.py --regex .1
     hr
+    # ============================================================================ #
     FAIL=3 docker_exec hbase_flush_tables.py --list-tables
     hr
     docker_exec hbase_flush_tables.py
     hr
     docker_exec hbase_flush_tables.py -r Disabled.*
     hr
+    # ============================================================================ #
     run_fail 3 ./hbase_show_table_region_ranges.py --list-tables
     hr
     run_conn_refused ./hbase_show_table_region_ranges.py --list-tables
@@ -178,6 +184,7 @@ EOF
     hr
     run ./hbase_show_table_region_ranges.py -T UniformSplitTable -v
     hr
+    # ============================================================================ #
     run_fail 3 ./hbase_calculate_table_region_row_distribution.py --list-tables
     hr
     run_conn_refused ./hbase_calculate_table_region_row_distribution.py --list-tables
@@ -200,6 +207,7 @@ EOF
     hr
     run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc
     hr
+    # ============================================================================ #
     run_fail 3 ./hbase_calculate_table_row_key_distribution.py -T DisabledTable --list-tables
     hr
     echo "checking hbase_calculate_table_row_key_distribution.py against DisabledTable:"
