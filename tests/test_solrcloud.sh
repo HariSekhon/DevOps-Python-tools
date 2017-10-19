@@ -62,14 +62,10 @@ test_solrcloud(){
     section2 "Setting up SolrCloud $version docker test container"
     VERSION="$version" docker-compose up -d
     echo "getting SolrCloud dynamic port mappings:"
-    printf "Solr HTTP port => "
-    export SOLR_PORT="`docker-compose port "$DOCKER_SERVICE" "$SOLR_PORT_DEFAULT" | sed 's/.*://'`"
-    echo "$SOLR_PORT"
-    printf "ZooKeeper port => "
-    export SOLR_ZOOKEEPER_PORT="`docker-compose port "$DOCKER_SERVICE" "$SOLR_ZOOKEEPER_PORT_DEFAULT" | sed 's/.*://'`"
-    echo "$SOLR_ZOOKEEPER_PORT"
+    docker_compose_port SOLR_PORT "Solr HTTP"
+    #docker_compose_port ZOOKEEPER_PORT "ZooKeeper"
     hr
-    when_ports_available "$SOLR_HOST" "$SOLR_PORT" "$SOLR_ZOOKEEPER_PORT"
+    when_ports_available "$SOLR_HOST" "$SOLR_PORT" # "$SOLR_ZOOKEEPER_PORT"
     hr
     when_url_content "http://$SOLR_HOST:$SOLR_PORT/solr/" "Solr Admin"
     hr
