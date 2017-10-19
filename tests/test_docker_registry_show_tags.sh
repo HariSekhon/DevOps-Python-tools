@@ -102,7 +102,7 @@ docker-compose up -d
 echo
 
 echo "getting dynamic Docker Registry port mapping:"
-docker_compose_port DOCKER_REGISTRY_PORT "Docker Registry"
+docker_compose_port "Docker Registry"
 
 if [ -z "$DOCKER_REGISTRY_PORT" ]; then
     echo "DOCKER_REGISTRY_PORT not found from running container, did container fail to start up properly?"
