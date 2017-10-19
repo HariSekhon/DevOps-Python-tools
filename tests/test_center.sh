@@ -26,152 +26,119 @@ cd "$srcdir/.."
 
 section "Testing center.py"
 
+
 expected="                                <this is a  test>"
 
-echo "testing args"
-result="$(./center.py "                     <this is a  test> ")"
-if [ "$result" = "$expected" ]; then
-    echo "Succeeded in centering args"
-else
-    echo "Failed to center args"
-    echo "Expected: '$expected'"
-    echo "Got:      '$result'"
-    exit 1
-fi
+echo "testing args:"
+#run_output "$expected" ./center.py "                     <this is a  test> "
+hr
 
-echo "testing stdin"
-result="$(./center.py <<< "<this is a  test>")"
-if [ "$result" = "$expected" ]; then
-    echo "Succeeded in centering stdin"
-else
-    echo "Failed to center stdin"
-    echo "Expected: '$expected'"
-    echo "Got:      '$result'"
-    exit 1
-fi
+echo "testing stdin:"
+run_output "$expected" ./center.py <<< "<this is a  test>"
+hr
 
 expected="                                 <this is a test>"
-echo "testing multi-args"
-result="$(./center.py "<this" is a  "test> ")"
-if [ "$result" = "$expected" ]; then
-    echo "Succeeded in centering multi-args"
-else
-    echo "Failed to center multi-args"
-    echo "Expected: '$expected'"
-    echo "Got:      '$result'"
-    exit 1
-fi
+echo "testing multi-args:"
+run_output "$expected" ./center.py "<this" is a  "test> "
+hr
+
 
 ###########
 # comment
 expected="#                                 this is a test"
 
-echo "testing args with # prefix"
-result="$(./center.py " #  this is a test ")"
-if [ "$result" = "$expected" ]; then
-    echo "Succeeded in centering args with # prefix"
-else
-    echo "Failed to center args with # prefix"
-    echo "Expected: '$expected'"
-    echo "Got:      '$result'"
-    exit 1
-fi
+echo "testing args with # prefix:"
+run_output "$expected" ./center.py " #  this is a test "
+hr
 
-echo "testing stdin with # prefix"
-result="$(./center.py <<< " # this is a test")"
-if [ "$result" = "$expected" ]; then
-    echo "Succeeded in centering stdin with # prefix"
-else
-    echo "Failed to center stdin with # prefix"
-    echo "Expected: '$expected'"
-    echo "Got:      '$result'"
-    exit 1
-fi
+echo "testing stdin with # prefix:"
+run_output "$expected" ./center.py <<< " # this is a test"
+hr
 
 expected="//                                 this is a test"
 
-echo "testing args with // prefix"
-result="$(./center.py " //  this is a test ")"
-if [ "$result" = "$expected" ]; then
-    echo "Succeeded in centering args with // prefix"
-else
-    echo "Failed to center args with // prefix"
-    echo "Expected: '$expected'"
-    echo "Got:      '$result'"
-    exit 1
-fi
+echo "testing args with // prefix:"
+run_output "$expected" ./center.py " //  this is a test "
+hr
 
-echo "testing stdin with // prefix"
-result="$(./center.py <<< " // this is a test")"
-if [ "$result" = "$expected" ]; then
-    echo "Succeeded in centering stdin with // prefix"
-else
-    echo "Failed to center stdin with // prefix"
-    echo "Expected: '$expected'"
-    echo "Got:      '$result'"
-    exit 1
-fi
+echo "testing stdin with // prefix:"
+run_output "$expected" ./center.py <<< " // this is a test"
+hr
 
 ###########
 # comment handling disabled
 expected="                               #  this is a test"
 
-echo "testing args with # prefix"
+echo "testing args with # prefix with comment handling disabled:"
+# doesn't preserve whitespace correctly
+#run_output "$expected" ./center.py -n " #  this is a test "
 result="$(./center.py -n " #  this is a test ")"
+run++
 if [ "$result" = "$expected" ]; then
-    echo "Succeeded in centering args with # prefix"
+    echo "Succeeded in centering args with # prefix with comment handling disabled"
 else
-    echo "Failed to center args with # prefix"
+    echo "Failed to center args with # prefix with comment handling disabled"
     echo "Expected: '$expected'"
     echo "Got:      '$result'"
     exit 1
 fi
+echo
+hr
 
-echo "testing stdin with # prefix"
-result="$(./center.py -n <<< " #  this is a test")"
-if [ "$result" = "$expected" ]; then
-    echo "Succeeded in centering stdin with # prefix"
-else
-    echo "Failed to center stdin with # prefix"
-    echo "Expected: '$expected'"
-    echo "Got:      '$result'"
-    exit 1
-fi
+echo "testing stdin with # prefix with comment handling disabled:"
+run_output "$expected" ./center.py -n <<< " #  this is a test"
+hr
 
 expected="                               //  this is a test"
 
-echo "testing args with // prefix"
+echo "testing args with // prefix with comment handling disabled:"
+# doesn't preserve whitespace correctly
+#run_output "$expected" ./center.py -n " //  this is a test "
 result="$(./center.py -n " //  this is a test ")"
+run++
 if [ "$result" = "$expected" ]; then
-    echo "Succeeded in centering args with // prefix"
+    echo "Succeeded in centering args with // prefix with comment handling disabled"
 else
-    echo "Failed to center args with // prefix"
+    echo "Failed to center args with // prefix with comment handling disabled"
     echo "Expected: '$expected'"
     echo "Got:      '$result'"
     exit 1
 fi
+echo
+hr
 
-echo "testing stdin with // prefix"
-result="$(./center.py -n <<< " //  this is a test")"
-if [ "$result" = "$expected" ]; then
-    echo "Succeeded in centering stdin with // prefix"
-else
-    echo "Failed to center stdin with // prefix"
-    echo "Expected: '$expected'"
-    echo "Got:      '$result'"
-    exit 1
-fi
+echo "testing stdin with // prefix:"
+run_output "$expected" ./center.py -n <<< " //  this is a test"
+hr
 
-echo "testing spacing"
+#######################
+# space in middle tests
+
 expected="                         < t h i s   i s   a    t e s t >"
+
+echo "testing spacing with arg:"
+# doesn't preserve whitespace correctly
+#run_output "$expected" ./center.py -s "                     <this is a  test> "
 result="$(./center.py -s "                     <this is a  test> ")"
+run++
 if [ "$result" = "$expected" ]; then
-    echo "Succeeded in centering args with spacing between chars"
+    echo "Succeeded in centering args with // prefix with comment handling disabled"
 else
-    echo "Failed to center args"
+    echo "Failed to center args with // prefix with comment handling disabled"
     echo "Expected: '$expected'"
     echo "Got:      '$result'"
     exit 1
 fi
+echo
+hr
+
+echo "testing spacing with stdin:"
+run_output "$expected" ./center.py -s <<< "                     <this is a  test> "
+hr
+
+echo
+echo "Completed $run_count tests"
+echo
+echo "All tests for center.py completed successfully"
 echo
 echo
