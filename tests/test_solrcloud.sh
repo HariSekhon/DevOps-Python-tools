@@ -63,7 +63,7 @@ test_solrcloud(){
     VERSION="$version" docker-compose up -d
     echo "getting SolrCloud dynamic port mappings:"
     docker_compose_port SOLR_PORT "Solr HTTP"
-    #docker_compose_port ZOOKEEPER_PORT "ZooKeeper"
+    #docker_compose_port "ZooKeeper"
     hr
     when_ports_available "$SOLR_HOST" "$SOLR_PORT" # "$SOLR_ZOOKEEPER_PORT"
     hr
