@@ -43,7 +43,7 @@ test_elasticsearch(){
     section2 "Setting up Elasticsearch $version test container"
     VERSION="$version" docker-compose up -d
     echo "getting Elasticsearch dynamic port mapping:"
-    docker_compose_port ELASTICSEARCH_PORT "Elasticsearch"
+    docker_compose_port "Elasticsearch"
     hr
     when_ports_available "$ELASTICSEARCH_HOST" "$ELASTICSEARCH_PORT"
     hr
