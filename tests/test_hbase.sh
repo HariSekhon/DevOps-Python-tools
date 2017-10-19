@@ -67,7 +67,7 @@ test_hbase(){
         VERSION="$version" docker-compose down || :
     fi
     VERSION="$version" docker-compose up -d
-    if [ "$version" = "0.96" ]; then
+    if [ "$version" = "0.96" -o "$version" = "0.98" ]; then
         local export HBASE_MASTER_PORT_DEFAULT=60010
         local export HBASE_REGIONSERVER_PORT_DEFAULT=60301
     fi
