@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 
 
 class DockerHubTags(CLI):
@@ -80,11 +80,11 @@ class DockerHubTags(CLI):
         self.quiet = self.get_opt('quiet')
         if not self.quiet:
             print('\nDocker', end='')
-        if 'registry.hub.docker.com' in self.url_base:
-            print('Hub')
-        else:
-            print(' Registry:  {0}'.format(self.url_base.split('/v2', 1)[0]))
-        print()
+            if 'registry.hub.docker.com' in self.url_base:
+                print('Hub')
+            else:
+                print(' Registry:  {0}'.format(self.url_base.split('/v2', 1)[0]))
+            print()
         for arg in self.args:
             self.print_tags(arg)
 
