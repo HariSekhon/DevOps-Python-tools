@@ -16,7 +16,7 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
-for docker_image in $(./dockerhub_search.py -q harisekhon); do
+for docker_image in $(./dockerhub_search.py -q harisekhon | grep -v presto.*dev); do
     for tag in $(./dockerhub_show_tags.py -q $docker_image); do
         docker pull $docker_image:$tag
     done
