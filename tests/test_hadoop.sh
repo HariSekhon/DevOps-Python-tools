@@ -54,8 +54,8 @@ trap_debug_env hadoop
 
 docker_exec(){
     #docker-compose exec "$DOCKER_SERVICE" $MNTDIR/$@
-    echo "docker exec 'pytools_${DOCKER_SERVICE}_1' $MNTDIR/$@"
-    docker exec "pytools_${DOCKER_SERVICE}_1" $MNTDIR/$@
+    echo "docker exec '$DOCKER_CONTAINER' $MNTDIR/$@"
+    docker exec "$DOCKER_CONTAINER" $MNTDIR/$@
 }
 
 test_hadoop(){
@@ -86,7 +86,7 @@ test_hadoop(){
 cat >/dev/null <<EOFCOMMENTED
     echo "setting up HDFS for tests"
     #docker-compose exec "$DOCKER_SERVICE" /bin/bash <<-EOF
-    docker exec -i "nagiosplugins_${DOCKER_SERVICE}_1" /bin/bash <<-EOF
+    docker exec -i "$DOCKER_CONTAINER" /bin/bash <<-EOF
         export JAVA_HOME=/usr
         echo "leaving safe mode"
         hdfs dfsadmin -safemode leave
