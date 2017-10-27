@@ -55,7 +55,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.10.0'
+__version__ = '0.11.0'
 
 
 # could consider using ConfigParser in Python2 / configparser in Python3
@@ -99,9 +99,9 @@ class IniValidatorTool(CLI):
                      help='Ignore duplicate keys inside the same section (not recommended but better than --exclude)')
         #self.add_opt('-i', '--no-inline-comments', action='store_true',
         #             help='Do not allow inline comments, must be on their own lines (WinAPI function reqires this)')
-        self.add_opt('-b', '--no-blanks', action='store_true',
-                     help='Do not allow blank lines as some programs do not allow them' + \
-                          ' (some rudimentary programs do not allow this)')
+        self.add_opt('-E', '--allow-empty', action='store_true', help='Permit files with no keys or sections')
+        self.add_opt('-b', '--no-blank-lines', action='store_true',
+                     help='Do not allow blank lines as some rudimentary programs expect to not allow them')
         self.add_opt('-p', '--print', action='store_true',
                      help='Print the INI lines(s) which are valid, else print nothing (useful for shell ' + \
                     'pipelines). Exit codes are still 0 for success, or {0} for failure'.format(ERRORS['CRITICAL']))
@@ -112,16 +112,19 @@ class IniValidatorTool(CLI):
         self.opts = {
             'no_hashes': self.get_opt('no_hash_comments'),
             'allow_colons': self.get_opt('allow_colon_delimiters'),
+            'allow_empty': self.get_opt('allow_empty'),
             #'disallow_inline_comments': self.get_opt('disallow_inline_comments'),
             'ignore_duplicate_sections': self.get_opt('ignore_duplicate_sections'),
             'ignore_duplicate_keys': self.get_opt('ignore_duplicate_keys'),
-            'disallow_blanks': self.get_opt('no_blanks'),
+            'disallow_blanks': self.get_opt('no_blank_lines'),
             'print': self.get_opt('print')
         }
         self.exclude = self.get_opt('exclude')
         if self.exclude:
             validate_regex(self.exclude, 'exclude')
             self.exclude = re.compile(self.exclude, re.I)
+        for key in self.opts:
+            log_option(key, self.opts[key])
 
     def is_excluded(self, path):
         if self.exclude and self.exclude.search(path):
@@ -206,7 +209,7 @@ class IniValidatorTool(CLI):
                 log.debug('failing ini due to no key or section detected for line: %s', line)
                 raise AssertionError('no key or section detected for line: %s' % line)
             variable_count += 1
-        if variable_count < 1:
+        if variable_count < 1 and not self.opts['allow_empty']:
             raise AssertionError('no keys or sections found')
         count = variable_count + comment_count + blank_count
         log.debug('%s INI lines passed (%s variables, %s comments, %s blank lines)', \
