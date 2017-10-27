@@ -91,7 +91,8 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.6'
+__version__ = '0.7.0'
+
 
 class DockerfileGitBranchCheckTool(CLI):
 
@@ -239,7 +240,13 @@ class DockerfileGitBranchCheckTool(CLI):
         # allow all -dev dirs to match same branch
         # special case for solr -> solrcloud dirs
         name2 = name
+        # cassandra-dev  -> cassandra
+        # solrcloud-dev  -> solrcloud
+        # presto-cli-dev -> presto-cli
+        # presto-cli     -> presto
+        # solrcloud      -> solr
         name2 = re.sub(pattern=r'-dev$', repl='', string=name2)
+        name2 = re.sub(pattern=r'-cli$', repl='', string=name2)
         name2 = re.sub(pattern=r'cloud$', repl='', string=name2)
         # don't need this hack, just check for generic java/jdk/jre to match JAVA_VERSION below
         #name2 = re.sub(pattern=r'(?:alpine|centos|debian|ubuntu)-$', repl='', string=name2)
