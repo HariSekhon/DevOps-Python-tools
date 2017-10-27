@@ -94,7 +94,7 @@ class IniValidatorTool(CLI):
         # Refused to enable this options until upstream zookeeper 3.4.8 log4j.properties ended up with duplicate keys
         # better than --exclude entirely
         self.add_opt('-s', '--ignore-duplicate-sections', action='store_true',
-                     help='Ignore duplicate sections (sloppy and not recommended but better than --exclude somtimes)')
+                     help='Ignore duplicate sections (sloppy and not recommended but better than --exclude sometimes)')
         self.add_opt('-k', '--ignore-duplicate-keys', action='store_true',
                      help='Ignore duplicate keys inside the same section (not recommended but better than --exclude)')
         #self.add_opt('-i', '--no-inline-comments', action='store_true',
