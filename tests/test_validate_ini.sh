@@ -105,8 +105,8 @@ check_broken(){
 }
 
 hr2
-echo "checking ini with blanks fails with --no-blanks:"
-check_broken test.ini 2 --no-blanks
+echo "checking ini with blanks fails with --no-blank-lines:"
+check_broken test.ini 2 --no-blank-lines
 echo
 
 hr2
@@ -207,12 +207,50 @@ hr2
 echo "checking blank content is invalid"
 echo > "$broken_dir/blank.ini"
 check_broken "$broken_dir/blank.ini"
+echo
 
+hr2
 echo "checking blank content is invalid via stdin"
 check_broken - 2 < "$broken_dir/blank.ini"
+echo
 
+hr2
 echo "checking blank content is invalid via stdin piped from /dev/null"
 cat /dev/null | check_broken - 2
+echo
+
+hr2
+echo "checking commented out ini is invalid due to no keys or sections:"
+cat >> "$broken_dir/commented_out.ini" <<EOF
+#[section1]
+#key1=value1
+
+EOF
+check_broken "$broken_dir/commented_out.ini"
+echo
+hr2
+echo "checking commented out ini is permitted if using --allow-empty:"
+./validate_ini.py --allow-empty "$broken_dir/commented_out.ini"
+echo
+
+hr2
+echo "checking commented out ini is permitted if using --allow-empty via std:"
+./validate_ini.py --allow-empty < "$broken_dir/commented_out.ini"
+echo
+
+hr2
+echo "checking blank ini is permitted if using --allow-empty:"
+validate_ini.py --allow-empty "$broken_dir/blank.ini"
+echo
+
+hr2
+echo "checking blank ini is permitted if using --allow-empty via stdin:"
+validate_ini.py --allow-empty < "$broken_dir/blank.ini"
+echo
+
+hr2
+echo "checking blank ini is permitted if using --allow-empty via stdin piped from /dev/null:"
+validate_ini.py --allow-empty < /dev/null
 echo
 
 rm -fr "$broken_dir"
