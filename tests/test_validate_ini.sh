@@ -240,17 +240,17 @@ echo
 
 hr2
 echo "checking blank ini is permitted if using --allow-empty:"
-validate_ini.py --allow-empty "$broken_dir/blank.ini"
+./validate_ini.py --allow-empty "$broken_dir/blank.ini"
 echo
 
 hr2
 echo "checking blank ini is permitted if using --allow-empty via stdin:"
-validate_ini.py --allow-empty < "$broken_dir/blank.ini"
+./validate_ini.py --allow-empty < "$broken_dir/blank.ini"
 echo
 
 hr2
 echo "checking blank ini is permitted if using --allow-empty via stdin piped from /dev/null:"
-validate_ini.py --allow-empty < /dev/null
+./validate_ini.py --allow-empty < /dev/null
 echo
 
 rm -fr "$broken_dir"
