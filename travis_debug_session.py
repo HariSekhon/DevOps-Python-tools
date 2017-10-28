@@ -64,7 +64,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.0'
+__version__ = '0.8.1'
 
 
 class TravisDebugSession(CLI):
@@ -232,7 +232,7 @@ class TravisDebugSession(CLI):
             if _['state'] == 'passed':
                 if build is None and not found_newer_passing_build:
                     log.warning("found more recent successful build %s with state = '%s'" + \
-                                ", you may not need to debug this build any more", _['id'], _['state'])
+                                ", you may not need to debug this build any more", _['number'], _['state'])
                     found_newer_passing_build = True
             elif _['state'] in ('failed', 'errored'):
                 if build is None:
