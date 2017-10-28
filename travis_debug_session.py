@@ -231,7 +231,7 @@ class TravisDebugSession(CLI):
             last_build_number = build_number
             if _['state'] == 'passed':
                 if build is None and not found_newer_passing_build:
-                    log.warning("found more recent successful build %s with state = '%s'" + \
+                    log.warning("found more recent successful build #%s with state = '%s'" + \
                                 ", you may not need to debug this build any more", _['number'], _['state'])
                     found_newer_passing_build = True
             elif _['state'] in ('failed', 'errored'):
