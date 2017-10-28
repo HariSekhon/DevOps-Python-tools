@@ -64,7 +64,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 
 class TravisDebugSession(CLI):
@@ -261,7 +261,7 @@ class TravisDebugSession(CLI):
                 log.debug("job id %s status:\n%s", _id, jsonpp(job))
             if job['state'] == 'finished' and job['status'] in (None, 1, '1'):
                 return _id
-        raise UnknownError('no failed job found in build {0}'.format(build['id']))
+        raise UnknownError('no failed job found in build {0}'.format(build['number']))
 
     def get_ssh_address(self, job_id):
         log.info('getting SSH address from triggered debug build')
