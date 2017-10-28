@@ -25,6 +25,9 @@ Options:
 - fetch last completed build log
 - fetch last failed build log
 
+Also removes all control characters as while color coding is nice
+there are a lot of other control sequences in Travis CI that mess terminals up
+
 """
 
 from __future__ import absolute_import
@@ -35,6 +38,9 @@ from __future__ import print_function
 import json
 import logging
 import os
+import re
+# not using string.printables now, more complex regex to strip ANSI control sequences now
+#import string
 import sys
 import traceback
 srcdir = os.path.abspath(os.path.dirname(__file__))
@@ -52,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 
 class TravisLastBuildLog(CLI):
@@ -69,8 +75,8 @@ class TravisLastBuildLog(CLI):
         self.job_id = None
         self.completed = False
         self.failed = False
-        #self.plaintext = False
-        #self.color = False
+        self.plaintext = False
+        self.color = False
         self.headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
@@ -253,19 +259,32 @@ class TravisLastBuildLog(CLI):
                     job = job_data
             if not job:
                 raise UnknownError('no job found in build {0}'.format(build['number']))
-            self.print_job_log(job)
+            self.print_job_log(job=job)
             log.info('end of log for build number %s job id %s', build['number'], self.job_id)
 
     def print_job_log(self, job=None, job_id=None):
         #if (self.color or not self.plaintext) and 'log' in job:
-        if job is not None and 'log' in job and job['log']:
-            print(job['log'])
-        elif job_id is not None:
+        if not job and not job_id:
+            code_error('no job data or job id passed to print_job_log()')
+        content = None
+        if job is not None:
+            if 'log' in job and job['log']:
+                content = job['log']
+            else:
+                job_id = job['id']
+        if not content:
             url = 'https://api.travis-ci.org/jobs/{id}/log.txt?deansi=true'.format(id=job_id)
             req = self.request_handler.get(url)
-            print (req.content)
-        else:
-            code_error('no job data or job id passed to print_job_log()')
+            content = req.content
+        content = re.sub(r'\r', '', content)
+        #if self.plaintext:
+            # leaves a few characters behind which are printable
+            #content = re.sub('[^{0}]'.format(string.printable), '', content)
+        # mandatory stripping ANI control sequences for now as although color coding is nice
+        # Travis has too many other control sequences that mess up my terminal
+        # strip all control sequences
+        content = re.sub(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]', '', content)
+        print(content)
 
 
 if __name__ == '__main__':
