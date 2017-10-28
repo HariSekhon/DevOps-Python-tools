@@ -64,7 +64,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.2'
+__version__ = '0.8.0'
 
 
 class TravisDebugSession(CLI):
@@ -106,7 +106,7 @@ class TravisDebugSession(CLI):
                      help='Travis Job ID to initiate the debug session ($JOB_ID)')
         self.add_opt('-T', '--travis-token', default=os.getenv('TRAVIS_TOKEN'),
                      help='Travis token required to authenticate to the API ($TRAVIS_TOKEN)')
-        self.add_opt('-r', '--repo', default=os.getenv('TRAVIS_REPO'),
+        self.add_opt('-R', '--repo', default=os.getenv('TRAVIS_REPO'),
                      help='Travis CI repo to find last failed build and re-execute a job from it ($TRAVIS_REPO)' + \
                           ', easier alternative to specifying a specific --job-id' + \
                           ', convenient if working with the same repo over and over and don\'t want to copy the ' + \
