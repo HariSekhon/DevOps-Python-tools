@@ -45,7 +45,8 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '2.0'
+__version__ = '2.0.1'
+
 
 class Welcome(CLI):
 
@@ -56,7 +57,8 @@ class Welcome(CLI):
         # super().__init__()
         self.quick = False
 
-    def case_user(self, user): # pylint: disable=no-self-use
+    @staticmethod
+    def case_user(user):
         if user == 'root':
             user = user.upper()
         elif len(user) < 4 or re.search(r'\d', user):
@@ -66,7 +68,7 @@ class Welcome(CLI):
             user = user.title()
         return user
 
-    def construct_msg(self): # pylint: disable=no-self-use
+    def construct_msg(self):
         # user = os.getenv('USER', '').strip()
         user = getpass.getuser()
         if not isUser(user):
@@ -112,7 +114,7 @@ class Welcome(CLI):
             msg += 'no last login information available!'
         return msg
 
-    def print_welcome(self):  # pylint: disable=no-self-use
+    def print_welcome(self):
         msg = self.construct_msg()
         if self.quick:
             print(msg)
@@ -154,6 +156,7 @@ class Welcome(CLI):
         if self.args:
             self.usage()
         self.print_welcome()
+
 
 if __name__ == '__main__':
     Welcome().main()
