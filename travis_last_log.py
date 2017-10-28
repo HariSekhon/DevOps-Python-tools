@@ -58,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 
 class TravisLastBuildLog(CLI):
@@ -241,7 +241,7 @@ class TravisLastBuildLog(CLI):
         else:
             if not build:
                 code_error('no job id passed to print_log(), nor build to determine job from')
-            log.info('getting job id for build %s', build['id'])
+            log.info('getting job id for build #%s', build['number'])
             if 'jobs' not in build:
                 raise UnknownError('no jobs field found in build, {0}'.format(support_msg_api))
             for _ in build['jobs']:
