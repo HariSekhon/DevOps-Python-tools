@@ -64,7 +64,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.1'
+__version__ = '0.8.2'
 
 
 class TravisDebugSession(CLI):
@@ -248,7 +248,7 @@ class TravisDebugSession(CLI):
         return build
 
     def get_failing_job_id_from_build(self, build):
-        log.info('getting failed job id for build %s', build['id'])
+        log.info('getting failed job id for build #%s', build['number'])
         if 'jobs' not in build:
             raise UnknownError('no jobs field found in build, {0}'.format(support_msg_api))
         for _ in build['jobs']:
