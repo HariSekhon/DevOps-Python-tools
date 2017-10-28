@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 
 class TravisLastBuildLog(CLI):
@@ -258,7 +258,7 @@ class TravisLastBuildLog(CLI):
 
     def print_job_log(self, job=None, job_id=None):
         #if (self.color or not self.plaintext) and 'log' in job:
-        if job is not None and 'log' in job:
+        if job is not None and 'log' in job and job['log']:
             print(job['log'])
         elif job_id is not None:
             url = 'https://api.travis-ci.org/jobs/{id}/log.txt?deansi=true'.format(id=job_id)
