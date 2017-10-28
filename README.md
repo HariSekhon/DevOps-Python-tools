@@ -51,7 +51,7 @@ Some Hadoop tools with require Jython, see [Jython for Hadoop Utils](https://git
 
 All programs come with a ```--help``` switch which includes a program description and the list of command line options.
 
-Environment variables are used for convenience to reduce repeated --switch usage and to hide them credentials from being exposed in the process list eg. ```$PASSWORD```, ```$TRAVIS_TOKEN```. These are indicated in the ```--help``` descriptions in brackets next to each option and often have more specific overrides with higher precedence eg. ```$AMBARI_HOST```, ```$HBASE_HOST``` take priority over ```$HOST```.
+Environment variables are supported for convenience and also to hide them credentials from being exposed in the process list eg. ```$PASSWORD```, ```$TRAVIS_TOKEN```. These are indicated in the ```--help``` descriptions in brackets next to each option and often have more specific overrides with higher precedence eg. ```$AMBARI_HOST```, ```$HBASE_HOST``` take priority over ```$HOST```.
 
 ### PyTools ###
 
