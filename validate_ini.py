@@ -55,7 +55,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.11.0'
+__version__ = '0.12.0'
 
 
 # could consider using ConfigParser in Python2 / configparser in Python3
@@ -79,6 +79,7 @@ class IniValidatorTool(CLI):
         self.invalid_ini_msg = '<unknown> => INI INVALID'
         self.opts = {}
         self.failed = False
+        self.include = None
         self.exclude = None
         self.section = ''
         # global section is represented by blank key
@@ -105,8 +106,11 @@ class IniValidatorTool(CLI):
         self.add_opt('-p', '--print', action='store_true',
                      help='Print the INI lines(s) which are valid, else print nothing (useful for shell ' + \
                     'pipelines). Exit codes are still 0 for success, or {0} for failure'.format(ERRORS['CRITICAL']))
+        self.add_opt('-i', '--include', metavar='regex', default=os.getenv('INCLUDE'),
+                     help='Regex of file / directory paths to check only ones that match ($INCLUDE, case insensitive)')
         self.add_opt('-e', '--exclude', metavar='regex', default=os.getenv('EXCLUDE'),
-                     help='Regex of file / directory paths to exclude from checking ($EXCLUDE)')
+                     help='Regex of file / directory paths to exclude from checking, ' + \
+                          '($EXCLUDE, case insensitive, takes priority over --include)')
 
     def process_options(self):
         self.opts = {
@@ -119,12 +123,26 @@ class IniValidatorTool(CLI):
             'disallow_blanks': self.get_opt('no_blank_lines'),
             'print': self.get_opt('print')
         }
+        self.include = self.get_opt('include')
         self.exclude = self.get_opt('exclude')
+        if self.include:
+            validate_regex(self.include, 'include')
+            self.include = re.compile(self.include, re.I)
         if self.exclude:
             validate_regex(self.exclude, 'exclude')
             self.exclude = re.compile(self.exclude, re.I)
         for key in self.opts:
             log_option(key, self.opts[key])
+
+    def is_included(self, path):
+        if self.include:
+            if self.include.search(path):
+                log.debug("including path: %s", path)
+                return True
+            else:
+                log.debug("not including path: %s", path)
+                return False
+        return True
 
     def is_excluded(self, path):
         if self.exclude and self.exclude.search(path):
@@ -284,6 +302,8 @@ class IniValidatorTool(CLI):
             self.check_ini(sys.stdin)
         else:
             if self.is_excluded(filename):
+                return
+            if not self.is_included(filename):
                 return
             log.debug('checking %s', self.filename)
             try:
