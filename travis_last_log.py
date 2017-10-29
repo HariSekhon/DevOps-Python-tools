@@ -57,7 +57,7 @@ try:
     # pylint: disable=wrong-import-position
     from harisekhon.utils import prog, log, support_msg_api, jsonpp, qquit, isInt, isStr, isJson
     from harisekhon.utils import UnknownError, code_error
-    from harisekhon.utils import validate_chars, validate_alnum
+    from harisekhon.utils import validate_chars, validate_alnum, validate_int
     from harisekhon import CLI
     from harisekhon import RequestHandler
 except ImportError as _:
@@ -80,6 +80,7 @@ class TravisLastBuildLog(CLI):
         self.travis_token = None
         self.repo = None
         self.job_id = None
+        self.num = None
         self.completed = False
         self.failed = False
         self.plaintext = False
@@ -99,8 +100,9 @@ class TravisLastBuildLog(CLI):
                      help='Job ID to download log for a specific job')
         self.add_opt('-T', '--travis-token', default=os.getenv('TRAVIS_TOKEN'),
                      help='Travis token required to authenticate to the API ($TRAVIS_TOKEN)')
-        self.add_opt('-c', '--completed', action='store_true', default=False, help='Get log from last completed build')
-        self.add_opt('-f', '--failed', action='store_true', default=False, help='Get log from last failed build')
+        self.add_opt('-n', '--num', default=1, help='Number of builds to pull logs from (default: 1)')
+        self.add_opt('-c', '--completed', action='store_true', default=False, help='Only completed build(s)')
+        self.add_opt('-f', '--failed', action='store_true', default=False, help='Only failed build(s)')
         #self.add_opt('-A', '--plaintext', action='store_true', default=False,
         #             help='Print in plaintext without fancy shell escapes ' + \
         #                  '(will do this by default if the output is not an interactive terminal ' + \
@@ -132,6 +134,9 @@ class TravisLastBuildLog(CLI):
             self.usage('--job-id / --repo not specified')
         validate_alnum(self.travis_token, 'travis token')
         self.headers['Authorization'] = 'token {0}'.format(self.travis_token)
+        self.num = self.get_opt('num')
+        validate_int(self.num, 'num', 1)
+        self.num = int(self.num)
         self.completed = self.get_opt('completed')
         self.failed = self.get_opt('failed')
         #self.plaintext = self.get_opt('plaintext')
@@ -146,8 +151,9 @@ class TravisLastBuildLog(CLI):
         if self.job_id:
             self.print_log(job_id=self.job_id)
         else:
-            build = self.get_build()
-            self.print_log(build=build)
+            builds = self.get_builds()
+            for build in builds:
+                self.print_log(build=build)
 
     @staticmethod
     def parse_travis_error(req):
@@ -160,17 +166,17 @@ class TravisLastBuildLog(CLI):
                 error_message = req.content
         return error_message
 
-    def get_build(self):
+    def get_builds(self):
         builds = self.get_latest_builds()
         try:
-            build = self.parse_builds(builds)
+            builds = self.parse_builds(builds)
         except (KeyError, ValueError):
             exception = traceback.format_exc().split('\n')[-2]
             # this covers up the traceback info and makes it harder to debug
             #raise UnknownError('failed to parse expected json response from Travis CI API: {0}'.format(exception))
             qquit('UNKNOWN', 'failed to parse expected json response from Travis CI API: {0}. {1}'.
                   format(exception, support_msg_api()))
-        return build
+        return builds
 
     def get_latest_builds(self):
         log.info('getting latest builds')
@@ -187,6 +193,7 @@ class TravisLastBuildLog(CLI):
     def parse_builds(self, content):
         log.debug('parsing build info')
         build = None
+        collected_builds = []
         json_data = json.loads(content)
         if not json_data or \
            'builds' not in json_data or \
@@ -216,35 +223,38 @@ class TravisLastBuildLog(CLI):
                                    '{0}'.format(support_msg_api()))
             last_build_number = build_number
             if self.completed:
-                if build is None and _['state'] in ('passed', 'finished', 'failed', 'errored'):
-                    build = _
+                if len(collected_builds) < self.num and _['state'] in ('passed', 'finished', 'failed', 'errored'):
+                    collected_builds.append(_)
             elif self.failed:
                 if _['state'] == 'passed':
-                    if build is None and not found_newer_passing_build:
+                    if not collected_builds and not found_newer_passing_build:
                         log.warning("found more recent successful build #%s with state = '%s'" + \
                                     ", you may not need to debug this build any more", _['number'], _['state'])
                         found_newer_passing_build = True
                 elif _['state'] in ('failed', 'errored'):
-                    if build is None:
-                        build = _
+                    if len(collected_builds) < self.num:
+                        collected_builds.append(_)
                         # by continuing to iterate through the rest of the builds we can check
                         # their last_build numbers are descending for extra sanity checking
                         #break
-            elif build is None:
-                build = _
+            elif len(collected_builds) < self.num:
+                collected_builds.append(_)
                 # by continuing to iterate through the rest of the builds we can check
                 # their last_build numbers are descending for extra sanity checking
                 #break
-        if build is None:
+        if not collected_builds:
             qquit('UNKNOWN', 'no recent builds found')
         if log.isEnabledFor(logging.DEBUG):
-            log.debug("latest build:\n%s", jsonpp(build))
-        return build
+            for build in collected_builds:
+                log.debug("build:\n%s", jsonpp(build))
+        return collected_builds
 
     def print_log(self, build=None, job_id=None):
         if job_id:
             self.print_job_log(job_id=job_id)
+            log.info('=' * 80)
             log.info('end of log for job id %s', job_id)
+            log.info('=' * 80 + '\n')
         else:
             if not build:
                 code_error('no job id passed to print_log(), nor build to determine job from')
@@ -267,7 +277,9 @@ class TravisLastBuildLog(CLI):
             if not job:
                 raise UnknownError('no job found in build {0}'.format(build['number']))
             self.print_job_log(job=job)
-            log.info('end of log for build number %s job id %s', build['number'], self.job_id)
+            log.info('=' * 80)
+            log.info('end of log for build number #%s job id %s', build['number'], job['id'])
+            log.info('=' * 80 + '\n')
 
     def print_job_log(self, job=None, job_id=None):
         #if (self.color or not self.plaintext) and 'log' in job:
