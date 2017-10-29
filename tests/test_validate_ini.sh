@@ -253,6 +253,13 @@ echo "checking blank ini is permitted if using --allow-empty via stdin piped fro
 ./validate_ini.py --allow-empty < /dev/null
 echo
 
+# ==================================================
+hr2
+echo
+echo "checking directory recursion with --include does not hit broken file"
+./validate_ini.py "$broken_dir" "$data_dir" --include "$data_dir/test.ini"
+echo
+
 rm -fr "$broken_dir"
 
 echo "======="
