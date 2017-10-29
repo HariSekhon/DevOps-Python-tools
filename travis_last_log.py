@@ -28,6 +28,13 @@ Options:
 Also removes all control characters as while color coding is nice
 there are a lot of other control sequences in Travis CI that mess terminals up
 
+If specifying a --repo be aware the API is case sensitive for repo names
+
+As a convenience you may supply either job id or repo as an argument without any switch and it'll infer it as a repo if
+if contains a slash but no url (eg. HariSekhon/nagios-plugins) otherwise it'll assume it's a job id, strip any leading
+URL so you can simply paste the path to a failing build and it'll just work. The switch versions of --job-id and --repo
+take priority as they're more explicit
+
 """
 
 from __future__ import absolute_import
