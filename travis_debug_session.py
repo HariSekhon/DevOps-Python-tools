@@ -26,9 +26,9 @@ been enabled for debugging yet (you may need to contact Travis at support@travis
 If specifying a --repo be aware the API is case sensitive for repo names
 
 As a convenience you may supply either job id or repo as an argument without any switch and it'll infer it as a repo if
-if contains a slash but no url (eg. HariSekhon/nagios-plugins) or a job id, strip any leading URL so you can simply
-paste the path to a failing build and it'll just work. The switch versions of --job-id and --repo take priority as
-they're more explicit
+if contains a slash but no url (eg. HariSekhon/nagios-plugins) otherwise it'll assume it's a job id, strip any leading
+URL so you can simply paste the path to a failing build and it'll just work. The switch versions of --job-id and --repo
+take priority as they're more explicit
 
 """
 
