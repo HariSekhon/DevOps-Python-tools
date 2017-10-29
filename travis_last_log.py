@@ -65,7 +65,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.2'
+__version__ = '0.4.0'
 
 
 class TravisLastBuildLog(CLI):
