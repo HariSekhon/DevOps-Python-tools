@@ -155,7 +155,7 @@ EOF
     run ./hbase_compact_tables.py --regex .1
     hr
     # ============================================================================ #
-    FAIL=3 docker_exec hbase_flush_tables.py --list-tables
+    ERRCODE=3 docker_exec hbase_flush_tables.py --list-tables
     hr
     docker_exec hbase_flush_tables.py
     hr
