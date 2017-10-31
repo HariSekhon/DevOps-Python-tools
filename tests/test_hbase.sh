@@ -45,7 +45,7 @@ trap_debug_env hbase
 
 export MNTDIR="/pytools"
 
-startupwait=30
+startupwait 30
 
 docker_exec(){
     # gets ValueError: file descriptor cannot be a negative integer (-1), -T should be the workaround but hangs
