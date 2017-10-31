@@ -56,7 +56,7 @@ export DATA_FILE='tests/data/opentsdb_data.txt'
 #    exit 0
 #fi
 
-startupwait=50
+startupwait 50
 
 docker_exec(){
     docker exec -i "$DOCKER_CONTAINER" /bin/bash <<-EOF
