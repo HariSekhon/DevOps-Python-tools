@@ -37,6 +37,7 @@ python-snappy>=0.5
 PyYAML>=3.11
 requests>=2.11.1
 sasl>=0.2.1
+sh>=1.12.14
 six>=1.10.0
 #snakebite[kerberos]>=2.11.0
 thrift-sasl>=0.2.1
