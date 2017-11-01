@@ -24,5 +24,6 @@ if [ -z "$docker_image" ]; then
 fi
 
 for tag in $(./dockerhub_show_tags.py -q $docker_image); do
+    echo "docker pull $docker_image:$tag"
     docker pull $docker_image:$tag
 done
