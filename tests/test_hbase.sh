@@ -45,7 +45,7 @@ trap_debug_env hbase
 
 export MNTDIR="/pytools"
 
-startupwait=30
+startupwait 30
 
 docker_exec(){
     # gets ValueError: file descriptor cannot be a negative integer (-1), -T should be the workaround but hangs
@@ -155,7 +155,7 @@ EOF
     run ./hbase_compact_tables.py --regex .1
     hr
     # ============================================================================ #
-    FAIL=3 docker_exec hbase_flush_tables.py --list-tables
+    ERRCODE=3 docker_exec hbase_flush_tables.py --list-tables
     hr
     docker_exec hbase_flush_tables.py
     hr

@@ -55,7 +55,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.12.0'
+__version__ = '0.12.1'
 
 
 # could consider using ConfigParser in Python2 / configparser in Python3
@@ -139,9 +139,8 @@ class IniValidatorTool(CLI):
             if self.include.search(path):
                 log.debug("including path: %s", path)
                 return True
-            else:
-                log.debug("not including path: %s", path)
-                return False
+            log.debug("not including path: %s", path)
+            return False
         return True
 
     def is_excluded(self, path):
