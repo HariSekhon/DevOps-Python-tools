@@ -17,5 +17,6 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
 for docker_image in $(./dockerhub_search.py -q harisekhon); do
+    echo "docker pull $docker_image"
     docker pull $docker_image
 done
