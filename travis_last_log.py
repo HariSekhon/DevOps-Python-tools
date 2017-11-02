@@ -35,6 +35,12 @@ if contains a slash but no url (eg. HariSekhon/nagios-plugins) otherwise it'll a
 URL so you can simply paste the path to a failing build and it'll just work. The switch versions of --job-id and --repo
 take priority as they're more explicit
 
+See also 'travis logs -r <repo>' from travis gem package. The main difference is that program outputs with control
+sequences that will mess up your terminal (this programs strips them) and with this program you can select the last
+completed log or last failed log or a specific job id whereas with the 'travis logs' you only get the latest which
+might be still executing. 'travis logs' is better for tailing the current build, whereas this program is better for
+quickly checking the last error when your CCMenu or BuildNotify applet shows the last completed build failed
+
 """
 
 from __future__ import absolute_import
