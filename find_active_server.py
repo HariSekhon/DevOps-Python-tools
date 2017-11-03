@@ -124,7 +124,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 
 
 class FindActiveServer(CLI):
@@ -141,7 +141,7 @@ class FindActiveServer(CLI):
         self.url_path = None
         self.regex = None
         self.request_timeout = None
-        self.num_threads = 10
+        self.num_threads = None
         self.queue = Queue.Queue()
         self.pool = None
 
@@ -156,7 +156,7 @@ class FindActiveServer(CLI):
         self.add_opt('-u', '--url', help='URL path to fetch (implies --http)')
         self.add_opt('-r', '--regex', help='Regex to search for in http content (optional). Case sensitive by default ' +
                                            'for better targeting, wrap with (?i:...) modifier for case insensitivity')
-        self.add_opt('-n', '--num-threads', default=self.num_threads, type='int',
+        self.add_opt('-n', '--num-threads', default=10, type='int',
                      help='Number or parallel threads to speed up processing (default: 10, ' +
                      'use -n=1 for deterministic host preference order [slower])')
         self.add_opt('-R', '--random', action='store_true', help='Randomize order of hosts tested ' +
