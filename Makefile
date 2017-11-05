@@ -96,6 +96,18 @@ build:
 	
 	# for impyla
 	$(SUDO_PIP) pip install --upgrade setuptools || :
+	#
+	# snappy may fail to install on Mac not finding snappy-c.h - workaround:
+	#
+	# brew install snappy
+	#
+	# find /usr/local -name snappy-c.h
+	#
+	# /usr/local/include/snappy-c.h
+	#
+	# sudo su
+	# LD_RUN_PATH=/usr/local/include pip install snappy
+	#
 	$(SUDO_PIP) pip install --upgrade -r requirements.txt
 	# prevents https://urllib3.readthedocs.io/en/latest/security.html#insecureplatformwarning
 	$(SUDO_PIP) pip install --upgrade ndg-httpsclient

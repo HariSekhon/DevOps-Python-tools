@@ -19,7 +19,8 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 . "$srcdir/utils.sh"
 
-. "$srcdir/../bash-tools/utils.sh"
+# imported by utils.sh above
+#. "$srcdir/../bash-tools/utils.sh"
 
 export PROJECT=pytools
 
