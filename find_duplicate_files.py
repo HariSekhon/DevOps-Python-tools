@@ -81,7 +81,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.2'
+__version__ = '0.5.3'
 
 
 class FindDuplicateFiles(CLI):
@@ -391,8 +391,8 @@ class FindDuplicateFiles(CLI):
                     self.hashes[checksum].add(filepath)
         if checksum is not None and len(self.hashes[checksum]) > 1:
             self.dups_by_hash[checksum] = self.dups_by_hash.get(checksum, set())
-            for filepath in self.hashes[checksum]:
-                self.dups_by_hash[checksum].add(filepath)
+            for filepath2 in self.hashes[checksum]:
+                self.dups_by_hash[checksum].add(filepath2)
             return True
         return False
 
