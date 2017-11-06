@@ -189,10 +189,9 @@ class HBaseShowTableRegionRanges(CLI):
     def encode_char(self, char):
         if char in string.printable and char not in ('\t', '\n', '\r', '\x0b', '\x0c'):
             return char
-        else:
-            _ = '{0:#0{1}x}'.format(ord(char), 4).replace('0x', '\\x')
-            _ = self.re_hex.sub(lambda x: x.group(1).upper(), _)
-            return _
+        _ = '{0:#0{1}x}'.format(ord(char), 4).replace('0x', '\\x')
+        _ = self.re_hex.sub(lambda x: x.group(1).upper(), _)
+        return _
 
     def bytes_to_str(self, arg):
         # unfortunately this is passed in a type str, must encode char by char
