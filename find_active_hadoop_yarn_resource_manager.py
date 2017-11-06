@@ -50,8 +50,6 @@ libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log_option, uniq_list_ordered
-    from harisekhon.utils import validate_int
     from find_active_server import FindActiveServer
 except ImportError as _:
     print(traceback.format_exc(), end='')
