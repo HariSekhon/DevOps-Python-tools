@@ -24,7 +24,7 @@ cd "$srcdir/.."
 section "H a d o o p"
 
 # find_active_hadoop_namenode.py doesn't work on Hadoop 2.2 as the JMX bean isn't present
-export HADOOP_VERSIONS="${@:-${HADOOP_VERSIONS:-latest 2.3 2.4 2.5 2.6 2.7}}"
+export HADOOP_VERSIONS="${@:-${HADOOP_VERSIONS:-latest 2.3 2.4 2.5 2.6 2.7 2.8}}"
 
 HADOOP_HOST="${DOCKER_HOST:-${HADOOP_HOST:-${HOST:-localhost}}}"
 HADOOP_HOST="${HADOOP_HOST##*/}"
