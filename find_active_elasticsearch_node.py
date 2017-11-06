@@ -33,7 +33,7 @@ override each one.
 Exits with return code 1 and NO_AVAILABLE_SERVER if none of the namenodes are active, --quiet mode will not print
 NO_AVAILABLE_SERVER.
 
-Tested on Elasticsearch 1.4 1.5 1.6 1.7 2.0 2.2 2.3 2.4 5.0
+Tested on Elasticsearch 1.3, 1.4, 1.5, 1.6, 1.7, 2.0, 2.1, 2.2, 2.3, 2.4, 5.0, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6
 
 """
 
@@ -58,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.0'
+__version__ = '0.8.0'
 
 
 class FindActiveElasticsearchNode(FindActiveServer):
@@ -75,27 +75,11 @@ class FindActiveElasticsearchNode(FindActiveServer):
 
     def add_options(self):
         self.add_hostoption(name='Elasticsearch', default_port=self.default_port)
-        self.add_opt('-S', '--ssl', action='store_true', help='Use SSL')
-        self.add_opt('-q', '--quiet', action='store_true', help='Returns no output instead of NO_AVAILABLE_SERVER '\
-                                                              + '(convenience for scripting)')
-        self.add_opt('-T', '--request-timeout', metavar='secs', type='int', default=os.getenv('REQUEST_TIMEOUT', 2),
-                     help='Timeout for each individual server request in seconds ($REQUEST_TIMEOUT, default: 2 secs)')
+        self.add_ssl_opt()
+        self.add_common_opts()
 
     def process_options(self):
-        hosts = self.get_opt('host')
-        self.port = self.get_opt('port')
-        if hosts:
-            self.host_list = [host.strip() for host in hosts.split(',') if host]
-        self.host_list += self.args
-        self.host_list = uniq_list_ordered(self.host_list)
-        if self.get_opt('ssl'):
-            self.protocol = 'https'
-            log_option('SSL', 'true')
-        else:
-            log_option('SSL', 'false')
-        self.request_timeout = self.get_opt('request_timeout')
-        validate_int(self.request_timeout, 'request timeout', 1, 60)
-        self.validate_options()
+        self.validate_common_opts()
 
 
 if __name__ == '__main__':
