@@ -124,7 +124,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.2'
+__version__ = '0.7.0'
 
 
 class FindActiveServer(CLI):
@@ -156,31 +156,33 @@ class FindActiveServer(CLI):
         self.add_opt('-u', '--url', help='URL path to fetch (implies --http)')
         self.add_opt('-r', '--regex', help='Regex to search for in http content (optional). Case sensitive by default ' +
                                            'for better targeting, wrap with (?i:...) modifier for case insensitivity')
+        self.add_common_opts()
+
+    # only here for subclassed programs convenience
+    def add_ssl(self):
+        self.add_opt('-S', '--ssl', action='store_true', help='Use SSL')
+
+    def add_common_opts(self):
+        if self.is_option_defined('ssl'):
+            if self.get_opt('ssl'):
+                self.protocol = 'https'
+                log_option('SSL', 'true')
+            else:
+                log_option('SSL', 'false')
+        self.add_opt('-q', '--quiet', action='store_true', help='Returns no output instead of NO_AVAILABLE_SERVER '\
+                                                              + '(convenience for scripting)')
         self.add_opt('-n', '--num-threads', default=10, type='int',
                      help='Number or parallel threads to speed up processing (default: 10, ' +
                      'use -n=1 for deterministic host preference order [slower])')
+        self.add_opt('-T', '--request-timeout', metavar='secs', type='int', default=os.getenv('REQUEST_TIMEOUT', 2),
+                     help='Timeout for each individual server request in seconds ($REQUEST_TIMEOUT, default: 2 secs)')
         self.add_opt('-R', '--random', action='store_true', help='Randomize order of hosts tested ' +
                      '(for use with --num-threads=1)')
-        self.add_opt('-q', '--quiet', action='store_true', help='Returns no output instead of NO_AVAILABLE_SERVER '\
-                                                              + '(convenience for scripting)')
-        self.add_opt('-T', '--request-timeout', metavar='secs', type='int', default=os.getenv('REQUEST_TIMEOUT', 2),
-                     help='Timeout for each individual server request in seconds, you may need to increase this if ' \
-                        + '--http/--https pages are a touch slow to load ($REQUEST_TIMEOUT, default: 2 secs)')
 
     def process_options(self):
-        hosts = self.get_opt('host')
-        self.port = self.get_opt('port')
+        self.validate_common_opts()
         self.url_path = self.get_opt('url')
         self.regex = self.get_opt('regex')
-        self.num_threads = self.get_opt('num_threads')
-        self.request_timeout = self.get_opt('request_timeout')
-        if hosts:
-            self.host_list = [host.strip() for host in hosts.split(',') if host]
-        self.host_list += self.args
-        self.host_list = uniq_list_ordered(self.host_list)
-        if self.get_opt('random'):
-            log_option('random', True)
-            shuffle(self.host_list)
         if self.get_opt('https'):
             self.protocol = 'https'
             # optparse returns string, even though default we gave from __init__ was int
@@ -203,10 +205,14 @@ class FindActiveServer(CLI):
                 self.protocol = 'http'
             elif self.protocol == 'ping':
                 self.usage('cannot specify --url-path with --ping, mutually exclusive options!')
-        validate_int(self.request_timeout, 'request timeout', 1, 60)
-        self.validate_options()
 
-    def validate_options(self):
+    def validate_common_opts(self):
+        hosts = self.get_opt('host')
+        self.port = self.get_opt('port')
+        if hosts:
+            self.host_list = [host.strip() for host in hosts.split(',') if host]
+        self.host_list += self.args
+        self.host_list = uniq_list_ordered(self.host_list)
         if not self.host_list:
             self.usage('no hosts specified')
         validate_hostport_list(self.host_list, port_optional=True)
@@ -218,7 +224,16 @@ class FindActiveServer(CLI):
                 self.usage('--regex cannot be used without --http / --https')
             validate_regex(self.regex)
             self.regex = re.compile(self.regex)
+
+        self.num_threads = self.get_opt('num_threads')
         validate_int(self.num_threads, 'num threads', 1, 100)
+
+        self.request_timeout = self.get_opt('request_timeout')
+        validate_int(self.request_timeout, 'request timeout', 1, 60)
+
+        if self.get_opt('random'):
+            log_option('random', True)
+            shuffle(self.host_list)
 
     def run(self):
         self.pool = ThreadPool(processes=self.num_threads)
