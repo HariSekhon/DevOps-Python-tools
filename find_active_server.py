@@ -59,21 +59,30 @@ Find a SolrCloud node:
 
 Find the active Hadoop NameNode in a High Availability cluster:
 
-    ./find_active_server.py --http --port 50070 --url 'jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus' --regex '"State"\s*:\s*"active"'  namenode1 namenode2
+    ./find_active_server.py --http --port 50070 \
+                            --url 'jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus' \
+                            --regex '"State"\s*:\s*"active"' \
+                            namenode1 namenode2
 
     ./find_active_hadoop_namenode.py  namenode1 namenode2
 
 
 Find the active Hadoop Yarn Resource Manager in a High Availability cluster:
 
-    ./find_active_server.py --http --port 8088 --url /ws/v1/cluster --regex '"haState"\s*:\s*"ACTIVE"'  resourcemanager1 resourcemanager2
+    ./find_active_server.py --http --port 8088 \
+                            --url /ws/v1/cluster \
+                            --regex '"haState"\s*:\s*"ACTIVE"' \
+                            resourcemanager1 resourcemanager2
 
     ./find_active_hadoop_yarn_resource_manager.py  resourcemanager1 resourcemanager2
 
 
 Find the active HBase Master in a High Availability cluster:
 
-    ./find_active_server.py --http --port 16010 --url '/jmx?qry=Hadoop:service=HBase,name=Master,sub=Server' --regex '"tag.isActiveMaster" : "true"'  hmaster1 hmaster2
+    ./find_active_server.py --http --port 16010 \
+                            --url '/jmx?qry=Hadoop:service=HBase,name=Master,sub=Server' \
+                            --regex '"tag.isActiveMaster" : "true"' \
+                            hmaster1 hmaster2
 
     ./find_active_hbase_master.py  hmaster1 hmaster2
 
@@ -154,8 +163,9 @@ class FindActiveServer(CLI):
                      help='Fetch web page over HTTPS protocol instead of doing a socket test ' +
                      '(overrides --http, changes port 80 to 443)')
         self.add_opt('-u', '--url', help='URL path to fetch (implies --http)')
-        self.add_opt('-r', '--regex', help='Regex to search for in http content (optional). Case sensitive by default ' +
-                                           'for better targeting, wrap with (?i:...) modifier for case insensitivity')
+        self.add_opt('-r', '--regex',
+                     help='Regex to search for in http content (optional). Case sensitive by default ' + \
+                          'for better targeting, wrap with (?i:...) modifier for case insensitivity')
         self.add_common_opts()
 
     # only here for subclassed programs convenience
