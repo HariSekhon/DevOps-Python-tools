@@ -159,7 +159,7 @@ class FindActiveServer(CLI):
         self.add_common_opts()
 
     # only here for subclassed programs convenience
-    def add_ssl(self):
+    def add_ssl_opt(self):
         self.add_opt('-S', '--ssl', action='store_true', help='Use SSL')
 
     def add_common_opts(self):
