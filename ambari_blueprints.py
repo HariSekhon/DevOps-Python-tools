@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.10.1'
+__version__ = '0.10.2'
 
 class AmbariBlueprintTool(CLI):
 
@@ -310,7 +310,7 @@ class AmbariBlueprintTool(CLI):
             _ = open(str(filename))
             file_data = _.read()
         except IOError as _:
-            err = "failed to read Ambari Blueprint from file '%s': %s" % (file, _)
+            err = "failed to read Ambari Blueprint from file '%s': %s" % (filename, _)
             # log.critical(err)
             qquit('CRITICAL', err)
         if not name:
