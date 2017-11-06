@@ -72,7 +72,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 
 
 class HBaseCalculateTableRegionRowDistribution(CLI):
@@ -200,10 +200,9 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
     def encode_char(self, char):
         if char in string.printable and char not in ('\t', '\n', '\r', '\x0b', '\x0c'):
             return char
-        else:
-            _ = '{0:#0{1}x}'.format(ord(char), 4).replace('0x', '\\x')
-            _ = self.re_hex.sub(lambda x: x.group(1).upper(), _)
-            return _
+        _ = '{0:#0{1}x}'.format(ord(char), 4).replace('0x', '\\x')
+        _ = self.re_hex.sub(lambda x: x.group(1).upper(), _)
+        return _
 
     def calculate_row_count_widths(self):
         for row_prefix in self.rows:
