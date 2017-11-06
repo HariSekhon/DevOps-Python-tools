@@ -81,7 +81,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 
 class DockerfileGitTagCheckTool(CLI):
 
@@ -237,10 +237,9 @@ class DockerfileGitTagCheckTool(CLI):
                             log.info("{0} (tag version '{1}' matches arg version '{2}')".
                                      format(self.valid_git_tags_msg, tag_version, found_version))
                             return True
-                        else:
-                            log.error('{0} ({1} tag vs {2} Dockerfile ARG)'.
-                                      format(self.invalid_git_tags_msg, tag_version, found_version))
-                            return False
+                        log.error('{0} ({1} tag vs {2} Dockerfile ARG)'.
+                                  format(self.invalid_git_tags_msg, tag_version, found_version))
+                        return False
         return True
 
 # a per file method, better for recursing across git submodules but much more brute force as a cartesian product of
