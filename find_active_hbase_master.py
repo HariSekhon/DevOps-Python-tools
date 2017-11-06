@@ -77,37 +77,11 @@ class FindActiveHBaseMaster(FindActiveServer):
 
     def add_options(self):
         self.add_hostoption(name='HBase Master', default_port=self.default_port)
-        self.add_opt('-S', '--ssl', action='store_true',
-                     help='Use SSL to HBase UI')
-        #self.add_opt('-n', '--num-threads', default=self.num_threads, type='int',
-        #             help='Number or parallel threads to speed up processing (default: 2, ' +
-        #             'use -n=1 for deterministic host preference order [slower])')
-        #self.add_opt('-R', '--random', action='store_true', help='Randomize order of hosts tested ' +
-        #             '(for use with --num-threads=1)')
-        self.add_opt('-q', '--quiet', action='store_true', help='Returns no output instead of NO_AVAILABLE_SERVER '\
-                                                              + '(convenience for scripting)')
-        self.add_opt('-T', '--request-timeout', metavar='secs', type='int', default=os.getenv('REQUEST_TIMEOUT', 2),
-                     help='Timeout for each individual server request in seconds ($REQUEST_TIMEOUT, default: 2 secs)')
+        self.add_ssl_opt()
+        self.add_common_opts()
 
     def process_options(self):
-        hosts = self.get_opt('host')
-        self.port = self.get_opt('port')
-        if hosts:
-            self.host_list = [host.strip() for host in hosts.split(',') if host]
-        self.host_list += self.args
-        self.host_list = uniq_list_ordered(self.host_list)
-        #self.num_threads = self.get_opt('num_threads')
-        #if self.get_opt('random'):
-        #    log_option('random', True)
-        #    shuffle(self.host_list)
-        if self.get_opt('ssl'):
-            self.protocol = 'https'
-            log_option('SSL', 'true')
-        else:
-            log_option('SSL', 'false')
-        self.request_timeout = self.get_opt('request_timeout')
-        validate_int(self.request_timeout, 'request timeout', 1, 60)
-        self.validate_options()
+        self.validate_common_opts()
 
 
 if __name__ == '__main__':
