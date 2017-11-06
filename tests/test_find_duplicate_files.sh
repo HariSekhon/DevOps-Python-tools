@@ -170,3 +170,8 @@ rm -fr "$testdir1" "$testdir2"
 
 echo
 echo
+hr2
+echo "Success - all find_duplicate_files.py tests passed"
+hr2
+echo
+echo
