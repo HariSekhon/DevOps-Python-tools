@@ -23,7 +23,8 @@ cd "$srcdir/.."
 
 section "H a d o o p"
 
-export HADOOP_VERSIONS="${@:-${HADOOP_VERSIONS:-latest 2.5 2.6 2.7}}"
+# find_active_hadoop_namenode.py doesn't work on Hadoop 2.2 as the JMX bean isn't present
+export HADOOP_VERSIONS="${@:-${HADOOP_VERSIONS:-latest 2.3 2.4 2.5 2.6 2.7}}"
 
 HADOOP_HOST="${DOCKER_HOST:-${HADOOP_HOST:-${HOST:-localhost}}}"
 HADOOP_HOST="${HADOOP_HOST##*/}"
@@ -71,18 +72,29 @@ test_hadoop(){
     hr
     when_ports_available "$HADOOP_HOST" $HADOOP_PORTS
     hr
+    # don't use the worker nodes so not testing for their availability
     echo "waiting for NN dfshealth page to come up before testing for active namenode:"
-    when_url_content "$HADOOP_HOST:$HADOOP_NAMENODE_PORT/dfshealth.html" 'NameNode Journal Status'
-    hr
+    if [[ "$version" =~ ^2\.[2-4]$ ]]; then
+        when_url_content "$HADOOP_HOST:$HADOOP_NAMENODE_PORT/dfshealth.jsp" 'Hadoop NameNode'
+        #echo "waiting for DN page to come up:"
+        #hr
+        # Hadoop 2.2 is broken, just check for WEB-INF, 2.3 redirects so check for url
+        #when_url_content "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 'WEB-INF|url=dataNodeHome.jsp'
+    else
+        when_url_content "$HADOOP_HOST:$HADOOP_NAMENODE_PORT/dfshealth.html" 'NameNode Journal Status'
+        #hr
+        #echo "waiting for DN page to come up:"
+        # Hadoop 2.8 uses /datanode.html but this isn't available on older versions eg. 2.6 so change the regex to find the redirect in 2.8 instead
+        #when_url_content "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 'DataNode on|url=datanode\.html'
+    fi
     echo "waiting for RM cluster page to come up before testing for active resource manager:"
     when_url_content "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT/ws/v1/cluster" resourceManager
     hr
-#    echo "waiting for NM node page to come up:"
-#    when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT/node" 'Node Manager Version'
-#    hr
-#    echo "waiting for DN page to come up:"
-#    when_url_content "$startupwait" "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 'Datanode on'
-#    hr
+    hr
+    #echo "waiting for NM node page to come up:"
+    # Hadoop 2.8 content = NodeManager information
+    #when_url_content "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT/node" 'Node Manager Version|NodeManager information'
+    hr
 cat >/dev/null <<EOFCOMMENTED
     echo "setting up HDFS for tests"
     #docker-compose exec "$DOCKER_SERVICE" /bin/bash <<-EOF
