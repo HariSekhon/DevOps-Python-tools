@@ -133,7 +133,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.2'
+__version__ = '0.7.3'
 
 
 class FindActiveServer(CLI):
@@ -195,7 +195,6 @@ class FindActiveServer(CLI):
     def validate_common_opts(self):
         hosts = self.get_opt('host')
         self.port = self.get_opt('port')
-        self.url_path = self.get_opt('url')
         if hosts:
             self.host_list = [host.strip() for host in hosts.split(',') if host]
         self.host_list += self.args
@@ -220,6 +219,8 @@ class FindActiveServer(CLI):
             self.protocol = 'http'
             if not self.port:
                 self.port = 80
+        if self.is_option_defined('url') and self.get_opt('url'):
+            self.url_path = self.get_opt('url')
         if self.url_path:
             if self.protocol is None:
                 self.protocol = 'http'
@@ -235,12 +236,13 @@ class FindActiveServer(CLI):
             code_error('invalid protocol, must be one of http / https / ping')
 
     def validate_misc_opts(self):
-        regex = self.get_opt('regex')
-        if regex:
+        if self.is_option_defined('regex') and self.get_opt('regex'):
+            self.regex = self.get_opt('regex')
+        if self.regex:
             if not self.protocol:
                 self.usage('--regex cannot be used without --http / --https')
-            validate_regex(regex)
-            self.regex = re.compile(regex)
+            validate_regex(self.regex)
+            self.regex = re.compile(self.regex)
 
         self.num_threads = self.get_opt('num_threads')
         validate_int(self.num_threads, 'num threads', 1, 100)
@@ -409,6 +411,9 @@ class FindActiveServer(CLI):
             return None
         if self.regex:
             log.info('%s - checking regex against content', url)
+            # if this ends up not being processed properly and remains a string instead
+            # of the expected compiled regex, then .search() will hang
+            assert not isStr(self.regex)
             if self.regex.search(req.content):
                 log.info('%s - regex matched http output', url)
             else:
