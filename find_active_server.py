@@ -133,7 +133,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 
 class FindActiveServer(CLI):
@@ -190,35 +190,12 @@ class FindActiveServer(CLI):
                      '(for use with --num-threads=1)')
 
     def process_options(self):
-        self.url_path = self.get_opt('url')
-        self.regex = self.get_opt('regex')
-        if self.get_opt('https'):
-            self.protocol = 'https'
-            # optparse returns string, even though default we gave from __init__ was int
-            # comparison would fail without this cast
-            if str(self.port) == '80':
-                log.info('overriding port 80 => 443 for https')
-                self.port = 443
-        elif self.get_opt('http'):
-            self.protocol = 'http'
-            if not self.port:
-                self.port = 80
-        if self.get_opt('ping'):
-            if self.protocol:
-                self.usage('cannot specify --ping with --http / --https, mutually exclusive tests!')
-            elif self.port != self.default_port:
-                self.usage('cannot specify --port with --ping, mutually exclusive options!')
-            self.protocol = 'ping'
-        if self.url_path:
-            if self.protocol is None:
-                self.protocol = 'http'
-            elif self.protocol == 'ping':
-                self.usage('cannot specify --url-path with --ping, mutually exclusive options!')
         self.validate_common_opts()
 
     def validate_common_opts(self):
         hosts = self.get_opt('host')
         self.port = self.get_opt('port')
+        self.url_path = self.get_opt('url')
         if hosts:
             self.host_list = [host.strip() for host in hosts.split(',') if host]
         self.host_list += self.args
@@ -227,13 +204,43 @@ class FindActiveServer(CLI):
             self.usage('no hosts specified')
         validate_hostport_list(self.host_list, port_optional=True)
         validate_port(self.port)
+        self.port = int(self.port)
+        self.validate_protocol_opts()
+        self.validate_misc_opts()
+
+    def validate_protocol_opts(self):
+        if self.is_option_defined('https') and self.get_opt('https'):
+            self.protocol = 'https'
+            # optparse returns string, even though default we gave from __init__ was int
+            # comparison would fail without this cast
+            if str(self.port) == '80':
+                log.info('overriding port 80 => 443 for https')
+                self.port = 443
+        elif self.is_option_defined('http') and self.get_opt('http'):
+            self.protocol = 'http'
+            if not self.port:
+                self.port = 80
+        if self.url_path:
+            if self.protocol is None:
+                self.protocol = 'http'
+            elif self.protocol == 'ping':
+                self.usage('cannot specify --url-path with --ping, mutually exclusive options!')
+        if self.is_option_defined('ping') and self.get_opt('ping'):
+            if self.protocol:
+                self.usage('cannot specify --ping with --http / --https, mutually exclusive tests!')
+            elif self.port != self.default_port:
+                self.usage('cannot specify --port with --ping, mutually exclusive options!')
+            self.protocol = 'ping'
         if self.protocol and self.protocol not in ('http', 'https', 'ping'):
-            code_error('invalid protocol, must be one of http or https')
-        if self.regex:
+            code_error('invalid protocol, must be one of http / https / ping')
+
+    def validate_misc_opts(self):
+        regex = self.get_opt('regex')
+        if regex:
             if not self.protocol:
                 self.usage('--regex cannot be used without --http / --https')
-            validate_regex(self.regex)
-            self.regex = re.compile(self.regex)
+            validate_regex(regex)
+            self.regex = re.compile(regex)
 
         self.num_threads = self.get_opt('num_threads')
         validate_int(self.num_threads, 'num threads', 1, 100)
