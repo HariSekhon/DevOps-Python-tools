@@ -35,6 +35,7 @@ if which git &>/dev/null; then
     fi
 fi
 # TODO: check if this works later and re-enable
+# https://github.com/gitpython-developers/GitPython/issues/687
 if is_travis; then
     echo "WARNING: Skipping check on Travis CI due to bug in GitPython"
     exit 0
