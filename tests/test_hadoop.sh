@@ -42,22 +42,12 @@ export HADOOP_YARN_RESOURCE_MANAGER_PORT_DEFAULT="8088"
 export HADOOP_YARN_NODE_MANAGER_PORT_DEFAULT="8042"
 #export HADOOP_PORTS="8042 8088 50010 50020 50070 50075 50090"
 
-# not used any more, see instead tests/docker/hadoop-docker-compose.yml
-#export DOCKER_IMAGE="harisekhon/hadoop"
-#export MNTDIR="/py"
-
 # NN comes up, but RM is really slow to come up, give 80 secs not 50
 startupwait 80
 
 check_docker_available
 
 trap_debug_env hadoop
-
-docker_exec(){
-    #docker-compose exec "$DOCKER_SERVICE" $MNTDIR/$@
-    echo "docker exec '$DOCKER_CONTAINER' $MNTDIR/$@"
-    docker exec "$DOCKER_CONTAINER" $MNTDIR/$@
-}
 
 test_hadoop(){
     local version="$1"

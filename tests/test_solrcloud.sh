@@ -36,18 +36,12 @@ export SOLR_PORTS="$SOLR_PORT_DEFAULT 8984 $SOLR_ZOOKEEPER_PORT_DEFAULT"
 export ZOOKEEPER_HOST="$SOLR_HOST"
 
 export SOLR_HOME="/solr"
-export MNTDIR="/pl"
 
 startupwait 30
 
 check_docker_available
 
 trap_debug_env solr zookeeper
-
-docker_exec(){
-    echo "docker-compose exec '$DOCKER_SERVICE' $MNTDIR/$@"
-    docker-compose exec "$DOCKER_SERVICE" $MNTDIR/$@
-}
 
 test_solrcloud(){
     local version="$1"

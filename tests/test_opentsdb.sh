@@ -47,8 +47,6 @@ export OPENTSDB_VERSIONS="${@:-latest}"
 #export DOCKER_IMAGE="petergrace/opentsdb-docker"
 export DOCKER_CONTAINER="opentsdb-test"
 
-export MNTDIR=/pytools
-
 export DATA_FILE='tests/data/opentsdb_data.txt'
 
 #if ! is_docker_available; then
@@ -57,13 +55,6 @@ export DATA_FILE='tests/data/opentsdb_data.txt'
 #fi
 
 startupwait 50
-
-docker_exec(){
-    docker exec -i "$DOCKER_CONTAINER" /bin/bash <<-EOF
-    export JAVA_HOME=/usr
-    $MNTDIR/$@
-EOF
-}
 
 generate_test_data(){
     if [ -f "$DATA_FILE" ]; then
