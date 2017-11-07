@@ -240,6 +240,7 @@ class FindActiveServer(CLI):
 
         self.request_timeout = self.get_opt('request_timeout')
         validate_int(self.request_timeout, 'request timeout', 1, 60)
+        self.request_timeout = int(self.request_timeout)
 
         if self.get_opt('random'):
             log_option('random', True)
