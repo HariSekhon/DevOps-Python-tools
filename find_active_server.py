@@ -133,7 +133,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 
 
 class FindActiveServer(CLI):
@@ -190,7 +190,6 @@ class FindActiveServer(CLI):
                      '(for use with --num-threads=1)')
 
     def process_options(self):
-        self.validate_common_opts()
         self.url_path = self.get_opt('url')
         self.regex = self.get_opt('regex')
         if self.get_opt('https'):
@@ -215,6 +214,7 @@ class FindActiveServer(CLI):
                 self.protocol = 'http'
             elif self.protocol == 'ping':
                 self.usage('cannot specify --url-path with --ping, mutually exclusive options!')
+        self.validate_common_opts()
 
     def validate_common_opts(self):
         hosts = self.get_opt('host')
@@ -237,6 +237,7 @@ class FindActiveServer(CLI):
 
         self.num_threads = self.get_opt('num_threads')
         validate_int(self.num_threads, 'num threads', 1, 100)
+        self.num_threads = int(self.num_threads)
 
         self.request_timeout = self.get_opt('request_timeout')
         validate_int(self.request_timeout, 'request timeout', 1, 60)
@@ -388,13 +389,16 @@ class FindActiveServer(CLI):
         try:
             # timeout here isn't total timeout, it's response time
             req = requests.get(url, timeout=self.request_timeout)
-        except requests.exceptions.RequestException:
+        except requests.exceptions.RequestException as _:
+            log.info('%s - returned exception: %s', url, _)
             return False
-        except IOError:
+        except IOError as _:
+            log.info('%s - returned IOError: %s', url, _)
             return False
         log.debug("%s - response: %s %s", url, req.status_code, req.reason)
         log.debug("%s - content:\n%s\n%s\n%s", url, '='*80, req.content.strip(), '='*80)
         if req.status_code != 200:
+            log.info('%s - status code %s != 200', url, req.status_code)
             return None
         if self.regex:
             log.info('%s - checking regex against content', url)
