@@ -37,7 +37,7 @@ broken_dir="tests/broken_ldif"
 rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
 
-export TIMEOUT=1
+export TIMEOUT=5
 
 ./validate_ldap_ldif.py --exclude "$exclude" .
 echo
