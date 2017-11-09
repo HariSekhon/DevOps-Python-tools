@@ -53,6 +53,7 @@ test_hadoop(){
     local version="$1"
     section2 "Setting up Hadoop $version test container"
     VERSION="$version" docker-compose up -d
+    hr
     echo "getting Hadoop dynamic port mappings:"
     docker_compose_port HADOOP_NAMENODE_PORT "HDFS NN"
     docker_compose_port HADOOP_DATANODE_PORT "HDFS DN"
@@ -77,15 +78,16 @@ test_hadoop(){
         # Hadoop 2.8 uses /datanode.html but this isn't available on older versions eg. 2.6 so change the regex to find the redirect in 2.8 instead
         #when_url_content "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 'DataNode on|url=datanode\.html'
     fi
+    hr
     echo "waiting for RM cluster page to come up before testing for active resource manager:"
     when_url_content "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT/ws/v1/cluster" resourceManager
-    hr
     hr
     #echo "waiting for NM node page to come up:"
     # Hadoop 2.8 content = NodeManager information
     #when_url_content "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT/node" 'Node Manager Version|NodeManager information'
     hr
-cat >/dev/null <<EOFCOMMENTED
+    [ -z "${NOSETUP:-}" ] &&
+    cat >/dev/null <<EOFCOMMENTED
     echo "setting up HDFS for tests"
     #docker-compose exec "$DOCKER_SERVICE" /bin/bash <<-EOF
     docker exec -i "$DOCKER_CONTAINER" /bin/bash <<-EOF
@@ -105,11 +107,10 @@ cat >/dev/null <<EOFCOMMENTED
         exit
 EOF
 EOFCOMMENTED
-    echo
+    hr
     if [ -n "${NOTESTS:-}" ]; then
         exit 0
     fi
-    hr
     if [ "$version" = "latest" ]; then
         local version=".*"
     fi
@@ -119,17 +120,17 @@ EOFCOMMENTED
 #        echo 'Failed to determine hostname of container via docker-compose exec, cannot continue with tests!'
 #        exit 1
 #    fi
-    hr
+
     # Docker maps all these 127.0.0.2, 127.0.0.3 etc to go to docker port mappings so is there is a container running it finds it accidentally
     # therefore reset the HADOOP PORTS to point to something that should get connection refused like port 1 and so that the failure hosts still fail and return only the expected correct host
-    HADOOP_NAMENODE_PORT=1 run_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_namenode.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_DATANODE_PORT"
-    hr
-    HADOOP_NAMENODE_PORT=1 run_output "$HADOOP_HOST:$HADOOP_NAMENODE_PORT" ./find_active_hadoop_namenode.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_NAMENODE_PORT"
-    hr
-    HADOOP_YARN_RESOURCE_MANAGER_PORT=1 run_output "NO_AVAILABLE_SERVER" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT"
-    hr
-    HADOOP_YARN_RESOURCE_MANAGER_PORT=1 run_output "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT"
-    hr
+    HADOOP_NAMENODE_PORT=1 ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_hadoop_namenode.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_DATANODE_PORT"
+
+    HADOOP_NAMENODE_PORT=1 run_grep "^$HADOOP_HOST:$HADOOP_NAMENODE_PORT$" ./find_active_hadoop_namenode.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_NAMENODE_PORT"
+
+    HADOOP_YARN_RESOURCE_MANAGER_PORT=1 ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT"
+
+    HADOOP_YARN_RESOURCE_MANAGER_PORT=1 run_grep "^$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT$" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT"
+    [ -z "${KEEPDOCKER:-}" ] ||
     docker-compose down
     echo
     echo
