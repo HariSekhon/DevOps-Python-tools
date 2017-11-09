@@ -43,6 +43,7 @@ test_elasticsearch(){
     local version="$1"
     section2 "Setting up Elasticsearch $version test container"
     VERSION="$version" docker-compose up -d
+    hr
     echo "getting Elasticsearch dynamic port mapping:"
     docker_compose_port "Elasticsearch"
     hr
@@ -55,11 +56,12 @@ test_elasticsearch(){
     fi
     non_es_node1="127.0.0.1:1025"
     non_es_node2="127.0.0.1:1026"
-    hr
-    ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT_DEFAULT" run_output "NO_AVAILABLE_SERVER" ./find_active_elasticsearch_node.py $non_es_node1 $non_es_node2
-    hr
-    ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT_DEFAULT" run_output "$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT" ./find_active_elasticsearch_node.py $non_es_node1 $non_es_node2 "$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT"
-    hr
+    ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT_DEFAULT" \
+    ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_elasticsearch_node.py $non_es_node1 $non_es_node2
+
+    ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT_DEFAULT" \
+    run_grep "^$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT$" ./find_active_elasticsearch_node.py $non_es_node1 $non_es_node2 "$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT"
+
     docker-compose down
 }
 
