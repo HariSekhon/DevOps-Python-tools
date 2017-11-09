@@ -84,14 +84,16 @@ if ! [ -f "$private_key" -a -f "$certificate" ]; then
     echo
     openssl x509 -req -days 3650 -in "$csr" -signkey "$private_key" -out "$certificate"
     echo
+    hr
 fi
 #if ! [ -f "$htpasswd" ]; then
-    echo "generating htpasswd auth file"
+    echo "generating htpasswd auth file:"
     # -B - becrypt - docker registry ignores entries that don't use very secure Becrypt
     # -b - take password from cli instead of prompting
     # -c - create htpasswd file
     htpasswd -B -b -c "$htpasswd" "$DOCKER_REGISTRY_USER" "$DOCKER_REGISTRY_PASSWORD"
     echo
+    hr
 #fi
 cd "$srcdir/.."
 
@@ -99,17 +101,18 @@ echo "Bringing up Docker Registry container:"
 echo
 #docker run -d --name "$name" -p 5000:5000 registry:2
 docker-compose up -d
+hr
 echo
 
 echo "getting dynamic Docker Registry port mapping:"
 docker_compose_port "Docker Registry"
+hr
 
 if [ -z "$DOCKER_REGISTRY_PORT" ]; then
     echo "DOCKER_REGISTRY_PORT not found from running container, did container fail to start up properly?"
     exit 1
 fi
 
-hr
 when_ports_available "$max_secs" "$DOCKER_REGISTRY_HOST" "$DOCKER_REGISTRY_PORT"
 hr
 when_url_content "$max_secs" "https://$DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT/v2/_catalog" repositories -u "$DOCKER_REGISTRY_USER":"$DOCKER_REGISTRY_PASSWORD"
@@ -118,10 +121,11 @@ echo
 
 echo "docker login to registry $DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT ..."
 docker login -e root@localhost -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASSWORD" "$DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT"
+hr
 
-tag="0.7"
-repo1="library/alpine"
-repo2="harisekhon/consul:$tag"
+tag="3.4"
+repo1="library/busybox"
+repo2="harisekhon/zookeeper:$tag"
 
 echo
 for image in $repo1 $repo2; do
@@ -134,14 +138,19 @@ for image in $repo1 $repo2; do
     echo
     echo "Pushing image $image to Docker Registry $DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT:"
     docker push "$DOCKER_REGISTRY_HOST:$DOCKER_REGISTRY_PORT/$image"
+    hr
     echo
 done
+hr
 echo
 
 export SSL_NOVERIFY=1
 check "./docker_registry_show_tags.py -S $repo1 $repo2" "Docker Registry Show Tags for $repo1 & $repo2"
+hr
 check "./docker_registry_show_tags.py -S ${repo2/:*}" "Docker Registry Show Tags for $repo2"
+hr
 check "./docker_registry_show_tags.py -S ${repo2/:*} | grep '$tag'" "Docker Registry Show Tags search for $repo2 tag $tag"
+hr
 
 #docker rm -f "$name"
 docker-compose down
