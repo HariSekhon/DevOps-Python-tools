@@ -31,16 +31,13 @@ expected="                                <this is a  test>"
 
 echo "testing args:"
 #run_output "$expected" ./center.py "                     <this is a  test> "
-hr
 
 echo "testing stdin:"
 run_output "$expected" ./center.py <<< "<this is a  test>"
-hr
 
 expected="                                 <this is a test>"
 echo "testing multi-args:"
 run_output "$expected" ./center.py "<this" is a  "test> "
-hr
 
 
 ###########
@@ -49,21 +46,17 @@ expected="#                                 this is a test"
 
 echo "testing args with # prefix:"
 run_output "$expected" ./center.py " #  this is a test "
-hr
 
 echo "testing stdin with # prefix:"
 run_output "$expected" ./center.py <<< " # this is a test"
-hr
 
 expected="//                                 this is a test"
 
 echo "testing args with // prefix:"
 run_output "$expected" ./center.py " //  this is a test "
-hr
 
 echo "testing stdin with // prefix:"
 run_output "$expected" ./center.py <<< " // this is a test"
-hr
 
 ###########
 # comment handling disabled
@@ -87,7 +80,6 @@ hr
 
 echo "testing stdin with # prefix with comment handling disabled:"
 run_output "$expected" ./center.py -n <<< " #  this is a test"
-hr
 
 expected="                               //  this is a test"
 
@@ -109,7 +101,6 @@ hr
 
 echo "testing stdin with // prefix:"
 run_output "$expected" ./center.py -n <<< " //  this is a test"
-hr
 
 #######################
 # space in middle tests
@@ -134,7 +125,6 @@ hr
 
 echo "testing spacing with stdin:"
 run_output "$expected" ./center.py -s <<< "                     <this is a  test> "
-hr
 
 echo
 echo "Completed $run_count tests"
