@@ -56,6 +56,7 @@ test_hbase(){
         VERSION="$version" docker-compose down || :
     fi
     VERSION="$version" docker-compose up -d
+    hr
     if [ "$version" = "0.96" -o "$version" = "0.98" ]; then
         local export HBASE_MASTER_PORT_DEFAULT=60010
         local export HBASE_REGIONSERVER_PORT_DEFAULT=60301
@@ -80,134 +81,134 @@ test_hbase(){
     # gets ValueError: file descriptor cannot be a negative integer (-1), -T should be the workaround but hangs
     #docker-compose exec -T "$DOCKER_SERVICE" /bin/bash <<-EOF
     if [ -z "${NOSETUP:-}" ]; then
-    docker exec -i "$DOCKER_CONTAINER" /bin/bash <<-EOF
-        export JAVA_HOME=/usr
-        /hbase/bin/hbase shell <<-EOF2
-            create 't1', 'cf1', { 'REGION_REPLICATION' => 1 }
-            create 'EmptyTable', 'cf2', { 'REGION_REPLICATION' => 1 }
-            create 'DisabledTable', 'cf3', { 'REGION_REPLICATION' => 1 }
-            disable 'DisabledTable'
-            put 't1', 'r1', 'cf1:q1', '$uniq_val'
-            put 't1', 'r2', 'cf1:q2', 'test'
-            list
+        docker exec -i "$DOCKER_CONTAINER" /bin/bash <<-EOF
+            export JAVA_HOME=/usr
+            /hbase/bin/hbase shell <<-EOF2
+                create 't1', 'cf1', { 'REGION_REPLICATION' => 1 }
+                create 'EmptyTable', 'cf2', { 'REGION_REPLICATION' => 1 }
+                create 'DisabledTable', 'cf3', { 'REGION_REPLICATION' => 1 }
+                disable 'DisabledTable'
+                put 't1', 'r1', 'cf1:q1', '$uniq_val'
+                put 't1', 'r2', 'cf1:q2', 'test'
+                list
 EOF2
-        hbase org.apache.hadoop.hbase.util.RegionSplitter UniformSplitTable UniformSplit -c 100 -f cf1
-        hbase org.apache.hadoop.hbase.util.RegionSplitter HexStringSplitTable HexStringSplit -c 100 -f cf1
-        # the above may fail, ensure we continue to try the tests
-        exit 0
+            hbase org.apache.hadoop.hbase.util.RegionSplitter UniformSplitTable UniformSplit -c 100 -f cf1
+            hbase org.apache.hadoop.hbase.util.RegionSplitter HexStringSplitTable HexStringSplit -c 100 -f cf1
+            # the above may fail, ensure we continue to try the tests
+            exit 0
 EOF
+        hr
     fi
     # ============================================================================ #
     if [ -n "${NOTESTS:-}" ]; then
         return
     fi
-    hr
     # will otherwise pick up HBASE_HOST and use default port and return the real HBase Master
     HBASE_HOST='' HOST='' HBASE_MASTER_PORT="$HBASE_MASTER_PORT_DEFAULT" \
-        run_output "NO_AVAILABLE_SERVER" ./find_active_hbase_master.py 127.0.0.2 127.0.0.3 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT"
-    hr
+        ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_hbase_master.py 127.0.0.2 127.0.0.3 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT"
+
     # if HBASE_PORT / --port is set to same as suffix then only outputs host not host:port
     HBASE_HOST='' HOST='' HBASE_MASTER_PORT="$HBASE_MASTER_PORT_DEFAULT" \
-        run_output "$HBASE_HOST:$HBASE_MASTER_PORT" ./find_active_hbase_master.py 127.0.0.2 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT" 127.0.0.3 "$HBASE_HOST:$HBASE_MASTER_PORT"
-    hr
+        run_grep "^$HBASE_HOST:$HBASE_MASTER_PORT$" ./find_active_hbase_master.py 127.0.0.2 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT" 127.0.0.3 "$HBASE_HOST:$HBASE_MASTER_PORT"
+
     export HBASE_THRIFT_SERVER_PORT="$HBASE_THRIFT_PORT"
-    hr
+
     # ============================================================================ #
     run ./hbase_generate_data.py -n 10
-    hr
+
     run_conn_refused ./hbase_generate_data.py -n 10
-    hr
+
     echo "checking generate data fails with exit code 2 when table already exists on second run"
     run_fail 2 ./hbase_generate_data.py -n 10
-    hr
+
     set +e
     echo "trying to send generated data to DisabledTable (times out):"
     run_fail 2 ./hbase_generate_data.py -n 10 -T DisabledTable --use-existing-table
-    hr
+
     run ./hbase_generate_data.py -n 10 --drop-table
-    hr
+
     run ./hbase_generate_data.py -n 10 --drop-table --skew
-    hr
+
     run ./hbase_generate_data.py -n 10000 --use-existing-table --skew --skew-percent 50 -T UniformSplitTable
-    hr
+
     run ./hbase_generate_data.py -n 10000 --use-existing-table -T HexStringSplitTable
-    hr
+
     # ============================================================================ #
     run_fail 3 ./hbase_compact_tables.py --list-tables
-    hr
+
     run ./hbase_compact_tables.py -H "$HBASE_HOST"
-    hr
+
     run_conn_refused ./hbase_compact_tables.py
-    hr
+
     run ./hbase_compact_tables.py -r DisabledTable
-    hr
+
     run ./hbase_compact_tables.py --regex .1
-    hr
+
     # ============================================================================ #
     ERRCODE=3 docker_exec hbase_flush_tables.py --list-tables
-    hr
+
     docker_exec hbase_flush_tables.py
-    hr
+
     docker_exec hbase_flush_tables.py -r Disabled.*
-    hr
+
     # ============================================================================ #
     run_fail 3 ./hbase_show_table_region_ranges.py --list-tables
-    hr
+
     run_conn_refused ./hbase_show_table_region_ranges.py --list-tables
-    hr
+
     echo "checking hbase_show_table_region_ranges.py against DisabledTable:"
     run ./hbase_show_table_region_ranges.py -T DisabledTable -vvv
-    hr
+
     echo "checking hbase_show_table_region_ranges.py against EmptyTable:"
     run ./hbase_show_table_region_ranges.py -T EmptyTable -vvv
-    hr
+
     run ./hbase_show_table_region_ranges.py -T HexStringSplitTable -v --short-region-name
-    hr
+
     run ./hbase_show_table_region_ranges.py -T UniformSplitTable -v
-    hr
+
     # ============================================================================ #
     run_fail 3 ./hbase_calculate_table_region_row_distribution.py --list-tables
-    hr
+
     run_conn_refused ./hbase_calculate_table_region_row_distribution.py --list-tables
-    hr
+
     echo "checking hbase_calculate_table_region_row_distribution.py against DisabledTable:"
     run_fail 2 ./hbase_calculate_table_region_row_distribution.py -T DisabledTable -vvv
-    hr
+
     echo "checking hbase_calculate_table_region_row_distribution.py against EmptyTable:"
     run_fail 2 ./hbase_calculate_table_region_row_distribution.py -T EmptyTable -vvv
-    hr
+
     run ./hbase_calculate_table_region_row_distribution.py -T UniformSplitTable -v --no-region-name
-    hr
+
     run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable
-    hr
+
     run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -vv --short-region-name --sort server
-    hr
+
     run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort server --desc
-    hr
+
     run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count
-    hr
+
     run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc
-    hr
+
     # ============================================================================ #
     run_fail 3 ./hbase_calculate_table_row_key_distribution.py -T DisabledTable --list-tables
-    hr
+
     echo "checking hbase_calculate_table_row_key_distribution.py against DisabledTable:"
     run_fail 2 ./hbase_calculate_table_row_key_distribution.py -T DisabledTable -vvv
-    hr
+
     echo "checking hbase_calculate_table_row_key_distribution.py against EmptyTable:"
     run_fail 2 ./hbase_calculate_table_row_key_distribution.py -T EmptyTable -vvv
-    hr
-    run ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2
-    hr
-    run ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable --sort
-    hr
-    run ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable --sort --desc
-    hr
-    run ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
-    hr
-    run_conn_refused ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
-    hr
 
+    run ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2
+
+    run ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable --sort
+
+    run ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable --sort --desc
+
+    run ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
+
+    run_conn_refused ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
+
+    [ -z "${KEEPDOCKER:-}" ] ||
     docker-compose down
     echo
 }
