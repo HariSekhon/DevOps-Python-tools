@@ -60,113 +60,101 @@ if is_CI; then
     export TIMEOUT=30
 fi
 
-echo "testing socket ordering result consistency"
+echo "testing socket ordering result consistency:"
 echo
 
-check_output "yahoo.com" ./find_active_server.py $opts --num-threads 1 --port 80 yahoo.com google.com
+run_grep "^yahoo.com$" ./find_active_server.py $opts --num-threads 1 --port 80 yahoo.com google.com
 
-hr
-echo "testing socket returns only functional server"
+echo "testing socket returns only functional server:"
 echo
 
-check_output "google.com" ./find_active_server.py $opts --port 80 0.0.0.1 google.com
+run_grep "^google.com$" ./find_active_server.py $opts --port 80 0.0.0.1 google.com
 
-hr
-echo "testing socket ordering result consistency with individual port overrides"
+echo "testing socket ordering result consistency with individual port overrides:"
 echo
 
-check_output "yahoo.com:80" ./find_active_server.py $opts --port 1 yahoo.com:80 google.com
+run_grep "^yahoo.com:80$" ./find_active_server.py $opts --port 1 yahoo.com:80 google.com
 
-check_output "google.com:80" ./find_active_server.py $opts --port 1 yahoo.com google.com:80
+run_grep "^google.com:80$" ./find_active_server.py $opts --port 1 yahoo.com google.com:80
 
 # ============================================================================ #
-hr
-echo "checking --ping and --port switch conflict fails"
-echo
-./find_active_server.py $opts --ping --port 1 yahoo.com google.com
-check_exit_code 3
-echo
 
-hr
-echo "checking --ping and --http switch conflict fails"
+echo "checking --ping and --port switch conflict fails:"
 echo
-./find_active_server.py $opts --ping --http yahoo.com google.com
-check_exit_code 3
+run_fail 3 ./find_active_server.py $opts --ping --port 1 yahoo.com google.com
+
+echo "checking --ping and --http switch conflict fails:"
 echo
+run_fail 3 ./find_active_server.py $opts --ping --http yahoo.com google.com
 
 # ============================================================================ #
-hr
-echo "testing ping returns only functional server"
-echo
-check_output "google.com" ./find_active_server.py $opts --ping 0.0.0.1 4.4.4.4 google.com
 
-hr
-echo "testing ping returns only functional server, ignoring port override"
+echo "testing ping returns only functional server:"
+echo
+run_grep "^google.com$" ./find_active_server.py $opts --ping 0.0.0.1 4.4.4.4 google.com
+
+echo "testing ping returns only functional server, ignoring port override:"
 echo
 
-check_output "google.com" ./find_active_server.py $opts -n1 --ping 0.0.0.1 4.4.4.4 google.com:80
+run_grep "^google.com$" ./find_active_server.py $opts -n1 --ping 0.0.0.1 4.4.4.4 google.com:80
 
 # ============================================================================ #
-hr
-echo "testing http ordering result consistency"
+
+echo "testing http ordering result consistency:"
 echo
 
 # Google's server latency is so much less than yahoo's that giving -n2 will allow google.com to overtake yahoo.com, limit to 1 so that yahoo gets the next available slot
-check_output "yahoo.com" ./find_active_server.py $opts -n1 --http 0.0.0.1 yahoo.com google.com
+run_grep "^yahoo.com$" ./find_active_server.py $opts -n1 --http 0.0.0.1 yahoo.com google.com
 
-hr
-echo "testing https ordering result consistency"
+echo "testing https ordering result consistency:"
 echo
 
-check_output "yahoo.com" ./find_active_server.py $opts -n1 --https yahoo.com google.com
+run_grep "^yahoo.com$" ./find_active_server.py $opts -n1 --https yahoo.com google.com
 
 # there is an bug somewhere in Alpine Linux's libraries where only --https doesn't limit concurrency and the yahoo result is often faster on https, breaking this test
 # works fine on normal Linux distributions like Centos, Debian and Ubuntu
-check_output "google.com" ./find_active_server.py $opts -n1 --https 0.0.0.1 google.com yahoo.com
+run_grep "^google.com$" ./find_active_server.py $opts -n1 --https 0.0.0.1 google.com yahoo.com
 
+echo "testing blank result for localhost 9999:"
 echo
-echo "testing blank result for localhost 9999"
-echo
-DEBUG="" check_output "" ./find_active_server.py --https localhost --port 9999 -q
+DEBUG="" ERRCODE=1 run_grep "^$" ./find_active_server.py --https localhost --port 9999 -q
 
+echo "testing NO_AVAILABLE_SERVER for localhost 9999 verbose:"
 echo
-echo "testing NO_AVAILABLE_SERVER for localhost 9999 verbose"
-echo
-check_output "NO_AVAILABLE_SERVER" ./find_active_server.py --https localhost --port 9999
+ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_server.py --https localhost --port 9999
 
 #echo
 #echo "testing http returns no results when using wrong port 25"
 #echo
 
 # DEBUG=1 breaks this to return NO_AVAILABLE_SERVER
-#DEBUG="" check_output "" ./find_active_server.py $opts mail.google.com --http --port 25
+#DEBUG="" ERRCODE=1 run_grep "^$" ./find_active_server.py $opts mail.google.com --http --port 25
 
 # hangs a bit
-#check_output "NO_AVAILABLE_SERVER" ./find_active_server.py $opts mail.google.com --https --port 25
+#ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_server.py $opts mail.google.com --https --port 25
 
-echo
-echo "testing https with url path and regex matching"
+echo "testing https with url path and regex matching:"
 echo
 
-check_output "github.com" ./find_active_server.py $opts --https google.com github.com -u /harisekhon --regex 'pytools'
+run_grep "^github.com$" ./find_active_server.py $opts --https google.com github.com -u /harisekhon --regex 'pytools'
 
 # ============================================================================ #
-hr
-echo "testing HTTP regex filtering"
+
+echo "testing HTTP regex filtering:"
 echo
 
-check_output "yahoo.com" ./find_active_server.py $opts --http --regex 'yahoo' google.com yahoo.com
+run_grep "^yahoo.com$" ./find_active_server.py $opts --http --regex 'yahoo' google.com yahoo.com
 
 # ============================================================================ #
-hr
-echo "testing HTTPS regex filtering"
+
+echo "testing HTTPS regex filtering:"
 echo
 
-check_output "yahoo.com" ./find_active_server.py $opts --https --regex '(?:yahoo)' google.com yahoo.com
+run_grep "^yahoo.com$" ./find_active_server.py $opts --https --regex '(?:yahoo)' google.com yahoo.com
 
 # ============================================================================ #
-hr
-echo "testing random socket select 10 times contains both google and yahoo results"
+
+echo "testing random socket select 10 times contains both google and yahoo results:"
 echo
 
 # Google's servers are consistenly so much faster / lower latency that I end up with all 10 as google here, must restrict to single threaded random to allow yahoo to succeed
@@ -196,10 +184,11 @@ else
     die "Failed to return both google.com and yahoo.com in results from $count_socket_attempts --random runs"
 fi
 echo
+hr
 
 # ============================================================================ #
-hr
-echo "testing random http select 10 times contains both google and yahoo results"
+
+echo "testing random http select 10 times contains both google and yahoo results:"
 echo
 
 #output="$(for x in {1..10}; do ./find_active_server.py -n1 --http --random google.com yahoo.com; done)"
@@ -229,6 +218,7 @@ if [ $found_google_http -eq 1 -a $found_yahoo_http -eq 1 ]; then
 else
     die "Failed to return both google.com and yahoo.com in results from $count_http_attempts --random runs"
 fi
+hr
 
 echo
 echo "SUCCEEDED - all tests passed for find_active_server.py"
