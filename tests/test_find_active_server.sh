@@ -26,7 +26,7 @@ set +e +o pipefail
 
 section "find_active_server.py"
 
-#datestring="$(date '+%F')"
+start_time="$(start_timer "find_active_server.py test")"
 
 # this is set to localhost in Travis CI, which via --host takes precedence and messes with our expected first result
 unset HOST
@@ -166,6 +166,7 @@ echo
 count_socket_attempts=0
 found_google_socket=0
 found_yahoo_socket=0
+run++
 for x in {1..10}; do
     echo -n .
     let count_socket_attempts+=1
@@ -201,6 +202,7 @@ echo
 count_http_attempts=0
 found_google_http=0
 found_yahoo_http=0
+run++
 for x in {1..10}; do
     echo -n .
     let count_http_attempts+=1
@@ -219,6 +221,7 @@ else
     die "Failed to return both google.com and yahoo.com in results from $count_http_attempts --random runs"
 fi
 hr
-
 echo
-echo "SUCCEEDED - all tests passed for find_active_server.py"
+echo "Tests run: $run_count"
+time_taken "$start_time" "find_active_server.py tests completed in"
+echo
