@@ -23,19 +23,32 @@ cd "$srcdir/.."
 
 section "Getent"
 
+start_time="$(start_timer "find_active_server.py test")"
+
 system=`uname -s`
 echo "system = $system"
 hr
+
 if [ "$system" = "Linux" -o "$system" = Darwin ]; then
-    ./getent.py passwd
-    hr
+    run ./getent.py passwd | grep -v ':[x*!]*:'
+    # counter is lost in subshell, increment manually
+    run++
+
     # $USER isn't always available in docker containers, use 'id' instead
-    ./getent.py passwd `id -un`
-    hr
-    ./getent.py group
-    hr
-    ./getent.py group `id -gn`
-    hr
+    run ./getent.py passwd `id -un`
+
+    run_fail 2 ./getent.py passwd nonexistentuser
+
+    run ./getent.py group | grep -v ':[x*!]:'
+    run++
+
+    run ./getent.py group `id -gn`
+
+    run_fail 2 ./getent.py group nonexistentgroup
+
+    echo
+    echo "Tests run: $run_count"
+    time_taken "$start_time" "find_active_server.py tests completed in"
 else
     echo "system is not Linux or Mac, skipping..."
 fi
