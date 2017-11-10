@@ -46,6 +46,13 @@ unset HOST
 export REQUEST_TIMEOUT=5
 export TIMEOUT=20
 
+SITE1="duckduckgo"
+SITE2="google"
+
+# put the faster website second
+WEBSITE1="duckduckgo.com"
+WEBSITE2="google.com"
+
 opts="-v"
 
 # Travis CI seems to fail to find things online when they clearly are available, perhaps it's the network delay, increasing
@@ -63,57 +70,57 @@ fi
 echo "testing socket ordering result consistency:"
 echo
 
-run_grep "^duckduckgo.com$" ./find_active_server.py $opts --num-threads 1 --port 80 duckduckgo.com google.com
+run_grep "^$WEBSITE1$" ./find_active_server.py $opts --num-threads 1 --port 80 $WEBSITE1 $WEBSITE2
 
 echo "testing socket returns only functional server:"
 echo
 
-run_grep "^google.com$" ./find_active_server.py $opts --port 80 0.0.0.1 google.com
+run_grep "^$WEBSITE2$" ./find_active_server.py $opts --port 80 0.0.0.1 $WEBSITE2
 
 echo "testing socket ordering result consistency with individual port overrides:"
 echo
 
-run_grep "^duckduckgo.com:80$" ./find_active_server.py $opts --port 1 duckduckgo.com:80 google.com
+run_grep "^$WEBSITE1:80$" ./find_active_server.py $opts --port 1 $WEBSITE1:80 $WEBSITE2
 
-run_grep "^duckduckgo.com:80$" ./find_active_server.py $opts --port 1 google.com duckduckgo.com:80
+run_grep "^$WEBSITE1:80$" ./find_active_server.py $opts --port 1 $WEBSITE2 $WEBSITE1:80
 
 # ============================================================================ #
 
 echo "checking --ping and --port switch conflict fails:"
 echo
-run_fail 3 ./find_active_server.py $opts --ping --port 1 duckduckgo.com google.com
+run_fail 3 ./find_active_server.py $opts --ping --port 1 $WEBSITE1 $WEBSITE2
 
 echo "checking --ping and --http switch conflict fails:"
 echo
-run_fail 3 ./find_active_server.py $opts --ping --http duckduckgo.com google.com
+run_fail 3 ./find_active_server.py $opts --ping --http $WEBSITE1 $WEBSITE2
 
 # ============================================================================ #
 
 echo "testing ping returns only functional server:"
 echo
-run_grep "^google.com$" ./find_active_server.py $opts --ping 0.0.0.1 4.4.4.4 google.com
+run_grep "^$WEBSITE2$" ./find_active_server.py $opts --ping 0.0.0.1 4.4.4.4 $WEBSITE2
 
 echo "testing ping returns only functional server, ignoring port override:"
 echo
 
-run_grep "^google.com$" ./find_active_server.py $opts -n1 --ping 0.0.0.1 4.4.4.4 google.com:80
+run_grep "^$WEBSITE2$" ./find_active_server.py $opts -n1 --ping 0.0.0.1 4.4.4.4 $WEBSITE2:80
 
 # ============================================================================ #
 
 echo "testing http ordering result consistency:"
 echo
 
-# Google's server latency is so much less than yahoo's that giving -n2 will allow google.com to overtake duckduckgo.com, limit to 1 so that yahoo gets the next available slot
-run_grep "^duckduckgo.com$" ./find_active_server.py $opts -n1 --http 0.0.0.1 duckduckgo.com google.com
+# Google's server latency is so much less than yahoo's that giving -n2 will allow $WEBSITE2 to overtake $WEBSITE1, limit to 1 so that yahoo gets the next available slot
+run_grep "^$WEBSITE1$" ./find_active_server.py $opts -n1 --http 0.0.0.1 $WEBSITE1 $WEBSITE2
 
 echo "testing https ordering result consistency:"
 echo
 
-run_grep "^duckduckgo.com$" ./find_active_server.py $opts -n1 --https duckduckgo.com google.com
+run_grep "^$WEBSITE1$" ./find_active_server.py $opts -n1 --https $WEBSITE1 $WEBSITE2
 
 # there is an bug somewhere in Alpine Linux's libraries where only --https doesn't limit concurrency and the yahoo result is often faster on https, breaking this test
 # works fine on normal Linux distributions like Centos, Debian and Ubuntu
-run_grep "^google.com$" ./find_active_server.py $opts -n1 --https 0.0.0.1 google.com duckduckgo.com
+run_grep "^$WEBSITE2$" ./find_active_server.py $opts -n1 --https 0.0.0.1 $WEBSITE2 $WEBSITE1
 
 echo "testing blank result for localhost 9999:"
 echo
@@ -128,39 +135,39 @@ ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_server.py --https local
 #echo
 
 # DEBUG=1 breaks this to return NO_AVAILABLE_SERVER
-#DEBUG="" ERRCODE=1 run_grep "^$" ./find_active_server.py $opts mail.google.com --http --port 25
+#DEBUG="" ERRCODE=1 run_grep "^$" ./find_active_server.py $opts mail.$WEBSITE2 --http --port 25
 
 # hangs a bit
-#ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_server.py $opts mail.google.com --https --port 25
+#ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_server.py $opts mail.$WEBSITE2 --https --port 25
 
 echo "testing https with url path and regex matching:"
 echo
 
-run_grep "^github.com$" ./find_active_server.py $opts --https google.com github.com -u /harisekhon --regex 'pytools'
+run_grep "^github.com$" ./find_active_server.py $opts --https $WEBSITE2 github.com -u /harisekhon --regex 'pytools'
 
 # ============================================================================ #
 
 echo "testing HTTP regex filtering:"
 echo
 
-run_grep "^duckduckgo.com$" ./find_active_server.py $opts --http --regex 'duckduckgo' google.com duckduckgo.com
+run_grep "^$WEBSITE1$" ./find_active_server.py $opts --http --regex "$SITE1" $WEBSITE2 $WEBSITE1
 
 # ============================================================================ #
 
 echo "testing HTTPS regex filtering:"
 echo
 
-run_grep "^duckduckgo.com$" ./find_active_server.py $opts --https --regex '(?:duckduckgo)' google.com duckduckgo.com
+run_grep "^$WEBSITE1$" ./find_active_server.py $opts --https --regex "(?:$SITE1)" $WEBSITE2 $WEBSITE1
 
 # ============================================================================ #
 
-echo "testing random socket select 10 times contains both google and duckduckgo results:"
+echo "testing random socket select 10 times contains both $SITE1 and $SITE2 results:"
 echo
 
 # Google's servers are consistenly so much faster / lower latency that I end up with all 10 as google here, must restrict to single threaded random to allow yahoo to succeed
-#output="$(for x in {1..10}; do ./find_active_server.py -n1 --random --port 80 google.com duckduckgo.com; done)"
-#grep "google.com" <<< "$output" &&
-#grep "duckduckgo.com" <<< "$output" ||
+#output="$(for x in {1..10}; do ./find_active_server.py -n1 --random --port 80 $WEBSITE2 $WEBSITE1; done)"
+#grep "$WEBSITE2" <<< "$output" &&
+#grep "$WEBSITE1" <<< "$output" ||
 #    die "FAILED: --random google + yahoo test, didn't return both results for 10 random runs"
 # more efficient - stop as soon as both results are returned, typically 2-3 runs rather than 10 runs
 count_socket_attempts=0
@@ -170,31 +177,31 @@ run++
 for x in {1..10}; do
     echo -n .
     let count_socket_attempts+=1
-    output="$(./find_active_server.py -n1 --random --port 80 google.com duckduckgo.com)"
-    if [ "$output" = "google.com" ]; then
+    output="$(./find_active_server.py -n1 --random --port 80 $WEBSITE1 $WEBSITE2)"
+    if [ "$output" = "$WEBSITE2" ]; then
         found_google_socket=1
-    elif [ "$output" = "duckduckgo.com" ]; then
+    elif [ "$output" = "$WEBSITE1" ]; then
         found_duckduckgo_socket=1
     fi
     [ $found_google_socket -eq 1 -a $found_duckduckgo_socket -eq 1 ] && break
 done
 echo
 if [ $found_google_socket -eq 1 -a $found_duckduckgo_socket -eq 1 ]; then
-    echo "Found both google.com and duckduckgo.com in results from $count_socket_attempts --random runs"
+    echo "Found both $WEBSITE1 and $WEBSITE2 in results from $count_socket_attempts --random runs"
 else
-    die "Failed to return both google.com and duckduckgo.com in results from $count_socket_attempts --random runs"
+    die "Failed to return both $WEBSITE1 and $WEBSITE2 in results from $count_socket_attempts --random runs"
 fi
 echo
 hr
 
 # ============================================================================ #
 
-echo "testing random http select 10 times contains both google and duckduckgo results:"
+echo "testing random http select 10 times contains both $SITE1 and $SITE2 results:"
 echo
 
-#output="$(for x in {1..10}; do ./find_active_server.py -n1 --http --random google.com duckduckgo.com; done)"
-#grep "google.com" <<< "$output" &&
-#grep "duckduckgo.com" <<< "$output" ||
+#output="$(for x in {1..10}; do ./find_active_server.py -n1 --http --random $WEBSITE2 $WEBSITE1; done)"
+#grep "$WEBSITE2" <<< "$output" &&
+#grep "$WEBSITE1" <<< "$output" ||
 #    die "FAILED: --random google + duckduckgo test, didn't return both results for 10 random HTTP runs"
 #echo
 #
@@ -206,19 +213,19 @@ run++
 for x in {1..10}; do
     echo -n .
     let count_http_attempts+=1
-    output="$(./find_active_server.py -n1 --http --random google.com duckduckgo.com)"
-    if [ "$output" = "google.com" ]; then
+    output="$(./find_active_server.py -n1 --http --random $WEBSITE1 $WEBSITE2)"
+    if [ "$output" = "$WEBSITE2" ]; then
         found_google_http=1
-    elif [ "$output" = "duckduckgo.com" ]; then
+    elif [ "$output" = "$WEBSITE1" ]; then
         found_duckduckgo_http=1
     fi
     [ $found_google_http -eq 1 -a $found_duckduckgo_http -eq 1 ] && break
 done
 echo
 if [ $found_google_http -eq 1 -a $found_duckduckgo_http -eq 1 ]; then
-    echo "Found both google.com and duckduckgo.com in results from $count_http_attempts --random runs"
+    echo "Found both $WEBSITE1 and $WEBSITE2 in results from $count_http_attempts --random runs"
 else
-    die "Failed to return both google.com and duckduckgo.com in results from $count_http_attempts --random runs"
+    die "Failed to return both $WEBSITE1 and $WEBSITE2 in results from $count_http_attempts --random runs"
 fi
 hr
 echo
