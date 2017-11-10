@@ -63,7 +63,7 @@ fi
 echo "testing socket ordering result consistency:"
 echo
 
-run_grep "^yahoo.com$" ./find_active_server.py $opts --num-threads 1 --port 80 yahoo.com google.com
+run_grep "^google$" ./find_active_server.py $opts --num-threads 1 --port 80 google.com yahoo.com
 
 echo "testing socket returns only functional server:"
 echo
@@ -73,7 +73,7 @@ run_grep "^google.com$" ./find_active_server.py $opts --port 80 0.0.0.1 google.c
 echo "testing socket ordering result consistency with individual port overrides:"
 echo
 
-run_grep "^yahoo.com:80$" ./find_active_server.py $opts --port 1 yahoo.com:80 google.com
+run_grep "^google.com:80$" ./find_active_server.py $opts --port 1 google.com:80 yahoo.com
 
 run_grep "^google.com:80$" ./find_active_server.py $opts --port 1 yahoo.com google.com:80
 
