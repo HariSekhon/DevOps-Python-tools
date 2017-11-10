@@ -71,10 +71,10 @@ test_solrcloud(){
     non_solr_node1="127.0.0.1:1025"
     non_solr_node2="127.0.0.1:1026"
     hr
-    SOLR_PORT="$SOLR_PORT_DEFAULT" run_output "NO_AVAILABLE_SERVER" ./find_active_solrcloud_node.py $non_solr_node1 $non_solr_node2
-    hr
-    SOLR_PORT="$SOLR_PORT_DEFAULT" run_output "$SOLR_HOST:$SOLR_PORT" ./find_active_solrcloud_node.py $non_solr_node1 $non_solr_node2 "$SOLR_HOST:$SOLR_PORT"
-    hr
+    SOLR_PORT="$SOLR_PORT_DEFAULT" ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_solrcloud_node.py $non_solr_node1 $non_solr_node2
+
+    SOLR_PORT="$SOLR_PORT_DEFAULT" run_grep "^$SOLR_HOST:$SOLR_PORT$" ./find_active_solrcloud_node.py $non_solr_node1 $non_solr_node2 "$SOLR_HOST:$SOLR_PORT"
+
     docker-compose down
     hr
     echo
