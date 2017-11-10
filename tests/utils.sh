@@ -23,6 +23,8 @@ srcdir2="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 srcdir="$srcdir2"
 
+export COMPOSE_PROJECT_NAME="pytools"
+
 if [ -n "${TRAVIS:-}" ]; then
     sudo=sudo
 else
