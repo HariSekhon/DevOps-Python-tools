@@ -63,7 +63,7 @@ fi
 echo "testing socket ordering result consistency:"
 echo
 
-run_grep "^google.com$" ./find_active_server.py $opts --num-threads 1 --port 80 google.com yahoo.com
+run_grep "^duckduckgo.com$" ./find_active_server.py $opts --num-threads 1 --port 80 duckduckgo.com google.com
 
 echo "testing socket returns only functional server:"
 echo
@@ -73,19 +73,19 @@ run_grep "^google.com$" ./find_active_server.py $opts --port 80 0.0.0.1 google.c
 echo "testing socket ordering result consistency with individual port overrides:"
 echo
 
-run_grep "^google.com:80$" ./find_active_server.py $opts --port 1 google.com:80 yahoo.com
+run_grep "^duckduckgo.com:80$" ./find_active_server.py $opts --port 1 duckduckgo.com:80 google.com
 
-run_grep "^google.com:80$" ./find_active_server.py $opts --port 1 yahoo.com google.com:80
+run_grep "^duckduckgo.com:80$" ./find_active_server.py $opts --port 1 google.com duckduckgo.com:80
 
 # ============================================================================ #
 
 echo "checking --ping and --port switch conflict fails:"
 echo
-run_fail 3 ./find_active_server.py $opts --ping --port 1 yahoo.com google.com
+run_fail 3 ./find_active_server.py $opts --ping --port 1 duckduckgo.com google.com
 
 echo "checking --ping and --http switch conflict fails:"
 echo
-run_fail 3 ./find_active_server.py $opts --ping --http yahoo.com google.com
+run_fail 3 ./find_active_server.py $opts --ping --http duckduckgo.com google.com
 
 # ============================================================================ #
 
@@ -103,17 +103,17 @@ run_grep "^google.com$" ./find_active_server.py $opts -n1 --ping 0.0.0.1 4.4.4.4
 echo "testing http ordering result consistency:"
 echo
 
-# Google's server latency is so much less than yahoo's that giving -n2 will allow google.com to overtake yahoo.com, limit to 1 so that yahoo gets the next available slot
-run_grep "^yahoo.com$" ./find_active_server.py $opts -n1 --http 0.0.0.1 yahoo.com google.com
+# Google's server latency is so much less than yahoo's that giving -n2 will allow google.com to overtake duckduckgo.com, limit to 1 so that yahoo gets the next available slot
+run_grep "^duckduckgo.com$" ./find_active_server.py $opts -n1 --http 0.0.0.1 duckduckgo.com google.com
 
 echo "testing https ordering result consistency:"
 echo
 
-run_grep "^yahoo.com$" ./find_active_server.py $opts -n1 --https yahoo.com google.com
+run_grep "^duckduckgo.com$" ./find_active_server.py $opts -n1 --https duckduckgo.com google.com
 
 # there is an bug somewhere in Alpine Linux's libraries where only --https doesn't limit concurrency and the yahoo result is often faster on https, breaking this test
 # works fine on normal Linux distributions like Centos, Debian and Ubuntu
-run_grep "^google.com$" ./find_active_server.py $opts -n1 --https 0.0.0.1 google.com yahoo.com
+run_grep "^google.com$" ./find_active_server.py $opts -n1 --https 0.0.0.1 google.com duckduckgo.com
 
 echo "testing blank result for localhost 9999:"
 echo
@@ -143,82 +143,82 @@ run_grep "^github.com$" ./find_active_server.py $opts --https google.com github.
 echo "testing HTTP regex filtering:"
 echo
 
-run_grep "^yahoo.com$" ./find_active_server.py $opts --http --regex 'yahoo' google.com yahoo.com
+run_grep "^duckduckgo.com$" ./find_active_server.py $opts --http --regex 'duckduckgo' google.com duckduckgo.com
 
 # ============================================================================ #
 
 echo "testing HTTPS regex filtering:"
 echo
 
-run_grep "^yahoo.com$" ./find_active_server.py $opts --https --regex '(?:yahoo)' google.com yahoo.com
+run_grep "^duckduckgo.com$" ./find_active_server.py $opts --https --regex '(?:duckduckgo)' google.com duckduckgo.com
 
 # ============================================================================ #
 
-echo "testing random socket select 10 times contains both google and yahoo results:"
+echo "testing random socket select 10 times contains both google and duckduckgo results:"
 echo
 
 # Google's servers are consistenly so much faster / lower latency that I end up with all 10 as google here, must restrict to single threaded random to allow yahoo to succeed
-#output="$(for x in {1..10}; do ./find_active_server.py -n1 --random --port 80 google.com yahoo.com; done)"
+#output="$(for x in {1..10}; do ./find_active_server.py -n1 --random --port 80 google.com duckduckgo.com; done)"
 #grep "google.com" <<< "$output" &&
-#grep "yahoo.com" <<< "$output" ||
+#grep "duckduckgo.com" <<< "$output" ||
 #    die "FAILED: --random google + yahoo test, didn't return both results for 10 random runs"
 # more efficient - stop as soon as both results are returned, typically 2-3 runs rather than 10 runs
 count_socket_attempts=0
 found_google_socket=0
-found_yahoo_socket=0
+found_duckduckgo_socket=0
 run++
 for x in {1..10}; do
     echo -n .
     let count_socket_attempts+=1
-    output="$(./find_active_server.py -n1 --random --port 80 google.com yahoo.com)"
+    output="$(./find_active_server.py -n1 --random --port 80 google.com duckduckgo.com)"
     if [ "$output" = "google.com" ]; then
         found_google_socket=1
-    elif [ "$output" = "yahoo.com" ]; then
-        found_yahoo_socket=1
+    elif [ "$output" = "duckduckgo.com" ]; then
+        found_duckduckgo_socket=1
     fi
-    [ $found_google_socket -eq 1 -a $found_yahoo_socket -eq 1 ] && break
+    [ $found_google_socket -eq 1 -a $found_duckduckgo_socket -eq 1 ] && break
 done
 echo
-if [ $found_google_socket -eq 1 -a $found_yahoo_socket -eq 1 ]; then
-    echo "Found both google.com and yahoo.com in results from $count_socket_attempts --random runs"
+if [ $found_google_socket -eq 1 -a $found_duckduckgo_socket -eq 1 ]; then
+    echo "Found both google.com and duckduckgo.com in results from $count_socket_attempts --random runs"
 else
-    die "Failed to return both google.com and yahoo.com in results from $count_socket_attempts --random runs"
+    die "Failed to return both google.com and duckduckgo.com in results from $count_socket_attempts --random runs"
 fi
 echo
 hr
 
 # ============================================================================ #
 
-echo "testing random http select 10 times contains both google and yahoo results:"
+echo "testing random http select 10 times contains both google and duckduckgo results:"
 echo
 
-#output="$(for x in {1..10}; do ./find_active_server.py -n1 --http --random google.com yahoo.com; done)"
+#output="$(for x in {1..10}; do ./find_active_server.py -n1 --http --random google.com duckduckgo.com; done)"
 #grep "google.com" <<< "$output" &&
-#grep "yahoo.com" <<< "$output" ||
-#    die "FAILED: --random google + yahoo test, didn't return both results for 10 random HTTP runs"
+#grep "duckduckgo.com" <<< "$output" ||
+#    die "FAILED: --random google + duckduckgo test, didn't return both results for 10 random HTTP runs"
 #echo
 #
 # more efficient - stop as soon as both results are returned, typically 2-3 runs rather than 10 runs
 count_http_attempts=0
 found_google_http=0
-found_yahoo_http=0
+found_duckduckgo_http=0
 run++
 for x in {1..10}; do
     echo -n .
     let count_http_attempts+=1
-    output="$(./find_active_server.py -n1 --http --random google.com yahoo.com)"
+    output="$(./find_active_server.py -n1 --http --random google.com duckduckgo.com)"
     if [ "$output" = "google.com" ]; then
         found_google_http=1
-    elif [ "$output" = "yahoo.com" ]; then
-        found_yahoo_http=1
+    elif [ "$output" = "duckduckgo.com" ]; then
+        found_duckduckgo_http=1
     fi
-    [ $found_google_http -eq 1 -a $found_yahoo_http -eq 1 ] && break
+    [ $found_google_http -eq 1 -a $found_duckduckgo_http -eq 1 ] && break
 done
 echo
-if [ $found_google_http -eq 1 -a $found_yahoo_http -eq 1 ]; then
-    echo "Found both google.com and yahoo.com in results from $count_http_attempts --random runs"
+if [ $found_google_http -eq 1 -a $found_duckduckgo_http -eq 1 ]; then
+    echo "Found both google.com and duckduckgo.com in results from $count_http_attempts --random runs"
 else
-    die "Failed to return both google.com and yahoo.com in results from $count_http_attempts --random runs"
+    die "Failed to return both google.com and duckduckgo.com in results from $count_http_attempts --random runs"
 fi
 hr
 echo
