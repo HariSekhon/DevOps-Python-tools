@@ -91,7 +91,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 
 class DockerfileGitBranchCheckTool(CLI):
@@ -247,9 +247,11 @@ class DockerfileGitBranchCheckTool(CLI):
         # presto-cli-dev -> presto-cli
         # presto-cli     -> presto
         # solrcloud      -> solr
+        # rabbitmq-cluster -> rabbitmq
         name2 = re.sub(pattern=r'-dev$', repl='', string=name2)
         name2 = re.sub(pattern=r'-cli$', repl='', string=name2)
         name2 = re.sub(pattern=r'cloud$', repl='', string=name2)
+        name2 = re.sub(pattern=r'-cluster$', repl='', string=name2)
         # don't need this hack, just check for generic java/jdk/jre to match JAVA_VERSION below
         #name2 = re.sub(pattern=r'(?:alpine|centos|debian|ubuntu)-$', repl='', string=name2)
         # special case for Java versions
