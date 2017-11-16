@@ -91,7 +91,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 
 
 class DockerfileGitBranchCheckTool(CLI):
@@ -152,9 +152,11 @@ class DockerfileGitBranchCheckTool(CLI):
         if branches_skipped > 0:
             log.warn('{0} branches skipped for not matching expected naming format'
                      .format(branches_skipped))
-        branches_not_checked = len(self.selected_branches) - len(self.branches_dockerfile_checked)
-        if branches_not_checked > 1:
-            log.warn('{0} branches not checked (no matching Dockerfile found?)'.format(branches_not_checked))
+        branches_not_checked = [branch for branch in self.selected_branches \
+                                    if branch not in self.branches_dockerfile_checked]
+        if len(branches_not_checked) > 1:
+            log.warn('{0} branches not checked (no matching Dockerfile found?): {1}'\
+                     .format(len(branches_not_checked), branches_not_checked))
             if log.isEnabledFor(logging.DEBUG):
                 log.debug('Branches with no corresponding Dockerfile found:\n%s',
                           '\n'.join(set(self.selected_branches) - set(self.branches_dockerfile_checked)))
