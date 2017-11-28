@@ -23,7 +23,7 @@ cd "$srcdir/..";
 
 section "Testing validate_json.py"
 
-export TIMEOUT=3
+export TIMEOUT=${TIMEOUT:-3}
 
 if [ $# -gt 0 ]; then
     echo "validate_json.py $@"
