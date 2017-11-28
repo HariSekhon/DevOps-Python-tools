@@ -23,6 +23,11 @@ cd "$srcdir/..";
 
 section "Testing validate_parquet.py"
 
+if [ -n "${SKIP_PARQUET:-}" ]; then
+    echo "Skipping Parquet checks..."
+    exit 0
+fi
+
 # validating parquet is relatively slow
 #export TIMEOUT=10
 
