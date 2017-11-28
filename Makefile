@@ -87,7 +87,11 @@ build:
 	
 	# don't pull parquet tools in to docker image by default, will bloat it
 	# can fetch separately by running 'make parquet-tools' if you really want to
-	if ! [ -f /.dockerenv ]; then \
+	if [ -f /.dockerenv -o -n "$(SKIP_PARQUET)" ]; then \
+		echo; echo; \
+		echo "Skipping Parquet install..."; \
+		echo; echo; \
+	else \
 		make parquet-tools; \
 	fi
 	
