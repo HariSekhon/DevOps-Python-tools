@@ -25,9 +25,21 @@ cd "$srcdir/.."
 
 section "Testing DockerHub Show Tags"
 
-check './dockerhub_show_tags.py centos debian' "DockerHub Show Tags for CentOS & Debian"
-check './dockerhub_show_tags.py harisekhon/centos-java' "DockerHub Show Tags for harisekhon/centos-java"
-check './dockerhub_show_tags.py centos | grep "6.7"' "DockerHub Show Tags search for CentOS 6.7 tag"
+start_time="$(start_timer "DockerHub Show Tags")"
 
+run ./dockerhub_show_tags.py centos debian
+run ./dockerhub_show_tags.py harisekhon/centos-java
+run_grep '6.7' ./dockerhub_show_tags.py centos
+
+run_grep "^latest$" ./dockerhub_show_tags.py -q centos
+
+run_grep "^centos6.9$" ./dockerhub_show_tags.py -q centos
+
+echo
+echo
+echo "All DockerHub Show Tags tests completed successfully"
+echo
+echo "Total Tests run: $run_count"
+time_taken "$start_time" "DockerHub Show Tags tests completed in"
 echo
 echo
