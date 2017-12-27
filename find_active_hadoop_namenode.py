@@ -67,11 +67,10 @@ class FindActiveHadoopNamenode(FindActiveServer):
         # Python 3.x
         # super().__init__()
         self.default_port = 50070
-        self.port = self.default_port
         self.protocol = 'http'
-        self.url_path = 'jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus'
-        self.num_threads = 2
+        self.url_path = '/jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus'
         self.regex = r'"State"\s*:\s*"active"'
+        self.default_num_threads = 2
 
     def add_options(self):
         self.add_hostoption(name=['Hadoop Namenode', 'Namenode'], default_port=self.default_port)
