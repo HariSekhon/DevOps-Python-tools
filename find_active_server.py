@@ -93,6 +93,11 @@ override each one.
 Exits with return code 1 and NO_AVAILABLE_SERVER if none of the supplied servers pass the test criteria,
 --quiet mode will return blank output and exit code 1 in that case.
 
+
+See also Advanced HAProxy configurations as part of the Advanced Nagios Plugins Collection at:
+
+    https://github.com/harisekhon/nagios-plugins/tree/master/haproxy
+
 """
 
 from __future__ import absolute_import
@@ -150,6 +155,7 @@ class FindActiveServer(CLI):
         self.url_path = None
         self.regex = None
         self.request_timeout = None
+        self.default_num_threads = 10
         self.num_threads = None
         self.queue = Queue.Queue()
         self.pool = None
@@ -181,9 +187,10 @@ class FindActiveServer(CLI):
                 log_option('SSL', 'false')
         self.add_opt('-q', '--quiet', action='store_true', help='Returns no output instead of NO_AVAILABLE_SERVER '\
                                                               + '(convenience for scripting)')
-        self.add_opt('-n', '--num-threads', default=10, type='int',
-                     help='Number or parallel threads to speed up processing (default: 10, ' +
-                     'use -n=1 for deterministic host preference order [slower])')
+        self.add_opt('-n', '--num-threads', default=self.default_num_threads, type='int',
+                     help='Number or parallel threads to speed up processing ' + \
+                          '(default: {}), '.format(self.default_num_threads) + \
+                          'use -n=1 for deterministic host preference order [slower])')
         self.add_opt('-T', '--request-timeout', metavar='secs', type='int', default=os.getenv('REQUEST_TIMEOUT', 2),
                      help='Timeout for each individual server request in seconds ($REQUEST_TIMEOUT, default: 2 secs)')
         self.add_opt('-R', '--random', action='store_true', help='Randomize order of hosts tested ' +
