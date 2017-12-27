@@ -59,15 +59,14 @@ __author__ = 'Hari Sekhon'
 __version__ = '0.7.0'
 
 
-class FindActiveSolrCloudNode(FindActiveServer):
+class FindActiveSolrCloud(FindActiveServer):
 
     def __init__(self):
         # Python 2.x
-        super(FindActiveSolrCloudNode, self).__init__()
+        super(FindActiveSolrCloud, self).__init__()
         # Python 3.x
         # super().__init__()
         self.default_port = 3389
-        self.port = self.default_port
         self.url_path = '/solr/'
         self.protocol = 'http'
         self.regex = r'Solr\s+Admin'
@@ -82,4 +81,4 @@ class FindActiveSolrCloudNode(FindActiveServer):
 
 
 if __name__ == '__main__':
-    FindActiveSolrCloudNode().main()
+    FindActiveSolrCloud().main()
