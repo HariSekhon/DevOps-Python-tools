@@ -67,10 +67,9 @@ class FindActiveHBaseMaster(FindActiveServer):
         # Python 3.x
         # super().__init__()
         self.default_port = 16010
-        self.port = self.default_port
         self.protocol = 'http'
         self.url_path = '/jmx?qry=Hadoop:service=HBase,name=Master,sub=Server'
-        self.num_threads = 2
+        self.default_num_threads = 2
         self.regex = r'"tag.isActiveMaster" : "true"'
 
     def add_options(self):
