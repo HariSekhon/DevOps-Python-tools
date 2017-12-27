@@ -59,15 +59,14 @@ __author__ = 'Hari Sekhon'
 __version__ = '0.8.0'
 
 
-class FindActiveElasticsearchNode(FindActiveServer):
+class FindActiveElasticsearch(FindActiveServer):
 
     def __init__(self):
         # Python 2.x
-        super(FindActiveElasticsearchNode, self).__init__()
+        super(FindActiveElasticsearch, self).__init__()
         # Python 3.x
         # super().__init__()
         self.default_port = 9200
-        self.port = self.default_port
         self.protocol = 'http'
         self.regex = 'lucene_version'
 
@@ -81,4 +80,4 @@ class FindActiveElasticsearchNode(FindActiveServer):
 
 
 if __name__ == '__main__':
-    FindActiveElasticsearchNode().main()
+    FindActiveElasticsearch().main()
