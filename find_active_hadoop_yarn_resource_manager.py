@@ -67,11 +67,10 @@ class FindActiveHadoopYarnResourceManager(FindActiveServer):
         # Python 3.x
         # super().__init__()
         self.default_port = 8088
-        self.port = self.default_port
         self.protocol = 'http'
         self.url_path = '/ws/v1/cluster'
-        self.num_threads = 2
         self.regex = r'"haState"\s*:\s*"ACTIVE"'
+        self.default_num_threads = 2
 
     def add_options(self):
         self.add_hostoption(name=['Hadoop Yarn Resource Manager', 'Yarn Resource Manager'],
