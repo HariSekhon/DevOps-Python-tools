@@ -23,7 +23,7 @@ cd "$srcdir/..";
 
 section "E l a s t i c s e a r c h"
 
-export ELASTICSEARCH_VERSIONS="${@:-${ELASTICSEARCH_VERSIONS:-latest 1.3 1.4 1.5 1.6 1.7 2.0 2.1 2.2 2.3 2.4 5.0 5.1 5.2 5.3 5.4 5.5 5.6}}"
+export ELASTICSEARCH_VERSIONS="${@:-${ELASTICSEARCH_VERSIONS:-latest 1.3 1.4 1.5 1.6 1.7 2.0 2.1 2.2 2.3 2.4 5.0 5.1 5.2 5.3 5.4 5.5 5.6 6.0.1 6.1.1}}"
 
 ELASTICSEARCH_HOST="${DOCKER_HOST:-${ELASTICSEARCH_HOST:-${HOST:-localhost}}}"
 ELASTICSEARCH_HOST="${ELASTICSEARCH_HOST##*/}"
@@ -42,6 +42,10 @@ startupwait 120
 test_elasticsearch(){
     local version="$1"
     section2 "Setting up Elasticsearch $version test container"
+    if [ "$version" != "latest" ] && [ "${version:0:1}" -ge 6 ]; then
+        local export COMPOSE_FILE="$srcdir/docker/$DOCKER_SERVICE-elastic.co-docker-compose.yml"
+    fi
+    docker_compose_pull
     VERSION="$version" docker-compose up -d
     hr
     echo "getting Elasticsearch dynamic port mapping:"
