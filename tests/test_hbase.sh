@@ -34,7 +34,9 @@ export HBASE_HOST
 export HBASE_MASTER_PORT_DEFAULT=16010
 export HBASE_REGIONSERVER_PORT_DEFAULT=16301
 export HBASE_STARGATE_PORT_DEFAULT=8080
+export HBASE_STARGATE_UI_PORT_DEFAULT=8085
 export HBASE_THRIFT_PORT_DEFAULT=9090
+export HBASE_THRIFT_UI_PORT_DEFAULT=9095
 export ZOOKEEPER_PORT_DEFAULT=2181
 
 export HBASE_VERSIONS="${@:-latest 0.96 0.98 1.0 1.1 1.2 1.3}"
@@ -65,7 +67,9 @@ test_hbase(){
     docker_compose_port "HBase Master"
     docker_compose_port "HBase RegionServer"
     docker_compose_port "HBase Stargate"
+    docker_compose_port "HBase Stargate UI"
     docker_compose_port "HBase Thrift"
+    docker_compose_port "HBase Thrift UI"
     #docker_compose_port ZOOKEEPER_PORT "HBase ZooKeeper"
     export HBASE_PORTS="$HBASE_MASTER_PORT $HBASE_REGIONSERVER_PORT $HBASE_STARGATE_PORT $HBASE_THRIFT_PORT"
     hr
@@ -110,6 +114,22 @@ EOF
     # if HBASE_PORT / --port is set to same as suffix then only outputs host not host:port
     HBASE_HOST='' HOST='' HBASE_MASTER_PORT="$HBASE_MASTER_PORT_DEFAULT" \
         run_grep "^$HBASE_HOST:$HBASE_MASTER_PORT$" ./find_active_hbase_master.py 127.0.0.2 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT" 127.0.0.3 "$HBASE_HOST:$HBASE_MASTER_PORT"
+
+    # ============================================================================ #
+
+    ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_hbase_thrift.py 127.0.0.2 127.0.0.3 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT"
+
+    # if HBASE_PORT / --port is set to same as suffix then only outputs host not host:port
+    run_grep "^$HBASE_HOST:$HBASE_THRIFT_UI_PORT$" ./find_active_hbase_thrift.py 127.0.0.2 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT" 127.0.0.3 "$HBASE_HOST:$HBASE_THRIFT_UI_PORT"
+
+    # ============================================================================ #
+
+    ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_hbase_stargate.py 127.0.0.2 127.0.0.3 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT"
+
+    # if HBASE_PORT / --port is set to same as suffix then only outputs host not host:port
+    run_grep "^$HBASE_HOST:$HBASE_STARGATE_UI_PORT$" ./find_active_hbase_stargate.py 127.0.0.2 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT" 127.0.0.3 "$HBASE_HOST:$HBASE_STARGATE_UI_PORT"
+
+    # ============================================================================ #
 
     export HBASE_THRIFT_SERVER_PORT="$HBASE_THRIFT_PORT"
 
