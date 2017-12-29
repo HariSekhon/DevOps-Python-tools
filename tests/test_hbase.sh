@@ -75,9 +75,15 @@ test_hbase(){
     hr
     when_ports_available "$HBASE_HOST" $HBASE_PORTS
     hr
-    when_url_content "http://$HBASE_HOST:$HBASE_MASTER_PORT/master-status" HMaster
-    hr
-    when_url_content "http://$HBASE_HOST:$HBASE_REGIONSERVER_PORT/rs-status" "HBase Region Server"
+    if [ "${version:0:3}" = "0.9" ]; then
+        when_url_content "http://$HBASE_HOST:$HBASE_MASTER_PORT/master-status" HBase
+        hr
+        when_url_content "http://$HBASE_HOST:$HBASE_REGIONSERVER_PORT/rs-status" HBase
+    else
+        when_url_content "http://$HBASE_HOST:$HBASE_MASTER_PORT/master-status" HMaster
+        hr
+        when_url_content "http://$HBASE_HOST:$HBASE_REGIONSERVER_PORT/rs-status" "HBase Region Server"
+    fi
     hr
     when_url_content "http://$HBASE_HOST:$HBASE_STARGATE_UI_PORT/rest.jsp" "HBase.+REST"
     hr
