@@ -71,13 +71,17 @@ test_hbase(){
     docker_compose_port "HBase Thrift"
     docker_compose_port "HBase Thrift UI"
     #docker_compose_port ZOOKEEPER_PORT "HBase ZooKeeper"
-    export HBASE_PORTS="$HBASE_MASTER_PORT $HBASE_REGIONSERVER_PORT $HBASE_STARGATE_PORT $HBASE_THRIFT_PORT"
+    export HBASE_PORTS="$HBASE_MASTER_PORT $HBASE_REGIONSERVER_PORT $HBASE_STARGATE_PORT $HBASE_STARGATE_UI_PORT $HBASE_THRIFT_PORT $HBASE_THRIFT_UI_PORT"
     hr
     when_ports_available "$HBASE_HOST" $HBASE_PORTS
     hr
-    when_url_content "http://$HBASE_HOST:$HBASE_MASTER_PORT/master-status" hbase
+    when_url_content "http://$HBASE_HOST:$HBASE_MASTER_PORT/master-status" HMaster
     hr
-    when_url_content "http://$HBASE_HOST:$HBASE_REGIONSERVER_PORT/rs-status" hbase
+    when_url_content "http://$HBASE_HOST:$HBASE_REGIONSERVER_PORT/rs-status" "HBase Region Server"
+    hr
+    when_url_content "http://$HBASE_HOST:$HBASE_STARGATE_UI_PORT/rest.jsp" "HBase.+REST"
+    hr
+    when_url_content "http://$HBASE_HOST:$HBASE_THRIFT_UI_PORT/thrift.jsp" "HBase.+Thrift"
     hr
     # ============================================================================ #
     echo "setting up test tables"
