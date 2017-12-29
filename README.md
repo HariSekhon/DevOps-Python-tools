@@ -90,7 +90,7 @@ Environment variables are supported for convenience and also to hide credentials
     - ```find_active_hbase_thrift.py``` - finds the first available HBase Thrift Server (run multiple of these for load balancing)
     - ```find_active_hbase_stargate.py``` - finds the first available HBase Stargate rest server (run multiple of these for load balancing)
     - ```find_active_apache_drill.py``` - finds the first available Apache Drill node
-    - ```find_active_impala.py``` - finds the first available Impala node
+    - ```find_active_impala*.py``` - finds the first available Impalad, Catalog or Statestore node
     - ```find_active_solrcloud.py``` - finds the first available SolrCloud node
     - ```find_active_elasticsearch.py``` - finds the first available Elasticsearch node
     - see also: [Advanced HAProxy configurations](https://github.com/harisekhon/nagios-plugins/tree/master/haproxy) which are part of the [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins)
