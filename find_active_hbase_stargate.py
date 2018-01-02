@@ -66,10 +66,18 @@ class FindActiveHBaseStargate(FindActiveServer):
         super(FindActiveHBaseStargate, self).__init__()
         # Python 3.x
         # super().__init__()
-        self.default_port = 8085
         self.protocol = 'http'
+        self.default_port = 8085
         self.url_path = '/rest.jsp'
         self.regex = r'HBase.+REST'
+        # the below would check REST API port instead
+        #self.url_path = '/status/cluster'
+        #self.regex = r'hbase'
+        # but the deployed port differs between Apache HBase and Cloudera HBase deployments
+        # Apache HBase
+        #self.default_port = 8080
+        # Cloudera Manager deployed HBase
+        #self.default_port = 20050
         self.default_num_threads = 5
 
     def add_options(self):
