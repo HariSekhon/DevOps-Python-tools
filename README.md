@@ -65,7 +65,7 @@ Environment variables are supported for convenience and also to hide credentials
 - ```hbase_calculate_table_row_key_distribution.py``` - calculates the distribution of row keys by configurable prefix length in an HBase table, giving per prefix row counts and % of total rows for the table as well as median and quartile row counts per prefix
 - ```hbase_compact_tables.py``` - compacts HBase tables (for off-peak compactions). Defaults to finding and iterating on all tables or takes an optional regex and compacts only matching tables.
 - ```hbase_flush_tables.py``` - flushes HBase tables. Defaults to finding and iterating on all tables or takes an optional regex and flushes only matching tables.
-- ```opentsdb_calculate_import_metric_distribution.py``` - shows distribution of [OpenTSDB](http://opentsdb.net/) metrics from import file(s) to find data skew and help avoid HBase region hotspotting
+- ```opentsdb_calculate_import_metric_distribution.py``` - shows [OpenTSDB](http://opentsdb.net/) metric distribution in bulk import file(s) to find data skew and help avoid HBase region hotspotting
 - ```pig-text-to-elasticsearch.pig``` / ```pig-text-to-solr.pig``` - [Pig](https://pig.apache.org/) scripts to bulk index unstructured files in [Hadoop](http://hadoop.apache.org/) to [Elasticsearch](https://www.elastic.co/products/elasticsearch) or [Solr](http://lucene.apache.org/solr/) / [SolrCloud clusters](https://wiki.apache.org/solr/SolrCloud)
 - ```pig_udfs.jy``` - Pig Jython UDFs for Hadoop
 - ```ipython-notebook-pyspark.py``` - per-user authenticated IPython Notebook + PySpark integration to allow each user to auto-create their own password protected IPython Notebook running Spark
