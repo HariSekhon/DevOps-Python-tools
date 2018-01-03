@@ -94,7 +94,7 @@ Environment variables are supported for convenience and also to hide credentials
     - ```find_active_impala*.py``` - finds the first available [Impala](https://impala.apache.org/) node of either Impalad, Catalog or Statestore
     - ```find_active_solrcloud.py``` - finds the first available [Solr](http://lucene.apache.org/solr/) / [SolrCloud](https://wiki.apache.org/solr/SolrCloud) node
     - ```find_active_elasticsearch.py``` - finds the first available [Elasticsearch](https://www.elastic.co/products/elasticsearch) node
-    - see also: [Advanced HAProxy configurations](https://github.com/harisekhon/nagios-plugins/tree/master/haproxy) which are part of the [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins)
+    - see also: [Advanced HAProxy configurations](https://github.com/harisekhon/nagios-plugins/tree/master/haproxy) for these and more technologies, which are part of the [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins)
 - ```travis_debug_session.py``` - launches a [Travis CI](https://travis-ci.org/) interactive debug build session via Travis API, tracks session creation and drops user straight in to the SSH shell on the remote Travis build, very convenient one shot debug launcher for Travis CI
 - ```validate_*.py``` - validate files, directory trees and/or standard input streams for the following file types:
     - Avro
