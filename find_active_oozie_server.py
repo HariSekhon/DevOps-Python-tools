@@ -59,11 +59,11 @@ __author__ = 'Hari Sekhon'
 __version__ = '0.7.1'
 
 
-class FindActiveOozieServer(FindActiveServer):
+class FindActiveOozie(FindActiveServer):
 
     def __init__(self):
         # Python 2.x
-        super(FindActiveOozieServer, self).__init__()
+        super(FindActiveOozie, self).__init__()
         # Python 3.x
         # super().__init__()
         self.default_port = 11000
@@ -82,4 +82,4 @@ class FindActiveOozieServer(FindActiveServer):
 
 
 if __name__ == '__main__':
-    FindActiveOozieServer().main()
+    FindActiveOozie().main()
