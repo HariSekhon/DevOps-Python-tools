@@ -88,8 +88,8 @@ Environment variables are supported for convenience and also to hide credentials
     - ```find_active_hadoop_namenode.py``` - finds the active [Hadoop](http://hadoop.apache.org/) Namenode in HDFS HA
     - ```find_active_hadoop_resource_manager.py``` - finds the active [Hadoop](http://hadoop.apache.org/) Resource Manager in Yarn HA
     - ```find_active_hbase_master.py``` - finds the active [HBase](https://hbase.apache.org/) Master in HBase HA
-    - ```find_active_hbase_thrift.py``` - finds the first available HBase Thrift Server (run multiple of these for load balancing)
-    - ```find_active_hbase_stargate.py``` - finds the first available HBase Stargate rest server (run multiple of these for load balancing)
+    - ```find_active_hbase_thrift.py``` - finds the first available [HBase](https://hbase.apache.org/) Thrift Server (run multiple of these for load balancing)
+    - ```find_active_hbase_stargate.py``` - finds the first available [HBase](https://hbase.apache.org/) Stargate rest server (run multiple of these for load balancing)
     - ```find_active_apache_drill.py``` - finds the first available [Apache Drill](https://drill.apache.org/) node
     - ```find_active_impala*.py``` - finds the first available [Impala](https://impala.apache.org/) node of either Impalad, Catalog or Statestore
     - ```find_active_solrcloud.py``` - finds the first available [Solr](http://lucene.apache.org/solr/) / [SolrCloud](https://wiki.apache.org/solr/SolrCloud) node
