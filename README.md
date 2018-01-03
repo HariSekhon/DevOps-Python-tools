@@ -93,7 +93,7 @@ Environment variables are supported for convenience and also to hide credentials
     - ```find_active_apache_drill.py``` - finds the first available [Apache Drill](https://drill.apache.org/) node
     - ```find_active_impala*.py``` - finds the first available [Impala](https://impala.apache.org/) node of either Impalad, Catalog or Statestore
     - ```find_active_presto_coordinator.py``` - finds the first available [Presto](https://prestodb.io/) Coordinator
-    - ```find_active_oozie_server.py``` - finds the first active [Oozie](http://oozie.apache.org/) server
+    - ```find_active_oozie.py``` - finds the first active [Oozie](http://oozie.apache.org/) server
     - ```find_active_solrcloud.py``` - finds the first available [Solr](http://lucene.apache.org/solr/) / [SolrCloud](https://wiki.apache.org/solr/SolrCloud) node
     - ```find_active_elasticsearch.py``` - finds the first available [Elasticsearch](https://www.elastic.co/products/elasticsearch) node
     - see also: [Advanced HAProxy configurations](https://github.com/harisekhon/nagios-plugins/tree/master/haproxy) which are part of the [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins)
