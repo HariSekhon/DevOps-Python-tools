@@ -84,7 +84,7 @@ Environment variables are supported for convenience and also to hide credentials
 - ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user (there is also a perl version in my [Tools](https://github.com/harisekhon/tools) repo)
 - ```find_duplicate_files.py``` - finds duplicate files in one or more directory trees via multiple methods including file basename, size, MD5 comparison of same sized files, or bespoke regex capture of partial file basename
 - ```find_active_server.py``` - generic solution to return the first available healthy server or active master in high availability deployments, useful for chaining with single argument tools. Configurable tests include socket, http, https, ping, url and/or regex content match, multi-threaded for speed. Designed to extend tools that only accept a single ```--host``` option but for which the technology has later added multi-master support or active-standby masters (eg. Hadoop, HBase) or where you want to query cluster wide information available from any online peer (eg. Elasticsearch)
-  The following are simplified specialisations of the above program, just pass host arguments, all the details have been baked in, no switches required
+  - The following are simplified specialisations of the above program, just pass host arguments, all the details have been baked in, no switches required
     - ```find_active_hadoop_namenode.py``` - finds the active [Hadoop](http://hadoop.apache.org/) Namenode in HDFS HA
     - ```find_active_hadoop_resource_manager.py``` - finds the active [Hadoop](http://hadoop.apache.org/) Resource Manager in Yarn HA
     - ```find_active_hbase_master.py``` - finds the active [HBase](https://hbase.apache.org/) Master in HBase HA
