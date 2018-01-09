@@ -30,6 +30,8 @@ section "Running PyTools ALL"
 cd "$srcdir/..";
 bash-tools/all.sh
 
+exit 0
+
 bash-tools/run_tests.sh
 
 # do help afterwards for Spark to be downloaded, and then help will find and use downloaded spark for SPARK_HOME
