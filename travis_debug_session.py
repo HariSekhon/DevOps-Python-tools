@@ -133,13 +133,13 @@ class TravisDebugSession(CLI):
             elif not self.job_id:
                 log.info('using argument as --job-id')
                 self.job_id = self.args[0]
-        self.repo = re.sub(r'https://travis-ci\.org/', '', self.repo)
         if self.job_id:
             # convenience to be able to lazily paste a URL like the following and still have it extract the job_id
             # https://travis-ci.org/HariSekhon/nagios-plugins/jobs/283840596#L1079
             self.job_id = self.job_id.split('/')[-1].split('#')[0]
             validate_chars(self.job_id, 'job id', '0-9')
         elif self.repo:
+            self.repo = re.sub(r'https://travis-ci\.org/', '', self.repo)
             validate_chars(self.repo, 'repo', r'\/\w\.-')
         else:
             self.usage('--job-id / --repo not specified')
