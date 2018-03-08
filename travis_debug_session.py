@@ -64,7 +64,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.2'
+__version__ = '0.8.3'
 
 
 class TravisDebugSession(CLI):
@@ -126,13 +126,14 @@ class TravisDebugSession(CLI):
         if self.args:
             # assume arg is a repo in form of HariSekhon/nagios-plugins but do not use url which we are more likely to
             # have pasted a travis-ci url to a job, see a few lines further down
-            if '/' in self.args[0] and '://' not in self.args[0]:
+            if '/' in self.args[0]:
                 if not self.repo:
                     log.info('using argument as --repo')
                     self.repo = self.args[0]
             elif not self.job_id:
                 log.info('using argument as --job-id')
                 self.job_id = self.args[0]
+        self.repo = re.sub(r'https://travis-ci\.org/', '', self.repo)
         if self.job_id:
             # convenience to be able to lazily paste a URL like the following and still have it extract the job_id
             # https://travis-ci.org/HariSekhon/nagios-plugins/jobs/283840596#L1079
