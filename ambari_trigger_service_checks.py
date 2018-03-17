@@ -356,6 +356,14 @@ class AmbariTriggerServiceChecks(CLI):
         for index in range(service_count):
             service = services[index]
             index += 1
+
+            commandData = ""
+            if service.upper() == "ZOOKEEPER" :
+              # this if block is needed because the ZOOKEEPRR service check command name is "ZOOKEEPER_QUORUM_SERVICE_CHECK" and not "ZOOKEEPER_SERVICE_CHECK"
+              commandData = "{service}_QUORUM_SERVICE_CHECK".format(service=service.upper())
+            else :
+              commandData = "{service}_SERVICE_CHECK".format(service=service.upper())
+
             payload[0]['RequestSchedule']['batch'][0]['requests'].append(
                 {
                     "order_id": index,
@@ -363,7 +371,7 @@ class AmbariTriggerServiceChecks(CLI):
                     "uri": "/api/v1/clusters/{0}/requests".format(self.cluster),
                     "RequestBodyInfo":{
                         "RequestInfo": {
-                            "command": "{service}_SERVICE_CHECK".format(service=service.upper()),
+                            "command": "{commandData}".format(commandData=commandData) ,
                             "context": "{service} Service Check (batch {index} of {total})".
                                        format(service=service, index=index, total=service_count)
                         },
