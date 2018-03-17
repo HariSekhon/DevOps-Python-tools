@@ -16,11 +16,7 @@
 
 """
 
-Tool to show Docker tags for one or more DockerHub repos
-
-Written for convenience as Docker CLI doesn't currently support this:
-
-See https://github.com/docker/docker/issues/17238
+Tool to show Docker tags for one or more Quay.io repos
 
 """
 
