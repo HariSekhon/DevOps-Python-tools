@@ -60,7 +60,7 @@ class QuayTags(DockerHubTags):
             self.usage('no repos given as args')
         self.quiet = self.get_opt('quiet')
         if not self.quiet:
-            print('\nQuay.io:', end='')
+            print('\nQuay.io ', end='')
         for arg in self.args:
             self.print_tags(arg)
 
