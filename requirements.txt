@@ -29,7 +29,7 @@ py>=1.4.31
 # PyLint fails some checks in Travis that pass locally
 #pylint==1.5.2
 #pyhs2>=0.6.0
-pytest>=3.0.0
+#pytest>=3.0.0
 #python-jenkins>=0.4.13
 #python-krbV>=1.0.90
 # needed by avro
@@ -44,5 +44,5 @@ thrift-sasl>=0.2.1
 thrift>=0.9.3
 traceback2>=1.4.0
 unittest2>=1.1.0
-wheel>=0.29.0
+#wheel>=0.29.0
 xmltodict>=0.10.2
