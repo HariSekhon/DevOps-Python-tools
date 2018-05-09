@@ -16,6 +16,8 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
+srcdir="$(dirname $0)"
+
 docker_image="${1:-}"
 
 if [ -z "$docker_image" ]; then
@@ -23,8 +25,8 @@ if [ -z "$docker_image" ]; then
     exit 1
 fi
 
-for tag in $(./dockerhub_show_tags.py -q $docker_image); do
+for tag in $("$srcdir/dockerhub_show_tags.py" -q "$docker_image"); do
     echo "docker pull $docker_image:$tag"
-    docker pull $docker_image:$tag
+    docker pull "$docker_image:$tag"
     echo
 done
