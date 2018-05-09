@@ -59,10 +59,15 @@ test_apache_drill(){
     non_drill_node2="127.0.0.1:1026"
     hr
     APACHE_DRILL_PORT="$APACHE_DRILL_PORT_DEFAULT" ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_apache_drill.py $non_drill_node1 $non_drill_node2
-    APACHE_DRILL_PORT="$APACHE_DRILL_PORT_DEFAULT" ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_apache_drill2.py $non_drill_node1 $non_drill_node2
 
     APACHE_DRILL_PORT="$APACHE_DRILL_PORT_DEFAULT" run_grep "^$APACHE_DRILL_HOST:$APACHE_DRILL_PORT$" ./find_active_apache_drill.py $non_drill_node1 "$APACHE_DRILL_HOST:$APACHE_DRILL_PORT"
-    APACHE_DRILL_PORT="$APACHE_DRILL_PORT_DEFAULT" run_grep "^$APACHE_DRILL_HOST:$APACHE_DRILL_PORT$" ./find_active_apache_drill2.py $non_drill_node1 "$APACHE_DRILL_HOST:$APACHE_DRILL_PORT"
+
+    # Drill 1.7+ only
+    if [ "${version:0:1}" != 0 -a "${version:2:1}" -ge 7 ]; then
+        APACHE_DRILL_PORT="$APACHE_DRILL_PORT_DEFAULT" ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_apache_drill2.py $non_drill_node1 $non_drill_node2
+
+        APACHE_DRILL_PORT="$APACHE_DRILL_PORT_DEFAULT" run_grep "^$APACHE_DRILL_HOST:$APACHE_DRILL_PORT$" ./find_active_apache_drill2.py $non_drill_node1 "$APACHE_DRILL_HOST:$APACHE_DRILL_PORT"
+    fi
 
     echo "Completed $run_count Apache Drill tests"
     hr
