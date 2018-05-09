@@ -71,6 +71,6 @@ test_apache_drill(){
     echo
 }
 
-startupwait 50
+startupwait 70
 
 run_test_versions "Apache Drill"
