@@ -16,9 +16,11 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
-for docker_image in $(./dockerhub_search.py -q harisekhon | grep -v 'presto.*dev'); do
+srcdir="$(dirname $0)"
+
+for docker_image in $("$srcdir/dockerhub_search.py" -q harisekhon | grep -v 'presto.*dev'); do
     echo "pulling all tags for docker image $docker_image:"
-    for tag in $(./dockerhub_show_tags.py -q "$docker_image"); do
+    for tag in $("$srcdir/dockerhub_show_tags.py" -q "$docker_image"); do
         echo
         echo "docker pull $docker_image:$tag"
         docker pull "$docker_image:$tag"
