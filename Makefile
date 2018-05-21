@@ -58,15 +58,15 @@ PARQUET_VERSION=1.5.0
 
 # Alpine:
 #
-#   apk add --no-cache git make && git clone https://github.com/harisekhon/pytools && cd pytools && make
+#   apk add --no-cache git $(MAKE) && git clone https://github.com/harisekhon/pytools && cd pytools && $(MAKE)
 
 # Debian / Ubuntu:
 #
-#   apt-get update && apt-get install -y make git && git clone https://github.com/harisekhon/pytools && cd pytools && make
+#   apt-get update && apt-get install -y $(MAKE) git && git clone https://github.com/harisekhon/pytools && cd pytools && $(MAKE)
 
 # RHEL / CentOS:
 #
-#   yum install -y make git && git clone https://github.com/harisekhon/pytools && cd pytools && make
+#   yum install -y $(MAKE) git && git clone https://github.com/harisekhon/pytools && cd pytools && $(MAKE)
 
 # ===================
 
@@ -76,14 +76,14 @@ build:
 	@echo PyTools Build
 	@echo =============
 
-	if [ -x /sbin/apk ];        then make apk-packages; fi
-	if [ -x /usr/bin/apt-get ]; then make apt-packages; fi
-	if [ -x /usr/bin/yum ];     then make yum-packages; fi
+	if [ -x /sbin/apk ];        then $(MAKE) apk-packages; fi
+	if [ -x /usr/bin/apt-get ]; then $(MAKE) apt-packages; fi
+	if [ -x /usr/bin/yum ];     then $(MAKE) yum-packages; fi
 	
 	git submodule init
 	git submodule update --recursive
 	
-	cd pylib && make
+	cd pylib && $(MAKE)
 	
 	# don't pull parquet tools in to docker image by default, will bloat it
 	# can fetch separately by running 'make parquet-tools' if you really want to
@@ -92,7 +92,7 @@ build:
 		echo "Skipping Parquet install..."; \
 		echo; echo; \
 	else \
-		make parquet-tools; \
+		$(MAKE) parquet-tools; \
 	fi
 	
 	# json module built-in to Python >= 2.6, backport not available via pypi
@@ -130,13 +130,13 @@ build:
 	bash-tools/python_compile.sh
 	@echo
 	@echo
-	make spark-deps
+	$(MAKE) spark-deps
 	@echo
 	@echo 'BUILD SUCCESSFUL (pytools)'
 
 .PHONY: quick
 quick:
-	QUICK=1 make
+	QUICK=1 $(MAKE)
 
 .PHONY: parquet-tools
 parquet-tools:
@@ -162,7 +162,7 @@ apk-packages-multimedia:
 
 .PHONY: apk-packages-remove
 apk-packages-remove:
-	cd pylib && make apk-packages-remove
+	cd pylib && $(MAKE) apk-packages-remove
 	$(SUDO) apk del `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/apk-packages-dev.txt` || :
 	$(SUDO) rm -fr /var/cache/apk/*
 
@@ -182,7 +182,7 @@ apt-packages-multimedia:
 
 .PHONY: apt-packages-remove
 apt-packages-remove:
-	cd pylib && make apt-packages-remove
+	cd pylib && $(MAKE) apt-packages-remove
 	$(SUDO) apt-get purge -y `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/deb-packages-dev.txt`
 
 .PHONY: yum-packages
@@ -201,7 +201,7 @@ yum-packages-multimedia:
 
 .PHONY: yum-packages-remove
 yum-packages-remove:
-	cd pylib && make yum-packages-remove
+	cd pylib && $(MAKE) yum-packages-remove
 	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/rpm-packages-dev.txt`; do rpm -q $$x && $(SUDO) yum remove -y $$x; done
 
 .PHONY: jython
@@ -217,7 +217,7 @@ sonar:
 
 .PHONY: lib-test
 lib-test:
-	cd pylib && make test
+	cd pylib && $(MAKE) test
 
 .PHONY: test
 test: lib-test
@@ -229,7 +229,7 @@ basic-test: lib-test
 
 .PHONY: test2
 test2:
-	cd pylib && make test2
+	cd pylib && $(MAKE) test2
 	tests/all.sh
 
 .PHONY: install
@@ -258,7 +258,7 @@ updatem: update-submodules
 
 .PHONY: clean
 clean:
-	cd pylib && make clean
+	cd pylib && $(MAKE) clean
 	@# the xargs option to ignore blank input doesn't work on Mac
 	@find . -maxdepth 3 -iname '*.py[co]' -o -iname '*.jy[co]' | xargs rm -f
 	@find . -type d -ipath '*/tests/*' -iname 'test-*spark*.avro' | xargs rm -rf
@@ -268,7 +268,7 @@ clean:
 
 .PHONY: deep-clean
 deep-clean: clean
-	cd pylib && make deep-clean
+	cd pylib && $(MAKE) deep-clean
 
 .PHONY: spark-deps
 spark-deps:
@@ -281,7 +281,7 @@ docker-run:
 
 .PHONY: run
 run:
-	make docker-run
+	$(MAKE) docker-run
 
 .PHONY: docker-mount
 docker-mount:
