@@ -45,6 +45,9 @@ git clone https://github.com/harisekhon/pytools
 cd pytools
 make
 ```
+
+Make sure to read [Detailed Build Instructions](https://github.com/HariSekhon/pytools#detailed-build-instructions) further down for more information.
+
 Some Hadoop tools with require Jython, see [Jython for Hadoop Utils](https://github.com/harisekhon/pytools#jython-for-hadoop-utils) for details.
 
 ### Usage ###
@@ -110,7 +113,9 @@ Environment variables are supported for convenience and also to hide credentials
   - directories are recursed, testing any files with relevant matching extensions (`.avro`, `.csv`, `json`, `parquet`, `.ini`/`.properties`, `.ldif`, `.xml`, `.yml`/`.yaml`)
   - used for Continuous Integration tests of various adjacent Spark data converters as well as configuration files for things like Presto, Ambari, Apache Drill etc found in my [DockerHub](https://hub.docker.com/u/harisekhon/) images [Dockerfiles master repo](https://github.com/HariSekhon/Dockerfiles) which contains docker builds and configurations for many open source Big Data & Linux technologies
 
-#### Manual Setup ####
+### Detailed Build Instructions
+
+#### Manual Setup
 
 Enter the pytools directory and run git submodule init and git submodule update to fetch my library repo:
 
@@ -120,6 +125,42 @@ cd pytools
 git submodule init
 git submodule update
 pip install -r requirements.txt
+```
+
+##### Mac OS X
+
+The automated build also works on Mac OS X but you'll need to download and install [Apple XCode](https://developer.apple.com/download/). I also recommend you get [HomeBrew](https://brew.sh/) to install other useful tools and libraries you may need like OpenSSL for development headers and tools such as wget (these are installed automatically if Homebrew is detected on Mac OS X):
+
+```
+brew install openssl wget
+```
+
+CPAN's Crypt::SSLeay may not find the OpenSSL header and error like so:
+
+```
+fatal error: 'openssl/opensslv.h' file not found
+#include <openssl/opensslv.h>
+```
+
+In this case, give it the path to the OpenSSL lib to build:
+
+```
+sudo OPENSSL_INCLUDE=/usr/local/opt/openssl/include OPENSSL_LIB=/usr/local/opt/openssl/lib cpan Crypt::SSLeay
+```
+
+then continue with the rest of the build:
+
+```
+make
+```
+
+You may get errors trying to install to Python library paths even as root on newer versions of Mac, sometimes this is caused by pip 10 vs pip 9 and downgrading will work around it:
+
+```
+pip install --upgrade pip==9.0.1
+make
+pip install --upgrade pip
+make
 ```
 
 ### Jython for Hadoop Utils ###
