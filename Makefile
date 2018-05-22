@@ -70,19 +70,35 @@ PARQUET_VERSION=1.5.0
 
 # ===================
 
+.PHONY: system-packages
+system-packages:
+	if [ -x /sbin/apk ];        then $(MAKE) apk-packages; fi
+	if [ -x /usr/bin/apt-get ]; then $(MAKE) apt-packages; fi
+	if [ -x /usr/local/bin/brew -a `uname` = Darwin ]; then $(MAKE) homebrew-packages; fi
+	if [ -x /usr/bin/yum ];     then $(MAKE) yum-packages; fi
+	
+.PHONY: common
+common: system-packages submodules
+	# Workaround for Mac OS X not finding the OpenSSL libraries when building
+	if [ -d /usr/local/opt/openssl/include -a \
+	     -d /usr/local/opt/openssl/lib     -a \
+	     `uname` = Darwin ]; then \
+	     sudo OPENSSL_INCLUDE=/usr/local/opt/openssl/include OPENSSL_LIB=/usr/local/opt/openssl/lib cpan Crypt::SSLeay; \
+	fi
+
+.PHONY: submodules
+submodules:
+	git submodule init
+	git submodule update --recursive
+
 .PHONY: build
 build:
 	@echo =============
 	@echo PyTools Build
 	@echo =============
 
-	if [ -x /sbin/apk ];        then $(MAKE) apk-packages; fi
-	if [ -x /usr/bin/apt-get ]; then $(MAKE) apt-packages; fi
-	if [ -x /usr/bin/yum ];     then $(MAKE) yum-packages; fi
-	
-	git submodule init
-	git submodule update --recursive
-	
+	$(MAKE) common
+
 	cd pylib && $(MAKE)
 	
 	# don't pull parquet tools in to docker image by default, will bloat it
@@ -184,6 +200,14 @@ apt-packages-multimedia:
 apt-packages-remove:
 	cd pylib && $(MAKE) apt-packages-remove
 	$(SUDO) apt-get purge -y `sed 's/#.*//; /^[[:space:]]*$$/d' < setup/deb-packages-dev.txt`
+
+.PHONY: homebrew-packages
+homebrew-packages:
+	# no sudo is required here, attempting it results in:
+	#
+	# Error: Running Homebrew as root is extremely dangerous and no longer supported.
+	# As Homebrew does not drop privileges on installation you would be giving all build scripts full access to your system.
+	brew install `sed 's/#.*//; /^[[:space:]]*$$/d' setup/brew-packages.txt`
 
 .PHONY: yum-packages
 yum-packages:
