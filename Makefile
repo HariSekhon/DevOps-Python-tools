@@ -70,27 +70,6 @@ PARQUET_VERSION=1.5.0
 
 # ===================
 
-.PHONY: system-packages
-system-packages:
-	if [ -x /sbin/apk ];        then $(MAKE) apk-packages; fi
-	if [ -x /usr/bin/apt-get ]; then $(MAKE) apt-packages; fi
-	if [ -x /usr/local/bin/brew -a `uname` = Darwin ]; then $(MAKE) homebrew-packages; fi
-	if [ -x /usr/bin/yum ];     then $(MAKE) yum-packages; fi
-	
-.PHONY: common
-common: system-packages submodules
-	# Workaround for Mac OS X not finding the OpenSSL libraries when building
-	if [ -d /usr/local/opt/openssl/include -a \
-	     -d /usr/local/opt/openssl/lib     -a \
-	     `uname` = Darwin ]; then \
-	     sudo OPENSSL_INCLUDE=/usr/local/opt/openssl/include OPENSSL_LIB=/usr/local/opt/openssl/lib cpan Crypt::SSLeay; \
-	fi
-
-.PHONY: submodules
-submodules:
-	git submodule init
-	git submodule update --recursive
-
 .PHONY: build
 build:
 	@echo =============
@@ -98,9 +77,28 @@ build:
 	@echo =============
 
 	$(MAKE) common
+	$(MAKE) python
 
 	cd pylib && $(MAKE)
+
+.PHONY: system-packages
+system-packages:
+	if [ -x /sbin/apk ];        then $(MAKE) apk-packages; fi
+	if [ -x /usr/bin/apt-get ]; then $(MAKE) apt-packages; fi
+	if [ -x /usr/local/bin/brew -a `uname` = Darwin ]; then $(MAKE) homebrew-packages; fi
+	if [ -x /usr/bin/yum ];     then $(MAKE) yum-packages; fi
+
+.PHONY: common
+common: system-packages submodules
+	:
+
+.PHONY: submodules
+submodules:
+	git submodule init
+	git submodule update --recursive
 	
+.PHONY: python
+python:
 	# don't pull parquet tools in to docker image by default, will bloat it
 	# can fetch separately by running 'make parquet-tools' if you really want to
 	if [ -f /.dockerenv -o -n "$(SKIP_PARQUET)" ]; then \
