@@ -16,9 +16,9 @@
 
 """
 
-Tool to show requests per second per HBase table region from JMX API stats
+Tool to calculate Requests Per Second since startup for a given HBase table region using JMX API stats
 
-Designed to help analyze region hotspotting by looking at requests per second
+Designed to help analyze region hotspotting
 
 Argument list should be one or more RegionServers to dump the JMX stats from
 
@@ -42,7 +42,8 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import validate_host, validate_port, validate_chars, support_msg_api, UnknownError
+    from harisekhon.utils import validate_host, validate_port, validate_chars
+    from harisekhon.utils import UnknownError, CriticalError, support_msg_api
     from harisekhon import CLI, RequestHandler
 except ImportError as _:
     print(traceback.format_exc(), end='')
@@ -64,7 +65,6 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
         self.table = None
         self.namespace = 'default'
         self.timeout_default = 300
-        #self.re_hex = re.compile('([a-f]+)') # to convert to uppercase later for aesthetics
         self._regions = None
 
     def add_options(self):
@@ -90,7 +90,7 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
         for host in self.host_list:
             try:
                 self.print_region_stats(host)
-            except (UnknownError, requests.RequestException) as _:
+            except (CriticalError, UnknownError, requests.RequestException) as _:
                 print("ERROR querying JMX stats for host '{}': {}".format(host, _))
 
     def print_region_stats(self, host):
