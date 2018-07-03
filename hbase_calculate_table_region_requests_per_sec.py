@@ -43,7 +43,7 @@ sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
     from harisekhon.utils import validate_host, validate_port, validate_chars
-    from harisekhon.utils import UnknownError, CriticalError, support_msg_api
+    from harisekhon.utils import UnknownError, CriticalError, support_msg_api, printerr
     from harisekhon import CLI, RequestHandler
 except ImportError as _:
     print(traceback.format_exc(), end='')
@@ -91,7 +91,7 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
             try:
                 self.print_region_stats(host)
             except (CriticalError, UnknownError, requests.RequestException) as _:
-                print("ERROR querying JMX stats for host '{}': {}".format(host, _))
+                printerr("ERROR querying JMX stats for host '{}': {}".format(host, _), )
 
     def print_region_stats(self, host):
         req = RequestHandler().get('http://{host}:{port}/jmx'.format(host=host, port=self.port))
