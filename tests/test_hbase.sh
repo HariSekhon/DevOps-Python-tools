@@ -238,6 +238,13 @@ EOF
 
     run_conn_refused ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
 
+    # ============================================================================ #
+    run ./hbase_calculate_table_region_requests_per_sec.py -T HexStringSplitTable $HBASE_HOST
+
+    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data $HBASE_HOST
+
+    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data localhost $HBASE_HOST
+
     [ -z "${KEEPDOCKER:-}" ] ||
     docker-compose down
     echo
