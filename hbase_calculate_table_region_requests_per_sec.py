@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.4'
 
 
 class HBaseCalculateTableRegionsRequestsPerSec(CLI):
@@ -73,7 +73,8 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
         self._regions = None
 
     def add_options(self):
-        self.add_opt('-P', '--port', default=self.port, help='HBase RegionServer port (default: {})'.format(self.port))
+        self.add_opt('-P', '--port', default=os.getenv('HBASE_REGIONSERVER_PORT', self.port),
+                     help='HBase RegionServer port (default: {})'.format(self.port))
         self.add_opt('-T', '--table', help='Table name')
         self.add_opt('-N', '--namespace', default=self.namespace, help='Namespace (default: {})'.format(self.namespace))
         self.add_opt('-i', '--interval', default=self.interval,
