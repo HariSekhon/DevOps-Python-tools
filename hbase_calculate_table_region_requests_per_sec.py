@@ -114,7 +114,7 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
                     if match:
                         region = match.group(1)
                         metric = match.group(2)
-                        print('{:20s}\t{:20s}\t\t{:10s}\t{:.1f}'.format(host, region, metric, bean[key] / uptime))
+                        print('{:20s}\t{:20s}\t\t{:10s}\t{:8.0f}'.format(host, region, metric, bean[key] / uptime))
 
     # some extra effort to make it look the same as HBase presents it as
     #def encode_char(self, char):
