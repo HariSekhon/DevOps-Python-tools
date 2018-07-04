@@ -239,11 +239,17 @@ EOF
     run_conn_refused ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
 
     # ============================================================================ #
-    run ./hbase_calculate_table_region_requests_per_sec.py -T HexStringSplitTable $HBASE_HOST
+    run ./hbase_calculate_table_region_requests_per_sec.py -T HexStringSplitTable $HBASE_HOST -c 1
+    run ./hbase_calculate_table_region_requests_per_sec.py -T HexStringSplitTable $HBASE_HOST -c 1 --average
 
-    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data $HBASE_HOST
+    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data $HBASE_HOST -c 1
+    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data $HBASE_HOST -c 1 --average
 
-    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data localhost $HBASE_HOST
+    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data $HBASE_HOST --count 2 --interval 1
+
+    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data localhost $HBASE_HOST -c 1
+    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data localhost $HBASE_HOST --count 2 -i 1
+    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data localhost $HBASE_HOST -c 1 --average
 
     [ -z "${KEEPDOCKER:-}" ] ||
     docker-compose down
