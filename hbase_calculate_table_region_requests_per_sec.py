@@ -37,6 +37,8 @@ import re
 import sys
 import time
 import traceback
+from multiprocessing.pool import ThreadPool
+import Queue
 import requests
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
@@ -68,6 +70,7 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
         self.count = 0
         self.since_uptime = False
         self.stats = {}
+        self.show = set()
         self.timeout_default = 300
         self.url = None
         self._regions = None
@@ -82,6 +85,9 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
         self.add_opt('-c', '--count', default=self.count,
                      help='Number of times to print stats (default: {}, zero means infinite)'.format(self.count))
         self.add_opt('-a', '--average', action='store_true', help='Calculate average since RegionServer startup')
+        self.add_opt('--reads', action='store_true', help='Show read requests (default shows all)')
+        self.add_opt('--writes', action='store_true', help='Show write requests (default shows all)')
+        self.add_opt('--total', action='store_true', help='Show total requests (default shows all)')
 
     def process_args(self):
         self.host_list = self.args
@@ -105,6 +111,12 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
         self.count = int(self.count)
         if self.count == 0:
             self.disable_timeout()
+        if self.get_opt('reads'):
+            self.show.add('read')
+        if self.get_opt('writes'):
+            self.show.add('write')
+        if self.get_opt('total'):
+            self.show.add('total')
 
     def run(self):
         if self.count:
@@ -148,27 +160,30 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
         region_regex = re.compile('^Namespace_{namespace}_table_{table}_region_(.+)_metric_(.+)RequestCount'\
                                   .format(namespace=self.namespace, table=self.table))
         first_iteration = 1
+        show = self.show
         for key in sorted(bean):
             match = region_regex.match(key)
             if match:
                 region = match.group(1)
-                metric = match.group(2)
-                #log.debug('match region %s %s request count', region, metric)
+                metric_type = match.group(2)
+                #log.debug('match region %s %s request count', region, metric_type)
                 if self.since_uptime:
-                    print('{:20s}\t{:20s}\t\t{:10s}\t{:8.0f}'.format(host, region, metric, bean[key] / uptime))
+                    print('{:20s}\t{:20s}\t\t{:10s}\t{:8.0f}'.format(host, region, metric_type, bean[key] / uptime))
                 else:
                     tstamp = time.strftime('%F %T')
                     if region not in self.stats:
                         self.stats[region] = {}
-                    if metric in self.stats[region]:
-                        print('{}\t{:20s}\t{:20s}\t\t{:10s}\t{:8.0f}'\
-                              .format(tstamp, host, region, metric, bean[key] - self.stats[region][metric]))
+                    if metric_type in self.stats[region]:
+                        if not show or metric_type in show:
+                            print('{}\t{:20s}\t{:20s}\t\t{:10s}\t{:8.0f}'\
+                                  .format(tstamp, host, region, metric_type,
+                                          bean[key] - self.stats[region][metric_type]))
                     else:
                         if first_iteration:
                             print('{}\trate stats will be available in next iteration in {} sec{}'\
                                   .format(tstamp, self.interval, plural(self.interval)))
                         first_iteration = 0
-                    self.stats[region][metric] = bean[key]
+                    self.stats[region][metric_type] = bean[key]
         print()
 
 
