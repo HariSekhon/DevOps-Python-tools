@@ -53,11 +53,11 @@ __author__ = 'Hari Sekhon'
 __version__ = '0.6.2'
 
 
-class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
+class HBaseTableRegionRowDistribution(HBaseShowTableRegionRanges):
 
     def __init__(self):
         # Python 2.x
-        super(HBaseCalculateTableRegionRowDistribution, self).__init__()
+        super(HBaseTableRegionRowDistribution, self).__init__()
         # Python 3.x
         # super().__init__()
         self.timeout_default = 6 * 3600
@@ -74,7 +74,7 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
         autoflush()
 
     def add_options(self):
-        super(HBaseCalculateTableRegionRowDistribution, self).add_options()
+        super(HBaseTableRegionRowDistribution, self).add_options()
         self.add_opt('-n', '--no-region-name', action='store_true',
                      help='Do not output Region name column to save screen space')
         self.add_opt('-s', '--sort', metavar='|'.join(self.valid_sorts),
@@ -272,4 +272,4 @@ class HBaseCalculateTableRegionRowDistribution(HBaseShowTableRegionRanges):
 
 
 if __name__ == '__main__':
-    HBaseCalculateTableRegionRowDistribution().main()
+    HBaseTableRegionRowDistribution().main()
