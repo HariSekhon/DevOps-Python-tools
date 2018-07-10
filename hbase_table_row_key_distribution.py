@@ -75,11 +75,11 @@ __author__ = 'Hari Sekhon'
 __version__ = '0.6.2'
 
 
-class HBaseCalculateTableRegionRowDistribution(CLI):
+class HBaseTableRegionRowDistribution(CLI):
 
     def __init__(self):
         # Python 2.x
-        super(HBaseCalculateTableRegionRowDistribution, self).__init__()
+        super(HBaseTableRegionRowDistribution, self).__init__()
         # Python 3.x
         # super().__init__()
         self.conn = None
@@ -281,4 +281,4 @@ class HBaseCalculateTableRegionRowDistribution(CLI):
 
 
 if __name__ == '__main__':
-    HBaseCalculateTableRegionRowDistribution().main()
+    HBaseTableRegionRowDistribution().main()
