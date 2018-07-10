@@ -37,22 +37,20 @@ import re
 import sys
 import time
 import traceback
-from multiprocessing.pool import ThreadPool
-import Queue
 import requests
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
     from harisekhon.utils import validate_host, validate_port, validate_chars, validate_int
-    from harisekhon.utils import UnknownError, CriticalError, support_msg_api, printerr, plural
+    from harisekhon.utils import UnknownError, CriticalError, support_msg_api, printerr, plural, log
     from harisekhon import CLI, RequestHandler
 except ImportError as _:
     print(traceback.format_exc(), end='')
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.5'
 
 
 class HBaseCalculateTableRegionsRequestsPerSec(CLI):
@@ -69,8 +67,10 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
         self.interval = 10
         self.count = 0
         self.since_uptime = False
-        self.stats = {}
         self.show = set()
+        self.stats = {}
+        self.last = {}
+        self.first_iteration = 0
         self.timeout_default = 300
         self.url = None
         self._regions = None
@@ -85,9 +85,9 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
         self.add_opt('-c', '--count', default=self.count,
                      help='Number of times to print stats (default: {}, zero means infinite)'.format(self.count))
         self.add_opt('-a', '--average', action='store_true', help='Calculate average since RegionServer startup')
-        self.add_opt('--reads', action='store_true', help='Show read requests (default shows all)')
-        self.add_opt('--writes', action='store_true', help='Show write requests (default shows all)')
-        self.add_opt('--total', action='store_true', help='Show total requests (default shows all)')
+        self.add_opt('--reads', action='store_true', help='Show read requests (default shows read and write)')
+        self.add_opt('--writes', action='store_true', help='Show write requests (default shows read and write')
+        self.add_opt('--total', action='store_true', help='Show total requests (default shows read and write)')
 
     def process_args(self):
         self.host_list = self.args
@@ -99,7 +99,11 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
         validate_port(self.port)
 
         self.table = self.get_opt('table')
-        validate_chars(self.table, 'hbase table', 'A-Za-z0-9:._-')
+        table_chars = 'A-Za-z0-9:._-'
+        if self.table:
+            validate_chars(self.table, 'table', table_chars)
+        else:
+            self.table = '[{}]+'.format(table_chars)
         self.namespace = self.get_opt('namespace')
         validate_chars(self.namespace, 'hbase namespace', 'A-Za-z0-9:._-')
         self.interval = self.get_opt('interval')
@@ -140,6 +144,7 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
                 printerr("ERROR querying JMX stats for host '{}': {}".format(host, _), )
 
     def run_host(self, host, url):
+        log.info('querying %s', host)
         req = RequestHandler().get(url)
         json_data = json.loads(req.text)
         uptime = None
@@ -153,39 +158,66 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
                 raise UnknownError("failed to find uptime in JMX stats for host '{}'. {}"\
                                    .format(host, support_msg_api()))
         for bean in beans:
+            log.debug('processing Regions bean')
             if bean['name'] == 'Hadoop:service=HBase,name=RegionServer,sub=Regions':
-                self.process_bean(host, bean, uptime)
+                self.process_bean(bean, uptime)
+                self.print_stats(host)
 
-    def process_bean(self, host, bean, uptime):
-        region_regex = re.compile('^Namespace_{namespace}_table_{table}_region_(.+)_metric_(.+)RequestCount'\
+    def process_bean(self, bean, uptime):
+        region_regex = re.compile('^Namespace_{namespace}_table_({table})_region_(.+)_metric_(.+)RequestCount'\
                                   .format(namespace=self.namespace, table=self.table))
-        first_iteration = 1
-        show = self.show
-        for key in sorted(bean):
+        stats = self.stats
+        last = self.last
+        for key in bean:
             match = region_regex.match(key)
             if match:
-                region = match.group(1)
-                metric_type = match.group(2)
-                #log.debug('match region %s %s request count', region, metric_type)
+                table = match.group(1)
+                region = match.group(2)
+                metric_type = match.group(3)
+                log.info('matched table %s region %s %s request count = %s', table, region, metric_type, bean[key])
+                if table not in stats:
+                    stats[table] = {}
+                if region not in stats[table]:
+                    stats[table][region] = {}
                 if self.since_uptime:
-                    print('{:20s}\t{:20s}\t\t{:10s}\t{:8.0f}'.format(host, region, metric_type, bean[key] / uptime))
+                    stats[table][region][metric_type] = bean[key] / uptime
                 else:
-                    tstamp = time.strftime('%F %T')
-                    if region not in self.stats:
-                        self.stats[region] = {}
-                    if metric_type in self.stats[region]:
-                        if not show or metric_type in show:
-                            print('{}\t{:20s}\t{:20s}\t\t{:10s}\t{:8.0f}'\
-                                  .format(tstamp, host, region, metric_type,
-                                          bean[key] - self.stats[region][metric_type]))
+                    # this isn't perfect - will result on a region split as well as first run
+                    # but it's generally good enough
+                    if key not in last:
+                        self.first_iteration = 1
                     else:
-                        if first_iteration:
-                            print('{}\trate stats will be available in next iteration in {} sec{}'\
-                                  .format(tstamp, self.interval, plural(self.interval)))
-                        first_iteration = 0
-                    self.stats[region][metric_type] = bean[key]
-        print()
+                        stats[table][region][metric_type] = bean[key] - last[key]
+                    last[key] = bean[key]
+                if 'read' in stats[table][region] and 'write' in stats[table][region]:
+                    #log.debug('calculating total now we have read and write info')
+                    stats[table][region]['total'] = stats[table][region]['read'] + stats[table][region]['write']
 
+    def print_stats(self, host):
+        stats = self.stats
+        show = self.show
+        tstamp = time.strftime('%F %T')
+        if not stats:
+            print("No table regions found for table '{}'. Did you specify the correct table name?".format(self.table))
+            sys.exit(1)
+        if self.first_iteration:
+            log.info('first iteration or recent new region, skipping iteration until we have a differential')
+            print('{}\trate stats will be available in next iteration in {} sec{}'\
+                  .format(tstamp, self.interval, plural(self.interval)))
+            self.first_iteration = 0
+            return
+        for table in sorted(stats):
+            for region in sorted(stats[table]):
+                table_region = region
+                if len(stats) > 1:
+                    table_region = '{}_{}'.format(table, region)
+                # maintain explicit order for humans
+                # rather than iterate keys of region which will some out in the wrong order
+                for metric in ('read', 'write', 'total'):
+                    if (not show) or metric in show:
+                        print('{:20s}\t{:20s}\t{:40s}\t{:10s}\t{:8.0f}'\
+                              .format(tstamp, host, table_region, metric, stats[table][region][metric]))
+        print()
 
     # some extra effort to make it look the same as HBase presents it as
     #def encode_char(self, char):
