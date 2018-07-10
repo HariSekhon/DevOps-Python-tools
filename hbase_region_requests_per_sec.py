@@ -53,11 +53,11 @@ __author__ = 'Hari Sekhon'
 __version__ = '0.5'
 
 
-class HBaseCalculateTableRegionsRequestsPerSec(CLI):
+class HBaseRegionsRequestsPerSec(CLI):
 
     def __init__(self):
         # Python 2.x
-        super(HBaseCalculateTableRegionsRequestsPerSec, self).__init__()
+        super(HBaseRegionsRequestsPerSec, self).__init__()
         # Python 3.x
         # super().__init__()
         self.host_list = []
@@ -229,4 +229,4 @@ class HBaseCalculateTableRegionsRequestsPerSec(CLI):
 
 
 if __name__ == '__main__':
-    HBaseCalculateTableRegionsRequestsPerSec().main()
+    HBaseRegionsRequestsPerSec().main()
