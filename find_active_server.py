@@ -316,7 +316,7 @@ class FindActiveServer(CLI):
             elif isStr(return_val):
                 self.finish(return_val)
             else:
-                code_error('collect_results() found non-tuple / non-string on que')
+                code_error('collect_results() found non-tuple / non-string on queue')
 
     def port_override(self, host):
         port = self.port
