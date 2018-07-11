@@ -52,11 +52,11 @@ __author__ = 'Hari Sekhon'
 __version__ = '0.5.1'
 
 
-class HBaseBiggestRegions(CLI):
+class HBaseRegionsLeastUsed(CLI):
 
     def __init__(self):
         # Python 2.x
-        super(HBaseBiggestRegions, self).__init__()
+        super(HBaseRegionsLeastUsed, self).__init__()
         # Python 3.x
         # super().__init__()
         self.host_list = []
@@ -67,6 +67,7 @@ class HBaseBiggestRegions(CLI):
         self.request_threshold = None
         self.regions_under_count = {}
         self.top_n = None
+        self.count = 0
         self.timeout_default = 300
         self.url = None
 
@@ -80,6 +81,7 @@ class HBaseBiggestRegions(CLI):
                                                                    '(default: 100, may return more regions ' + \
                                                                    'than N if multiple have the same size)')
         self.add_opt('-r', '--requests', help='Only output regions with totalRequestCounts less than or equal to this')
+        self.add_opt('-s', '--smallest', action='store_true', help='Sort by smallest (default: largest)')
 
     def process_args(self):
         self.host_list = self.args
@@ -170,7 +172,9 @@ class HBaseBiggestRegions(CLI):
         if not stats:
             print("No table regions found for table '{}'. Did you specify the correct table name?".format(self.table))
             sys.exit(1)
-        size_list = list(reversed(sorted(stats)))
+        size_list = sorted(stats)
+        if not self.get_opt('smallest'):
+            size_list = list(reversed(size_list))
         if self.top_n:
             size_list = size_list[0:self.top_n]
         human = self.get_opt('human')
@@ -178,11 +182,16 @@ class HBaseBiggestRegions(CLI):
             import humanize
         for size in size_list:
             for _ in stats[size]:
-                host = _[0]
+                host2 = _[0]
+                if host != host2:
+                    continue
                 table = _[1]
                 region = _[2]
                 if region not in regions_under_count:
                     continue
+                self.count += 1
+                if self.count > self.top_n:
+                    sys.exit(0)
                 size_human = size
                 if human:
                     size_human = humanize.naturalsize(size_human)
@@ -200,4 +209,4 @@ class HBaseBiggestRegions(CLI):
 
 
 if __name__ == '__main__':
-    HBaseBiggestRegions().main()
+    HBaseRegionsLeastUsed().main()
