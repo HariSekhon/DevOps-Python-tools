@@ -197,59 +197,59 @@ EOF
     run ./hbase_show_table_region_ranges.py -T UniformSplitTable -v
 
     # ============================================================================ #
-    run_fail 3 ./hbase_calculate_table_region_row_distribution.py --list-tables
+    run_fail 3 ./hbase_table_region_row_distribution.py --list-tables
 
-    run_conn_refused ./hbase_calculate_table_region_row_distribution.py --list-tables
+    run_conn_refused ./hbase_table_region_row_distribution.py --list-tables
 
-    echo "checking hbase_calculate_table_region_row_distribution.py against DisabledTable:"
-    run_fail 2 ./hbase_calculate_table_region_row_distribution.py -T DisabledTable -vvv
+    echo "checking hbase_table_region_row_distribution.py against DisabledTable:"
+    run_fail 2 ./hbase_table_region_row_distribution.py -T DisabledTable -vvv
 
-    echo "checking hbase_calculate_table_region_row_distribution.py against EmptyTable:"
-    run_fail 2 ./hbase_calculate_table_region_row_distribution.py -T EmptyTable -vvv
+    echo "checking hbase_table_region_row_distribution.py against EmptyTable:"
+    run_fail 2 ./hbase_table_region_row_distribution.py -T EmptyTable -vvv
 
-    run ./hbase_calculate_table_region_row_distribution.py -T UniformSplitTable -v --no-region-name
+    run ./hbase_table_region_row_distribution.py -T UniformSplitTable -v --no-region-name
 
-    run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable
+    run ./hbase_table_region_row_distribution.py -T HexStringSplitTable
 
-    run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable -vv --short-region-name --sort server
+    run ./hbase_table_region_row_distribution.py -T HexStringSplitTable -vv --short-region-name --sort server
 
-    run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort server --desc
+    run ./hbase_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort server --desc
 
-    run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count
+    run ./hbase_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count
 
-    run ./hbase_calculate_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc
-
-    # ============================================================================ #
-    run_fail 3 ./hbase_calculate_table_row_key_distribution.py -T DisabledTable --list-tables
-
-    echo "checking hbase_calculate_table_row_key_distribution.py against DisabledTable:"
-    run_fail 2 ./hbase_calculate_table_row_key_distribution.py -T DisabledTable -vvv
-
-    echo "checking hbase_calculate_table_row_key_distribution.py against EmptyTable:"
-    run_fail 2 ./hbase_calculate_table_row_key_distribution.py -T EmptyTable -vvv
-
-    run ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2
-
-    run ./hbase_calculate_table_row_key_distribution.py -T UniformSplitTable --sort
-
-    run ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable --sort --desc
-
-    run ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
-
-    run_conn_refused ./hbase_calculate_table_row_key_distribution.py -T HexStringSplitTable
+    run ./hbase_table_region_row_distribution.py -T HexStringSplitTable --short-region-name --sort count --desc
 
     # ============================================================================ #
-    run ./hbase_calculate_table_region_requests_per_sec.py -T HexStringSplitTable $HBASE_HOST -c 1
-    run ./hbase_calculate_table_region_requests_per_sec.py -T HexStringSplitTable $HBASE_HOST -c 1 --average
+    run_fail 3 ./hbase_table_row_key_distribution.py -T DisabledTable --list-tables
 
-    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data $HBASE_HOST -c 1
-    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data $HBASE_HOST -c 1 --average
+    echo "checking hbase_table_row_key_distribution.py against DisabledTable:"
+    run_fail 2 ./hbase_table_row_key_distribution.py -T DisabledTable -vvv
 
-    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data $HBASE_HOST --count 2 --interval 1
+    echo "checking hbase_table_row_key_distribution.py against EmptyTable:"
+    run_fail 2 ./hbase_table_row_key_distribution.py -T EmptyTable -vvv
 
-    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data localhost $HBASE_HOST -c 1
-    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data localhost $HBASE_HOST --count 2 -i 1
-    run ./hbase_calculate_table_region_requests_per_sec.py -T HS_test_data localhost $HBASE_HOST -c 1 --average
+    run ./hbase_table_row_key_distribution.py -T UniformSplitTable -v --key-prefix-length 2
+
+    run ./hbase_table_row_key_distribution.py -T UniformSplitTable --sort
+
+    run ./hbase_table_row_key_distribution.py -T HexStringSplitTable --sort --desc
+
+    run ./hbase_table_row_key_distribution.py -T HexStringSplitTable
+
+    run_conn_refused ./hbase_table_row_key_distribution.py -T HexStringSplitTable
+
+    # ============================================================================ #
+    run ./hbase_region_requests.py -T HexStringSplitTable $HBASE_HOST -c 1
+    run ./hbase_region_requests.py -T HexStringSplitTable $HBASE_HOST -c 1 --average
+
+    run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST -c 1
+    run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST -c 1 --average
+
+    run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST --count 2 --interval 1
+
+    run ./hbase_region_requests.py -T HS_test_data localhost $HBASE_HOST -c 1
+    run ./hbase_region_requests.py -T HS_test_data localhost $HBASE_HOST --count 2 -i 1
+    run ./hbase_region_requests.py -T HS_test_data localhost $HBASE_HOST -c 1 --average
 
     [ -z "${KEEPDOCKER:-}" ] ||
     docker-compose down
