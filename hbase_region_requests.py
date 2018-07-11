@@ -213,7 +213,7 @@ class HBaseRegionsRequests(CLI):
             for region in sorted(stats[host][table]):
                 table_region = region
                 if len(stats) > 1:
-                    table_region = '{}_{}'.format(table, region)
+                    table_region = '{}:{}'.format(table, region)
                 # maintain explicit order for humans
                 # rather than iterate keys of region which will some out in the wrong order
                 for metric in ('read', 'write', 'total'):
