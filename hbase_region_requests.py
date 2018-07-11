@@ -64,7 +64,7 @@ class HBaseRegionsRequests(CLI):
         self.port = 16030
         self.table = None
         self.namespace = 'default'
-        self.interval = 10
+        self.interval = 1
         self.count = 0
         self.since_uptime = False
         self.show = set()
