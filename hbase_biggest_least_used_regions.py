@@ -76,9 +76,9 @@ class HBaseBiggestRegions(CLI):
         self.add_opt('-T', '--table', help='Table name (optional, returns regions for all tables otherwise)')
         self.add_opt('-N', '--namespace', default=self.namespace, help='Namespace (default: {})'.format(self.namespace))
         self.add_opt('-n', '--human', action='store_true', help='Humanize size metrics to KB, MB, GB etc')
-        self.add_opt('-o', '--top', default=100, help='Only output regions with the top N sizes ' + \
-                                                      '(default: 100, may return more regions ' + \
-                                                      'than N if multiple have the same size)')
+        self.add_opt('-o', '--top', metavar='N', default=100, help='Only output regions with the top N sizes ' + \
+                                                                   '(default: 100, may return more regions ' + \
+                                                                   'than N if multiple have the same size)')
         self.add_opt('-r', '--requests', help='Only output regions with totalRequestCounts less than or equal to this')
 
     def process_args(self):
