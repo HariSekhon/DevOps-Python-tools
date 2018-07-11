@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 
 
 class HBaseRegionServerRequests(CLI):
@@ -162,16 +162,18 @@ class HBaseRegionServerRequests(CLI):
                 log.info('matched regionserver %s %s request count = %s', host, metric_type, bean[key])
                 if host not in stats:
                     stats[host] = {}
+                if host not in last:
+                    last[host] = {}
                 if self.request_type and metric_type not in self.request_type:
                     continue
                 if self.since_uptime:
                     stats[host][metric_type] = bean[key] / uptime
                 else:
-                    if key not in last:
+                    if key not in last[host]:
                         self.first_iteration = 1
                     else:
-                        stats[host][metric_type] = (bean[key] - last[key]) / self.interval
-                    last[key] = bean[key]
+                        stats[host][metric_type] = (bean[key] - last[host][key]) / self.interval
+                    last[host][key] = bean[key]
 
     def print_stats(self, host):
         stats = self.stats
@@ -181,8 +183,8 @@ class HBaseRegionServerRequests(CLI):
             sys.exit(1)
         if self.first_iteration:
             log.info('first iteration, skipping iteration until we have a differential')
-            print('{}\trate stats will be available in next iteration in {} sec{}'\
-                  .format(tstamp, self.interval, plural(self.interval)))
+            print('{}\t{} rate stats will be available in next iteration in {} sec{}'\
+                  .format(tstamp, host, self.interval, plural(self.interval)))
             self.first_iteration = 0
             return
         for metric in self.request_types:
