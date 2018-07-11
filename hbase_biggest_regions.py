@@ -22,6 +22,8 @@ Designed to find big regions to look at migrating for storage skew across Region
 
 Argument list should be one or more RegionServers to dump the JMX stats from
 
+See also hbase_biggest_least_used_regions.py
+
 Tested on Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2, 1.3.1
 
 """
