@@ -255,7 +255,7 @@ EOF
     run ./hbase_regionserver_requests.py $HBASE_HOST -c 1
     run ./hbase_regionserver_requests.py $HBASE_HOST -c 1 --average
 
-    run ./hbase_regionserver_requests.py $HBASE_HOST -c 1 --type read,write,total
+    run ./hbase_regionserver_requests.py $HBASE_HOST -c 1 -T read,write,total
     run ./hbase_regionserver_requests.py $HBASE_HOST -c 1 --type read,write,total --average
 
     run ./hbase_regionserver_requests.py $HBASE_HOST --count 2 --interval 2
