@@ -265,15 +265,15 @@ EOF
     run ./hbase_regionserver_requests.py localhost $HBASE_HOST -c 1 --average
 
     # ============================================================================ #
-    run ./hbase_biggest_regions.py $HBASE_HOST
-    run ./hbase_biggest_regions.py $HBASE_HOST --human
-    run ./hbase_biggest_regions.py $HBASE_HOST --human --top 10
+    run ./hbase_regions_by_size.py $HBASE_HOST
+    run ./hbase_regions_by_size.py $HBASE_HOST --human
+    run ./hbase_regions_by_size.py $HBASE_HOST --human --top 10
 
     # ============================================================================ #
-    run ./hbase_biggest_least_used_regions.py $HBASE_HOST -r 20000
-    run ./hbase_biggest_least_used_regions.py $HBASE_HOST -r 0
-    run ./hbase_biggest_least_used_regions.py $HBASE_HOST --human --requests 20000
-    run ./hbase_biggest_least_used_regions.py $HBASE_HOST --human --requests 20000 --top 10
+    run ./hbase_regions_least_used.py $HBASE_HOST -r 20000
+    run ./hbase_regions_least_used.py $HBASE_HOST -r 0
+    run ./hbase_regions_least_used.py $HBASE_HOST --human --requests 20000
+    run ./hbase_regions_least_used.py $HBASE_HOST --human --requests 20000 --top 10
 
     [ -z "${KEEPDOCKER:-}" ] ||
     docker-compose down
