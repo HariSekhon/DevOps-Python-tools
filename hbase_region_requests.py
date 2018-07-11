@@ -16,9 +16,9 @@
 
 """
 
-Tool to calculate Requests Per Second since startup for a given HBase table region using JMX API stats
+Tool to calculate HBase Region Requests Per Second since startup using JMX API stats
 
-Designed to help analyze region hotspotting
+Designed to help analyze region hotspotting (see also hbase_regionserver_request.py for regionserver load skew)
 
 Argument list should be one or more RegionServers to dump the JMX stats from
 
@@ -78,7 +78,7 @@ class HBaseRegionsRequests(CLI):
     def add_options(self):
         self.add_opt('-P', '--port', default=os.getenv('HBASE_REGIONSERVER_PORT', self.port),
                      help='HBase RegionServer port (default: {})'.format(self.port))
-        self.add_opt('-T', '--table', help='Table name')
+        self.add_opt('-T', '--table', help='Table name (optional, returns regions for all tables otherwise)')
         self.add_opt('-N', '--namespace', default=self.namespace, help='Namespace (default: {})'.format(self.namespace))
         self.add_opt('-i', '--interval', default=self.interval,
                      help='Interval to print rates at (default: {})'.format(self.interval))
@@ -187,7 +187,7 @@ class HBaseRegionsRequests(CLI):
                     if key not in last:
                         self.first_iteration = 1
                     else:
-                        stats[table][region][metric_type] = bean[key] - last[key]
+                        stats[table][region][metric_type] = (bean[key] - last[key]) / self.interval
                     last[key] = bean[key]
                 if 'read' in stats[table][region] and 'write' in stats[table][region]:
                     #log.debug('calculating total now we have read and write info')
