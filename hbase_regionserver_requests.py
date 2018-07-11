@@ -16,7 +16,7 @@
 
 """
 
-Tool to calculate RegionServer Requests Per Second or Average Since Startup using JMX API stats
+Tool to calculate HBase RegionServer Requests Per Second or Average Since Startup using JMX API stats
 
 Designed to help analyze regionserver load imbalance (see also hbase_region_requests.py for region hotspotting)
 
