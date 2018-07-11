@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
+__version__ = '0.5.1'
 
 
 class HBaseRegionsRequests(CLI):
@@ -160,10 +160,10 @@ class HBaseRegionsRequests(CLI):
         for bean in beans:
             log.debug('processing Regions bean')
             if bean['name'] == 'Hadoop:service=HBase,name=RegionServer,sub=Regions':
-                self.process_bean(bean, uptime)
+                self.process_bean(host, bean, uptime)
                 self.print_stats(host)
 
-    def process_bean(self, bean, uptime):
+    def process_bean(self, host, bean, uptime):
         region_regex = re.compile('^Namespace_{namespace}_table_({table})_region_(.+)_metric_(.+)RequestCount'\
                                   .format(namespace=self.namespace, table=self.table))
         stats = self.stats
@@ -175,23 +175,26 @@ class HBaseRegionsRequests(CLI):
                 region = match.group(2)
                 metric_type = match.group(3)
                 log.info('matched table %s region %s %s request count = %s', table, region, metric_type, bean[key])
-                if table not in stats:
-                    stats[table] = {}
-                if region not in stats[table]:
-                    stats[table][region] = {}
+                if host not in stats:
+                    stats[host] = {}
+                if table not in stats[host]:
+                    stats[host][table] = {}
+                if region not in stats[host][table]:
+                    stats[host][table][region] = {}
                 if self.since_uptime:
-                    stats[table][region][metric_type] = bean[key] / uptime
+                    stats[host][table][region][metric_type] = bean[key] / uptime
                 else:
                     # this isn't perfect - will result on a region split as well as first run
                     # but it's generally good enough
                     if key not in last:
                         self.first_iteration = 1
                     else:
-                        stats[table][region][metric_type] = (bean[key] - last[key]) / self.interval
+                        stats[host][table][region][metric_type] = (bean[key] - last[key]) / self.interval
                     last[key] = bean[key]
-                if 'read' in stats[table][region] and 'write' in stats[table][region]:
+                if 'read' in stats[host][table][region] and 'write' in stats[host][table][region]:
                     #log.debug('calculating total now we have read and write info')
-                    stats[table][region]['total'] = stats[table][region]['read'] + stats[table][region]['write']
+                    stats[host][table][region]['total'] = stats[host][table][region]['read'] + \
+                                                          stats[host][table][region]['write']
 
     def print_stats(self, host):
         stats = self.stats
@@ -206,8 +209,8 @@ class HBaseRegionsRequests(CLI):
                   .format(tstamp, self.interval, plural(self.interval)))
             self.first_iteration = 0
             return
-        for table in sorted(stats):
-            for region in sorted(stats[table]):
+        for table in sorted(stats[host]):
+            for region in sorted(stats[host][table]):
                 table_region = region
                 if len(stats) > 1:
                     table_region = '{}_{}'.format(table, region)
@@ -216,7 +219,7 @@ class HBaseRegionsRequests(CLI):
                 for metric in ('read', 'write', 'total'):
                     if (not show) or metric in show:
                         print('{:20s}\t{:20s}\t{:40s}\t{:10s}\t{:8.0f}'\
-                              .format(tstamp, host, table_region, metric, stats[table][region][metric]))
+                              .format(tstamp, host, table_region, metric, stats[host][table][region][metric]))
         print()
 
     # some extra effort to make it look the same as HBase presents it as
