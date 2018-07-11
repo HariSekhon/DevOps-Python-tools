@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 
 
 class HBaseRegionsRequests(CLI):
@@ -177,6 +177,8 @@ class HBaseRegionsRequests(CLI):
                 log.info('matched table %s region %s %s request count = %s', table, region, metric_type, bean[key])
                 if host not in stats:
                     stats[host] = {}
+                if host not in last:
+                    last[host] = {}
                 if table not in stats[host]:
                     stats[host][table] = {}
                 if region not in stats[host][table]:
@@ -186,11 +188,11 @@ class HBaseRegionsRequests(CLI):
                 else:
                     # this isn't perfect - will result on a region split as well as first run
                     # but it's generally good enough
-                    if key not in last:
+                    if key not in last[host]:
                         self.first_iteration = 1
                     else:
-                        stats[host][table][region][metric_type] = (bean[key] - last[key]) / self.interval
-                    last[key] = bean[key]
+                        stats[host][table][region][metric_type] = (bean[key] - last[host][key]) / self.interval
+                    last[host][key] = bean[key]
                 if 'read' in stats[host][table][region] and 'write' in stats[host][table][region]:
                     #log.debug('calculating total now we have read and write info')
                     stats[host][table][region]['total'] = stats[host][table][region]['read'] + \
@@ -205,8 +207,8 @@ class HBaseRegionsRequests(CLI):
             sys.exit(1)
         if self.first_iteration:
             log.info('first iteration or recent new region, skipping iteration until we have a differential')
-            print('{}\trate stats will be available in next iteration in {} sec{}'\
-                  .format(tstamp, self.interval, plural(self.interval)))
+            print('{}\t{} rate stats will be available in next iteration in {} sec{}'\
+                  .format(tstamp, host, self.interval, plural(self.interval)))
             self.first_iteration = 0
             return
         for table in sorted(stats[host]):
