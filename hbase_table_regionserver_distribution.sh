@@ -13,6 +13,13 @@
 #  https://www.linkedin.com/in/harisekhon
 #
 
+# Useful to see table region skew across regionservers
+#
+# Consider setting for dedicated HBase clusters such as OpenTSDB:
+#
+# hbase.master.loadbalance.bytable=true
+#
+
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
