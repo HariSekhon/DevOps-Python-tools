@@ -51,14 +51,14 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 
 
-class HBaseBiggestRegions(CLI):
+class HBaseRegionsBySize(CLI):
 
     def __init__(self):
         # Python 2.x
-        super(HBaseBiggestRegions, self).__init__()
+        super(HBaseRegionsBySize, self).__init__()
         # Python 3.x
         # super().__init__()
         self.host_list = []
@@ -67,6 +67,7 @@ class HBaseBiggestRegions(CLI):
         self.namespace = 'default'
         self.stats = {}
         self.top_n = None
+        self.count = 0
         self.timeout_default = 300
         self.url = None
 
@@ -143,14 +144,17 @@ class HBaseBiggestRegions(CLI):
             print("No table regions found for table '{}'. Did you specify the correct table name?".format(self.table))
             sys.exit(1)
         size_list = list(reversed(sorted(stats)))
-        if self.top_n:
-            size_list = size_list[0:self.top_n]
         human = self.get_opt('human')
         if human:
             import humanize
         for size in size_list:
             for _ in stats[size]:
-                host = _[0]
+                host2 = _[0]
+                if host != host2:
+                    continue
+                self.count += 1
+                if self.count > self.top_n:
+                    sys.exit(0)
                 table = _[1]
                 region = _[2]
                 size_human = size
@@ -170,4 +174,4 @@ class HBaseBiggestRegions(CLI):
 
 
 if __name__ == '__main__':
-    HBaseBiggestRegions().main()
+    HBaseRegionsBySize().main()
