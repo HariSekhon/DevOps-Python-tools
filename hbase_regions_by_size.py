@@ -18,7 +18,7 @@
 
 Tool to find biggest HBase Regions across any given RegionServers using JMX API stats
 
-Designed to find big regions to look at migrating for storage skew across RegionServers
+Designed to find big and small regions to look at migrating for storage skew across RegionServers
 
 Argument list should be one or more RegionServers to dump the JMX stats from
 
@@ -51,7 +51,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.2'
+__version__ = '0.6'
 
 
 class HBaseRegionsBySize(CLI):
@@ -80,6 +80,7 @@ class HBaseRegionsBySize(CLI):
         self.add_opt('-o', '--top', default=100, help='Only output regions with the top N sizes ' + \
                                                       '(default: 100, may return more regions ' + \
                                                       'than N if multiple have the same size)')
+        self.add_opt('-s', '--smallest', action='store_true', help='Sort by smallest (default: largest)')
 
     def process_args(self):
         self.host_list = self.args
@@ -143,7 +144,9 @@ class HBaseRegionsBySize(CLI):
         if not stats:
             print("No table regions found for table '{}'. Did you specify the correct table name?".format(self.table))
             sys.exit(1)
-        size_list = list(reversed(sorted(stats)))
+        size_list = sorted(stats)
+        if not self.get_opt('smallest'):
+            size_list = list(reversed(size_list))
         human = self.get_opt('human')
         if human:
             import humanize
