@@ -158,6 +158,7 @@ class HBaseGenerateData(CLI):
 
     def get_tables(self):
         try:
+            log.info('getting table list')
             return self.conn.tables()
         except (socket.timeout, ThriftException, HBaseIOError) as _:
             die('ERROR while trying to get table list: {0}'.format(_))
