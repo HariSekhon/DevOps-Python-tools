@@ -19,6 +19,8 @@
 #
 # hbase.master.loadbalance.bytable=true
 #
+#
+# Tested on Hortonworks HDP 2.6 (HBase 1.1.2) and Apache HBase 1.3.1
 
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
