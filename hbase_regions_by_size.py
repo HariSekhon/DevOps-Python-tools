@@ -51,7 +51,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6'
+__version__ = '0.6.1'
 
 
 class HBaseRegionsBySize(CLI):
@@ -112,6 +112,7 @@ class HBaseRegionsBySize(CLI):
                 self.run_host(host, url)
             except (CriticalError, UnknownError, requests.RequestException) as _:
                 printerr("ERROR querying JMX stats for host '{}': {}".format(host, _), )
+        self.print_stats()
 
     def run_host(self, host, url):
         log.info('querying %s', host)
@@ -122,7 +123,6 @@ class HBaseRegionsBySize(CLI):
             log.debug('processing Regions bean')
             if bean['name'] == 'Hadoop:service=HBase,name=RegionServer,sub=Regions':
                 self.process_bean(host, bean)
-                self.print_stats(host)
 
     def process_bean(self, host, bean):
         region_regex = re.compile('^Namespace_{namespace}_table_({table})_region_(.+)_metric_storeFileSize'\
@@ -139,7 +139,7 @@ class HBaseRegionsBySize(CLI):
                     stats[size] = []
                 stats[size].append((host, table, region))
 
-    def print_stats(self, host):
+    def print_stats(self):
         stats = self.stats
         if not stats:
             print("No table regions found for table '{}'. Did you specify the correct table name?".format(self.table))
@@ -152,12 +152,10 @@ class HBaseRegionsBySize(CLI):
             import humanize
         for size in size_list:
             for _ in stats[size]:
-                host2 = _[0]
-                if host != host2:
-                    continue
-                self.count += 1
-                if self.count > self.top_n:
+                if self.top_n and self.count > self.top_n:
                     sys.exit(0)
+                self.count += 1
+                host = _[0]
                 table = _[1]
                 region = _[2]
                 size_human = size
