@@ -14,7 +14,7 @@
 #
 
 # Find regions that require major_compact after region migration to achieve data locality again
-
+#
 # Tested on Hortonworks HDP 2.6 (HBase 1.1.2) and Apache HBase 1.3.1
 
 set -euo pipefail
