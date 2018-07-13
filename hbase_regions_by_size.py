@@ -16,7 +16,7 @@
 
 """
 
-Tool to find biggest HBase Regions across any given RegionServers using JMX API stats
+Tool to find the biggest or smallest HBase Regions across any given RegionServers using JMX API stats
 
 Designed to find big and small regions to look at migrating for storage skew across RegionServers
 
