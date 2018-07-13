@@ -266,12 +266,18 @@ EOF
 
     # ============================================================================ #
     run ./hbase_regions_by_size.py $HBASE_HOST
+    run ./hbase_regions_by_size.py $HBASE_HOST --smallest
     run ./hbase_regions_by_size.py $HBASE_HOST --human
+    run ./hbase_regions_by_size.py $HBASE_HOST --human -s
     run ./hbase_regions_by_size.py $HBASE_HOST --human --top 10
+    run ./hbase_regions_by_size.py $HBASE_HOST --human --top 10 --smallest
 
     run ./hbase_regions_by_memstore_size.py $HBASE_HOST
+    run ./hbase_regions_by_memstore_size.py $HBASE_HOST --smallest
     run ./hbase_regions_by_memstore_size.py $HBASE_HOST --human
+    run ./hbase_regions_by_memstore_size.py $HBASE_HOST --human -s
     run ./hbase_regions_by_memstore_size.py $HBASE_HOST --human --top 10
+    run ./hbase_regions_by_memstore_size.py $HBASE_HOST --human --top 10 --smallest
 
     # ============================================================================ #
     run ./hbase_regions_least_used.py $HBASE_HOST -r 20000
