@@ -56,10 +56,10 @@ __author__ = 'Hari Sekhon'
 __version__ = '0.6'
 
 
-class OpenTSDBCalculateImportDistribution(CLI):
+class OpenTSDBImportDistribution(CLI):
     def __init__(self):
         # Python 2.x
-        super(OpenTSDBCalculateImportDistribution, self).__init__()
+        super(OpenTSDBImportDistribution, self).__init__()
         # Python 3.x
         # super().__init__()
         self.timeout_default = 3600
@@ -248,4 +248,4 @@ class OpenTSDBCalculateImportDistribution(CLI):
 
 
 if __name__ == '__main__':
-    OpenTSDBCalculateImportDistribution().main()
+    OpenTSDBImportDistribution().main()
