@@ -51,7 +51,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 
 
 class HBaseRegionsBySize(CLI):
@@ -65,6 +65,8 @@ class HBaseRegionsBySize(CLI):
         self.port = 16030
         self.table = None
         self.namespace = 'default'
+        self.metric = 'storeFileSize'
+        self.region_regex = None
         self.stats = {}
         self.top_n = None
         self.count = 0
@@ -99,6 +101,8 @@ class HBaseRegionsBySize(CLI):
             self.table = '[{}]+'.format(table_chars)
         self.namespace = self.get_opt('namespace')
         validate_chars(self.namespace, 'hbase namespace', 'A-Za-z0-9:._-')
+        self.region_regex = re.compile('^Namespace_{namespace}_table_({table})_region_(.+)_metric_{metric}'\
+                                       .format(namespace=self.namespace, table=self.table, metric=self.metric))
         self.top_n = self.get_opt('top')
         if self.top_n:
             validate_int(self.top_n, 'top N', 1)
@@ -125,8 +129,7 @@ class HBaseRegionsBySize(CLI):
                 self.process_bean(host, bean)
 
     def process_bean(self, host, bean):
-        region_regex = re.compile('^Namespace_{namespace}_table_({table})_region_(.+)_metric_storeFileSize'\
-                                  .format(namespace=self.namespace, table=self.table))
+        region_regex = self.region_regex
         stats = self.stats
         for key in bean:
             match = region_regex.match(key)
