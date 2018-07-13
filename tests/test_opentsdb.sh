@@ -93,25 +93,25 @@ test_opentsdb(){
     fi
     hr
     echo "testing from data file:"
-    ./opentsdb_calculate_import_metric_distribution.py -K 1 -vv "$DATA_FILE"
+    ./opentsdb_import_metric_distribution.py -K 1 -vv "$DATA_FILE"
     hr
     echo "testing from STDIN:"
-    ./opentsdb_calculate_import_metric_distribution.py -K 2 -vv - < "$DATA_FILE"
+    ./opentsdb_import_metric_distribution.py -K 2 -vv - < "$DATA_FILE"
     hr
     echo "testing including timestamps:"
-    ./opentsdb_calculate_import_metric_distribution.py -K 22 -vv --include-timestamps "$DATA_FILE"
+    ./opentsdb_import_metric_distribution.py -K 22 -vv --include-timestamps "$DATA_FILE"
     hr
     echo "testing reverse sort on count:"
-    ./opentsdb_calculate_import_metric_distribution.py -K 3 -d "$DATA_FILE"
+    ./opentsdb_import_metric_distribution.py -K 3 -d "$DATA_FILE"
     hr
     echo "testing skipping error lines:"
-    ./opentsdb_calculate_import_metric_distribution.py -K 4 --skip-errors - <<EOF
+    ./opentsdb_import_metric_distribution.py -K 4 --skip-errors - <<EOF
 shipCustom $(date +%s) 10 id=metric1
 made up error line
 EOF
     hr
     echo "testing from data file and STDIN at the same time:"
-    ./opentsdb_calculate_import_metric_distribution.py --key-prefix-length 7 "$DATA_FILE" - < "$DATA_FILE"
+    ./opentsdb_import_metric_distribution.py --key-prefix-length 7 "$DATA_FILE" - < "$DATA_FILE"
     hr
 
     #delete_container
