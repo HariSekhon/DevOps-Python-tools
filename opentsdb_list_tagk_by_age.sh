@@ -13,11 +13,11 @@
 #  https://www.linkedin.com/in/harisekhon
 #
 
-# Quick script to list OpenTSDB metrics by age via local HBase Shell
+# Quick script to list OpenTSDB tag keys by age via local HBase Shell
 
 # Output:
 #
-# <timestamp_epoch_millis>  <human_timestamp>   <metric>
+# <timestamp_epoch_millis>  <human_timestamp>   <tagk>
 
 # Tested on OpenTSDB 2.3 on HBase 1.4
 
