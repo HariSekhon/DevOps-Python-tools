@@ -22,7 +22,8 @@ Designed to find big and small regions to look at migrating for storage skew acr
 
 Argument list should be one or more RegionServers to dump the JMX stats from
 
-See also hbase_biggest_least_used_regions.py
+See also hbase_regions_by_memstore_size.py
+         hbase_regions_least_used.py
 
 Tested on Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2, 1.3.1
 
