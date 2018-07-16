@@ -16,13 +16,24 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
-if [ $# != 1 ]; then
+usage(){
     echo "Lists all hosts in Ambari Metrics Collector service via the API
 
 usage: ${0##*/} <ambari_metrics_collector_host>
 "
     exit 1
+}
+
+if [ $# != 1 ]; then
+    usage
 fi
+
+for arg in $@; do
+    case $arg in
+        -*) usage
+            ;;
+    esac
+done
 
 ams_host="$1"
 ams_port="${AMBARI_METRICS_COLLECTOR_PORT:-${AMBARI_PORT:6188}}"
