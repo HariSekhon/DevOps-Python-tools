@@ -27,7 +27,7 @@ fi
 ams_host="$1"
 ams_port="${AMBARI_METRICS_COLLECTOR_PORT:-${AMBARI_PORT:6188}}"
 
-curl "$ams_host:$ams_port/ws/v1/timeline/metrics/hosts" |
+curl -s "$ams_host:$ams_port/ws/v1/timeline/metrics/hosts" |
 python -m json.tool |
 egrep '^[[:space:]]*".+":[[:space:]]* \[[[:space:]]*$' |
 sed 's/"//g;s/:.*//;s/[[:space:]]*//g' |
