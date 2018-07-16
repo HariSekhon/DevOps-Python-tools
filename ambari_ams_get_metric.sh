@@ -31,7 +31,7 @@ if [ $# != 3 ]; then
     usage
 fi
 
-for $arg in $@; do
+for arg in $@; do
     case $arg in
         -*) usage
             ;;
