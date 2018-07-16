@@ -21,7 +21,7 @@ set -euo pipefail
 if [ $# != 1 ]; then
     echo "Lists all hosts in Ambari Metrics Collector service via the API
 
-usage: ${0##*/} <ambari_host>
+usage: ${0##*/} <ambari_metrics_collector_host>
 "
     exit 1
 fi
