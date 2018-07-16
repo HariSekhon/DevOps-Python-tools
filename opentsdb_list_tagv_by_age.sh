@@ -24,11 +24,7 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
-for path in {,/opt}/hbase/bin; do
-    if [ -d "$path" ]; then
-        export PATH="$PATH:$path"
-    fi
-done
+export PATH="$PATH:/opt/hbase/bin:/hbase/bin"
 
 if ! which hbase &>/dev/null; then
     echo "hbase command not found in \$PATH ($PATH)"
@@ -43,7 +39,7 @@ for line in sys.stdin:
     (ts, metric) = line.split()
     print "{}\t{}\t{}".format(ts, time.strftime("%F %T", time.localtime(int(ts)/1000)), metric)
 EOF
-trap "rm '$tmp'" EXIT
+trap "rm '$tmp_python_script'" EXIT
 
 hbase shell <<< "scan 'tsdb-uid', { COLUMNS => 'name:tagv', VERSIONS => 1 }" 2>/dev/null |
 grep 'value=' |
