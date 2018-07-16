@@ -165,7 +165,7 @@ class HBaseRegionsBySize(CLI):
                 size_human = size
                 if human:
                     size_human = humanize.naturalsize(size_human)
-                print('{:20s}\t{:20s}\t{:20s}\t{:10}'\
+                print('{:20s}\t{:20s}\t{:20s}\t{:>10}'\
                       .format(host, table, region, size_human))
         print()
 
