@@ -29,7 +29,7 @@ fi
 ams_host="$1"
 ams_port="${AMBARI_METRICS_COLLECTOR_PORT:-${AMBARI_PORT:6188}}"
 
-curl "$ams_host:$ams_port/ws/v1/timeline/metrics/metadata" |
+curl -s "$ams_host:$ams_port/ws/v1/timeline/metrics/metadata" |
 python -m json.tool |
 grep metricname |
 awk '{print $2}' |
