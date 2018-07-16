@@ -193,6 +193,16 @@ class HBaseRegionsRequests(CLI):
                     else:
                         stats[host][table][region][metric_type] = (bean[key] - last[host][key]) / self.interval
                     last[host][key] = bean[key]
+                # totalRequestCount field seems to not always be found, causing key errors later in print_stats()
+                #
+                # worse is that totalRequestCount calculation is wrong due to change
+                #
+                # See https://issues.apache.org/jira/browse/HBASE-20626
+                #
+                # which counts multi-requests as a single request, breaking the seemingly reasonable assertion
+                #
+                # assert readRequestCount + writeRequestcount == totalRequestCount
+                #
                 if 'read' in stats[host][table][region] and 'write' in stats[host][table][region]:
                     #log.debug('calculating total now we have read and write info')
                     stats[host][table][region]['total'] = stats[host][table][region]['read'] + \
