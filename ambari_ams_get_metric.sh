@@ -16,7 +16,7 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
-if [ $# != 3 ]; then
+usage(){
     echo "Fetches a given Ambari Metric from the Ambari Metrics Collector API
 
 usage: ${0##*/} <ambari_metrics_collector_host> <metric> <cluster_node_hostname>
@@ -25,7 +25,18 @@ See also ./ambari_ams_list_metrics.sh - find available metrics
          ./ambari_ams_list_hosts.sh   - find available hosts
 "
     exit 1
+}
+
+if [ $# != 3 ]; then
+    usage
 fi
+
+for $arg in $@; do
+    case $arg in
+        -*) usage
+            ;;
+    esac
+done
 
 ams_host="$1"
 ams_port="${AMBARI_METRICS_COLLECTOR_PORT:-${AMBARI_PORT:6188}}"
