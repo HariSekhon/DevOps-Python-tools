@@ -26,10 +26,10 @@ usage: ${0##*/} <ambari_metrics_collector_host>
     exit 1
 fi
 
-ambari_host="$1"
-ambari_port="${AMBARI_PORT:6188}"
+ams_host="$1"
+ams_port="${AMBARI_METRICS_COLLECTOR_PORT:-${AMBARI_PORT:6188}}"
 
-curl "$ambari_host:$ambari_port/ws/v1/timeline/metrics/metadata" |
+curl "$ams_host:$ams_port/ws/v1/timeline/metrics/metadata" |
 python -m json.tool |
 grep metricname |
 awk '{print $2}' |
