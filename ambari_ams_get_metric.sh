@@ -17,7 +17,7 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
 if [ $# != 3 ]; then
-    echo "Dumps an given Ambari Metric for a given host from the Ambari Metrics Collector API
+    echo "Fetches a given Ambari Metric from the Ambari Metrics Collector API
 
 usage: ${0##*/} <ambari_metrics_collector_host> <metric> <cluster_node_hostname>
 
@@ -27,11 +27,11 @@ See also ./ambari_ams_list_metrics.sh - find available metrics
     exit 1
 fi
 
-ambari_host="$1"
-ambari_port="${AMBARI_PORT:6188}"
+ams_host="$1"
+ams_port="${AMBARI_METRICS_COLLECTOR_PORT:-${AMBARI_PORT:6188}}"
 metric="$2"
 host="$3"
 
 # returns last metric with second precision
-curl -s "$ambari_host:$ambari_port/ws/v1/timeline/metrics?metricNames=$metric&hostname=$host" |
+curl -s "$ams_host:$ams_port/ws/v1/timeline/metrics?metricNames=$metric&hostname=$host" |
 python -m json.tool
