@@ -63,6 +63,8 @@ until [ $# -lt 1 ]; do
                 ;;
      --by-age)  by_age=1
                 ;;
+    -h|--help)  usage
+                ;;
             *)  usage "unknown argument: $1"
                 ;;
     esac
