@@ -16,7 +16,7 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
-ams_host="${AMBARI_METRICS_COLLECTOR_HOST:-${AMBARI_HOST:-${HOST:-localhost}}}"
+ams_host="${AMBARI_METRICS_COLLECTOR_HOST:-${AMBARI_HOST:-${HOST:-}}}"
 ams_port="${AMBARI_METRICS_COLLECTOR_PORT:-${AMBARI_PORT:-${PORT:-6188}}}"
 
 usage(){
@@ -28,7 +28,7 @@ usage(){
 
 usage: ${0##*/} [options]
 
--H  --host      Ambari Metrics Collector host (default: localhost, \$AMBARI_METRICS_COLLECTOR_HOST, \$AMBARI_HOST, \$HOST)
+-H  --host      Ambari Metrics Collector host (\$AMBARI_METRICS_COLLECTOR_HOST, \$AMBARI_HOST, \$HOST)
 -P  --port      Ambari Metrics Collector port (default: 6188, \$AMBARI_METRICS_COLLECTOR_PORT, \$AMBARI_PORT, \$PORT)
 "
     exit 1
