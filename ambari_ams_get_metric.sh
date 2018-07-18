@@ -29,7 +29,7 @@ usage(){
     cat <<EOF
 Fetches a given Ambari Metric from the Ambari Metrics Collector API
 
-usage: ${0##*/} --host <ambari_metrics_collector_host> --metric <metric> --node <cluster_node_hostname>
+usage: ${0##*/} [options]
 
 -H  --host      Ambari Metrics Collector host (default: localhost, \$AMBARI_METRICS_COLLECTOR_HOST, \$AMBARI_HOST)
 -P  --port      Ambari Metrics Collector port (default: 6188, \$AMBARI_METRICS_COLLECTOR_PORT, \$AMBARI_PORT)
