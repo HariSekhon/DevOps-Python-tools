@@ -31,8 +31,8 @@ Fetches a given Ambari Metric from the Ambari Metrics Collector API
 
 usage: ${0##*/} [options]
 
--H  --host      Ambari Metrics Collector host (default: localhost, \$AMBARI_METRICS_COLLECTOR_HOST, \$AMBARI_HOST)
--P  --port      Ambari Metrics Collector port (default: 6188, \$AMBARI_METRICS_COLLECTOR_PORT, \$AMBARI_PORT)
+-H  --host      Ambari Metrics Collector host (default: localhost, \$AMBARI_METRICS_COLLECTOR_HOST, \$AMBARI_HOST, \$HOST)
+-P  --port      Ambari Metrics Collector port (default: 6188, \$AMBARI_METRICS_COLLECTOR_PORT, \$AMBARI_PORT, \$PORT)
 -m  --metric    The metric to fetch (see ./ambari_ams_list_metrics.sh for a list of available metrics)
 -n  --node      Cluster node hostname to fetch metric for (see ./ambari_ams_list_hosts.sh for a list of available hosts)
 EOF
