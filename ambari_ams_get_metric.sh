@@ -16,33 +16,72 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
+ams_host="${AMBARI_METRICS_COLLECTOR_HOST:-${AMBARI_HOST:-localhost}}"
+ams_port="${AMBARI_METRICS_COLLECTOR_PORT:-${AMBARI_PORT:-6188}}"
+metric=""
+node=""
+
 usage(){
-    echo "Fetches a given Ambari Metric from the Ambari Metrics Collector API
+    if [ -n "$*" ]; then
+        echo "$@"
+        echo
+    fi
+    cat <<EOF
+Fetches a given Ambari Metric from the Ambari Metrics Collector API
 
-usage: ${0##*/} <ambari_metrics_collector_host> <metric> <cluster_node_hostname>
+usage: ${0##*/} --host <ambari_metrics_collector_host> --metric <metric> --node <cluster_node_hostname>
 
-See also ./ambari_ams_list_metrics.sh - find available metrics
-         ./ambari_ams_list_hosts.sh   - find available hosts
-"
+-H  --host      Ambari Metrics Collector host (default: localhost, \$AMBARI_METRICS_COLLECTOR_HOST, \$AMBARI_HOST)
+-P  --port      Ambari Metrics Collector port (default: 6188, \$AMBARI_METRICS_COLLECTOR_PORT, \$AMBARI_PORT)
+-m  --metric    The metric to fetch (see ./ambari_ams_list_metrics.sh for a list of available metrics)
+-n  --node      Cluster node hostname to fetch metric for (see ./ambari_ams_list_hosts.sh for a list of available hosts)
+EOF
     exit 1
 }
 
-if [ $# != 3 ]; then
-    usage
-fi
-
-for arg in $@; do
-    case $arg in
-        -*) usage
-            ;;
+until [ $# -lt 1 ]; do
+    case $1 in
+    -H|--host)  ams_host="${2:-}"
+                shift
+                ;;
+    -P|--port)  ams_host="${2:-}"
+                shift
+                ;;
+  -m|--metric)  metric="${2:-}"
+                shift
+                ;;
+    -n|--node)  node="${2:-}"
+                shift
+                ;;
+    -h|--help)  usage
+                ;;
+            *)  usage "unknown argument: $1"
+                ;;
     esac
+    shift
 done
 
-ams_host="$1"
-ams_port="${AMBARI_METRICS_COLLECTOR_PORT:-${AMBARI_PORT:6188}}"
-metric="$2"
-host="$3"
+if [ -z "$ams_host" ]; then
+    usage "--host not defined"
+elif [ -z "$ams_port" ]; then
+    usage "--port not defined"
+elif [ -z "$metric" ]; then
+    usage "--metric not defined"
+elif [ -z "$node" ]; then
+    usage "--node not defined"
+fi
+
+check_bin(){
+    local bin="$1"
+    if ! which $bin &>/dev/null; then
+        echo "$bin command not found in \$PATH ($PATH)"
+        exit 1
+    fi
+}
+check_bin curl
+check_bin python
 
 # returns last metric with second precision
-curl -s "$ams_host:$ams_port/ws/v1/timeline/metrics?metricNames=$metric&hostname=$host" |
-python -m json.tool
+curl -s "$ams_host:$ams_port/ws/v1/timeline/metrics?metricNames=$metric&hostname=$node" |
+python -m json.tool ||
+    { echo "You probably specified an invalid / non-existent --metric and --node combination to wrong --host/--port"; exit 2; }
