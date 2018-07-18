@@ -16,7 +16,7 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
-ams_host="${AMBARI_METRICS_COLLECTOR_HOST:-${AMBARI_HOST:-${HOST:-localhost}}}"
+ams_host="${AMBARI_METRICS_COLLECTOR_HOST:-${AMBARI_HOST:-${HOST:-}}}"
 ams_port="${AMBARI_METRICS_COLLECTOR_PORT:-${AMBARI_PORT:-${PORT:-6188}}}"
 metric=""
 node=""
@@ -31,7 +31,7 @@ Fetches a given Ambari Metric from the Ambari Metrics Collector API
 
 usage: ${0##*/} [options]
 
--H  --host      Ambari Metrics Collector host (default: localhost, \$AMBARI_METRICS_COLLECTOR_HOST, \$AMBARI_HOST, \$HOST)
+-H  --host      Ambari Metrics Collector host (\$AMBARI_METRICS_COLLECTOR_HOST, \$AMBARI_HOST, \$HOST)
 -P  --port      Ambari Metrics Collector port (default: 6188, \$AMBARI_METRICS_COLLECTOR_PORT, \$AMBARI_PORT, \$PORT)
 -m  --metric    The metric to fetch (see ./ambari_ams_list_metrics.sh for a list of available metrics)
 -n  --node      Cluster node hostname to fetch metric for (see ./ambari_ams_list_hosts.sh for a list of available hosts)
