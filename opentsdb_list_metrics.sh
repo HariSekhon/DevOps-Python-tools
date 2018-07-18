@@ -22,7 +22,7 @@ metrics="metrics"
 by_age=0
 
 usage(){
-    if [ -n "$@" ]; then
+    if [ -n "$*" ]; then
         echo "$@"
         echo
     fi
