@@ -359,7 +359,7 @@ class AmbariTriggerServiceChecks(CLI):
 
             commandData = ""
             if service.upper() == "ZOOKEEPER" :
-              # this if block is needed because the ZOOKEEPRR service check command name is "ZOOKEEPER_QUORUM_SERVICE_CHECK" and not "ZOOKEEPER_SERVICE_CHECK"
+              # ZOOKEEPER service check command name is irregular ZOOKEEPER_QUORUM_SERVICE_CHECK, not ZOOKEEPER_SERVICE_CHECK
               commandData = "{service}_QUORUM_SERVICE_CHECK".format(service=service.upper())
             else :
               commandData = "{service}_SERVICE_CHECK".format(service=service.upper())
