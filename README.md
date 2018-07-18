@@ -64,7 +64,7 @@ Environment variables are supported for convenience and also to hide credentials
   - ```ambari_cancel_all_requests.sh``` - cancel all ongoing operations using the Ambari API
   - ```ambari_trigger_service_checks.py``` - trigger service checks using the Ambari API
 - [Hadoop](http://hadoop.apache.org/) HDFS:
-  - ```hadoop_hdfs_time_block_reads.jy``` - [Hadoop](http://hadoop.apache.org/) HDFS per-block read timing debugger with datanode and rack locations for a given file or directory tree. Reports the slowest Hadoop datanodes in descending order at the end. Helps find cluster data layer bottlenecks such as slow datanodes, faulty hardware or misconfigured top-of-rack switch ports.
+  - ```hadoop_hdfs_time_block_reads.jy``` - HDFS per-block read timing debugger with datanode and rack locations for a given file or directory tree. Reports the slowest Hadoop datanodes in descending order at the end. Helps find cluster data layer bottlenecks such as slow datanodes, faulty hardware or misconfigured top-of-rack switch ports.
   - ```hadoop_hdfs_files_native_checksums.jy``` - fetches native HDFS checksums for quicker file comparisons (about 100x faster than doing hdfs dfs -cat | md5sum)
   - ```hadoop_hdfs_files_stats.jy``` - fetches HDFS file stats. Useful to generate a list of all files in a directory tree showing block size, replication factor, underfilled blocks and small files
 - [HBase](https://hbase.apache.org/):
