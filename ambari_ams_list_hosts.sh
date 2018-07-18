@@ -16,8 +16,8 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
-ams_host="${AMBARI_METRICS_COLLECTOR_HOST:-${AMBARI_HOST:-localhost}}"
-ams_port="${AMBARI_METRICS_COLLECTOR_PORT:-${AMBARI_PORT:-6188}}"
+ams_host="${AMBARI_METRICS_COLLECTOR_HOST:-${AMBARI_HOST:-${HOST:-localhost}}}"
+ams_port="${AMBARI_METRICS_COLLECTOR_PORT:-${AMBARI_PORT:-${PORT:-6188}}}"
 
 usage(){
     if [ -n "$*" ]; then
