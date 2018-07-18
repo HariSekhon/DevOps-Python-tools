@@ -70,7 +70,7 @@ until [ $# -lt 1 ]; do
     esac
     shift || :
 done
- 
+
 check_bin(){
     local bin="$1"
     if ! which $bin &>/dev/null; then
