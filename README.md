@@ -73,6 +73,7 @@ Environment variables are supported for convenience and also to hide credentials
 - ```hbase_regionserver_requests.py``` - calculates requests per regionserver second across all given regionservers or average since regionserver(s) startup(s), configurable interval and count, can filter to any combination of read, write, total, rpcScan, rpcMutate, rpcMulti, rpcGet, blocked per second. Useful for watching more granular RegionServer stats to detect RegionServer hotspotting
 - ```hbase_regions_least_used.py``` - finds topN biggest/smallest regions across given RegionServers than have received the least requests (requests below a given threshold)
 - ```opentsdb_import_metric_distribution.py``` - calculates [OpenTSDB](http://opentsdb.net/) metric distribution in bulk import file(s) to find data skew and help avoid HBase region hotspotting
+- ```opentsdb_list_metrics.sh``` - lists metrics, tagk or tagv and optionally their created date, sorted ascending
 - ```pig-text-to-elasticsearch.pig``` / ```pig-text-to-solr.pig``` - [Pig](https://pig.apache.org/) scripts to bulk index unstructured files in [Hadoop](http://hadoop.apache.org/) to [Elasticsearch](https://www.elastic.co/products/elasticsearch) or [Solr](http://lucene.apache.org/solr/) / [SolrCloud clusters](https://wiki.apache.org/solr/SolrCloud)
 - ```pig_udfs.jy``` - Pig Jython UDFs for Hadoop
 - ```ipython-notebook-pyspark.py``` - per-user authenticated IPython Notebook + PySpark integration to allow each user to auto-create their own password protected IPython Notebook running Spark
