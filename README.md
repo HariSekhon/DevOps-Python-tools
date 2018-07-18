@@ -114,7 +114,8 @@ Environment variables are supported for convenience and also to hide credentials
     - ```find_active_elasticsearch.py``` - finds the first available [Elasticsearch](https://www.elastic.co/products/elasticsearch) node
     - see also: [Advanced HAProxy configurations](https://github.com/harisekhon/nagios-plugins/tree/master/haproxy) which are part of the [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins)
 - ```travis_debug_session.py``` - launches a [Travis CI](https://travis-ci.org/) interactive debug build session via Travis API, tracks session creation and drops user straight in to the SSH shell on the remote Travis build, very convenient one shot debug launcher for Travis CI
-- ```validate_*.py``` - validate files, directory trees and/or standard input streams for the following file types:
+- ```validate_*.py``` - validate files, directory trees and/or standard input streams
+  - supports the following file formats:
     - Avro
     - CSV
     - INI / Java Properties (also detects duplicate sections and duplicate keys within sections)
