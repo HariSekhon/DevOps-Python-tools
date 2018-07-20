@@ -32,6 +32,9 @@ variety of different ini and properties files both in this repo (see tests/) and
 contains lots of DockerHub image source builds and configurations for a wide variety of official Big Data open source
 technologies
 
+See also validate_ini2.py which uses Python's ConfigParser in Python 2 / configparser in Python 3
+but gives much less depth, flexibility and control to allow for different variations of ini files than this version
+
 """
 
 from __future__ import absolute_import
@@ -57,9 +60,6 @@ except ImportError as _:
 __author__ = 'Hari Sekhon'
 __version__ = '0.12.1'
 
-
-# could consider using ConfigParser in Python2 / configparser in Python3
-# but this gives more control over validation rules
 
 class IniValidatorTool(CLI):
 
