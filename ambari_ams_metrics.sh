@@ -32,7 +32,7 @@ usage(){
     cat <<EOF
 Script to making it easy to test the Ambari Metrics Collector API
 
-Does one of the following
+Performs one of the following actions:
 
 - List all metrics collected by AMS Collector (default action if --list-hosts or --metric isn't specified)
 - List all hosts which have metrics collected by AMS Collector
