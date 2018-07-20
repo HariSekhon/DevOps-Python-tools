@@ -45,7 +45,7 @@ usage: ${0##*/} [options]
     --list-metrics  List all metrics collected by AMS (default action)
 -o  --list-hosts    List all hosts for which metrics collected by AMS
 -m  --metric        Fetch metric for given node
--n  --node          Cluster node hostname to fetch metric for
+-n  --node          Cluster node hostname for use with --metric
 EOF
     exit 1
 }
