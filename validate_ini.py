@@ -32,7 +32,7 @@ variety of different ini and properties files both in this repo (see tests/) and
 contains lots of DockerHub image source builds and configurations for a wide variety of official Big Data open source
 technologies
 
-See also validate_ini2.py which uses Python's ConfigParser in Python 2 / configparser in Python 3
+See also validate_ini2.py which uses Python's native ConfigParser / configparser (Python 2 / Python 3)
 but gives much less depth, flexibility and control to allow for different variations of ini files than this version
 
 """
