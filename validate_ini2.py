@@ -29,7 +29,14 @@ from standard input
 
 See also the more flexible validate_ini.py
 
-This version is less flexible to different format varieties, but also stricter in that it requires section headers etc
+This version is less flexible to different format varieties:
+
+Stricter in some ways - requires section headers
+Looser in other ways - allows without any special switch:
+                       - colon delimited ini files
+                       - hash comments
+                       - duplicate keys and sections
+                       - blank files
 
 """
 
