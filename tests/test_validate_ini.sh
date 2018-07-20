@@ -39,7 +39,18 @@ exclude='/tests/spark-\d+\.\d+.\d+-bin-hadoop\d+.\d+$|broken|error'
 rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
 
-./validate_ini.py --exclude "$exclude" .
+run2(){
+    run "$@"
+    run "${@/validate_ini/validate_ini2}"
+}
+
+run_fail2(){
+    run_fail "$@"
+    run_fail "${@/validate_ini/validate_ini2}"
+}
+
+run ./validate_ini.py --exclude "$exclude" .
+run_fail 2 ./validate_ini2.py --exclude "$exclude" .
 echo
 
 
@@ -47,14 +58,14 @@ echo
 hr2
 echo
 echo "checking directory recursion (mixed with explicit file given)"
-./validate_ini.py "$data_dir/test.ini" "$data_dir"
+run2 ./validate_ini.py "$data_dir/test.ini" "$data_dir"
 echo
 
 # ==================================================
 hr2
 echo "checking symlink handling"
 ln -sfv "test.ini" "$data_dir/testlink.ini"
-./validate_ini.py "$data_dir/testlink.ini"
+run2 ./validate_ini.py "$data_dir/testlink.ini"
 rm "$data_dir/testlink.ini"
 echo
 
@@ -62,16 +73,16 @@ echo
 hr2
 echo "checking ini file without an extension"
 cp -iv "$(find "${1:-.}" -iname '*.ini' | grep -v -e '/spark-.*-bin-hadoop.*/' -e 'broken' -e 'error' | head -n1)" "$broken_dir/no_extension_testfile"
-./validate_ini.py -t 1 "$broken_dir/no_extension_testfile"
+run2 ./validate_ini.py -t 1 "$broken_dir/no_extension_testfile"
 echo
 
 # ==================================================
 hr2
 echo "testing stdin"
-./validate_ini.py - < "$data_dir/test.ini"
-./validate_ini.py < "$data_dir/test.ini"
+run2 ./validate_ini.py - < "$data_dir/test.ini"
+run2 ./validate_ini.py < "$data_dir/test.ini"
 echo "testing stdin mixed with filename"
-./validate_ini.py "$data_dir/test.ini" - < "$data_dir/test.ini"
+run2 ./validate_ini.py "$data_dir/test.ini" - < "$data_dir/test.ini"
 echo
 
 echo "testing print mode"
@@ -82,14 +93,22 @@ fi
 echo "successfully passed out test ini to stdout"
 echo
 
+if [ "$(./validate_ini2.py -p "$data_dir/test.ini" | cksum)" != "$(cksum < "$data_dir/test.ini")" ]; then
+    echo "print test2 failed! "
+    exit 1
+fi
+echo "successfully passed out test ini2 to stdout"
+echo
+
 # ==================================================
 hr2
+export TIMEOUT=1
 check_broken(){
     local filename="$1"
     local expected_exitcode="${2:-2}"
     local options="${@:3}"
     set +e
-    ./validate_ini.py -t 1 $options "$filename"
+    ./validate_ini.py $options "$filename"
     exitcode=$?
     set -e
     if [ $exitcode = $expected_exitcode ]; then
@@ -106,27 +125,35 @@ check_broken(){
 
 hr2
 echo "checking ini with blanks fails with --no-blank-lines:"
-check_broken test.ini 2 --no-blank-lines
+#check_broken test.ini 2 --no-blank-lines
+run_fail 2 ./validate_ini.py test.ini --no-blank-lines
+run_fail 2 ./validate_ini2.py test.ini
 echo
 
 hr2
 echo "checking ini with colons fails:"
-check_broken "$data_dir/test.ini-colons"
+#check_broken "$data_dir/test.ini-colons"
+run_fail 2 ./validate_ini.py "$data_dir/test.ini-colons"
+echo "validate_ini2.py permits colon delimited ini files:"
+run ./validate_ini2.py "$data_dir/test.ini-colons"
 echo
 
 hr2
 echo "checking ini with colons passes with --allow-colon-delimiters:"
-./validate_ini.py --allow-colon-delimiters "$data_dir/test.ini-colons"
+run ./validate_ini.py --allow-colon-delimiters "$data_dir/test.ini-colons"
 echo
 
 hr2
 echo "checking ini with hashes comments passes:"
-./validate_ini.py "$data_dir/test.ini-hashes"
+run2 ./validate_ini.py "$data_dir/test.ini-hashes"
 echo
 
 hr2
 echo "checking ini with hash comments fails with --no-hash-comments:"
-check_broken "$data_dir/test.ini-hashes" 2 --no-hash-comments
+#check_broken "$data_dir/test.ini-hashes" 2 --no-hash-comments
+run_fail 2 ./validate_ini.py "$data_dir/test.ini-hashes" --no-hash-comments
+echo "validate_ini2.py permits hash comments:"
+run ./validate_ini2.py "$data_dir/test.ini-hashes"
 echo
 
 hr2
@@ -134,6 +161,8 @@ echo "checking ini just bracket fails"
 cat "$data_dir/test.ini" > "$broken_dir/test_bracket.ini"
 echo "[" >> "$broken_dir/test_bracket.ini"
 check_broken "$broken_dir/test_bracket.ini"
+run_fail 2 ./validate_ini.py "$broken_dir/test_bracket.ini"
+run_fail 2 ./validate_ini2.py "$broken_dir/test_bracket.ini"
 echo
 hr2
 
@@ -144,11 +173,15 @@ echo
 hr2
 echo "checking ini with global single property passes:"
 echo "key1=value1" > "$broken_dir/duplicate_properties_global.ini"
-./validate_ini.py "$broken_dir/duplicate_properties_global.ini"
+run ./validate_ini.py "$broken_dir/duplicate_properties_global.ini"
+run_fail 2 ./validate_ini2.py "$broken_dir/duplicate_properties_global.ini"
 
 echo "checking ini global duplicate property fails:"
 echo "key1=value1" >> "$broken_dir/duplicate_properties_global.ini"
-check_broken "$broken_dir/duplicate_properties_global.ini"
+#check_broken "$broken_dir/duplicate_properties_global.ini"
+# TODO: add section headers
+echo "validate_ini2.py actually fails this test only because of lack of section header:"
+run_fail2 2 ./validate_ini.py "$broken_dir/duplicate_properties_global.ini"
 
 hr2
 echo "checking ini sections with non-duplicate properties passes:"
@@ -160,11 +193,14 @@ key2=value2
 key3=value3
 " > "$broken_dir/duplicate_properties_section.ini"
 
-./validate_ini.py "$broken_dir/duplicate_properties_section.ini"
+run2 ./validate_ini.py "$broken_dir/duplicate_properties_section.ini"
 
 echo "checking ini section with duplicate properties fails:"
 echo "key3=value3" >> "$broken_dir/duplicate_properties_section.ini"
 check_broken "$broken_dir/duplicate_properties_section.ini"
+run_fail 2 ./validate_ini.py "$broken_dir/duplicate_properties_section.ini"
+echo "validate_ini2.py doesn't detect duplicate properties:"
+run ./validate_ini2.py "$broken_dir/duplicate_properties_section.ini"
 
 hr2
 echo "checking ini with non-duplicate sections passes:"
@@ -176,7 +212,7 @@ key5=value5
 key6=value6
 key7=value7
 " > "$broken_dir/duplicate_sections.ini"
-./validate_ini.py "$broken_dir/duplicate_sections.ini"
+run2 ./validate_ini.py "$broken_dir/duplicate_sections.ini"
 
 hr
 echo "checking ini with duplicate sections fails:"
@@ -185,38 +221,53 @@ echo "
 key8=value8
 key9=value9" >> "$broken_dir/duplicate_sections.ini"
 check_broken "$broken_dir/duplicate_sections.ini"
+run_fail 2 ./validate_ini.py "$broken_dir/duplicate_sections.ini"
+echo "validate_ini2.py doesn't detect duplicate sections:"
+run ./validate_ini2.py "$broken_dir/duplicate_sections.ini"
 
 echo
 
 hr2
 check_broken_sample_files ini
+for filename in $(sample_files ini); do
+    run_fail 2 ./validate_ini.py "$filename"
+done
 
 # ==================================================
 hr2
 echo "checking single word text file is not valid ini"
 echo blah > "$broken_dir/single_field.ini"
 check_broken "$broken_dir/single_field.ini" 2
+run_fail2 2 ./validate_ini.py "$broken_dir/single_field.ini"
 
 # ==================================================
 hr2
 echo "checking for non-existent file"
 check_broken nonexistentfile 2
+run_fail2 2 ./validate_ini.py nonexistentfile
 
 # ==================================================
 hr2
 echo "checking blank content is invalid"
 echo > "$broken_dir/blank.ini"
 check_broken "$broken_dir/blank.ini"
+run_fail 2 ./validate_ini.py "$broken_dir/blank.ini"
+run ./validate_ini2.py "$broken_dir/blank.ini"
 echo
 
 hr2
 echo "checking blank content is invalid via stdin"
 check_broken - 2 < "$broken_dir/blank.ini"
+run_fail 2 ./validate_ini.py < "$broken_dir/blank.ini"
+run ./validate_ini2.py < "$broken_dir/blank.ini"
 echo
 
 hr2
 echo "checking blank content is invalid via stdin piped from /dev/null"
 cat /dev/null | check_broken - 2
+cat /dev/null | run_fail 2 ./validate_ini.py
+echo "validate_ini2.py blank content is valid:"
+cat /dev/null | run ./validate_ini2.py
 echo
 
 hr2
@@ -227,37 +278,44 @@ cat >> "$broken_dir/commented_out.ini" <<EOF
 
 EOF
 check_broken "$broken_dir/commented_out.ini"
+run_fail 2 ./validate_ini.py "$broken_dir/commented_out.ini"
+run ./validate_ini2.py "$broken_dir/commented_out.ini"
 echo
 hr2
 echo "checking commented out ini is permitted if using --allow-empty:"
-./validate_ini.py --allow-empty "$broken_dir/commented_out.ini"
+run ./validate_ini.py --allow-empty "$broken_dir/commented_out.ini"
+run ./validate_ini2.py "$broken_dir/commented_out.ini"
 echo
 
 hr2
 echo "checking commented out ini is permitted if using --allow-empty via std:"
-./validate_ini.py --allow-empty < "$broken_dir/commented_out.ini"
+run ./validate_ini.py --allow-empty < "$broken_dir/commented_out.ini"
+run ./validate_ini2.py < "$broken_dir/commented_out.ini"
 echo
 
 hr2
 echo "checking blank ini is permitted if using --allow-empty:"
-./validate_ini.py --allow-empty "$broken_dir/blank.ini"
+run ./validate_ini.py --allow-empty "$broken_dir/blank.ini"
+run ./validate_ini2.py "$broken_dir/blank.ini"
 echo
 
 hr2
 echo "checking blank ini is permitted if using --allow-empty via stdin:"
-./validate_ini.py --allow-empty < "$broken_dir/blank.ini"
+run ./validate_ini.py --allow-empty < "$broken_dir/blank.ini"
+run ./validate_ini2.py < "$broken_dir/blank.ini"
 echo
 
 hr2
 echo "checking blank ini is permitted if using --allow-empty via stdin piped from /dev/null:"
-./validate_ini.py --allow-empty < /dev/null
+run ./validate_ini.py --allow-empty < /dev/null
+run ./validate_ini2.py < /dev/null
 echo
 
 # ==================================================
 hr2
 echo
 echo "checking directory recursion with --include does not hit broken file"
-./validate_ini.py "$broken_dir" "$data_dir" --include "$data_dir/test.ini"
+run2 ./validate_ini.py "$broken_dir" "$data_dir" --include "$data_dir/test.ini"
 echo
 
 rm -fr "$broken_dir"
