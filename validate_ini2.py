@@ -22,7 +22,7 @@ See validate_ini.py for a better more flexible version
 
 Validates each file passed as an argument
 
-Directories are recursed, checking all files ending in a .ini or .properties suffix.
+Directories are recursed, checking all files ending in a .ini suffix.
 
 Works like a standard unix filter program - if no files are passed as arguments or '-' is given then reads
 from standard input
@@ -65,7 +65,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.12.1'
+__version__ = '0.12.2'
 
 
 class IniValidatorTool2(IniValidatorTool):
@@ -75,6 +75,7 @@ class IniValidatorTool2(IniValidatorTool):
         super(IniValidatorTool2, self).__init__()
         # Python 3.x
         # super().__init__()
+        self.re_ini_suffix = re.compile(r'.*\.ini$', re.I)
 
     def add_options(self):
         self.add_opt('-p', '--print', action='store_true',
