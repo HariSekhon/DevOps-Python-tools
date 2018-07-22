@@ -40,13 +40,13 @@ rm -fr "$broken_dir" || :
 mkdir "$broken_dir"
 
 run2(){
-    run "$@"
-    run "${@/validate_ini/validate_ini2}"
+    run "$@"  # ignore_run_unqualified
+    run "${@/validate_ini/validate_ini2}"  # ignore_run_unqualified
 }
 
 run_fail2(){
-    run_fail "$@"
-    run_fail "${@/validate_ini/validate_ini2}"
+    run_fail "$@"  # ignore_run_unqualified
+    run_fail "${@/validate_ini/validate_ini2}"  # ignore_run_unqualified
 }
 
 run ./validate_ini.py --exclude "$exclude" .
