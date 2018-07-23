@@ -20,9 +20,10 @@ set -euo pipefail
 
 ams_host="${AMBARI_METRICS_COLLECTOR_HOST:-${AMBARI_HOST:-${HOST:-}}}"
 ams_port="${AMBARI_METRICS_COLLECTOR_PORT:-${AMBARI_PORT:-${PORT:-6188}}}"
+list_metrics=false
 list_nodes=false
 metric=""
-node=""
+node_list=""
 
 usage(){
     if [ -n "$*" ]; then
@@ -35,17 +36,27 @@ Script to making it easy to test the Ambari Metrics Collector API
 Performs one of the following actions:
 
 - List all metrics collected by AMS Collector (default action if --list-hosts or --metric isn't specified)
-- List all hosts which have metrics collected by AMS Collector
-- Fetch a given Ambari Metric for a given host
+- List all cluster nodes for which metrics have been collected by AMS
+- Fetch a given Ambari Metric for given cluster node(s)
+
+Tested on Ambari 2.5, 2.6 on HDP 2.6
+
+export AMBARI_METRICS_COLLECTOR_HOST=myhost  # or use --host each time if you prefer but it's longer
+./${0##*/} --list-metrics
+./${0##*/} --list-nodes
+./${0##*/} --metric <blah> --nodes master1,master2  # comma separated list
+./${0##*/} --metric <blah> --nodes datanode{1..10}  # makes use of args being incorporated to node list
+
 
 usage: ${0##*/} [options]
 
 -H  --host          Ambari Metrics Collector host (\$AMBARI_METRICS_COLLECTOR_HOST, \$AMBARI_HOST, \$HOST)
 -P  --port          Ambari Metrics Collector port (default: 6188, \$AMBARI_METRICS_COLLECTOR_PORT, \$AMBARI_PORT, \$PORT)
     --list-metrics  List all metrics collected by AMS (default action)
--o  --list-hosts    List all hosts for which metrics collected by AMS
--m  --metric        Fetch metric for given node
--n  --node          Cluster node hostname for use with --metric
+-o  --list-nodes    List all cluster nodes for which metrics have been collected by AMS
+-m  --metric        Fetch metric for given node(s)
+-n  --nodes         Specify nodes for which to fetch given --metric (comma separated list, arguments are added to the node list)
+-D  --debug         Debug mode
 EOF
     exit 1
 }
@@ -58,19 +69,25 @@ until [ $# -lt 1 ]; do
         -P|--port)  ams_host="${2:-}"
                     shift
                     ;;
-   --list-metrics)  :
+   --list-metrics)  list_metrics=true
+                    [ "$list_nodes" = true ] && usage '--list-metrics and --list-nodes are mutually exclusive!'
                     ;;
   -o|--list-nodes)  list_nodes=true
+                    [ "$list_metrics" = true ] && usage '--list-metrics and --list-nodes are mutually exclusive!'
                     ;;
       -m|--metric)  metric="${2:-}"
                     shift
                     ;;
-        -n|--node)  node="${2:-}"
+-n|--node|--nodes)  node_list="${2:-}"
                     shift
                     ;;
         -h|--help)  usage
                     ;;
-                *)  usage "unknown argument: $1"
+       -D|--debug)  DEBUG=1; set -x
+                    ;;
+               -*)  usage "unknown option: $1"
+                    ;;
+                *)  node_list="$node_list $1"
                     ;;
     esac
     shift || :
@@ -82,11 +99,11 @@ elif [ -z "$ams_port" ]; then
     usage "--port not defined"
 fi
 if [ -n "$metric" ]; then
-    if [ -z "$node" ]; then
-        usage "--node must be defined when using --metric"
+    if [ -z "$node_list" ]; then
+        usage "--nodes must be defined when using --metric"
     fi
-elif [ -n "$node" ]; then
-    usage "--node option requires --metric. Use --list-metrics"
+elif [ -n "$node_list" ]; then
+    usage "--nodes option requires --metric. See --list-metrics for a list of available metrics"
 fi
 
 check_bin(){
@@ -120,10 +137,13 @@ list_hosts(){
 }
 
 fetch_metric(){
-    # returns last metric with second precision
-    curl -s "$ams_host:$ams_port/ws/v1/timeline/metrics?metricNames=$metric&hostname=$node" |
-    python -m json.tool ||
-        { echo "You probably specified an invalid / non-existent --metric and --node combination to wrong --host/--port"; exit 2; }
+    node_list="$(tr ',' ',' <<< "$node_list")"
+    for node in $node_list; do
+        # returns last metric with second precision
+        curl -s "$ams_host:$ams_port/ws/v1/timeline/metrics?metricNames=$metric&hostname=$node" |
+        python -m json.tool ||
+            { echo "You probably specified an invalid / non-existent --metric and --nodes combination to wrong --host/--port"; exit 2; }
+    done
 }
 
 if [ "$list_nodes" = true ]; then
