@@ -142,16 +142,12 @@ fetch_metric(){
 
 fetch_metrics(){
     node_list="$(tr ',' ' ' <<< "$node_list")"
-    if [ -n "$node_list" ]; then
-        for node in $node_list; do
-            fetch_metric "$node"
-        done
-    else
-        set -o pipefail
-        for node in $(list_hosts); do
-            fetch_metric "$node"
-        done
+    if [ -z "$node_list" ]; then
+        node_list=$(list_hosts)
     fi
+    for node in $node_list; do
+        fetch_metric "$node"
+    done
 }
 
 if [ "$list_nodes" = true ]; then
