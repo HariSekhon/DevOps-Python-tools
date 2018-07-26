@@ -98,11 +98,7 @@ if [ -z "$ams_host" ]; then
 elif [ -z "$ams_port" ]; then
     usage "--port not defined"
 fi
-if [ -n "$metric" ]; then
-    if [ -z "$node_list" ]; then
-        usage "--nodes must be defined when using --metric"
-    fi
-elif [ -n "$node_list" ]; then
+if [ -n "$node_list" -a -z "$metric" ]; then
     usage "--nodes option requires --metric. See --list-metrics for a list of available metrics"
 fi
 
@@ -137,19 +133,31 @@ list_hosts(){
 }
 
 fetch_metric(){
-    node_list="$(tr ',' ',' <<< "$node_list")"
-    for node in $node_list; do
-        # returns last metric with second precision
-        curl -s "$ams_host:$ams_port/ws/v1/timeline/metrics?metricNames=$metric&hostname=$node" |
-        python -m json.tool ||
-            { echo "You probably specified an invalid / non-existent --metric and --nodes combination to wrong --host/--port"; exit 2; }
-    done
+    local node="$1"
+    # returns last metric with second precision
+    curl -s "$ams_host:$ams_port/ws/v1/timeline/metrics?metricNames=$metric&hostname=$node" |
+    python -m json.tool ||
+        { echo "You probably specified an invalid / non-existent --metric and --nodes combination to wrong --host/--port"; exit 2; }
+}
+
+fetch_metrics(){
+    node_list="$(tr ',' ' ' <<< "$node_list")"
+    if [ -n "$node_list" ]; then
+        for node in $node_list; do
+            fetch_metric "$node"
+        done
+    else
+        set -o pipefail
+        for node in $(list_hosts); do
+            fetch_metric "$node"
+        done
+    fi
 }
 
 if [ "$list_nodes" = true ]; then
     list_hosts
 elif [ -n "$metric" ]; then
-    fetch_metric
+    fetch_metrics
 else
     list_metrics
 fi
