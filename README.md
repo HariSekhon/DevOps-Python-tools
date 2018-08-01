@@ -163,9 +163,20 @@ https://github.com/HariSekhon/pytools/archive/master.zip
 
 https://github.com/HariSekhon/pylib/archive/master.zip
 
-Unzip both and move Pylib to the ```pylib``` folder under the folder containing PyTools.
+Unzip both and move Pylib to the ```pylib``` folder under PyTools.
 
-Proceed to install PyPI modules for whichever programs you want to use using your internal mirror or standard procedure. All PyPI modules are listed in the ```requirements.txt``` file.
+```
+unzip pytools-master.zip
+unzip pylib-master.zip
+
+mv pytools-master pytools
+mv pylib pylib
+mv -f pylib pytools/
+```
+
+Proceed to install PyPI modules for whichever programs you want to use using your usual procedure - usually an internal mirror or proxy server to PyPI, or rpms / debs (some libraries are packaged by Linux distributions).
+
+All PyPI modules are listed in the ```requirements.txt``` file.
 
 
 ##### Mac OS X
