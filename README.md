@@ -138,7 +138,7 @@ See ```validate_*.py``` data and config file validators further down which are u
     - YAML
   - directories are recursed, testing any files with relevant matching extensions (`.avro`, `.csv`, `json`, `parquet`, `.ini`/`.properties`, `.ldif`, `.xml`, `.yml`/`.yaml`)
   - used for Continuous Integration tests of various adjacent Spark data converters as well as configuration files for things like Presto, Ambari, Apache Drill etc found in my [DockerHub](https://hub.docker.com/u/harisekhon/) images [Dockerfiles master repo](https://github.com/HariSekhon/Dockerfiles) which contains docker builds and configurations for many open source Big Data & Linux technologies
-- ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user (there is also a perl version in my [Tools](https://github.com/harisekhon/tools) repo)
+- ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user to put in your shell's ```.profile``` (there is also a perl version in my [Tools](https://github.com/harisekhon/tools) repo)
 
 ### Detailed Build Instructions
 
