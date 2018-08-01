@@ -163,7 +163,7 @@ https://github.com/HariSekhon/pytools/archive/master.zip
 
 https://github.com/HariSekhon/pylib/archive/master.zip
 
-Unzip both and move Pylib to the ```pylib``` folder under the folder containg PyTools.
+Unzip both and move Pylib to the ```pylib``` folder under the folder containing PyTools.
 
 Proceed to install PyPI modules for whichever programs you want to use using your internal mirror or standard procedure. All PyPI modules are listed in the ```requirements.txt``` file.
 
