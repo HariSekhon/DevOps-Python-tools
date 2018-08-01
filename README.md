@@ -157,7 +157,7 @@ pip install -r requirements.txt
 
 #### Offline Setup
 
-Download the PyTools and Pylib git repos zip files:
+Download the PyTools and Pylib git repos as zip files:
 
 https://github.com/HariSekhon/pytools/archive/master.zip
 
