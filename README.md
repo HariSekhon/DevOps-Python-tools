@@ -170,7 +170,7 @@ unzip pytools-master.zip
 unzip pylib-master.zip
 
 mv pytools-master pytools
-mv pylib pylib
+mv pylib-master pylib
 mv -f pylib pytools/
 ```
 
