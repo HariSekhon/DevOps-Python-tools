@@ -92,9 +92,18 @@ print_metrics_by_age(){
     # hackish but convenient - forking to the date command thousands or hundreds of thousands of times can take hours, python takes 10 secs even for 250,000+ metrics
     tmp_python_script=$(mktemp)
     cat > "$tmp_python_script" <<EOF
+from __future__ import print_function
 import sys, time
+metrics = {}
 for line in sys.stdin:
-    (ts, metric) = line.split()
+    try:
+        (ts, metric) = line.split()
+    except ValueError as _:
+        print('ValueError: _, line: {}'.format(_, line), file=sys.stderr)
+#    if not metric in metrics or ts < metrics[metric]:
+#        metric[metric] = ts
+#for metric in metrics:
+#    ts = metrics[metric]
     print "{}\t{}\t{}".format(ts, time.strftime("%F %T", time.localtime(int(ts)/1000)), metric)
 EOF
     trap "rm '$tmp_python_script'" EXIT
