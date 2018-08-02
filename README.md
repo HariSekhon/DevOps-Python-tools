@@ -151,7 +151,7 @@ git clone https://github.com/harisekhon/pytools
 cd pytools
 git submodule init
 git submodule update
-pip install -r requirements.txt
+sudo pip install -r requirements.txt
 ```
 
 
