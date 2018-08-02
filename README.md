@@ -209,9 +209,9 @@ make
 You may get errors trying to install to Python library paths even as root on newer versions of Mac, sometimes this is caused by pip 10 vs pip 9 and downgrading will work around it:
 
 ```
-pip install --upgrade pip==9.0.1
+sudo pip install --upgrade pip==9.0.1
 make
-pip install --upgrade pip
+sudo pip install --upgrade pip
 make
 ```
 
@@ -259,7 +259,8 @@ If you end up with an error like:
 ```
 It can be caused by an issue with the underlying Python + libraries due to changes in OpenSSL and certificates. One quick fix is to do the following:
 ```
-pip uninstall -y certifi && pip install certifi==2015.04.28
+sudo pip uninstall -y certifi &&
+sudo pip install certifi==2015.04.28
 ```
 
 ### Updating ###
