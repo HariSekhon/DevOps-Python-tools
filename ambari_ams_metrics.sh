@@ -105,7 +105,7 @@ fi
 check_bin(){
     local bin="$1"
     if ! which $bin &>/dev/null; then
-        echo "$bin command not found in \$PATH ($PATH)"
+        echo "'$bin' command not found in \$PATH ($PATH)"
         exit 1
     fi
 }
