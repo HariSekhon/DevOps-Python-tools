@@ -3,6 +3,7 @@ scrub_custom.conf
 solr-env.sh
 spark-deps.zip
 *.pyc
+*.pyo
 *.jyc
 *.avro
 *.parquet
