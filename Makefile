@@ -234,16 +234,16 @@ jython:
 sonar:
 	sonar-scanner
 
-.PHONY: lib-test
-lib-test:
+.PHONY: test-lib
+test-lib:
 	cd pylib && $(MAKE) test
 
 .PHONY: test
-test: lib-test
+test: test-lib
 	tests/all.sh
 
 .PHONY: basic-test
-basic-test: lib-test
+basic-test: test-lib
 	bash-tools/all.sh
 
 .PHONY: test2
