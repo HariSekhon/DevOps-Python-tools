@@ -58,16 +58,13 @@ Environment variables are supported for convenience and also to hide credentials
 
 ### PyTools ###
 
-See ```validate_*.py``` data and config file validators further down which are useful to use in conjunction with these data converters.
-
-- [Spark](https://spark.apache.org/):
+- [Spark](https://spark.apache.org/) & Data Format Converters (see also ```validate_*.py``` further down):
   - ```spark_avro_to_parquet.py``` - PySpark Avro => Parquet converter
   - ```spark_parquet_to_avro.py``` - PySpark Parquet => Avro converter
   - ```spark_csv_to_avro.py``` - PySpark CSV => Avro converter, supports both inferred and explicit schemas
   - ```spark_csv_to_parquet.py``` - PySpark CSV => Parquet converter, supports both inferred and explicit schemas
   - ```spark_json_to_avro.py``` - PySpark JSON => Avro converter
   - ```spark_json_to_parquet.py``` - PySpark JSON => Parquet converter
-- Data Format Converters:
   - ```json_to_xml.py``` - JSON to XML converter
   - ```xml_to_json.py``` - XML to JSON converter
   - ```json_docs_to_bulk_multiline.py``` - converts json files to bulk multi-record one-line-per-json-document format for pre-processing and loading to big data systems like [Hadoop](http://hadoop.apache.org/) and [MongoDB](https://www.mongodb.com/), can recurse directory trees, and mix json-doc-per-file / bulk-multiline-json / directories / standard input, combines all json documents and outputs bulk-one-json-document-per-line to standard output for convenient command line chaining and redirection, optionally continues on error, collects broken records to standard error for logging and later reprocessing for bulk batch jobs, even supports single quoted json while not technically valid json is used by MongoDB and even handles embedded double quotes in 'single quoted json'
