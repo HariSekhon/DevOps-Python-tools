@@ -94,9 +94,9 @@ Exits with return code 1 and NO_AVAILABLE_SERVER if none of the supplied servers
 --quiet mode will return blank output and exit code 1 in that case.
 
 
-See also Advanced HAProxy configurations as part of the Advanced Nagios Plugins Collection at:
+See also Advanced HAProxy configurations (part of the Advanced Nagios Plugins Collection) at:
 
-    https://github.com/harisekhon/nagios-plugins/tree/master/haproxy
+    https://github.com/harisekhon/haproxy-configs
 
 """
 
