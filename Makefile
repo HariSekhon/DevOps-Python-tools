@@ -79,8 +79,6 @@ build:
 	$(MAKE) common
 	$(MAKE) python
 
-	cd pylib && $(MAKE)
-
 .PHONY: system-packages
 system-packages:
 	if [ -x /sbin/apk ];        then $(MAKE) apk-packages; fi
@@ -99,6 +97,7 @@ submodules:
 	
 .PHONY: python
 python:
+	cd pylib && $(MAKE)
 	# don't pull parquet tools in to docker image by default, will bloat it
 	# can fetch separately by running 'make parquet-tools' if you really want to
 	if [ -f /.dockerenv -o -n "$(SKIP_PARQUET)" ]; then \
