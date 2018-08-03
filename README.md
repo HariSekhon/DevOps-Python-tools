@@ -124,7 +124,7 @@ See ```validate_*.py``` data and config file validators further down which are u
     - ```find_active_oozie.py``` - finds the first active [Oozie](http://oozie.apache.org/) server
     - ```find_active_solrcloud.py``` - finds the first available [Solr](http://lucene.apache.org/solr/) / [SolrCloud](https://wiki.apache.org/solr/SolrCloud) node
     - ```find_active_elasticsearch.py``` - finds the first available [Elasticsearch](https://www.elastic.co/products/elasticsearch) node
-    - see also: [Advanced HAProxy configurations](https://github.com/harisekhon/nagios-plugins/tree/master/haproxy) which are part of the [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins)
+    - see also: [Advanced HAProxy configurations](https://github.com/harisekhon/haproxy-configs) which are part of the [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins)
 - ```travis_debug_session.py``` - launches a [Travis CI](https://travis-ci.org/) interactive debug build session via Travis API, tracks session creation and drops user straight in to the SSH shell on the remote Travis build, very convenient one shot debug launcher for Travis CI
 - ```validate_*.py``` - validate files, directory trees and/or standard input streams
   - supports the following file formats:
