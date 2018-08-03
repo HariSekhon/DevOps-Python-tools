@@ -178,6 +178,17 @@ Proceed to install PyPI modules for whichever programs you want to use using you
 
 All PyPI modules are listed in the ```requirements.txt``` file.
 
+Internal Mirror example ([JFrog Artifactory](https://jfrog.com/artifactory/) or similar):
+
+```
+sudo pip install --index https://host.domain.com/api/pypi/repo/simple --trusted host.domain.com -r requirements.txt
+```
+
+Proxy example:
+
+```
+sudo pip install --proxy hari:mypassword@proxy-host:8080 -r requirements.txt
+```
 
 ##### Mac OS X
 
