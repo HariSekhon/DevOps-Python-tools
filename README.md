@@ -140,6 +140,11 @@ Environment variables are supported for convenience and also to hide credentials
 
 ### Detailed Build Instructions
 
+##### Python VirtualEnv localized installs
+
+The automated build will use 'sudo' to install required Python PyPI libraries to the system unless running as root or it detects being inside a VirtualEnv. If you want to install some of the common Python libraries using your OS packages instead of installing from CPAN / PyPI then follow the Manual Build section below.
+
+
 #### Manual Setup
 
 Enter the pytools directory and run git submodule init and git submodule update to fetch my library repo:
