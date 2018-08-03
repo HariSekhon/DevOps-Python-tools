@@ -58,7 +58,8 @@ Environment variables are supported for convenience and also to hide credentials
 
 ### PyTools ###
 
-- [Spark](https://spark.apache.org/) & Data Format Converters (see also ```validate_*.py``` further down):
+- [Spark](https://spark.apache.org/) & Data Format Converters:
+(see also ```validate_*.py``` further down)
   - ```spark_avro_to_parquet.py``` - PySpark Avro => Parquet converter
   - ```spark_parquet_to_avro.py``` - PySpark Parquet => Avro converter
   - ```spark_csv_to_avro.py``` - PySpark CSV => Avro converter, supports both inferred and explicit schemas
