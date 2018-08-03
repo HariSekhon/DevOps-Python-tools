@@ -19,6 +19,7 @@ git
 python
 python-pip
 python-setuptools
+python-six
 unzip
 wget
 zip
