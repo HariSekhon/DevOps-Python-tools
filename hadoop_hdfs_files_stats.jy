@@ -14,9 +14,10 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-__author__  = 'Hari Sekhon'
-__version__ = '0.9.0'
+__author__ = 'Hari Sekhon'
+__version__ = '0.9.1'
 
+# pylint: disable=wrong-import-position
 import os
 import sys
 import time
@@ -25,28 +26,27 @@ import socket
 import getopt
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
-sys.path.append(libdir)
 try:
     from harisekhon.utils import jython_only, die, printerr, ERRORS, \
-                                 isJavaOOM, java_oom_fix_msg, log_jython_exception, get_jython_exception
-except ImportError, e:
-    print('module import failed: %s' % e, file=sys.stderr)
+                                 isJavaOOM, java_oom_fix_msg, get_jython_exception # log_jython_exception
+except ImportError as _:
+    print('module import failed: %s' % _, file=sys.stderr)
     sys.exit(4)
 
 jython_only()
 
 #import array # using jarray for byte arrays
-import jarray
-try:
-    from java.nio import ByteBuffer
-except ImportError, e:
-    die("Couldn't find java.nio class, not running inside Jython?")
+#import jarray
+#try:
+#    from java.nio import ByteBuffer
+#except ImportError as _:
+#    die("Couldn't find java.nio class, not running inside Jython?")
 try:
     from org.apache.hadoop.conf import Configuration
     #from org.apache.hadoop.fs import FileSystem
     from org.apache.hadoop.fs import Path
     from org.apache.hadoop.hdfs import DistributedFileSystem
-except ImportError, e:
+except ImportError as _:
     die("Couldn't find Hadoop Java classes, try:  jython -J-cp `hadoop classpath` %s <args>" % sys.argv[0])
 
 def usage(*msg):
@@ -75,7 +75,8 @@ watch memory usage with top like so:    top -p $(pgrep -f jython|tr '\n' ','|sed
 
 ================================================================================
 """ % (os.path.basename(__file__), __version__, os.path.basename(__file__)), ERRORS["UNKNOWN"])
-#-a --all-blocks         Fetch all copies of all blocks from all datanodes (--one-block-per-DN shortcuts this) [Not implemented yet]
+#-a --all-blocks         Fetch all copies of all blocks from all datanodes
+#                        (--one-block-per-DN shortcuts this) [Not implemented yet]
 # TODO: add multiple files and dir recursion
 
 
@@ -85,12 +86,12 @@ def main():
     noheader = False
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:], "hn", ["help", "usage" "no-header"])
-    except getopt.GetoptError, e:
-        usage("error: %s" % e)
-    for o, a in opts:
-        if o in ("-h", "--help", "--usage"):
+    except getopt.GetoptError as _:
+        usage("error: %s" % _)
+    for opt, arg in opts:
+        if opt in ("-h", "--help", "--usage"):
             usage()
-        elif o in ("-n", "--no=header"):
+        elif opt in ("-n", "--no=header"):
             noheader = True
         else:
             usage()
@@ -101,13 +102,13 @@ def main():
         usage("no file / directory specified")
     filelist = sorted(filelist)
     try:
-        HDFSBlockCounter().printBlockCounts(filelist, noheader)
-    except KeyboardInterrupt, e:
+        HDFSBlockCounter().print_block_counts(filelist, noheader)
+    except KeyboardInterrupt as _:
         printerr("Caught Control-C...", 1)
         sys.exit(ERRORS["OK"])
-    except Exception, e:
-        printerr("Error running HDFSBlockCounter: %s" % e, 1)
-        if isJavaOOM(e.message):
+    except Exception as _:
+        printerr("Error running HDFSBlockCounter: %s" % _, 1)
+        if isJavaOOM(_.message):
             printerr(java_oom_fix_msg())
         sys.exit(ERRORS["CRITICAL"])
     except:
@@ -117,13 +118,18 @@ def main():
         sys.exit(ERRORS["CRITICAL"])
 
 
-class HDFSBlockCounter:
+class HDFSBlockCounter(object):
     """ Class to hold HDFS Block Counter State """
 
     def __init__(self):
         """ Instantiate HDFSBlockCounter State """
 
         self.files = 0
+        self.block_num = 0
+        self.offset = 0
+        self.length = 1
+        self.filehandle = None
+        self.filename = None
         try:
             self.fqdn = socket.getfqdn()
             # time.strftime("%z") doesn't work in Jython
@@ -132,23 +138,24 @@ class HDFSBlockCounter:
             printerr("Failed to get fqdn of local host, continuing anyway...\n\nError: %s\n" % get_jython_exception())
             self.fqdn = None
 
-        conf      = Configuration()
-        self.fs   = DistributedFileSystem.get(conf)
+        conf = Configuration()
+        self.filesystem = DistributedFileSystem.get(conf)
 
-        #self.fh = self.fs.open(path)
+        #self.filehandle = self.filesystem.open(path)
         # The client one tells you which DN you are reading from
         try:
-            self.client = self.fs.getClient()
+            self.client = self.filesystem.getClient()
         except:
             raise Exception, "Failed to create hdfs client: %s" % get_jython_exception()
-        #in = client.DFSDataInputStream(self.fh)
+        #in = client.DFSDataInputStream(self.filehandle)
 
 
-    def get_path(self, filename):
+    @staticmethod
+    def get_path(filename):
         """ Return the path object for a given filename """
         try:
             path = Path(filename)
-        except Exception, e:
+        except Exception:
             return None
         if path:
             return path
@@ -156,7 +163,7 @@ class HDFSBlockCounter:
             return None
 
 
-    def printBlockCounts(self, filelist, noheader):
+    def print_block_counts(self, filelist, noheader):
         """ Recurses directories and calls printFileBlocks(file) per file """
 
         if not noheader:
@@ -170,7 +177,7 @@ class HDFSBlockCounter:
             if not path:
                 printerr("Failed to get HDFS path object for file " + filename, 1)
                 continue
-            if not self.fs.exists(path):
+            if not self.filesystem.exists(path):
                 #raise IOError, "HDFS File not found: %s" % filename
                 printerr("HDFS file/dir not found: %s" % filename, 1)
                 continue
@@ -187,19 +194,20 @@ class HDFSBlockCounter:
     def recurse_path(self, filename, path):
         """ Recurse filename, path """
 
-        if self.fs.isFile(path):
+        if self.filesystem.isFile(path):
             try:
-                self.printFileBlockCounts(filename, path)
-            except Exception, e:
-                printerr(e, 1)
-        elif self.fs.isDirectory(path):
-            # even if there is only one file under the whole directory tree since it's now different to the specified arg we should print it
+                self.print_file_block_counts(filename, path)
+            except Exception as _:
+                printerr(_, 1)
+        elif self.filesystem.isDirectory(path):
+            # even if there is only one file under the whole directory tree since
+            # it's now different to the specified arg we should print it
             try:
-                l = self.fs.listStatus(path)
-                for i in range(0, len(l)):
+                _ = self.filesystem.listStatus(path)
+                for i in range(0, len(_)):
                     try:
-                        p = l[i].getPath()
-                        self.recurse_path(p.toUri().getPath(), p)
+                        path = _[i].getPath()
+                        self.recurse_path(path.toUri().getPath(), path)
                     except:
                         printerr(get_jython_exception().split("\n")[0], 1)
             except:
@@ -208,36 +216,38 @@ class HDFSBlockCounter:
             raise IOError, ">>> %s is not a file or directory" % filename
 
 
-    def printFileBlockCounts(self, filename, path):
+    def print_file_block_counts(self, filename, path):
         """ Prints block counts for the given file """
 
-        self.filename   = filename
-        self.block_num  = 0
-        self.offset     = 0
-        self.length     = 1
+        self.filename = filename
+        self.block_num = 0
+        self.offset = 0
+        self.length = 1
         try:
-            self.fh = self.client.open(filename)
+            self.filehandle = self.client.open(filename)
         except:
             raise IOError, "Failed to get client filehandle to HDFS file %s: %s" % (filename, get_jython_exception())
-        if self.fh == None:
+        if self.filehandle is None:
             raise IOError, "Failed to get client filehandle to HDFS file %s" % filename
 
         try:
-            filestatus = self.fs.getFileStatus(path)
-            blocksize  = filestatus.getBlockSize() # in bytes
-            size       = filestatus.getLen()       # in bytes
-            repl       = filestatus.getReplication()
+            filestatus = self.filesystem.getFileStatus(path)
+            blocksize = filestatus.getBlockSize() # in bytes
+            size = filestatus.getLen()       # in bytes
+            repl = filestatus.getReplication()
             num_blocks = int((size / blocksize)+1)
         except:
             print("Failed to get file stats for HDFS file %s: %s" % (filename, get_jython_exception()))
             return 0
-        if(size < blocksize):
+        if size < blocksize:
             smallfile = "YES"
         else:
             smallfile = "NO"
 
-        #print("blocksize: %.0fMB  blocks: %d  replication factor: %d  bytes: %d (%.2fMB)  %s%s" % ((blocksize/(1024*1024)), num_blocks, repl, size, (size/(1024*1024)), filename, smallfile))
-        print("%-9.2f %7d %6d %17d %12.2f   %-3s    %s" % ((blocksize/(1024*1024)), num_blocks, repl, size, (size/(1024*1024)), smallfile, filename))
+        #print("blocksize: %.0fMB  blocks: %d  replication factor: %d  bytes: %d (%.2fMB)  %s%s" %
+        #      ((blocksize/(1024*1024)), num_blocks, repl, size, (size/(1024*1024)), filename, smallfile))
+        print("%-9.2f %7d %6d %17d %12.2f   %-3s    %s" %
+              ((blocksize/(1024*1024)), num_blocks, repl, size, (size/(1024*1024)), smallfile, filename))
         self.files += 1
         return 1
 
