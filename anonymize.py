@@ -360,7 +360,7 @@ class Anonymize(CLI):
                 regex.add(re.compile(line, re.I))
                 raw += line + '|'
         raw = raw.rstrip('|')
-        log.debug('custom_raw: %s', raw)
+        #log.debug('custom_raw: %s', raw)
         return (regex, raw)
 
     def run(self):
@@ -424,13 +424,13 @@ class Anonymize(CLI):
                 continue
             method = None
             try:
-                log.debug('checking for anonymize_%s', _)
+                #log.debug('checking for anonymize_%s', _)
                 method = getattr(self, 'anonymize_' + _)
             except AttributeError:
-                log.debug('anonymize_%s not found', _)
-                #pass
+                #log.debug('anonymize_%s not found', _)
+                pass
             if method:
-                log.debug('found anonymize_%s: %s', _, method)
+                #log.debug('found anonymize_%s: %s', _, method)
                 line = method(line)
             else:
                 line = self.anonymize_dynamic(_, line)
@@ -443,7 +443,7 @@ class Anonymize(CLI):
         return line
 
     def anonymize_dynamic(self, name, line):
-        log.debug('anonymize_dynamic(%s, %s)', name, line)
+        #log.debug('anonymize_dynamic(%s, %s)', name, line)
         if not isStr(line):
             raise AssertionError('anonymize_dynamic: passed in non-string line: %s', line)
         line = self.dynamic_replace(name, line)
