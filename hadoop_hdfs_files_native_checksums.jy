@@ -90,11 +90,11 @@ def main():
     filelist = sorted(filelist)
     try:
         HDFSChecksumReader().print_checksums(filelist, noheader)
-    except KeyboardInterrupt, e:
+    except KeyboardInterrupt:
         printerr("Caught Control-C...", 1)
         sys.exit("OK")
-    except Exception, e:
-        printerr("Error running HDFSChecksumReader: %s" % e, 1)
+    except Exception as _:
+        printerr("Error running HDFSChecksumReader: %s" % _, 1)
         if isJavaOOM(e.message):
             printerr(java_oom_fix_msg())
         #import traceback; traceback.print_exc()
