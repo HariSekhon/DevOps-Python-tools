@@ -14,18 +14,21 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-__author__  = 'Hari Sekhon'
-__version__ = '0.4.0'
+__author__ = 'Hari Sekhon'
+__version__ = '0.5.0'
 
-import os, sys
+# pylint: disable=wrong-import-position
+import os
+import sys
 # Refusing to use either optparse or argparse since it's annoyingly non-portable across different versions of Python
 import getopt
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import jython_only, die, printerr, ERRORS, isJavaOOM, java_oom_fix_msg, log_jython_exception, get_jython_exception
-except ImportError, e:
-    print('module import failed: %s' % e, file=sys.stderr)
+    from harisekhon.utils import jython_only, die, printerr, ERRORS, \
+                                 isJavaOOM, java_oom_fix_msg, log_jython_exception, get_jython_exception
+except ImportError as _:
+    print('module import failed: %s' % _, file=sys.stderr)
     sys.exit(4)
 
 jython_only()
@@ -33,11 +36,11 @@ jython_only()
 try:
     from org.apache.hadoop.conf import Configuration
     from org.apache.hadoop.fs import Path
-    from org.apache.hadoop.hdfs import DistributedFileSystem
+    #from org.apache.hadoop.hdfs import DistributedFileSystem
     from org.apache.hadoop.fs import FileSystem
     from org.apache.hadoop.util import StringUtils
     #from org.apache.hadoop.security import AccessControlException
-except ImportError, e:
+except ImportError:
     die("Couldn't find Hadoop Java classes, try:  jython -J-cp `hadoop classpath` %s <args>" % sys.argv[0])
 
 
@@ -64,7 +67,7 @@ Will be implemented in hadoop-9209 jira for versions 3.0.0, 0.23.7, 2.1.0-beta u
 USAGE:  jython -J-cp `hadoop classpath` %s <list of HDFS files and/or directories>
 
 -n --no-header      Don't output headers
-""" % (os.path.basename(__file__), __version__, os.path.basename(__file__)), ERRORS["UNKNOWN"] )
+""" % (os.path.basename(__file__), __version__, os.path.basename(__file__)), ERRORS["UNKNOWN"])
 
 
 def main():
@@ -73,12 +76,12 @@ def main():
     noheader = False
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:], "hn", ["help", "usage", "no-header"])
-    except getopt.GetoptError, e:
-        usage("error: %s" % e)
-    for o, a in opts:
-        if o in ("-n", "--no-header"):
+    except getopt.GetoptError as _:
+        usage("error: %s" % _)
+    for opt, arg in opts:
+        if opt in ("-n", "--no-header"):
             noheader = True
-        elif o in ("-h", "--help", "--usage"):
+        elif opt in ("-h", "--help", "--usage"):
             usage()
         else:
             usage()
@@ -95,7 +98,7 @@ def main():
         sys.exit("OK")
     except Exception as _:
         printerr("Error running HDFSChecksumReader: %s" % _, 1)
-        if isJavaOOM(e.message):
+        if isJavaOOM(_.message):
             printerr(java_oom_fix_msg())
         #import traceback; traceback.print_exc()
         sys.exit("CRITICAL")
@@ -104,21 +107,22 @@ def main():
         sys.exit("CRITICAL")
 
 
-class HDFSChecksumReader:
+class HDFSChecksumReader(object):
     """ Class to hold HDFS Checksum Read state """
 
     def __init__(self):
         """ Instantiate State """
 
-        conf      = Configuration()
-        #self.fs   = DistributedFileSystem.get(conf)
-        self.fs   = FileSystem.get(conf)
+        conf = Configuration()
+        #self.filesystem= DistributedFileSystem.get(conf)
+        self.filesystem = FileSystem.get(conf)
 
-    def get_path(self, filename):
+    @staticmethod
+    def get_path(filename):
         """ Return the path object for a given filename """
         try:
             path = Path(filename)
-        except Exception, e:
+        except Exception:
             return None
         if path:
             return path
@@ -137,7 +141,7 @@ class HDFSChecksumReader:
             if not path:
                 printerr("Failed to get HDFS path object for file " + filename, 1)
                 continue
-            if not self.fs.exists(path):
+            if not self.filesystem.exists(path):
                 #raise IOError, "HDFS File not found: %s" % filename
                 printerr("HDFS file/dir not found: %s" % filename, 1)
                 continue
@@ -146,14 +150,14 @@ class HDFSChecksumReader:
     def print_checksum_recurse(self, filename, path):
         """ Recurses a path object if directory or passes to print_checksum if file """
 
-        if self.fs.isFile(path):
+        if self.filesystem.isFile(path):
             self.print_checksum(filename, path)
-        elif self.fs.isDirectory(path):
+        elif self.filesystem.isDirectory(path):
             try:
-                l = self.fs.listStatus(path)
-                for i in range(0, len(l)):
-                    p = l[i].getPath()
-                    self.print_checksum_recurse(p.toUri().getPath(), p)
+                _ = self.filesystem.listStatus(path)
+                for i in range(0, len(_)):
+                    path = _[i].getPath()
+                    self.print_checksum_recurse(path.toUri().getPath(), path)
             except:
                 printerr(get_jython_exception().split("\n")[0], 1)
         else:
@@ -163,19 +167,19 @@ class HDFSChecksumReader:
         """ Prints the HDFS checksum for the given file + fs path object """
 
         try:
-            checksum = self.fs.getFileChecksum(path)
+            checksum = self.filesystem.getFileChecksum(path)
             if checksum:
                 print("%-56s  %-25s  %-12s  %s" % (
-                        StringUtils.byteToHexString(checksum.getBytes(), 0, checksum.getLength()),
-                        checksum.getAlgorithmName(),
-                        self.fs.getFileStatus(path).getBlockSize(),
-                        filename)
-                      )
+                    StringUtils.byteToHexString(checksum.getBytes(), 0, checksum.getLength()),
+                    checksum.getAlgorithmName(),
+                    self.filesystem.getFileStatus(path).getBlockSize(),
+                    filename)
+                     )
             else:
                 printerr("<NO CHECKSUM for file " + filename + ">", 1)
                 return 0
-        except Exception, e:
-            printerr(e, 1)
+        except Exception as _:
+            printerr(_, 1)
         except:
             print(">>> " + get_jython_exception().split("\n")[0])
             return 0
