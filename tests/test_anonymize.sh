@@ -81,17 +81,15 @@ dest[15]="INFO 2015-12-01 19:52:21,066 DataCleaner.py:39 - Data cleanup thread s
 src[16]="INFO 2015-12-01 22:47:42,273 scheduler.py:287 - Adding job tentatively"
 dest[16]="INFO 2015-12-01 22:47:42,273 scheduler.py:287 - Adding job tentatively"
 
-# TODO: enable and make this exclusion work
-#src[17]="/usr/hdp/2.3.0.0-2557"
-#dest[17]="/usr/hdp/2.3.0.0-2557"
+src[17]="/usr/hdp/2.3.0.0-2557"
+dest[17]="/usr/hdp/2.3.0.0-2557"
 
 # can't safely prevent this without potentially exposing real IPs
 #src[18]="/usr/hdp/2.3.0.0"
 #dest[18]="/usr/hdp/2.3.0.0"
 
-# TODO: enable and make this exclusion work
-#src[19]="ranger-plugins-audit-0.5.0.2.3.0.0-2557.jar"
-#dest[19]="ranger-plugins-audit-0.5.0.2.3.0.0-2557.jar"
+src[19]="ranger-plugins-audit-0.5.0.2.3.0.0-2557.jar"
+dest[19]="ranger-plugins-audit-0.5.0.2.3.0.0-2557.jar"
 
 src[20]="yarn-yarn-resourcemanager-ip-172-31-1-2.log"
 dest[20]="yarn-yarn-resourcemanager-<aws_hostname>.log"
