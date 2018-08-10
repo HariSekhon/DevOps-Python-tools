@@ -186,7 +186,7 @@ class Anonymize(CLI):
             'hostname2': '<aws_hostname>',
             'user': r'\1<user>',
             'user2': '/home/<user>',
-            'user2': r'\1<user>',
+            'user3': r'\1<user>',
             'password': r'\1<password>',
             'password2': r'\1<user>:<password>',
             'ip_prefix': r'<ip_prefix>.',
@@ -402,6 +402,8 @@ class Anonymize(CLI):
         self.regex['hostname'] = re.compile(
             r'(?<!\w\]\s)' + \
             r'(?<!\.)' + \
+            # don't match 2018-01-01T00:00:00 => 2018-01-<hostname>:00:00
+            r'(?!\d+T\d+:\d+)' + \
             r'(?!\d+[^A-Za-z0-9]|' + \
             self.custom_ignores_raw + ')' + \
             hostname_regex + \
