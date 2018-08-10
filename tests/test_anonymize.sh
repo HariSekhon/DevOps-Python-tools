@@ -100,6 +100,9 @@ dest[21]="<ip>:9092"
 src[22]="192.168.99.100"
 dest[22]="<ip>"
 
+src[23]="openssl req ... -passin hari:mypassword ..."
+dest[23]="openssl req ... -passin <password> ..."
+
 test_anonymize(){
     src="$1"
     dest="$2"
