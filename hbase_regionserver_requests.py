@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.2'
+__version__ = '0.5.3'
 
 
 class HBaseRegionServerRequests(CLI):
@@ -190,8 +190,13 @@ class HBaseRegionServerRequests(CLI):
         for metric in self.request_types:
             if self.request_type and metric not in self.request_type:
                 continue
-            print('{:20s}\t{:20s}\t{:10s}\t{:8.0f}'\
-                  .format(tstamp, host, metric, stats[host][metric]))
+            try:
+                val = '{:8.0f}'.format(stats[host][metric])
+            # might happen if server is down for maintenance - in which case N/A and retry later rather than crash
+            except ValueError:
+                val = 'N/A'
+            print('{:20s}\t{:20s}\t{:10s}\t{}'\
+                  .format(tstamp, host, metric, val))
         print()
 
     # some extra effort to make it look the same as HBase presents it as
