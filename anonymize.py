@@ -85,7 +85,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 class Anonymize(CLI):
@@ -105,17 +105,20 @@ class Anonymize(CLI):
         self.strip_cr = False
         # order of iteration of application matters because we must do more specific matches before less specific ones
         self.anonymizations = OrderedDict([
-            ('cisco', False),
-            ('email', False),
-            ('http_auth', False),
             ('ip', False),
             ('ip_prefix', False),
-            ('junos', False),
+            ('subnet_mask', False),
+            ('mac', False),
             ('kerberos', False),
-            ('network', False),
+            ('email', False),
             ('password', False),
+            ('user', False),
             ('proxy', False),
+            ('http_auth', False),
+            ('cisco', False),
             ('screenos', False),
+            ('junos', False),
+            ('network', False),
             ('fqdn', False),
             ('domain', False),
             ('hostname', False),
@@ -130,6 +133,27 @@ class Anonymize(CLI):
         #password_regex = r'\S+'
         password_regex = r'(?:\'[^\']+\'|"[^"]+"|\S+)'
         self.regex = {
+            'hostname2': r'\b(?:ip-10-\d+-\d+-\d+|' + \
+                         r'ip-172-1[6-9]-\d+-\d+|' + \
+                         r'ip-172-2[0-9]-\d+-\d+|' + \
+                         r'ip-172-3[0-1]-\d+-\d+|' +
+                         r'ip-192-168-\d+-\d+)\b(?!-\d)',
+            'user': r'(-user[=\s]+)\S+',
+            'user2': r'/home/\S+',
+            # openssl uses -passin switch
+            'password': r'(\b(?:password|passin)(?:=|\s+)){pw}'.format(pw=password_regex),
+            'password2': r'(\bcurl\s.*?-[A-Za-tv-z]*u(?:=|\s+)?)[^:\s]+:{pw}'.format(pw=password_regex),
+            'http_auth': r'(https?:\/\/)[^:]+:[^\@]*\@',
+            'http_auth2': r'(Proxy auth using \w+ with user )([\'"]).+([\'"])',
+            'ip_prefix': r'{}(?!\.\d+\.\d+)'.format(ip_prefix_regex),
+            'kerberos': user_regex + '/_HOST@' + domain_regex,
+            'kerberos2': r'\b' + user_regex + r'(?:\/' + hostname_regex + r')?@' + domain_regex + r'\b/',
+            # mac is inferred from imported mac_regex
+            'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',  # network device format mac address
+            'proxy': 'proxy ' + host_regex + r'port \d+',
+            'proxy2': 'Trying' + ip_regex,
+            'proxy3': 'Connected to ' + host_regex + r'\($ip_regex\) port \d+',
+            'proxy4': r'(Via:\s[^\s]+\s)' + ip_regex + '.*',
             'cisco': r'username .+ (?:password|secret) .*?$',
             'cisco2': r'password .*?$',
             'cisco3': r'\ssecret\s.*?$',
@@ -138,29 +162,16 @@ class Anonymize(CLI):
             'cisco6': r'(standby\s+\d+\s+authentication).*',
             'cisco7': r'\sremote-as\s\d+',
             'cisco8': r'\sdescription\s.*$',
-            'http_auth': r'(https?:\/\/)[^:]+:[^\@]*\@',
-            'http_auth2': r'(Proxy auth using \w+ with user )([\'"]).+([\'"])',
-            'ip_prefix': r'{}(?!\.\d+\.\d+)'.format(ip_prefix_regex),
-            'junos': r'pre-shared-key\s.*',
-            'junos2': r'\shome\s+.*',
-            'kerberos': user_regex + '/_HOST@' + domain_regex,
-            'kerberos2': r'\b' + user_regex + r'(?:\/' + hostname_regex + r')?@' + domain_regex + r'\b/',
-            # mac is inferred from imported mac_regex
-            'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',  # network device format mac address
-            'network': r'username .*',
-            'network2': r'syscontact .*',
-            'password': r'(--password(?:=|\s+)){pw}'.format(pw=password_regex),
-            'password2': r'(\bcurl\s.*?-[A-Za-tv-z]*u(?:=|\s+)?)[^:\s]+:{pw}'.format(pw=password_regex),
-            'proxy': 'proxy ' + host_regex + r'port \d+',
-            'proxy2': 'Trying' + ip_regex,
-            'proxy3': 'Connected to ' + host_regex + r'\($ip_regex\) port \d+',
-            'proxy4': r'(Via:\s[^\s]+\s)' + ip_regex + '.*',
             'screenos': r'set admin (name|user|password) "?.+"?',
             'screenos2': r'set snmp (community|host) "?.+"?',
             'screenos3': r' md5 "?.+"?',
             'screenos4': r' key [^\s]+ (?:!enable)',
             'screenos5': r'set nsmgmt init id [^\s]+',
             'screenos6': r'preshare .+? ',
+            'junos': r'pre-shared-key\s.*',
+            'junos2': r'\shome\s+.*',
+            'network': r'username .*',
+            'network2': r'syscontact .*',
         }
         # auto-populate any *_regex to self.regex[name] = name_regex
         for _ in globals():
@@ -170,6 +181,10 @@ class Anonymize(CLI):
             self.regex[_] = re.compile(self.regex[_])
         # will auto-infer replacements to not have to be explicit, use this only for override mappings
         self.replacements = {
+            'hostname': r'<hostname>:\1',
+            'hostname2': '<aws_hostname>',
+            'user': r'\1<user>',
+            'user2': '/home/<user>',
             'password': r'\1<password>',
             'password2': r'\1<user>:<password>',
             'proxy': r'proxy <proxy_host> port <proxy_port>',
@@ -235,6 +250,8 @@ class Anonymize(CLI):
         self.add_opt('-P', '--port', action='store_true',
                      help='Apply port anonymization (not included in --all since you usually want to include port ' + \
                           'numbers for cluster or service debugging)')
+        self.add_opt('-u', '--user', action='store_true',
+                     help='Apply user anonymization (user=<user>). Auto enables --password')
         self.add_opt('-p', '--password', action='store_true',
                      help='Apply password anonymization against --password switches (can\'t catch MySQL ' + \
                           '-p<password> since it\'s too ambiguous with bunched arguments, can use --custom ' + \
@@ -256,7 +273,7 @@ class Anonymize(CLI):
                      help='Apply email format anonymization')
         self.add_opt('-x', '--proxy', action='store_true',
                      help='Apply anonymization to remove proxy host, user etc (eg. from curl -iv output). You ' + \
-                          'should probably also apply --ip and --host if using this')
+                          'should probably also apply --ip and --host if using this. Auto enables --http-auth')
         self.add_opt('-n', '--network', action='store_true',
                      help='Apply all network anonymization, whether Cisco, ScreenOS, JunOS for secrets, auth, ' + \
                           'usernames, passwords, md5s, PSKs, AS, SNMP etc.')
@@ -309,15 +326,24 @@ class Anonymize(CLI):
                 self.anonymizations[_] = True
         else:
             for _ in self.anonymizations:
+                if _ in ('subnet_mask', 'mac'):
+                    continue
                 self.anonymizations[_] = self.get_opt(_)
         ######
+        if self.anonymizations['ip'] or self.anonymizations['ip_prefix']:
+            self.anonymizations['subnet_mask'] = True
+            self.anonymizations['mac'] = True
         if self.get_opt('host'):
             for _ in ('hostname', 'fqdn', 'domain'):
                 self.anonymizations[_] = True
-        # don't double up calling these as they are called by overarching method
+        if self.anonymizations['proxy']:
+            self.anonymizations['http_auth'] = True
         if self.anonymizations['network']:
             for _ in ('cisco', 'screenos', 'junos'):
-                self.anonymizations[_] = False
+                self.anonymizations[_] = True
+        for _ in ('cisco', 'screenos', 'junos'):
+            if self.anonymizations[_]:
+                self.anonymizations['network'] = True
         #######
         if not self.is_anonymization_selected():
             self.usage('must specify one or more anonymization types to apply')
@@ -372,7 +398,9 @@ class Anonymize(CLI):
 
     def prepare_regex(self):
         self.regex['hostname'] = re.compile(
-            r'(?<!\w\]\s)(?<!\.)(?!\d+[^A-Za-z0-9]|' + \
+            r'(?<!\w\]\s)' + \
+            r'(?<!\.)' + \
+            r'(?!\d+[^A-Za-z0-9]|' + \
             self.custom_ignores_raw + ')' + \
             hostname_regex + \
             self.negative_host_lookbehind + r':(\d{1,5}(?:[^A-Za-z]|$))',
@@ -387,8 +415,9 @@ class Anonymize(CLI):
             fqdn_regex + \
             r'(?!\.[A-Za-z])(\b|$)' + \
             self.negative_host_lookbehind, re.I)
-        self.regex['ip'] = re.compile(ip_regex + r'(?![^:]\d+)')
-        self.regex['ip_prefix'] = re.compile(ip_prefix_regex + r'(?!\.\d+\.\d+)')
+        self.regex['ip'] = re.compile(r'(?<!\d.)' + ip_regex + r'(?![^:]\d+)')
+        self.regex['subnet_mask'] = re.compile(r'(?<!\d.)' + subnet_mask_regex + r'(?![^:]\d+)')
+        self.regex['ip_prefix'] = re.compile(r'(?<!\d.)' + ip_prefix_regex + r'(?!\.\d+\.\d+)')
 
     def process_file(self, filename):
         anonymize = self.anonymize
@@ -479,75 +508,22 @@ class Anonymize(CLI):
             return True
         return False
 
-    # using ordered dict instead now
-    #def anonymize_host(self, line):
-    #    # more specific first - this is why I don't just enable the flags to do these automatically
-    #    line = self.anonymize_fqdn(line)
-    #    line = self.anonymize_domain(line)
-    #    line = self.anonymize_hostname(line)
-    #    return line
-
     def anonymize_hostname(self, line):
         if self.skip_exceptions(line):
             return line
-        line = self.regex['hostname'].sub(r'<hostname>:\1', line)
-        line = re.sub(r'\b(?:ip-10-\d+-\d+-\d+|' +
-                      r'ip-172-1[6-9]-\d+-\d+|' +
-                      r'ip-172-2[0-9]-\d+-\d+|' +
-                      r'ip-172-3[0-1]-\d+-\d+|' +
-                      r'ip-192-168-\d+-\d+)\b(?!-\d)',
-                      '<aws_hostname>',
-                      line, re.I)
+        line = self.anonymize_dynamic('hostname', line)
         return line
 
     def anonymize_domain(self, line):
         if self.skip_exceptions(line):
             return line
-        line = self.regex['domain'].sub('<domain>', line)
+        line = self.anonymize_dynamic('domain', line)
         return line
 
     def anonymize_fqdn(self, line):
         if self.skip_exceptions(line):
             return line
-        line = self.regex['fqdn'].sub('<fqdn>', line)
-        return line
-
-    def anonymize_ip(self, line):
-        line = self.anonymize_dynamic('ip', line)
-        line = self.anonymize_dynamic('mac', line)
-        return line
-
-    def anonymize_ip_prefix(self, line):
-        line = self.anonymize_dynamic('ip_prefix', line)
-        line = self.anonymize_dynamic('subnet_mask', line)
-        line = self.anonymize_dynamic('mac', line)
-        return line
-
-    def anonymize_proxy(self, line):
-        line = self.anonymize_dynamic('proxy', line)
-        line = self.anonymize_dynamic('http_auth', line)
-        return line
-
-    def anonymize_network(self, line):
-        line = self.anonymize_dynamic('cisco', line)
-        line = self.anonymize_dynamic('screenos', line)
-        line = self.anonymize_dynamic('junos', line)
-        line = self.anonymize_dynamic('network', line)
-        return line
-
-    def anonymize_cisco(self, line):
-        line = self.anonymize_dynamic('cisco', line)
-        line = self.anonymize_dynamic('network', line)
-        return line
-
-    def anonymize_screenos(self, line):
-        line = self.anonymize_dynamic('screenos', line)
-        line = self.anonymize_dynamic('network', line)
-        return line
-
-    def anonymize_junos(self, line):
-        line = self.anonymize_dynamic('junos', line)
-        line = self.anonymize_dynamic('network', line)
+        line = self.anonymize_dynamic('fqdn', line)
         return line
 
 
