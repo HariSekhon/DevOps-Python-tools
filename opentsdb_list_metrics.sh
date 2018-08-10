@@ -99,12 +99,12 @@ for line in sys.stdin:
     try:
         (ts, metric) = line.split()
     except ValueError as _:
-        print('ValueError: _, line: {}'.format(_, line), file=sys.stderr)
-#    if not metric in metrics or ts < metrics[metric]:
+        print('ValueError: {}, line: {}'.format(_, line), file=sys.stderr)
+#    if  metric inot in metrics or ts < metrics[metric]:
 #        metric[metric] = ts
 #for metric in metrics:
 #    ts = metrics[metric]
-    print "{}\t{}\t{}".format(ts, time.strftime("%F %T", time.localtime(int(ts)/1000)), metric)
+    print("{}\t{}\t{}".format(ts, time.strftime("%F %T", time.localtime(int(ts)/1000)), metric))
 EOF
     trap "rm '$tmp_python_script'" EXIT
 
