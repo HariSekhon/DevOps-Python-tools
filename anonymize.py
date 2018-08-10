@@ -146,6 +146,8 @@ class Anonymize(CLI):
             'http_auth': r'(https?:\/\/)[^:]+:[^\@]*\@',
             'http_auth2': r'(Proxy auth using \w+ with user )([\'"]).+([\'"])',
             'ip_prefix': r'{}(?!\.\d+\.\d+)'.format(ip_prefix_regex),
+            # network device format Mac address
+            'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',
             'kerberos': user_regex + '/_HOST@' + domain_regex,
             'kerberos2': r'\b' + user_regex + r'(?:\/' + hostname_regex + r')?@' + domain_regex + r'\b/',
             # mac is inferred from imported mac_regex
