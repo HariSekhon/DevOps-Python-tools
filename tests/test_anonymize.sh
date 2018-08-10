@@ -103,6 +103,9 @@ dest[22]="<ip>"
 src[23]="openssl req ... -passin hari:mypassword ..."
 dest[23]="openssl req ... -passin <password> ..."
 
+src[24]="2018-01-01T00:00:00 INFO user=hari"
+dest[24]="2018-01-01T00:00:00 INFO user=<user>"
+
 test_anonymize(){
     src="$1"
     dest="$2"
