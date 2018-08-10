@@ -100,7 +100,7 @@ for line in sys.stdin:
         (ts, metric) = line.split()
     except ValueError as _:
         print('ValueError: {}, line: {}'.format(_, line), file=sys.stderr)
-#    if  metric inot in metrics or ts < metrics[metric]:
+#    if  metric not in metrics or ts < metrics[metric]:
 #        metric[metric] = ts
 #for metric in metrics:
 #    ts = metrics[metric]
