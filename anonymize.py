@@ -143,19 +143,19 @@ class Anonymize(CLI):
             # openssl uses -passin switch
             'password': r'(\b(?:password|passin)(?:=|\s+)){pw}'.format(pw=password_regex),
             'password2': r'(\bcurl\s.*?-[A-Za-tv-z]*u(?:=|\s+)?)[^:\s]+:{pw}'.format(pw=password_regex),
-            'http_auth': r'(https?:\/\/)[^:]+:[^\@]*\@',
-            'http_auth2': r'(Proxy auth using \w+ with user )([\'"]).+([\'"])',
             'ip_prefix': r'{}(?!\.\d+\.\d+)'.format(ip_prefix_regex),
             # network device format Mac address
             'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',
             'kerberos': user_regex + '/_HOST@' + domain_regex,
             'kerberos2': r'\b' + user_regex + r'(?:\/' + hostname_regex + r')?@' + domain_regex + r'\b/',
-            # mac is inferred from imported mac_regex
-            'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',  # network device format mac address
+            # network device format mac address
+            'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',
             'proxy': 'proxy ' + host_regex + r'port \d+',
             'proxy2': 'Trying' + ip_regex,
             'proxy3': 'Connected to ' + host_regex + r'\($ip_regex\) port \d+',
             'proxy4': r'(Via:\s[^\s]+\s)' + ip_regex + '.*',
+            'http_auth': r'(https?:\/\/)[^:]+:[^\@]*\@',
+            'http_auth2': r'(Proxy auth using \w+ with user )([\'"]).+([\'"])',
             'cisco': r'username .+ (?:password|secret) .*?$',
             'cisco2': r'password .*?$',
             'cisco3': r'\ssecret\s.*?$',
@@ -189,17 +189,15 @@ class Anonymize(CLI):
             'user2': '/home/<user>',
             'password': r'\1<password>',
             'password2': r'\1<user>:<password>',
-            'proxy': r'proxy <proxy_host> port <proxy_port>',
-            'proxy2': r'Trying <proxy_ip>',
-            'proxy3': r'Connected to <proxy_host> (<proxy_ip>) port <proxy_port>',
-            'proxy4': r'\1<proxy_ip>',
-            'http_auth': r'$1<user>:<password>@',
-            'http_auth2': r'\1\'<proxy_user>\2\3/',
             'ip_prefix': r'<ip_prefix>.',
             'kerberos': r'<kerberos_primary>\/_HOST@<kerberos_realm>',
             'kerberos2': r'<kerberos_principal>',
-            'network': r'username <username>',
-            'network2': r'syscontact <syscontact>',
+            'proxy': r'proxy <proxy_host> port <proxy_port>',
+            'proxy2': r'Trying <proxy_ip>',
+            'proxy3': r'Connected to <proxy_host> (<proxy_ip>) port <proxy_port>',
+            'http_auth': r'$1<user>:<password>@',
+            'http_auth2': r'\1\'<proxy_user>\2\3/',
+            'proxy4': r'\1<proxy_ip>',
             'cisco': r'username <username> password <password>',
             'cisco2': r'password <password>',
             'cisco3': r'secret <secret>',
@@ -216,6 +214,8 @@ class Anonymize(CLI):
             'screenos6': r'preshare <psk> ',
             'junos': r'pre-shared-key <psk>',
             'junos2': r' home <home>',
+            'network': r'username <username>',
+            'network2': r'syscontact <syscontact>',
         }
 
     def add_options(self):
