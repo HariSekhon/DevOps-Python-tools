@@ -193,7 +193,7 @@ class HBaseRegionServerRequests(CLI):
             try:
                 val = '{:8.0f}'.format(stats[host][metric])
             # might happen if server is down for maintenance - in which case N/A and retry later rather than crash
-            except ValueError:
+            except KeyError:
                 val = 'N/A'
             print('{:20s}\t{:20s}\t{:10s}\t{}'\
                   .format(tstamp, host, metric, val))
