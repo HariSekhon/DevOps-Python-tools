@@ -1,5 +1,5 @@
 # This doesn't actually work on already committed files,  git update-index --assume-unchanged is set in Makefile instead
-scrub_custom.conf
+anonymize_custom.conf
 solr-env.sh
 spark-deps.zip
 *.pyc

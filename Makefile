@@ -79,8 +79,6 @@ build:
 	$(MAKE) common
 	$(MAKE) python
 
-	cd pylib && $(MAKE)
-
 .PHONY: system-packages
 system-packages:
 	if [ -x /sbin/apk ];        then $(MAKE) apk-packages; fi
@@ -99,6 +97,7 @@ submodules:
 	
 .PHONY: python
 python:
+	cd pylib && $(MAKE)
 	# don't pull parquet tools in to docker image by default, will bloat it
 	# can fetch separately by running 'make parquet-tools' if you really want to
 	if [ -f /.dockerenv -o -n "$(SKIP_PARQUET)" ]; then \
@@ -235,16 +234,16 @@ jython:
 sonar:
 	sonar-scanner
 
-.PHONY: lib-test
-lib-test:
+.PHONY: test-lib
+test-lib:
 	cd pylib && $(MAKE) test
 
 .PHONY: test
-test: lib-test
+test: test-lib
 	tests/all.sh
 
 .PHONY: basic-test
-basic-test: lib-test
+basic-test: test-lib
 	bash-tools/all.sh
 
 .PHONY: test2

@@ -45,12 +45,12 @@ services:
   - docker
 
 install:
-  - make
+  - travis_retry make
   #- pip install --upgrade ndg-httpsclient
-  - pip uninstall -y certifi && pip install certifi==2015.04.28
+  - travis_retry pip uninstall -y certifi && travis_retry pip install certifi==2015.04.28
 
 script:
-  - make test
+  - travis_retry make test
 
 after_success:
   - coveralls
