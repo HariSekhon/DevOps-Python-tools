@@ -85,7 +85,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.3'
 
 
 class Anonymize(CLI):
@@ -140,6 +140,7 @@ class Anonymize(CLI):
                          r'ip-192-168-\d+-\d+)\b(?!-\d)',
             'user': r'(-user[=\s]+)\S+',
             'user2': r'/home/\S+',
+            'user3': r'(user\s*=\s*)\S+',
             # openssl uses -passin switch
             'password': r'(\b(?:password|passin)(?:=|\s+)){pw}'.format(pw=password_regex),
             'password2': r'(\bcurl\s.*?-[A-Za-tv-z]*u(?:=|\s+)?)[^:\s]+:{pw}'.format(pw=password_regex),
@@ -185,6 +186,7 @@ class Anonymize(CLI):
             'hostname2': '<aws_hostname>',
             'user': r'\1<user>',
             'user2': '/home/<user>',
+            'user2': r'\1<user>',
             'password': r'\1<password>',
             'password2': r'\1<user>:<password>',
             'ip_prefix': r'<ip_prefix>.',
@@ -415,9 +417,9 @@ class Anonymize(CLI):
             fqdn_regex + \
             r'(?!\.[A-Za-z])(\b|$)' + \
             self.negative_host_lookbehind, re.I)
-        self.regex['ip'] = re.compile(r'(?<!\d.)' + ip_regex + r'(?![^:]\d+)')
-        self.regex['subnet_mask'] = re.compile(r'(?<!\d.)' + subnet_mask_regex + r'(?![^:]\d+)')
-        self.regex['ip_prefix'] = re.compile(r'(?<!\d.)' + ip_prefix_regex + r'(?!\.\d+\.\d+)')
+        self.regex['ip'] = re.compile(r'(?<!\d\.)' + ip_regex + r'(?![^:]\d+)')
+        self.regex['subnet_mask'] = re.compile(r'(?<!\d\.)' + subnet_mask_regex + r'(?![^:]\d+)')
+        self.regex['ip_prefix'] = re.compile(r'(?<!\d\.)' + ip_prefix_regex + r'(?!\.\d+\.\d+)')
 
     def process_file(self, filename):
         anonymize = self.anonymize
@@ -429,13 +431,13 @@ class Anonymize(CLI):
                 for line in sys.stdin:
                     lineno += 1
                     line = anonymize(line)
-                    print(line)
+                    print(line, end='')
             else:
                 with open(filename) as filehandle:
                     for line in filehandle:
                         lineno += 1
                         line = anonymize(line)
-                        print(line)
+                        print(line, end='')
         except AssertionError as _:
             raise AssertionError('{} line {}: {}'.format(filename, lineno, _))
 
@@ -492,7 +494,7 @@ class Anonymize(CLI):
 
     def anonymize_custom(self, line):
         for regex in self.custom_anonymizations:
-            line = regex.sub(r'\1<custom_anonymized>\2', line)
+            line = regex.sub(r'\1<custom>\2', line)
         return line
 
     @staticmethod
