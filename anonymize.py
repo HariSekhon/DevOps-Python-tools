@@ -148,8 +148,6 @@ class Anonymize(CLI):
             'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',
             'kerberos': user_regex + '/_HOST@' + domain_regex,
             'kerberos2': r'\b' + user_regex + r'(?:\/' + hostname_regex + r')?@' + domain_regex + r'\b/',
-            # network device format mac address
-            'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',
             'proxy': 'proxy ' + host_regex + r'port \d+',
             'proxy2': 'Trying' + ip_regex,
             'proxy3': 'Connected to ' + host_regex + r'\($ip_regex\) port \d+',
