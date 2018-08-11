@@ -401,6 +401,7 @@ class Anonymize(CLI):
             self.process_file(filename)
 
     # allow to easily switch pre-compilation on/off for testing
+    # testing shows on a moderate sized file that it is a couple secs quicker to use pre-compiled regex
     def compile(self, regex_name, regex):
         self.regex[regex_name] = re.compile(regex, re.I)
         #self.regex[regex_name] = regex
