@@ -85,7 +85,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.5'
 
 
 class Anonymize(CLI):
@@ -304,7 +304,7 @@ class Anonymize(CLI):
         if files:
             self.file_list = set(files.split(','))
         self.file_list = self.file_list.union(self.args)
-        self.validate_filenames()
+        self._validate_filenames()
         if self.get_opt('all'):
             for _ in self.anonymizations:
                 if _ == 'ip_prefix':
@@ -315,15 +315,15 @@ class Anonymize(CLI):
                 if _ in ('subnet_mask', 'mac'):
                     continue
                 self.anonymizations[_] = self.get_opt(_)
-        self.process_options_host()
-        self.process_options_network()
-        self.process_options_exceptions()
-        if not self.is_anonymization_selected():
+        self._process_options_host()
+        self._process_options_network()
+        self._process_options_exceptions()
+        if not self._is_anonymization_selected():
             self.usage('must specify one or more anonymization types to apply')
         if self.anonymizations['ip'] and self.anonymizations['ip_prefix']:
             self.usage('cannot specify both --ip and --ip-prefix, they are mutually exclusive behaviours')
 
-    def validate_filenames(self):
+    def _validate_filenames(self):
         for filename in self.file_list:
             if filename == '-':
                 log_option('file', '<STDIN>')
@@ -333,7 +333,7 @@ class Anonymize(CLI):
         if not self.file_list:
             self.file_list.add('-')
 
-    def process_options_host(self):
+    def _process_options_host(self):
         if self.anonymizations['ip'] or \
            self.anonymizations['ip_prefix']:
             self.anonymizations['subnet_mask'] = True
@@ -344,7 +344,7 @@ class Anonymize(CLI):
         if self.anonymizations['proxy']:
             self.anonymizations['http_auth'] = True
 
-    def process_options_network(self):
+    def _process_options_network(self):
         if self.anonymizations['network']:
             for _ in ('cisco', 'screenos', 'junos'):
                 self.anonymizations[_] = True
@@ -352,7 +352,7 @@ class Anonymize(CLI):
             if self.anonymizations[_]:
                 self.anonymizations['network'] = True
 
-    def process_options_exceptions(self):
+    def _process_options_exceptions(self):
         if self.get_opt('skip_exceptions'):
             for _ in self.exceptions:
                 self.exceptions[_] = True
@@ -360,7 +360,7 @@ class Anonymize(CLI):
             for _ in self.exceptions:
                 self.exceptions[_] = self.get_opt('skip_' + _)
 
-    def is_anonymization_selected(self):
+    def _is_anonymization_selected(self):
         for _ in self.anonymizations:
             if self.anonymizations[_]:
                 return True
@@ -407,27 +407,27 @@ class Anonymize(CLI):
 
     def prepare_regex(self):
         self.compile('hostname',
-            r'(?<!\w\]\s)' + \
-            r'(?<!\.)' + \
-            # don't match 2018-01-01T00:00:00 => 2018-01-<hostname>:00:00
-            r'(?!\d+T\d+:\d+)' + \
-            r'(?!\d+[^A-Za-z0-9]|' + \
-            self.custom_ignores_raw + ')' + \
-            hostname_regex + \
-            self.negative_host_lookbehind + r':(\d{1,5}(?:[^A-Za-z]|$))',
-            )
+                     r'(?<!\w\]\s)' + \
+                     r'(?<!\.)' + \
+                     # don't match 2018-01-01T00:00:00 => 2018-01-<hostname>:00:00
+                     r'(?!\d+T\d+:\d+)' + \
+                     r'(?!\d+[^A-Za-z0-9]|' + \
+                     self.custom_ignores_raw + ')' + \
+                     hostname_regex + \
+                     self.negative_host_lookbehind + r':(\d{1,5}(?:[^A-Za-z]|$))',
+                    )
         self.compile('domain',
-            r'(?!' + self.custom_ignores_raw + ')' + \
-            domain_regex_strict + \
-            r'(?!\.[A-Za-z])(\b|$)' + \
-            self.negative_host_lookbehind
-            )
-        self.regex['fqdn'] = re.compile(
-            r'(?!' + self.custom_ignores_raw + ')' + \
-            fqdn_regex + \
-            r'(?!\.[A-Za-z])(\b|$)' + \
-            self.negative_host_lookbehind
-            )
+                     r'(?!' + self.custom_ignores_raw + ')' + \
+                     domain_regex_strict + \
+                     r'(?!\.[A-Za-z])(\b|$)' + \
+                     self.negative_host_lookbehind
+                    )
+        self.compile('fqdn',
+                     r'(?!' + self.custom_ignores_raw + ')' + \
+                     fqdn_regex + \
+                     r'(?!\.[A-Za-z])(\b|$)' + \
+                     self.negative_host_lookbehind
+                    )
         self.compile('ip', r'(?<!\d\.)' + ip_regex + r'(?![^:]\d+)')
         self.compile('subnet_mask', r'(?<!\d\.)' + subnet_mask_regex + r'(?![^:]\d+)')
         self.compile('ip_prefix', r'(?<!\d\.)' + ip_prefix_regex + r'(?!\.\d+\.\d+)')
