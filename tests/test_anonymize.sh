@@ -162,7 +162,7 @@ run_tests(){
         fi
     done
 }
-run_tests
+run_tests  # ignore_run_unqualified
 
 # test ip prefix
 src="4.3.2.1"
@@ -186,7 +186,7 @@ src[102]="some description = blah, module = foo"
 dest[102]="some description = blah, module = foo"
 
 args="-Hiukex"
-run_tests 101 102
+run_tests 101 102  # ignore_run_unqualified
 
 # now check --network / --cisco / --juniper do strip these
 src[103]="reading password from bar"
@@ -196,7 +196,7 @@ src[104]="some description = blah, module=bar"
 dest[104]="some description <cisco_description>"
 
 args="--network"
-run_tests 103 104
+run_tests 103 104  # ignore_run_unqualified
 
 if [ -n "$parallel" ]; then
     # can't trust exit code for parallel yet, only for quick local testing
