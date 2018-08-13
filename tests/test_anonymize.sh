@@ -106,11 +106,21 @@ dest[23]="openssl req ... -passin <password> ..."
 src[24]="2018-01-01T00:00:00 INFO user=hari"
 dest[24]="2018-01-01T00:00:00 INFO user=<user>"
 
+src[25]="BigInsight:4.2"
+dest[25]="BigInsight:4.2"
+
+src[26]="user: hari, password: foo bar"
+dest[26]="user: <user>, password: <password> bar"
+
+src[27]="SomeClass\$method:20 something happened"
+dest[27]="SomeClass\$method:20 something happened"
+
+args="-aPe"
 test_anonymize(){
     src="$1"
     dest="$2"
     #[ -z "${src[$i]:-}" ] && { echo "skipping test $i..."; continue; }
-    result="$(./anonymize.py -ae <<< "$src")"
+    result="$(./anonymize.py $args <<< "$src")"
     if grep -Fq "$dest" <<< "$result"; then
         echo "SUCCEEDED anonymization test $i"
     else
@@ -134,15 +144,19 @@ fi
 # suport sparse arrays so that we can easily comment out any check pair for convenience
 # this gives the number of elements and prevents testing the last element(s) if commenting something out in the middle
 #for (( i = 0 ; i < ${#src[@]} ; i++ )); do
-for i in ${!src[@]}; do
-    [ -n "${src[$i]:-}" ]  || { echo "code error: src[$i] not defined";  exit 1; }
-    [ -n "${dest[$i]:-}" ] || { echo "code error: dest[$i] not defined"; exit 1; }
-    if [ -n "$parallel" ]; then
-        test_anonymize "${src[$i]}" "${dest[$i]}" &
-    else
-        test_anonymize "${src[$i]}" "${dest[$i]}"
-    fi
-done
+run_tests(){
+    test_numbers="${@:-${!src[@]}}"
+    for i in $test_numbers; do
+        [ -n "${src[$i]:-}" ]  || { echo "code error: src[$i] not defined";  exit 1; }
+        [ -n "${dest[$i]:-}" ] || { echo "code error: dest[$i] not defined"; exit 1; }
+        if [ -n "$parallel" ]; then
+            test_anonymize "${src[$i]}" "${dest[$i]}" &
+        else
+            test_anonymize "${src[$i]}" "${dest[$i]}"
+        fi
+    done
+}
+run_tests
 
 # test ip prefix
 src="4.3.2.1"
@@ -158,6 +172,26 @@ else
     exit 1
 fi
 
+# check normal don't strip these
+src[28]="reading password from foo"
+dest[28]="reading password from foo"
+
+src[29]="some description = blah, module = foo"
+dest[29]="some description = blah, module = foo"
+
+args="-Hiukex"
+run_tests 28 29
+
+# now check --network / --cisco / --juniper do strip these
+src[30]="reading password from bar"
+dest[30]="reading password <cisco_password>"
+
+src[31]="some description = blah, module=bar"
+dest[31]="some description <cisco_description>"
+
+args="--network"
+run_tests 30 31
+
 if [ -n "$parallel" ]; then
     # can't trust exit code for parallel yet, only for quick local testing
     exit 1
@@ -167,4 +201,11 @@ if [ -n "$parallel" ]; then
 #        [ $? -eq 0 ] || { echo "FAILED"; exit $?; }
 #    done
 fi
+
+echo "checking file args"
+if [ `./anonymize.py -ae README.md | wc -l` -lt 100 ]; then
+    echo "Suspicious readme file arg result came to < 100 lines"
+    exit 1
+fi
+
 exit 0
