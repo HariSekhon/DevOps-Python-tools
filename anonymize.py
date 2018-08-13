@@ -433,7 +433,7 @@ class Anonymize(CLI):
                      r'(?!\d+[^A-Za-z0-9]|' + \
                      self.custom_ignores_raw + ')' + \
                      hostname_regex + \
-                     self.negative_host_lookbehind + r':(\d{1,5}(?:[^A-Za-z]|$))',
+                     self.negative_host_lookbehind + r':(\d{1,5}(?!\.?\w))',
                     )
         self.compile('domain',
                      r'(?!' + self.custom_ignores_raw + ')' + \
