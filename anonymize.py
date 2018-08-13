@@ -428,6 +428,8 @@ class Anonymize(CLI):
                      r'(?<!\.)' + \
                      # ignore Java methods such as SomeClass$method:20
                      r'(?<!\$)' + \
+                     # ignore Java stack traces eg. at SomeClass(Thread.java;789)
+                     r'(?!\(\w+\.java:\d+\))' + \
                      # don't match 2018-01-01T00:00:00 => 2018-01-<hostname>:00:00
                      r'(?!\d+T\d+:\d+)' + \
                      r'(?!\d+[^A-Za-z0-9]|' + \
@@ -439,12 +441,16 @@ class Anonymize(CLI):
                      r'(?!' + self.custom_ignores_raw + ')' + \
                      domain_regex_strict + \
                      r'(?!\.[A-Za-z])(\b|$)' + \
+                     # ignore Java stack traces eg. at SomeClass(Thread.java;789)
+                     r'(?!\(\w+\.java:\d+\))' + \
                      self.negative_host_lookbehind
                     )
         self.compile('fqdn',
                      r'(?!' + self.custom_ignores_raw + ')' + \
                      fqdn_regex + \
                      r'(?!\.[A-Za-z])(\b|$)' + \
+                     # ignore Java stack traces eg. at SomeClass(Thread.java;789)
+                     r'(?!\(\w+\.java:\d+\))' + \
                      self.negative_host_lookbehind
                     )
         self.compile('ip', r'(?<!\d\.)' + ip_regex + r'(?![^:]\d+)')
