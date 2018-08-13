@@ -118,6 +118,9 @@ dest[27]="SomeClass\$method:20 something happened"
 #src[28]="-passphase 'foo'"
 #dest[28]="-passphrase '<password>'"
 
+src[29]=" at host.domain.com(Thread.java:789)"
+dest[29]=" at host.domain.com(Thread.java:789"
+
 args="-aPe"
 test_anonymize(){
     src="$1"
