@@ -153,7 +153,7 @@ class Anonymize(CLI):
                                 sep=arg_sep,
                                 pw=password_quoted),
             'password2': r'(\bcurl\s.*?-[A-Za-tv-z]*u[=\s]*)[^\s:]+:{pw}'.format(pw=password_quoted),
-            'password3': r'\b({user}{sep})[^\s,]+([\,\.\s]+{pass_word_phrase}{sep}){pw}'\
+            'password3': r'\b({user}{sep})\S+([\,\.\s]+{pass_word_phrase}{sep}){pw}'\
                          .format(user=user_name,
                                  sep=arg_sep,
                                  pass_word_phrase=pass_word_phrase,
