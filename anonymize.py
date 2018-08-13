@@ -85,7 +85,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.4'
 
 
 class Anonymize(CLI):
@@ -128,27 +128,41 @@ class Anonymize(CLI):
             'java_exceptions': False,
             'python_tracebacks': False,
         }
-        self.negative_host_lookbehind = r'(?<!\.java)(?<!\.py)(?<!\sid)'
+        self.negative_host_lookbehind = r'(?<!\.java)' + \
+                                        r'(?<!\.py)' + \
+                                        r'(?<!\sid)'
         # don't use this simpler one as we want to catch everything inside quotes eg. 'my secret'
-        #password_regex = r'\S+'
-        password_regex = r'(?:\'[^\']+\'|"[^"]+"|\S+)'
+        #password_quoted = r'\S+'
+        password_quoted = r'(?:\'[^\']+\'|"[^"]+"|\S+)'
+        user_name = r'\buser(?:name)?'
+        arg_sep = r'[=\s:]+'
+        # openssl uses -passin switch
+        pass_word_phrase = r'pass(?:word|phrase|in)?'
         self.regex = {
             'hostname2': r'\b(?:ip-10-\d+-\d+-\d+|' + \
                          r'ip-172-1[6-9]-\d+-\d+|' + \
                          r'ip-172-2[0-9]-\d+-\d+|' + \
                          r'ip-172-3[0-1]-\d+-\d+|' +
                          r'ip-192-168-\d+-\d+)\b(?!-\d)',
-            'user': r'(-user[=\s]+)\S+',
-            'user2': r'/home/\S+',
-            'user3': r'(user\s*=\s*)\S+',
-            # openssl uses -passin switch
-            'password': r'(\b(?:password|passin)(?:=|\s+)){pw}'.format(pw=password_regex),
-            'password2': r'(\bcurl\s.*?-[A-Za-tv-z]*u(?:=|\s+)?)[^:\s]+:{pw}'.format(pw=password_regex),
+            'user': r'(-{user_name}{sep})\S+'.format(user_name=user_name, sep=arg_sep),
+            'user2': r'/home/{user}'.format(user=user_regex),
+            'user3': r'({user_name}{sep}){user}'.format(user_name=user_name, sep=arg_sep, user=user_regex),
+            'password': r'(-{pass_word_phrase}{sep}){pw}'\
+                        .format(pass_word_phrase=pass_word_phrase,
+                                sep=arg_sep,
+                                pw=password_quoted),
+            'password2': r'(\bcurl\s.*?-[A-Za-tv-z]*u[=\s]*)[^\s:]+:{pw}'.format(pw=password_quoted),
+            'password3': r'\b({user}{sep})[^\s,]+([\,\.\s]+{pass_word_phrase}{sep}){pw}'\
+                         .format(user=user_name,
+                                 sep=arg_sep,
+                                 pass_word_phrase=pass_word_phrase,
+                                 pw=password_quoted),
             'ip_prefix': r'{}(?!\.\d+\.\d+)'.format(ip_prefix_regex),
             # network device format Mac address
             'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',
             'kerberos': user_regex + '/_HOST@' + domain_regex,
             'kerberos2': r'\b' + user_regex + r'(?:\/' + hostname_regex + r')?@' + domain_regex + r'\b/',
+            'port': r':\d+(?!\.?[\w-])',
             'proxy': 'proxy ' + host_regex + r'port \d+',
             'proxy2': 'Trying' + ip_regex,
             'proxy3': 'Connected to ' + host_regex + r'\($ip_regex\) port \d+',
@@ -162,7 +176,7 @@ class Anonymize(CLI):
             'cisco5': r'\scommunity\s+.*$',
             'cisco6': r'(standby\s+\d+\s+authentication).*',
             'cisco7': r'\sremote-as\s\d+',
-            'cisco8': r'\sdescription\s.*$',
+            'cisco8': r'description\s.*$',
             'screenos': r'set admin (name|user|password) "?.+"?',
             'screenos2': r'set snmp (community|host) "?.+"?',
             'screenos3': r' md5 "?.+"?',
@@ -184,11 +198,13 @@ class Anonymize(CLI):
         self.replacements = {
             'hostname': r'<hostname>:\1',
             'hostname2': '<aws_hostname>',
+            'port': ':<port>',
             'user': r'\1<user>',
             'user2': '/home/<user>',
             'user3': r'\1<user>',
             'password': r'\1<password>',
             'password2': r'\1<user>:<password>',
+            'password3': r'\1<user>\2<password>',
             'ip_prefix': r'<ip_prefix>.',
             'kerberos': r'<kerberos_primary>\/_HOST@<kerberos_realm>',
             'kerberos2': r'<kerberos_principal>',
@@ -199,13 +215,13 @@ class Anonymize(CLI):
             'http_auth2': r'\1\'<proxy_user>\2\3/',
             'proxy4': r'\1<proxy_ip>',
             'cisco': r'username <username> password <password>',
-            'cisco2': r'password <password>',
+            'cisco2': r'password <cisco_password>',
             'cisco3': r'secret <secret>',
             'cisco4': r' md5 <md5>',
             'cisco5': r' community <community>',
             'cisco6': r'\1 <auth>',
             'cisco7': r'remote-as <AS>',
-            'cisco8': r'description <description>',
+            'cisco8': r'description <cisco_description>',
             'screenos': r'set admin \1 <anonymized>',
             'screenos2': r'set snmp \1 <anonymized>',
             'screenos3': r' md5 <md5>',
@@ -402,12 +418,14 @@ class Anonymize(CLI):
         self.regex['hostname'] = re.compile(
             r'(?<!\w\]\s)' + \
             r'(?<!\.)' + \
+            # ignore Java methods such as SomeClass$method:20
+            r'(?<!\$)' + \
             # don't match 2018-01-01T00:00:00 => 2018-01-<hostname>:00:00
             r'(?!\d+T\d+:\d+)' + \
             r'(?!\d+[^A-Za-z0-9]|' + \
             self.custom_ignores_raw + ')' + \
             hostname_regex + \
-            self.negative_host_lookbehind + r':(\d{1,5}(?:[^A-Za-z]|$))',
+            self.negative_host_lookbehind + r':(\d{1,5}(?!\.?\w))',
             re.I)
         self.regex['domain'] = re.compile(
             r'(?!' + self.custom_ignores_raw + ')' + \
