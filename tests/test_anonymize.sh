@@ -115,6 +115,9 @@ dest[26]="user: <user>, password: <password> bar"
 src[27]="SomeClass\$method:20 something happened"
 dest[27]="SomeClass\$method:20 something happened"
 
+#src[28]="-passphase 'foo'"
+#dest[28]="-passphrase '<password>'"
+
 args="-aPe"
 test_anonymize(){
     src="$1"
@@ -173,24 +176,24 @@ else
 fi
 
 # check normal don't strip these
-src[28]="reading password from foo"
-dest[28]="reading password from foo"
+src[101]="reading password from foo"
+dest[101]="reading password from foo"
 
-src[29]="some description = blah, module = foo"
-dest[29]="some description = blah, module = foo"
+src[102]="some description = blah, module = foo"
+dest[102]="some description = blah, module = foo"
 
 args="-Hiukex"
-run_tests 28 29
+run_tests 101 102
 
 # now check --network / --cisco / --juniper do strip these
-src[30]="reading password from bar"
-dest[30]="reading password <cisco_password>"
+src[103]="reading password from bar"
+dest[103]="reading password <cisco_password>"
 
-src[31]="some description = blah, module=bar"
-dest[31]="some description <cisco_description>"
+src[104]="some description = blah, module=bar"
+dest[104]="some description <cisco_description>"
 
 args="--network"
-run_tests 30 31
+run_tests 103 104
 
 if [ -n "$parallel" ]; then
     # can't trust exit code for parallel yet, only for quick local testing
