@@ -110,7 +110,7 @@ src[25]="BigInsight:4.2"
 dest[25]="BigInsight:4.2"
 
 src[26]="user: hari, password: foo bar"
-dest[26]="user: <user>, password: <password> bar"
+dest[26]="user: <user> password: <password> bar"
 
 src[27]="SomeClass\$method:20 something happened"
 dest[27]="SomeClass\$method:20 something happened"
