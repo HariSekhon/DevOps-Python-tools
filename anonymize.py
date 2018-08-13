@@ -85,7 +85,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.5'
 
 
 class Anonymize(CLI):
@@ -95,6 +95,7 @@ class Anonymize(CLI):
         super(Anonymize, self).__init__()
         # Python 3.x
         # super().__init__()
+        self.timeout_default = None
         self.custom_anonymization_file = os.path.join(srcdir, 'anonymize_custom.conf')
         self.custom_ignore_file = os.path.join(srcdir, 'anonymize_ignore.conf')
         self.custom_anonymizations = set()
@@ -188,12 +189,6 @@ class Anonymize(CLI):
             'network': r'username .*',
             'network2': r'syscontact .*',
         }
-        # auto-populate any *_regex to self.regex[name] = name_regex
-        for _ in globals():
-            if re.sub('_regex$', '', _) not in self.regex and re.search('_regex$', _):
-                self.regex[re.sub('_regex$', '', _)] = globals()[_]
-        for _ in self.regex:
-            self.regex[_] = re.compile(self.regex[_])
         # will auto-infer replacements to not have to be explicit, use this only for override mappings
         self.replacements = {
             'hostname': r'<hostname>:\1',
@@ -324,22 +319,11 @@ class Anonymize(CLI):
         files = self.get_opt('files')
         if files:
             self.file_list = set(files.split(','))
-        file_list = self.file_list
-        if self.args:
-            for arg in self.args:
-                file_list.add(arg)
-        for filename in file_list:
-            if filename == '-':
-                log_option('file', '<STDIN>')
-            else:
-                validate_file(filename)
-        # use stdin
-        if not file_list:
-            file_list.add('-')
+        self.file_list = self.file_list.union(self.args)
+        self._validate_filenames()
         if self.get_opt('all'):
             for _ in self.anonymizations:
                 if _ == 'ip_prefix':
-                    #self.anonymizations[_] = False
                     continue
                 self.anonymizations[_] = True
         else:
@@ -347,8 +331,27 @@ class Anonymize(CLI):
                 if _ in ('subnet_mask', 'mac'):
                     continue
                 self.anonymizations[_] = self.get_opt(_)
-        ######
-        if self.anonymizations['ip'] or self.anonymizations['ip_prefix']:
+        self._process_options_host()
+        self._process_options_network()
+        self._process_options_exceptions()
+        if not self._is_anonymization_selected():
+            self.usage('must specify one or more anonymization types to apply')
+        if self.anonymizations['ip'] and self.anonymizations['ip_prefix']:
+            self.usage('cannot specify both --ip and --ip-prefix, they are mutually exclusive behaviours')
+
+    def _validate_filenames(self):
+        for filename in self.file_list:
+            if filename == '-':
+                log_option('file', '<STDIN>')
+            else:
+                validate_file(filename)
+        # use stdin
+        if not self.file_list:
+            self.file_list.add('-')
+
+    def _process_options_host(self):
+        if self.anonymizations['ip'] or \
+           self.anonymizations['ip_prefix']:
             self.anonymizations['subnet_mask'] = True
             self.anonymizations['mac'] = True
         if self.get_opt('host'):
@@ -356,17 +359,16 @@ class Anonymize(CLI):
                 self.anonymizations[_] = True
         if self.anonymizations['proxy']:
             self.anonymizations['http_auth'] = True
+
+    def _process_options_network(self):
         if self.anonymizations['network']:
             for _ in ('cisco', 'screenos', 'junos'):
                 self.anonymizations[_] = True
         for _ in ('cisco', 'screenos', 'junos'):
             if self.anonymizations[_]:
                 self.anonymizations['network'] = True
-        #######
-        if not self.is_anonymization_selected():
-            self.usage('must specify one or more anonymization types to apply')
-        if self.anonymizations['ip'] and self.anonymizations['ip_prefix']:
-            self.usage('cannot specify both --ip and --ip-prefix, they are mutually exclusive behaviours')
+
+    def _process_options_exceptions(self):
         if self.get_opt('skip_exceptions'):
             for _ in self.exceptions:
                 self.exceptions[_] = True
@@ -374,7 +376,7 @@ class Anonymize(CLI):
             for _ in self.exceptions:
                 self.exceptions[_] = self.get_opt('skip_' + _)
 
-    def is_anonymization_selected(self):
+    def _is_anonymization_selected(self):
         for _ in self.anonymizations:
             if self.anonymizations[_]:
                 return True
@@ -414,32 +416,48 @@ class Anonymize(CLI):
         for filename in self.file_list:
             self.process_file(filename)
 
+    # allow to easily switch pre-compilation on/off for testing
+    # testing shows on a moderate sized file that it is a couple secs quicker to use pre-compiled regex
+    def compile(self, regex_name, regex):
+        self.regex[regex_name] = re.compile(regex, re.I)
+        #self.regex[regex_name] = regex
+
     def prepare_regex(self):
-        self.regex['hostname'] = re.compile(
-            r'(?<!\w\]\s)' + \
-            r'(?<!\.)' + \
-            # ignore Java methods such as SomeClass$method:20
-            r'(?<!\$)' + \
-            # don't match 2018-01-01T00:00:00 => 2018-01-<hostname>:00:00
-            r'(?!\d+T\d+:\d+)' + \
-            r'(?!\d+[^A-Za-z0-9]|' + \
-            self.custom_ignores_raw + ')' + \
-            hostname_regex + \
-            self.negative_host_lookbehind + r':(\d{1,5}(?!\.?\w))',
-            re.I)
-        self.regex['domain'] = re.compile(
-            r'(?!' + self.custom_ignores_raw + ')' + \
-            domain_regex_strict + \
-            r'(?!\.[A-Za-z])(\b|$)' + \
-            self.negative_host_lookbehind, re.I)
-        self.regex['fqdn'] = re.compile(
-            r'(?!' + self.custom_ignores_raw + ')' + \
-            fqdn_regex + \
-            r'(?!\.[A-Za-z])(\b|$)' + \
-            self.negative_host_lookbehind, re.I)
-        self.regex['ip'] = re.compile(r'(?<!\d\.)' + ip_regex + r'(?![^:]\d+)')
-        self.regex['subnet_mask'] = re.compile(r'(?<!\d\.)' + subnet_mask_regex + r'(?![^:]\d+)')
-        self.regex['ip_prefix'] = re.compile(r'(?<!\d\.)' + ip_prefix_regex + r'(?!\.\d+\.\d+)')
+        self.compile('hostname',
+                     r'(?<!\w\]\s)' + \
+                     r'(?<!\.)' + \
+                     # ignore Java methods such as SomeClass$method:20
+                     r'(?<!\$)' + \
+                     # don't match 2018-01-01T00:00:00 => 2018-01-<hostname>:00:00
+                     r'(?!\d+T\d+:\d+)' + \
+                     r'(?!\d+[^A-Za-z0-9]|' + \
+                     self.custom_ignores_raw + ')' + \
+                     hostname_regex + \
+                     self.negative_host_lookbehind + r':(\d{1,5}(?:[^A-Za-z]|$))',
+                    )
+        self.compile('domain',
+                     r'(?!' + self.custom_ignores_raw + ')' + \
+                     domain_regex_strict + \
+                     r'(?!\.[A-Za-z])(\b|$)' + \
+                     self.negative_host_lookbehind
+                    )
+        self.compile('fqdn',
+                     r'(?!' + self.custom_ignores_raw + ')' + \
+                     fqdn_regex + \
+                     r'(?!\.[A-Za-z])(\b|$)' + \
+                     self.negative_host_lookbehind
+                    )
+        self.compile('ip', r'(?<!\d\.)' + ip_regex + r'(?![^:]\d+)')
+        self.compile('subnet_mask', r'(?<!\d\.)' + subnet_mask_regex + r'(?![^:]\d+)')
+        self.compile('ip_prefix', r'(?<!\d\.)' + ip_prefix_regex + r'(?!\.\d+\.\d+)')
+        re_regex_ending = re.compile('_regex$')
+        # auto-populate any *_regex to self.regex[name] = name_regex
+        for _ in globals():
+            if re_regex_ending.search(_) and \
+                    re_regex_ending.sub('', _) not in self.regex:
+                self.regex[re.sub('_regex$', '', _)] = globals()[_]
+        for _ in self.regex:
+            self.regex[_] = re.compile(self.regex[_])
 
     def process_file(self, filename):
         anonymize = self.anonymize
@@ -464,12 +482,12 @@ class Anonymize(CLI):
     def anonymize(self, line):
         #log.debug('anonymize: line: %s', line)
         match = self.re_line_ending.search(line)
-        line_ending = ""
+        line_ending = ''
         if match:
             line_ending = match.group(1)
         if self.strip_cr:
-            line_ending = "\n"
-        line = self.re_line_ending.sub("", line)
+            line_ending = '\n'
+        line = self.re_line_ending.sub('', line)
         for _ in self.anonymizations:
             if not self.anonymizations[_]:
                 continue
@@ -510,11 +528,13 @@ class Anonymize(CLI):
         replacement = self.replacements.get(name, '<{}>'.format(name))
         #log.debug('%s replacement = %s', name, replacement)
         line = self.regex[name].sub(replacement, line)
+        #line = re.sub(self.regex[name], replacement, line)
         return line
 
     def anonymize_custom(self, line):
         for regex in self.custom_anonymizations:
             line = regex.sub(r'\1<custom>\2', line)
+            #line = re.sub(regex, r'\1<custom>\2', line)
         return line
 
     @staticmethod
