@@ -173,9 +173,9 @@ Unzip both and move Pylib to the ```pylib``` folder under PyTools.
 unzip pytools-master.zip
 unzip pylib-master.zip
 
-mv pytools-master pytools
-mv pylib-master pylib
-mv -f pylib pytools/
+mv -v pytools-master pytools
+mv -v pylib-master pylib
+mv -vf pylib pytools/
 ```
 
 Proceed to install PyPI modules for whichever programs you want to use using your usual procedure - usually an internal mirror or proxy server to PyPI, or rpms / debs (some libraries are packaged by Linux distributions).
