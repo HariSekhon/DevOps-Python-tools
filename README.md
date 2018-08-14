@@ -237,6 +237,8 @@ See below for procedure to install Jython if you don't already have it.
 
 ##### Automated Jython Install
 
+This will download and install jython to /opt/jython-2.7.0:
+
 ```
 make jython
 ```
@@ -245,7 +247,7 @@ make jython
 
 Jython is a simple download and unpack and can be fetched from http://www.jython.org/downloads.html
 
-Then add the Jython untarred directory to the $PATH or specify the /path/to/jythondir/bin/jython explicitly when calling jython.
+Then add the Jython install bin directory to the $PATH or specify the full path to the `jython` binary before each program (eg. `/opt/jython-2.7.0/bin/jython`).
 
 #### Configuration for Strict Domain / FQDN validation ####
 
