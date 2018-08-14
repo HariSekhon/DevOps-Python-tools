@@ -229,10 +229,10 @@ hadoop_hdfs_files_stats.jy
 
 Run like so:
 ```
-jython -J-cp `hadoop classpath` hadoop_hdfs_time_block_reads.jy --help
+jython -J-cp $(hadoop classpath) hadoop_hdfs_time_block_reads.jy --help
 ```
 
-The ```-J-cp `hadoop classpath` ``` bit does the right thing in finding the Hadoop java classes required to use the Hadoop APIs.
+The ```-J-cp $(hadoop classpath) ``` part dynamically inserts the current Hadoop java classpath required to use the Hadoop APIs.
 
 See below for procedure to install Jython if you don't already have it.
 
