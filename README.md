@@ -111,18 +111,19 @@ Environment variables are supported for convenience and also to hide credentials
   - ```dockerfiles_check_git*.py``` - check Git tags & branches align with the containing Dockerfile's ```ARG *_VERSION```
 - ```find_active_server.py``` - returns first available healthy server or active master in high availability deployments, useful for chaining with single argument tools. Configurable tests include socket, http, https, ping, url and/or regex content match, multi-threaded for speed. Designed to extend tools that only accept a single ```--host``` option but for which the technology has later added multi-master support or active-standby masters (eg. Hadoop, HBase) or where you want to query cluster wide information available from any online peer (eg. Elasticsearch)
   - The following are simplified specialisations of the above program, just pass host arguments, all the details have been baked in, no switches required
-    - ```find_active_hadoop_namenode.py``` - finds the active [Hadoop](http://hadoop.apache.org/) Namenode in HDFS HA
-    - ```find_active_hadoop_resource_manager.py``` - finds the active [Hadoop](http://hadoop.apache.org/) Resource Manager in Yarn HA
-    - ```find_active_hbase_master.py``` - finds the active [HBase](https://hbase.apache.org/) Master in HBase HA
-    - ```find_active_hbase_thrift.py``` - finds the first available [HBase](https://hbase.apache.org/) Thrift Server (run multiple of these for load balancing)
-    - ```find_active_hbase_stargate.py``` - finds the first available [HBase](https://hbase.apache.org/) Stargate rest server (run multiple of these for load balancing)
-    - ```find_active_apache_drill.py``` - finds the first available [Apache Drill](https://drill.apache.org/) node
-    - ```find_active_impala*.py``` - finds the first available [Impala](https://impala.apache.org/) node of either Impalad, Catalog or Statestore
-    - ```find_active_presto_coordinator.py``` - finds the first available [Presto](https://prestodb.io/) Coordinator
-    - ```find_active_oozie.py``` - finds the first active [Oozie](http://oozie.apache.org/) server
-    - ```find_active_solrcloud.py``` - finds the first available [Solr](http://lucene.apache.org/solr/) / [SolrCloud](https://wiki.apache.org/solr/SolrCloud) node
-    - ```find_active_elasticsearch.py``` - finds the first available [Elasticsearch](https://www.elastic.co/products/elasticsearch) node
+    - ```find_active_hadoop_namenode.py``` - returns active [Hadoop](http://hadoop.apache.org/) Namenode in HDFS HA
+    - ```find_active_hadoop_resource_manager.py``` - returns active [Hadoop](http://hadoop.apache.org/) Resource Manager in Yarn HA
+    - ```find_active_hbase_master.py``` - returns active [HBase](https://hbase.apache.org/) Master in HBase HA
+    - ```find_active_hbase_thrift.py``` - returns first available [HBase](https://hbase.apache.org/) Thrift Server (run multiple of these for load balancing)
+    - ```find_active_hbase_stargate.py``` - returns first available [HBase](https://hbase.apache.org/) Stargate rest server (run multiple of these for load balancing)
+    - ```find_active_apache_drill.py``` - returns first available [Apache Drill](https://drill.apache.org/) node
+    - ```find_active_impala*.py``` - returns first available [Impala](https://impala.apache.org/) node of either Impalad, Catalog or Statestore
+    - ```find_active_presto_coordinator.py``` - returns first available [Presto](https://prestodb.io/) Coordinator
+    - ```find_active_oozie.py``` - returns first active [Oozie](http://oozie.apache.org/) server
+    - ```find_active_solrcloud.py``` - returns first available [Solr](http://lucene.apache.org/solr/) / [SolrCloud](https://wiki.apache.org/solr/SolrCloud) node
+    - ```find_active_elasticsearch.py``` - returns first available [Elasticsearch](https://www.elastic.co/products/elasticsearch) node
     - see also: [Advanced HAProxy configurations](https://github.com/harisekhon/haproxy-configs) which are part of the [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins)
+- ```travis_last_log.py``` - fetches [Travis CI](https://travis-ci.org/) latest running / completed / failed build log for given repo - useful for quickly getting the log of the last failed build when CCMenu or BuildNotify applets turn red
 - ```travis_debug_session.py``` - launches a [Travis CI](https://travis-ci.org/) interactive debug build session via Travis API, tracks session creation and drops user straight in to the SSH shell on the remote Travis build, very convenient one shot debug launcher for Travis CI
 - ```validate_*.py``` - validate files, directory trees and/or standard input streams
   - supports the following file formats:
