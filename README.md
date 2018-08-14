@@ -248,7 +248,12 @@ make jython
 
 Jython is a simple download and unpack and can be fetched from http://www.jython.org/downloads.html
 
-Then add the Jython install bin directory to the $PATH or specify the full path to the `jython` binary (eg. `/opt/jython-2.7.0/bin/jython hadoop_hdfs_time_block_reads.jy ...`).
+Then add the Jython install bin directory to the $PATH or specify the full path to the `jython` binary, eg:
+
+```
+/opt/jython-2.7.0/bin/jython hadoop_hdfs_time_block_reads.jy ...
+```
+
 
 #### Configuration for Strict Domain / FQDN validation ####
 
