@@ -1,6 +1,6 @@
 Hari Sekhon PyTools
 ===================
-[![Build Status](https://travis-ci.org/HariSekhon/pytools.svg?branch=master)](https://travis-ci.org/HariSekhon/pytools)
+[![Build Status](https://travis-ci.org/HariSekhon/python-tools.svg?branch=master)](https://travis-ci.org/HariSekhon/python-tools)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f7af72140c3b408b9659207ced17544f)](https://www.codacy.com/app/harisekhon/pytools)
 [![GitHub stars](https://img.shields.io/github/stars/harisekhon/pytools.svg)](https://github.com/harisekhon/pytools/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/harisekhon/pytools.svg)](https://github.com/harisekhon/pytools/network)
@@ -13,7 +13,7 @@ Hari Sekhon PyTools
 
 A few of the Big Data, NoSQL & Linux tools I've written over the years. All programs have `--help` to list the available options.
 
-For many more tools see the [Tools](https://github.com/harisekhon/tools) and [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) repos which contains many Hadoop, NoSQL, Web and infrastructure tools and Nagios plugins.
+For many more tools see the [Perl Tools](https://github.com/harisekhon/perl-tools) and [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) repos which contains many Hadoop, NoSQL, Web and infrastructure tools and Nagios plugins.
 
 Hari Sekhon
 
@@ -109,7 +109,7 @@ Environment variables are supported for convenience and also to hide credentials
   - ```docker_registry_show_tags.py``` / ```dockerhub_show_tags.py``` / ```quay_show_tags.py``` - shows tags for docker repos in a docker registry or on [DockerHub](https://hub.docker.com/u/harisekhon/) or [Quay.io](https://quay.io/) - Docker CLI doesn't support this yet but it's a very useful thing to be able to see live on the command line or use in shell scripts (use `-q`/`--quiet` to return only the tags for easy shell scripting). You can use this to pre-download all tags of a docker image before running tests across versions in a simple bash for loop, eg. ```docker_pull_all_tags.sh```
   - ```dockerhub_search.py``` - search DockerHub with a configurable number of returned results (official `docker search` is limited to only 25 results), using `--verbose` will also show you how many results were returned to the termainal and how many DockerHub has in total (use ```-q / --quiet``` to return only the image names for easy shell scripting). This can be used to download all of my DockerHub images in a simple bash for loop eg. ```docker_pull_all_images.sh``` and can be chained with ```dockerhub_show_tags.py``` to download all tagged versions for all docker images eg. ```docker_pull_all_images_all_tags.sh```
   - ```dockerfiles_check_git*.py``` - check Git tags & branches align with the containing Dockerfile's ```ARG *_VERSION```
-- ```find_active_server.py``` - generic solution to return the first available healthy server or active master in high availability deployments, useful for chaining with single argument tools. Configurable tests include socket, http, https, ping, url and/or regex content match, multi-threaded for speed. Designed to extend tools that only accept a single ```--host``` option but for which the technology has later added multi-master support or active-standby masters (eg. Hadoop, HBase) or where you want to query cluster wide information available from any online peer (eg. Elasticsearch)
+- ```find_active_server.py``` - returns first available healthy server or active master in high availability deployments, useful for chaining with single argument tools. Configurable tests include socket, http, https, ping, url and/or regex content match, multi-threaded for speed. Designed to extend tools that only accept a single ```--host``` option but for which the technology has later added multi-master support or active-standby masters (eg. Hadoop, HBase) or where you want to query cluster wide information available from any online peer (eg. Elasticsearch)
   - The following are simplified specialisations of the above program, just pass host arguments, all the details have been baked in, no switches required
     - ```find_active_hadoop_namenode.py``` - finds the active [Hadoop](http://hadoop.apache.org/) Namenode in HDFS HA
     - ```find_active_hadoop_resource_manager.py``` - finds the active [Hadoop](http://hadoop.apache.org/) Resource Manager in Yarn HA
@@ -136,13 +136,13 @@ Environment variables are supported for convenience and also to hide credentials
     - YAML
   - directories are recursed, testing any files with relevant matching extensions (`.avro`, `.csv`, `json`, `parquet`, `.ini`/`.properties`, `.ldif`, `.xml`, `.yml`/`.yaml`)
   - used for Continuous Integration tests of various adjacent Spark data converters as well as configuration files for things like Presto, Ambari, Apache Drill etc found in my [DockerHub](https://hub.docker.com/u/harisekhon/) images [Dockerfiles master repo](https://github.com/HariSekhon/Dockerfiles) which contains docker builds and configurations for many open source Big Data & Linux technologies
-- ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user to put in your shell's ```.profile``` (there is also a perl version in my [Tools](https://github.com/harisekhon/tools) repo)
+- ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user to put in your shell's ```.profile``` (there is also a perl version in my [Perl Tools](https://github.com/harisekhon/perl-tools) repo)
 
 ### Detailed Build Instructions
 
 ##### Python VirtualEnv localized installs
 
-The automated build will use 'sudo' to install required Python PyPI libraries to the system unless running as root or it detects being inside a VirtualEnv. If you want to install some of the common Python libraries using your OS packages instead of installing from CPAN / PyPI then follow the Manual Build section below.
+The automated build will use 'sudo' to install required Python PyPI libraries to the system unless running as root or it detects being inside a VirtualEnv. If you want to install some of the common Python libraries using your OS packages instead of installing from PyPI then follow the Manual Build section below.
 
 
 #### Manual Setup
@@ -201,23 +201,10 @@ The automated build also works on Mac OS X but you'll need to download and insta
 brew install openssl wget
 ```
 
-CPAN's Crypt::SSLeay may not find the OpenSSL header and error like so:
+If failing to build an OpenSSL lib dependency, just prefix the build command like so:
 
 ```
-fatal error: 'openssl/opensslv.h' file not found
-#include <openssl/opensslv.h>
-```
-
-In this case, give it the path to the OpenSSL lib to build:
-
-```
-sudo OPENSSL_INCLUDE=/usr/local/opt/openssl/include OPENSSL_LIB=/usr/local/opt/openssl/lib cpan Crypt::SSLeay
-```
-
-then continue with the rest of the build:
-
-```
-make
+sudo OPENSSL_INCLUDE=/usr/local/opt/openssl/include OPENSSL_LIB=/usr/local/opt/openssl/lib ...
 ```
 
 You may get errors trying to install to Python library paths even as root on newer versions of Mac, sometimes this is caused by pip 10 vs pip 9 and downgrading will work around it:
@@ -251,7 +238,7 @@ See below for procedure to install Jython if you don't already have it.
 ##### Automated Jython Install
 
 ```
-make jython-install
+make jython
 ```
 
 ##### Manual Jython Install
@@ -304,11 +291,11 @@ Patches, improvements and even general feedback are welcome in the form of GitHu
 
 ### See Also ###
 
-* [Tools](https://github.com/harisekhon/tools) - 30+ tools for Hadoop, NoSQL, Solr, Elasticsearch, Pig, Hive, Web URL + Nginx stats watchers, SQL and NoSQL syntax recasers, various Linux CLI tools
+* [Perl Tools](https://github.com/harisekhon/perl-tools) - 30+ tools for Hadoop, NoSQL, Solr, Elasticsearch, Pig, Hive, Web URL + Nginx stats watchers, SQL and NoSQL syntax recasers, various Linux CLI tools
 
 * [The Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) - 400+ programs for Nagios monitoring your Hadoop & NoSQL clusters. Covers every Hadoop vendor's management API and every major NoSQL technology (HBase, Cassandra, MongoDB, Elasticsearch, Solr, Riak, Redis etc.) as well as message queues (Kafka, RabbitMQ), continuous integration (Jenkins, Travis CI) and traditional infrastructure (SSL, Whois, DNS, Linux)
 
-* [PyLib](https://github.com/harisekhon/pylib) - my personal python library leveraged in this repo as a submodule
+* [PyLib](https://github.com/harisekhon/pylib) - Python library leveraged throughout the programs in this repo as a submodule
 
 * [Perl Lib](https://github.com/harisekhon/lib) - Perl version of above library
 
