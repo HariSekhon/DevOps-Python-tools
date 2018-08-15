@@ -4,7 +4,7 @@
 #  Author: Hari Sekhon
 #  Date: 2016-10-03 11:44:41 +0100 (Mon, 03 Oct 2016)
 #
-#  https://github.com/harisekhon/pytools
+#  https://github.com/harisekhon/python-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
@@ -143,7 +143,7 @@ ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_server.py --https local
 echo "testing https with url path and regex matching:"
 echo
 
-run_grep "^github.com$" ./find_active_server.py $opts --https $WEBSITE2 github.com -u /harisekhon --regex 'pytools'
+run_grep "^github.com$" ./find_active_server.py $opts --https $WEBSITE2 github.com -u /harisekhon --regex 'python-tools'
 
 # ============================================================================ #
 
