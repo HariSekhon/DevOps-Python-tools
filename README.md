@@ -1,5 +1,5 @@
-Hari Sekhon PyTools
-===================
+Hari Sekhon - DevOps Python Tools
+=================================
 [![Build Status](https://travis-ci.org/HariSekhon/python-tools.svg?branch=master)](https://travis-ci.org/HariSekhon/python-tools)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f7af72140c3b408b9659207ced17544f)](https://www.codacy.com/app/harisekhon/pytools)
 [![GitHub stars](https://img.shields.io/github/stars/harisekhon/pytools.svg)](https://github.com/harisekhon/pytools/stargazers)
