@@ -29,6 +29,8 @@ cd "$srcdir/..";
 
 . ./tests/utils.sh
 
+anonymize="./anonymize.py"
+
 src[0]="2015-11-19 09:59:59,893 - Execution of 'mysql -u root --password=somep@ssword! -h myHost.internal  -s -e \"select version();\"' returned 1. ERROR 2003 (HY000): Can't connect to MySQL server on 'host.domain.com' (111)"
 dest[0]="2015-11-19 09:59:59,893 - Execution of 'mysql -u root --password=<password> -h <fqdn>  -s -e \"select version();\"' returned 1. ERROR 2003 (HY000): Can't connect to MySQL server on '<fqdn>' (111)"
 
@@ -138,7 +140,7 @@ test_anonymize(){
     src="$1"
     dest="$2"
     #[ -z "${src[$i]:-}" ] && { echo "skipping test $i..."; continue; }
-    result="$(./anonymize.py $args <<< "$src")"
+    result="$($anonymize $args <<< "$src")"
     if grep -Fq "$dest" <<< "$result"; then
         echo "SUCCEEDED anonymization test $i"
     else
@@ -179,7 +181,7 @@ run_tests  # ignore_run_unqualified
 # test ip prefix
 src="4.3.2.1"
 dest="<ip_x.x.x>.1"
-result="$(./anonymize.py --ip-prefix <<< "$src")"
+result="$($anonymize --ip-prefix <<< "$src")"
 if grep -Fq "<ip_x.x.x>.1" <<< "$result"; then
     echo "SUCCEEDED anonymization test ip_prefix"
 else
@@ -221,7 +223,7 @@ if [ -n "$parallel" ]; then
 fi
 
 echo "checking file args"
-if [ `./anonymize.py -ae README.md | wc -l` -lt 100 ]; then
+if [ `$anonymize -ae README.md | wc -l` -lt 100 ]; then
     echo "Suspicious readme file arg result came to < 100 lines"
     exit 1
 fi
