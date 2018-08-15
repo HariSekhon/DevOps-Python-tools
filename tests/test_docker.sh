@@ -24,7 +24,7 @@ cd "$srcdir/.."
 
 section "Docker Image"
 
-export DOCKER_IMAGE="harisekhon/devops-python-tools"
+export DOCKER_IMAGE="harisekhon/pytools"
 
 if is_docker_available; then
     [ -n "${NO_DOCKER:-}" ] && exit 0
