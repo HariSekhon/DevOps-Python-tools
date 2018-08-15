@@ -204,6 +204,7 @@ class Anonymize(CLI):
             'password3': r'\1<user>\2<password>',
             'ip': r'<ip_x.x.x.x>',
             'ip_prefix': r'<ip_x.x.x>.',
+            'subnet_mask': r'<subnet_x.x.x.x>',
             'kerberos': r'<kerberos_primary>\/_HOST@<kerberos_realm>',
             'kerberos2': r'<kerberos_principal>',
             'proxy': r'proxy <proxy_host> port <proxy_port>',
