@@ -135,6 +135,9 @@ dest[32]="https://<hostname>:443/path"
 src[33]="tcp://blah:8080"
 dest[33]="tcp://<hostname>:8080"
 
+src[34]="AA-BB-CC-DD-EE-FF"
+dest[34]="<mac>"
+
 args="-aPe"
 test_anonymize(){
     src="$1"
