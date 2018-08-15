@@ -6,7 +6,7 @@ Hari Sekhon - DevOps Python Tools
 [![GitHub forks](https://img.shields.io/github/forks/harisekhon/devops-python-tools.svg)](https://github.com/harisekhon/devops-python-tools/network)
 [![Dependency Status](https://gemnasium.com/badges/github.com/HariSekhon/devops-python-tools.svg)](https://gemnasium.com/github.com/HariSekhon/devops-python-tools)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20OS%20X-blue.svg)](https://github.com/harisekhon/devops-python-tools#hari-sekhon-pytools)
-[![DockerHub](https://img.shields.io/badge/docker-available-blue.svg)](https://hub.docker.com/r/harisekhon/devops-python-tools/)
+[![DockerHub](https://img.shields.io/badge/docker-available-blue.svg)](https://hub.docker.com/r/harisekhon/pytools/)
 [![](https://images.microbadger.com/badges/image/harisekhon/devops-python-tools.svg)](http://microbadger.com/#/images/harisekhon/devops-python-tools)
 
 ### Hadoop, Spark / PySpark, HBase, Pig, Ambari, IPython and Linux Tools ###
@@ -27,21 +27,21 @@ https://www.linkedin.com/in/harisekhon
 
 #### Ready to run Docker image #####
 
-All programs and their pre-compiled dependencies can be found ready to run on [DockerHub](https://hub.docker.com/r/harisekhon/devops-python-tools/).
+All programs and their pre-compiled dependencies can be found ready to run on [DockerHub](https://hub.docker.com/r/harisekhon/pytools/).
 
 List all programs:
 ```
-docker run harisekhon/devops-python-tools
+docker run harisekhon/pytools
 ```
 Run any given program:
 ```
-docker run harisekhon/devops-python-tools <program> <args>
+docker run harisekhon/pytools <program> <args>
 ```
 
 #### Automated Build from source #####
 
 ```
-git clone https://github.com/harisekhon/devops-python-tools
+git clone https://github.com/harisekhon/devops-python-tools pytools
 cd pytools
 make
 ```
