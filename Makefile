@@ -83,8 +83,8 @@ build:
 system-packages:
 	if [ -x /sbin/apk ];        then $(MAKE) apk-packages; fi
 	if [ -x /usr/bin/apt-get ]; then $(MAKE) apt-packages; fi
-	if [ -x /usr/local/bin/brew -a `uname` = Darwin ]; then $(MAKE) homebrew-packages; fi
 	if [ -x /usr/bin/yum ];     then $(MAKE) yum-packages; fi
+	if [ -x /usr/local/bin/brew -a `uname` = Darwin ]; then $(MAKE) homebrew-packages; fi
 
 .PHONY: common
 common: system-packages submodules
