@@ -5,7 +5,7 @@
 #  Date: 2015-11-08 14:09:50 +0000 (Sun, 08 Nov 2015)
 #  (re-instantiated from a Perl version in 2014)
 #
-#  https://github.com/harisekhon/pytools
+#  https://github.com/harisekhon/devops-python-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
@@ -48,7 +48,7 @@ Specifying --blueprint is optional for --create-cluster if blueprint is specifie
 
 See the adjacent ambari_blueprints/ directory for sample templates.
 
-See also the validate_json.py program in this same PyTools repo for validating Ambari blueprint templates
+See also the validate_json.py program in this same DevOps Python Tools repo for validating Ambari blueprint templates
 to make hand editing them safer.
 
 Ambari Blueprints documentation

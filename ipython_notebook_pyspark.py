@@ -3,7 +3,7 @@
 #  Author: Hari Sekhon
 #  Date: 6/8/2014
 #
-#  https://github.com/harisekhon/pytools
+#  https://github.com/harisekhon/devops-python-tools
 #
 #  License: see accompanying LICENSE file
 #
@@ -93,7 +93,7 @@ Exception message: %s""" % _)
 # TODO: rewrite from here as a CLI class, not using globals
 
 if len(sys.argv) > 1:
-    printerr("""Hari Sekhon - https://github.com/harisekhon/pytools
+    printerr("""Hari Sekhon - https://github.com/harisekhon/devops-python-tools
 
 usage: %s
 

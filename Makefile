@@ -2,7 +2,7 @@
 #  Author: Hari Sekhon
 #  Date: 2013-02-03 10:25:36 +0000 (Sun, 03 Feb 2013)
 #
-#  https://github.com/harisekhon/pytools
+#  https://github.com/harisekhon/devops-python-tools
 #
 #  License: see accompanying LICENSE file
 #
@@ -58,22 +58,22 @@ PARQUET_VERSION=1.5.0
 
 # Alpine:
 #
-#   apk add --no-cache git $(MAKE) && git clone https://github.com/harisekhon/pytools && cd pytools && $(MAKE)
+#   apk add --no-cache git $(MAKE) && git clone https://github.com/harisekhon/devops-python-tools && cd pytools && $(MAKE)
 
 # Debian / Ubuntu:
 #
-#   apt-get update && apt-get install -y $(MAKE) git && git clone https://github.com/harisekhon/pytools && cd pytools && $(MAKE)
+#   apt-get update && apt-get install -y $(MAKE) git && git clone https://github.com/harisekhon/devops-python-tools && cd pytools && $(MAKE)
 
 # RHEL / CentOS:
 #
-#   yum install -y $(MAKE) git && git clone https://github.com/harisekhon/pytools && cd pytools && $(MAKE)
+#   yum install -y $(MAKE) git && git clone https://github.com/harisekhon/devops-python-tools && cd pytools && $(MAKE)
 
 # ===================
 
 .PHONY: build
 build:
 	@echo =============
-	@echo PyTools Build
+	@echo DevOps Python Tools Build
 	@echo =============
 
 	$(MAKE) common
@@ -296,7 +296,7 @@ spark-deps:
 
 .PHONY: docker-run
 docker-run:
-	docker run -ti --rm harisekhon/pytools ${ARGS}
+	docker run -ti --rm harisekhon/devops-python-tools ${ARGS}
 
 .PHONY: run
 run:
@@ -304,7 +304,7 @@ run:
 
 .PHONY: docker-mount
 docker-mount:
-	docker run -ti --rm -v $$PWD:/py harisekhon/pytools bash -c "cd /py; exec bash"
+	docker run -ti --rm -v $$PWD:/py harisekhon/devops-python-tools bash -c "cd /py; exec bash"
 
 .PHONY: mount
 mount: docker-mount

@@ -1,13 +1,13 @@
 Hari Sekhon - DevOps Python Tools
 =================================
-[![Build Status](https://travis-ci.org/HariSekhon/python-tools.svg?branch=master)](https://travis-ci.org/HariSekhon/python-tools)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f7af72140c3b408b9659207ced17544f)](https://www.codacy.com/app/harisekhon/pytools)
-[![GitHub stars](https://img.shields.io/github/stars/harisekhon/pytools.svg)](https://github.com/harisekhon/pytools/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/harisekhon/pytools.svg)](https://github.com/harisekhon/pytools/network)
-[![Dependency Status](https://gemnasium.com/badges/github.com/HariSekhon/pytools.svg)](https://gemnasium.com/github.com/HariSekhon/pytools)
-[![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20OS%20X-blue.svg)](https://github.com/harisekhon/pytools#hari-sekhon-pytools)
-[![DockerHub](https://img.shields.io/badge/docker-available-blue.svg)](https://hub.docker.com/r/harisekhon/pytools/)
-[![](https://images.microbadger.com/badges/image/harisekhon/pytools.svg)](http://microbadger.com/#/images/harisekhon/pytools)
+[![Build Status](https://travis-ci.org/HariSekhon/devops-python-tools.svg?branch=master)](https://travis-ci.org/HariSekhon/devops-python-tools)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f7af72140c3b408b9659207ced17544f)](https://www.codacy.com/app/harisekhon/devops-python-tools)
+[![GitHub stars](https://img.shields.io/github/stars/harisekhon/devops-python-tools.svg)](https://github.com/harisekhon/devops-python-tools/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/harisekhon/devops-python-tools.svg)](https://github.com/harisekhon/devops-python-tools/network)
+[![Dependency Status](https://gemnasium.com/badges/github.com/HariSekhon/devops-python-tools.svg)](https://gemnasium.com/github.com/HariSekhon/devops-python-tools)
+[![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20OS%20X-blue.svg)](https://github.com/harisekhon/devops-python-tools#hari-sekhon-pytools)
+[![DockerHub](https://img.shields.io/badge/docker-available-blue.svg)](https://hub.docker.com/r/harisekhon/devops-python-tools/)
+[![](https://images.microbadger.com/badges/image/harisekhon/devops-python-tools.svg)](http://microbadger.com/#/images/harisekhon/devops-python-tools)
 
 ### Hadoop, Spark / PySpark, HBase, Pig, Ambari, IPython and Linux Tools ###
 
@@ -27,28 +27,28 @@ https://www.linkedin.com/in/harisekhon
 
 #### Ready to run Docker image #####
 
-All programs and their pre-compiled dependencies can be found ready to run on [DockerHub](https://hub.docker.com/r/harisekhon/pytools/).
+All programs and their pre-compiled dependencies can be found ready to run on [DockerHub](https://hub.docker.com/r/harisekhon/devops-python-tools/).
 
 List all programs:
 ```
-docker run harisekhon/pytools
+docker run harisekhon/devops-python-tools
 ```
 Run any given program:
 ```
-docker run harisekhon/pytools <program> <args>
+docker run harisekhon/devops-python-tools <program> <args>
 ```
 
 #### Automated Build from source #####
 
 ```
-git clone https://github.com/harisekhon/pytools
+git clone https://github.com/harisekhon/devops-python-tools
 cd pytools
 make
 ```
 
-Make sure to read [Detailed Build Instructions](https://github.com/HariSekhon/pytools#detailed-build-instructions) further down for more information.
+Make sure to read [Detailed Build Instructions](https://github.com/HariSekhon/devops-python-tools#detailed-build-instructions) further down for more information.
 
-Some Hadoop tools with require Jython, see [Jython for Hadoop Utils](https://github.com/harisekhon/pytools#jython-for-hadoop-utils) for details.
+Some Hadoop tools with require Jython, see [Jython for Hadoop Utils](https://github.com/harisekhon/devops-python-tools#jython-for-hadoop-utils) for details.
 
 ### Usage ###
 
@@ -56,7 +56,7 @@ All programs come with a ```--help``` switch which includes a program descriptio
 
 Environment variables are supported for convenience and also to hide credentials from being exposed in the process list eg. ```$PASSWORD```, ```$TRAVIS_TOKEN```. These are indicated in the ```--help``` descriptions in brackets next to each option and often have more specific overrides with higher precedence eg. ```$AMBARI_HOST```, ```$HBASE_HOST``` take priority over ```$HOST```.
 
-### PyTools ###
+### DevOps Python Tools ###
 
 - [Spark](https://spark.apache.org/) & Data Format Converters:
   - ```spark_avro_to_parquet.py``` - PySpark Avro => Parquet converter
@@ -151,7 +151,7 @@ The automated build will use 'sudo' to install required Python PyPI libraries to
 Enter the pytools directory and run git submodule init and git submodule update to fetch my library repo:
 
 ```
-git clone https://github.com/harisekhon/pytools
+git clone https://github.com/harisekhon/devops-python-tools
 cd pytools
 git submodule init
 git submodule update
@@ -161,13 +161,13 @@ sudo pip install -r requirements.txt
 
 #### Offline Setup
 
-Download the PyTools and Pylib git repos as zip files:
+Download the DevOps Python Tools and Pylib git repos as zip files:
 
-https://github.com/HariSekhon/pytools/archive/master.zip
+https://github.com/HariSekhon/devops-python-tools/archive/master.zip
 
 https://github.com/HariSekhon/pylib/archive/master.zip
 
-Unzip both and move Pylib to the ```pylib``` folder under PyTools.
+Unzip both and move Pylib to the ```pylib``` folder under DevOps Python Tools.
 
 ```
 unzip pytools-master.zip
@@ -280,10 +280,10 @@ If you update often and want to just quickly git pull + submodule update but ski
 
 ### Testing
 
-[Continuous Integration](https://travis-ci.org/HariSekhon/pytools) is run on this repo with tests for success and failure scenarios:
+[Continuous Integration](https://travis-ci.org/HariSekhon/devops-python-tools) is run on this repo with tests for success and failure scenarios:
 - unit tests for the custom supporting [python library](https://github.com/harisekhon/pylib)
 - integration tests of the top level programs using the libraries for things like option parsing
-- [functional tests](https://github.com/HariSekhon/pytools/tree/master/tests) for the top level programs using local test data and [Docker containers](https://hub.docker.com/u/harisekhon/)
+- [functional tests](https://github.com/HariSekhon/devops-python-tools/tree/master/tests) for the top level programs using local test data and [Docker containers](https://hub.docker.com/u/harisekhon/)
 
 To trigger all tests run:
 
@@ -299,7 +299,7 @@ Patches, improvements and even general feedback are welcome in the form of GitHu
 
 ### See Also ###
 
-* [Perl Tools](https://github.com/harisekhon/perl-tools) - 30+ tools for Hadoop, NoSQL, Solr, Elasticsearch, Pig, Hive, Web URL + Nginx stats watchers, SQL and NoSQL syntax recasers, various Linux CLI tools
+* [DevOps Perl Tools](https://github.com/harisekhon/perl-tools) - 30+ tools for Hadoop, NoSQL, Solr, Elasticsearch, Pig, Hive, Web URL + Nginx stats watchers, SQL and NoSQL syntax recasers, various Linux CLI tools
 
 * [The Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) - 400+ programs for Nagios monitoring your Hadoop & NoSQL clusters. Covers every Hadoop vendor's management API and every major NoSQL technology (HBase, Cassandra, MongoDB, Elasticsearch, Solr, Riak, Redis etc.) as well as message queues (Kafka, RabbitMQ), continuous integration (Jenkins, Travis CI) and traditional infrastructure (SSL, Whois, DNS, Linux)
 
