@@ -85,7 +85,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6'
+__version__ = '0.6.1'
 
 
 class Anonymize(CLI):
@@ -202,7 +202,8 @@ class Anonymize(CLI):
             'password': r'\1<password>',
             'password2': r'\1<user>:<password>',
             'password3': r'\1<user>\2<password>',
-            'ip_prefix': r'<ip_prefix>.',
+            'ip': r'<ip_x.x.x.x>',
+            'ip_prefix': r'<ip_x.x.x>.',
             'kerberos': r'<kerberos_primary>\/_HOST@<kerberos_realm>',
             'kerberos2': r'<kerberos_principal>',
             'proxy': r'proxy <proxy_host> port <proxy_port>',
