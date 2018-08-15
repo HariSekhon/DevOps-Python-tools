@@ -296,7 +296,7 @@ spark-deps:
 
 .PHONY: docker-run
 docker-run:
-	docker run -ti --rm harisekhon/devops-python-tools ${ARGS}
+	docker run -ti --rm harisekhon/pytools ${ARGS}
 
 .PHONY: run
 run:
@@ -304,7 +304,7 @@ run:
 
 .PHONY: docker-mount
 docker-mount:
-	docker run -ti --rm -v $$PWD:/py harisekhon/devops-python-tools bash -c "cd /py; exec bash"
+	docker run -ti --rm -v $$PWD:/py harisekhon/pytools bash -c "cd /py; exec bash"
 
 .PHONY: mount
 mount: docker-mount
