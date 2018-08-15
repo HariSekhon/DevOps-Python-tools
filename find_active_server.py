@@ -112,7 +112,7 @@ import socket
 import subprocess
 import sys
 #from threading import Thread
-from multiprocessing.pool import ThreadPool
+from multiprocessing.pool import ThreadPool, cpu_count
 # prefer blocking semantics of que.get() rather than handling deque.popleft() => 'IndexError: pop from an empty deque'
 #from collections import deque
 import Queue
@@ -138,7 +138,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.4'
+__version__ = '0.8.0'
 
 
 class FindActiveServer(CLI):
@@ -155,7 +155,7 @@ class FindActiveServer(CLI):
         self.url_path = None
         self.regex = None
         self.request_timeout = None
-        self.default_num_threads = 10
+        self.default_num_threads = cpu_count() * 4
         self.num_threads = None
         self.queue = Queue.Queue()
         self.pool = None
@@ -189,7 +189,7 @@ class FindActiveServer(CLI):
                                                               + '(convenience for scripting)')
         self.add_opt('-n', '--num-threads', default=self.default_num_threads, type='int',
                      help='Number or parallel threads to speed up processing ' + \
-                          '(default: {}), '.format(self.default_num_threads) + \
+                          '(default is 4 times number of cores: {}), '.format(self.default_num_threads) + \
                           'use -n=1 for deterministic host preference order [slower])')
         self.add_opt('-T', '--request-timeout', metavar='secs', type='int', default=os.getenv('REQUEST_TIMEOUT', 2),
                      help='Timeout for each individual server request in seconds ($REQUEST_TIMEOUT, default: 2 secs)')
