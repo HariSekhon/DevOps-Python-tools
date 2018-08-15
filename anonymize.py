@@ -85,7 +85,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
+__version__ = '0.6'
 
 
 class Anonymize(CLI):
@@ -145,6 +145,7 @@ class Anonymize(CLI):
                          r'ip-172-2[0-9]-\d+-\d+|' + \
                          r'ip-172-3[0-1]-\d+-\d+|' +
                          r'ip-192-168-\d+-\d+)\b(?!-\d)',
+            'hostname3': r'(\w+://){host}'.format(host=hostname_regex),
             'user': r'(-{user_name}{sep})\S+'.format(user_name=user_name, sep=arg_sep),
             'user2': r'/home/{user}'.format(user=user_regex),
             'user3': r'({user_name}{sep}){user}'.format(user_name=user_name, sep=arg_sep, user=user_regex),
@@ -193,6 +194,7 @@ class Anonymize(CLI):
         self.replacements = {
             'hostname': r'<hostname>:\1',
             'hostname2': '<aws_hostname>',
+            'hostname3': r'\1<hostname>',
             'port': ':<port>',
             'user': r'\1<user>',
             'user2': '/home/<user>',
@@ -385,7 +387,7 @@ class Anonymize(CLI):
     @staticmethod
     def load_file(filename, boundary=False):
         log.info('loading custom regex patterns from %s', filename)
-        regex = set()
+        regex_list = []
         raw = ''
         re_ending_pipe = re.compile(r'\|\s*$')
         re_leading_space = re.compile(r'^\s*')
@@ -403,11 +405,11 @@ class Anonymize(CLI):
                     continue
                 if boundary:
                     line = r'(\b|[^A-Za-z])' + line + r'(\b|[^A-Za-z])'
-                regex.add(re.compile(line, re.I))
-                raw += line + '|'
-        raw = raw.rstrip('|')
+                regex_list.append(line)
+        raw = '|'.join(regex_list)
         #log.debug('custom_raw: %s', raw)
-        return (regex, raw)
+        regex_list = [re.compile(_, re.I) for _ in regex_list]
+        return (regex_list, raw)
 
     def run(self):
         (self.custom_anonymizations, _) = self.load_file(self.custom_anonymization_file, boundary=True)
@@ -433,6 +435,7 @@ class Anonymize(CLI):
                      # don't match 2018-01-01T00:00:00 => 2018-01-<hostname>:00:00
                      r'(?!\d+T\d+:\d+)' + \
                      r'(?!\d+[^A-Za-z0-9]|' + \
+                     # XXX: this is unfortunately very expensive in the Python regex implementation compared to Perl
                      self.custom_ignores_raw + ')' + \
                      hostname_regex + \
                      self.negative_host_lookbehind + r':(\d{1,5}(?!\.?\w))',
