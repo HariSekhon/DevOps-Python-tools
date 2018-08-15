@@ -170,10 +170,10 @@ https://github.com/HariSekhon/pylib/archive/master.zip
 Unzip both and move Pylib to the ```pylib``` folder under DevOps Python Tools.
 
 ```
-unzip pytools-master.zip
+unzip devops-python-tools-master.zip
 unzip pylib-master.zip
 
-mv -v pytools-master pytools
+mv -v devops-python-tools-master pytools
 mv -v pylib-master pylib
 mv -vf pylib pytools/
 ```
