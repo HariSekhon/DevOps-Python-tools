@@ -4,7 +4,7 @@
 #  Author: Hari Sekhon
 #  Date: 2016-12-08 14:38:37 +0000 (Thu, 08 Dec 2016)
 #
-#  https://github.com/harisekhon/pytools
+#  https://github.com/harisekhon/devops-python-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
@@ -24,7 +24,7 @@ cd "$srcdir/.."
 
 section "Docker Image"
 
-export DOCKER_IMAGE="harisekhon/pytools"
+export DOCKER_IMAGE="harisekhon/devops-python-tools"
 
 if is_docker_available; then
     [ -n "${NO_DOCKER:-}" ] && exit 0

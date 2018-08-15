@@ -4,7 +4,7 @@
 #  Author: Hari Sekhon
 #  Date: 2016-08-14 20:42:01 +0100 (Sun, 14 Aug 2016)
 #
-#  https://github.com/harisekhon/pytools
+#  https://github.com/harisekhon/devops-python-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #

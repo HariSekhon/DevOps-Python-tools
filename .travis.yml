@@ -3,7 +3,7 @@
 #  Author: Hari Sekhon
 #  Date: 2014-11-29 01:02:47 +0000 (Sat, 29 Nov 2014)
 #
-#  https://github.com/harisekhon/pytools
+#  https://github.com/harisekhon/devops-python-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
@@ -54,7 +54,7 @@ script:
 
 after_success:
   - coveralls
-  - curl --data {build:true} -X POST https://registry.hub.docker.com/u/harisekhon/pytools/trigger/0e69c39f-ea1b-43c7-a97d-cef1252f1400/
+  - curl --data {build:true} -X POST https://registry.hub.docker.com/u/harisekhon/devops-python-tools/trigger/0e69c39f-ea1b-43c7-a97d-cef1252f1400/
   - curl --data {build:true} -X POST https://registry.hub.docker.com/u/harisekhon/alpine-github/trigger/8d9cb826-48df-439c-8c20-1975713064fc/
   - curl --data {build:true} -X POST https://registry.hub.docker.com/u/harisekhon/centos-github/trigger/316d1158-7ffb-49a4-a7bd-8e5456ba2d15/
   - curl --data {build:true} -X POST https://registry.hub.docker.com/u/harisekhon/debian-github/trigger/0cfb3fe7-2028-494b-a43b-068435e6a2b3/

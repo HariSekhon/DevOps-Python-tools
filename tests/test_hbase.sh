@@ -4,7 +4,7 @@
 #  Author: Hari Sekhon
 #  Date: 2016-05-06 12:12:15 +0100 (Fri, 06 May 2016)
 #
-#  https://github.com/harisekhon/pytools
+#  https://github.com/harisekhon/devops-python-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
@@ -46,7 +46,7 @@ check_docker_available
 trap_debug_env hbase
 
 # used by docker_exec
-export DOCKER_MOUNT_DIR=/pytools
+export DOCKER_MOUNT_DIR=/devops-python-tools
 export DOCKER_JAVA_HOME=/usr
 
 startupwait 30

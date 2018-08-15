@@ -4,10 +4,10 @@
 #
 #  Author: Hari Sekhon
 #  Date: 2018-08-08 19:02:02 +0100 (Wed, 08 Aug 2018)
-#  ported from Perl version from Perl Tools repo (https://github.com/harisekhon/tools)
+#  ported from Perl version from Perl Tools repo (https://github.com/harisekhon/devops-perl-tools)
 #  Date: 2013-07-18 21:17:41 +0100 (Thu, 18 Jul 2013)
 #
-#  https://github.com/harisekhon/pytools
+#  https://github.com/harisekhon/devops-python-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
@@ -35,7 +35,7 @@ as this program, one PCRE format regex per line, blank lines and lines prefixed 
 
 Ignore phrases are in a similar file anonymize_ignore.conf, also adjacent to this program.
 
-Based on Perl Anonymize.pl from https://github.com/harisekhon/tools
+Based on Perl Anonymize.pl from https://github.com/harisekhon/devops-perl-tools
 
 My Perl version is incredibly faster than this Python version at this time
 
