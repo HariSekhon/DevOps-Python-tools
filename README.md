@@ -151,7 +151,7 @@ The automated build will use 'sudo' to install required Python PyPI libraries to
 Enter the pytools directory and run git submodule init and git submodule update to fetch my library repo:
 
 ```
-git clone https://github.com/harisekhon/devops-python-tools
+git clone https://github.com/harisekhon/devops-python-tools pytools
 cd pytools
 git submodule init
 git submodule update
