@@ -138,7 +138,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.0'
+__version__ = '0.8.1'
 
 
 class FindActiveServer(CLI):
@@ -155,7 +155,7 @@ class FindActiveServer(CLI):
         self.url_path = None
         self.regex = None
         self.request_timeout = None
-        self.default_num_threads = cpu_count() * 4
+        self.default_num_threads = max(cpu_count() * 4, 100)
         self.num_threads = None
         self.queue = Queue.Queue()
         self.pool = None
