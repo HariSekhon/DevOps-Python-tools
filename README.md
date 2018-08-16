@@ -13,7 +13,7 @@ Hari Sekhon - DevOps Python Tools
 
 A few of the Big Data, NoSQL & Linux tools I've written over the years. All programs have `--help` to list the available options.
 
-For many more tools see the [Perl Tools](https://github.com/harisekhon/perl-tools) and [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) repos which contains many Hadoop, NoSQL, Web and infrastructure tools and Nagios plugins.
+For many more tools see the [DevOps Perl Tools](https://github.com/harisekhon/perl-tools) and [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) repos which contains many Hadoop, NoSQL, Web and infrastructure tools and Nagios plugins.
 
 Hari Sekhon
 
@@ -137,7 +137,7 @@ Environment variables are supported for convenience and also to hide credentials
     - YAML
   - directories are recursed, testing any files with relevant matching extensions (`.avro`, `.csv`, `json`, `parquet`, `.ini`/`.properties`, `.ldif`, `.xml`, `.yml`/`.yaml`)
   - used for Continuous Integration tests of various adjacent Spark data converters as well as configuration files for things like Presto, Ambari, Apache Drill etc found in my [DockerHub](https://hub.docker.com/u/harisekhon/) images [Dockerfiles master repo](https://github.com/HariSekhon/Dockerfiles) which contains docker builds and configurations for many open source Big Data & Linux technologies
-- ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user to put in your shell's ```.profile``` (there is also a perl version in my [Perl Tools](https://github.com/harisekhon/perl-tools) repo)
+- ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user to put in your shell's ```.profile``` (there is also a perl version in my [DevOps Perl Tools](https://github.com/harisekhon/perl-tools) repo)
 
 ### Detailed Build Instructions
 
