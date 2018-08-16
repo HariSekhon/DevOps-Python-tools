@@ -4,7 +4,7 @@
 #
 #  Author: Hari Sekhon
 #  Date: 2018-08-08 19:02:02 +0100 (Wed, 08 Aug 2018)
-#  ported from Perl version from Perl Tools repo (https://github.com/harisekhon/devops-perl-tools)
+#  ported from Perl version from DevOps Perl Tools repo (https://github.com/harisekhon/devops-perl-tools)
 #  Date: 2013-07-18 21:17:41 +0100 (Thu, 18 Jul 2013)
 #
 #  https://github.com/harisekhon/devops-python-tools
@@ -85,7 +85,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.7.0'
 
 
 class Anonymize(CLI):
@@ -111,6 +111,7 @@ class Anonymize(CLI):
             ('subnet_mask', False),
             ('mac', False),
             ('kerberos', False),
+            ('ldap', False),
             ('email', False),
             ('password', False),
             ('user', False),
@@ -121,6 +122,7 @@ class Anonymize(CLI):
             ('junos', False),
             ('network', False),
             ('fqdn', False),
+            ('windows', False),
             ('domain', False),
             ('hostname', False),
             ('custom', False),
@@ -139,6 +141,33 @@ class Anonymize(CLI):
         arg_sep = r'[=\s:]+'
         # openssl uses -passin switch
         pass_word_phrase = r'pass(?:word|phrase|in)?'
+        ldap_attributes = [
+            # this will be a CN, let general case strip it
+            #'msDS-AuthenticatedAtDC'
+            'cn',
+            'department',
+            'description',
+            'distinguishedName',
+            'dn',
+            'gidNumber',
+            'givenName',
+            'member',
+            'memberOf',
+            'msSFU30Name',
+            'msSFU30NisDomain',
+            'name',
+            'objectCategory',
+            'objectGUID',
+            'objectSid',
+            'primaryGroupID',
+            'sAMAccountName',
+            'sn',
+            'title',
+            'uid',
+            'uidNumber',
+            # let /home/hari => /home/<user>
+            #'unixHomeDirectory',
+        ]
         self.regex = {
             'hostname2': r'\b(?:ip-10-\d+-\d+-\d+|' + \
                          r'ip-172-1[6-9]-\d+-\d+|' + \
@@ -146,9 +175,11 @@ class Anonymize(CLI):
                          r'ip-172-3[0-1]-\d+-\d+|' +
                          r'ip-192-168-\d+-\d+)\b(?!-\d)',
             'hostname3': r'(\w+://){host}'.format(host=hostname_regex),
+            'hostname4': r'\\\\{host}'.format(host=hostname_regex),
             'user': r'(-{user_name}{sep})\S+'.format(user_name=user_name, sep=arg_sep),
             'user2': r'/home/{user}'.format(user=user_regex),
             'user3': r'({user_name}{sep}){user}'.format(user_name=user_name, sep=arg_sep, user=user_regex),
+            'user4': r'(?<![\w\\])\w+\\{user}(?!\\)'.format(user=user_regex),
             'password': r'(-{pass_word_phrase}{sep}){pw}'\
                         .format(pass_word_phrase=pass_word_phrase,
                                 sep=arg_sep,
@@ -162,13 +193,24 @@ class Anonymize(CLI):
             'ip_prefix': r'{}(?!\.\d+\.\d+)'.format(ip_prefix_regex),
             # network device format Mac address
             'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',
-            'kerberos': user_regex + '/_HOST@' + domain_regex,
-            'kerberos2': r'\b' + user_regex + r'(?:\/' + hostname_regex + r')?@' + domain_regex + r'\b/',
+            # _HOST and HTTP are commonly use in Hadoop clusters, let's make sure they are left for debugging purposes
+            'kerberos': r'\bhost/(_HOST|HTTP)@{realm}'.format(realm=domain_regex),
+            'kerberos2': r'\bhost/{instance}@{realm}'.format(instance=host_regex, realm=domain_regex),
+            'kerberos3': '{primary}/(_HOST|HTTP)@{realm}'.format(primary=user_regex, realm=domain_regex),
+            'kerberos4': r'{primary}/{instance}@{realm}'\
+                         .format(primary=user_regex, instance=host_regex, realm=domain_regex),
+            'kerberos5': r'{primary}@{realm}'.format(primary=user_regex, realm=domain_regex),
+            'kerberos6': r'/krb5cc_\d+',
+            # https://tools.ietf.org/html/rfc4514
+            #'ldap': '(CN=)[^,]+(?:,OU=[^,]+)+(?:,DC=[\w-]+)+',
+            # replace individual components instead
+            'ldap': r'(\b(CN|L|OU|ST|O|C|STREET|DC|UID)\s*[:=]+\s*)(?!(?:Person|Schema|Configuration),)[\\\%\s\w-]+',
+            'ldap2': r'^(\s*({})\s*[:=]+\s*).*$'.format('|'.join(ldap_attributes)),
             'port': r'{host}:\d+(?!\.?[\w-])'.format(host=host_regex),
-            'proxy': 'proxy ' + host_regex + r'port \d+',
+            'proxy': r'proxy {} port \d+'.format(host_regex),
             'proxy2': 'Trying' + ip_regex,
             'proxy3': 'Connected to ' + host_regex + r'\($ip_regex\) port \d+',
-            'proxy4': r'(Via:\s[^\s]+\s)' + ip_regex + '.*',
+            'proxy4': r'(Via:\s\S+\s)' + ip_regex + '.*',
             'http_auth': r'(https?:\/\/)[^:]+:[^\@]*\@',
             'http_auth2': r'(Proxy auth using \w+ with user )([\'"]).+([\'"])',
             'cisco': r'username .+ (?:password|secret) .*?$',
@@ -189,24 +231,34 @@ class Anonymize(CLI):
             'junos2': r'\shome\s+.*',
             'network': r'username .*',
             'network2': r'syscontact .*',
+            'windows': r'S-\d+-\d+-\d+-\d+-\d+-\d+-\d+'
         }
         # will auto-infer replacements to not have to be explicit, use this only for override mappings
         self.replacements = {
             'hostname': r'<hostname>:\1',
             'hostname2': '<aws_hostname>',
             'hostname3': r'\1<hostname>',
+            'hostname4': r'\\\\<hostname>'.format(host=hostname_regex),
             'port': ':<port>',
             'user': r'\1<user>',
             'user2': '/home/<user>',
             'user3': r'\1<user>',
+            'user4': r'<domain>\\<user>',
             'password': r'\1<password>',
             'password2': r'\1<user>:<password>',
             'password3': r'\1<user>\2<password>',
             'ip': r'<ip_x.x.x.x>',
             'ip_prefix': r'<ip_x.x.x>.',
             'subnet_mask': r'<subnet_x.x.x.x>',
-            'kerberos': r'<kerberos_primary>\/_HOST@<kerberos_realm>',
-            'kerberos2': r'<kerberos_principal>',
+            'kerberos': r'host/\1@<kerberos_realm>',
+            'kerberos2': r'host/<kerberos_instance>@<kerberos_realm>',
+            'kerberos3': r'<kerberos_primary>/\1@<kerberos_realm>',
+            'kerberos4': r'<kerberos_primary>/<kerberos_instance>@<kerberos_realm>',
+            'kerberos5': r'<kerberos_principal>',
+            'kerberos6': '/krb5cc_<uid>',
+            #'ldap': r'\1<cn>',
+            'ldap': lambda m: r'{}<{}>'.format(m.group(1), m.group(2).lower()),
+            'ldap2': lambda m: r'{}<{}>'.format(m.group(1), m.group(2).lower()),
             'proxy': r'proxy <proxy_host> port <proxy_port>',
             'proxy2': r'Trying <proxy_ip>',
             'proxy3': r'Connected to <proxy_host> (<proxy_ip>) port <proxy_port>',
@@ -231,6 +283,7 @@ class Anonymize(CLI):
             'junos2': r' home <home>',
             'network': r'username <username>',
             'network2': r'syscontact <syscontact>',
+            'windows': r'<windows_SID>',
         }
 
     def add_options(self):
@@ -241,6 +294,10 @@ class Anonymize(CLI):
         self.add_opt('-a', '--all', action='store_true',
                      help='Apply all anonymizations (careful this includes --host which can be overzealous and ' + \
                           'match too many things, in which case try more targeted anonymizations below)')
+        self.add_opt('-C', '--custom', action='store_true',
+                     help='Apply custom phrase anonymization (add your Name, Company Name etc to the list of ' + \
+                          'blacklisted words/phrases one per line in anonymize_custom.conf). Matching is case ' + \
+                          'insensitive. Recommended to use to work around --host matching too many things')
         self.add_opt('-i', '--ip', action='store_true',
                      help='Apply IPv4 IP address and Mac address format anonymization. This and --ip-prefix below ' + \
                           'can end up matching version numbers (eg. \'HDP 2.2.4.2\' => \'HDP <ip>\'), in which ' + \
@@ -276,7 +333,7 @@ class Anonymize(CLI):
         self.add_opt('-T', '--http-auth', action='store_true',
                      help=r'Apply HTTP auth anonymization to replace http://username:password\@ => ' + \
                           r'http://<user>:<password>\@. Also works with https://')
-        self.add_opt('-k', '--kerberos', action='store_true',
+        self.add_opt('-K', '--kerberos', action='store_true',
                      help=r'Kerberos 5 principals in the form <primary>@<realm> or <primary>/<instance>@<realm> ' + \
                           '(where <realm> must match a valid domain name - otherwise use --custom and populate ' + \
                           r'anonymize_custom.conf). These kerberos principals are anonymizebed to ' + \
@@ -285,7 +342,10 @@ class Anonymize(CLI):
                           'useful to know for debugging, the principal and realm will still be anonymizebed in ' + \
                           'those cases (if wanting to retain NN/_HOST then use --domain instead of --kerberos). ' + \
                           'This is applied before --email in order to not prevent the email replacement leaving ' + \
-                          r'this as user/host\@realm to user/<email_regex>, which would have exposed \'user\'')
+                          r'this as user/host\@realm to user/<email_regex>, which would have exposed \'user\'' + \
+                          '. Auto enables --domain and --fqdn')
+        self.add_opt('-L', '--ldap', action='store_true',
+                     help='Apply LDAP anonymization (CN, DN, OU, user/group ldap object attributes)')
         self.add_opt('-E', '--email', action='store_true',
                      help='Apply email format anonymization')
         self.add_opt('-x', '--proxy', action='store_true',
@@ -301,10 +361,9 @@ class Anonymize(CLI):
         self.add_opt('-j', '--junos', action='store_true',
                      help='Apply Juniper JunOS configuration format anonymization (limited, please raise a ticket ' + \
                           'for extra matches to be added)')
-        self.add_opt('-m', '--custom', action='store_true',
-                     help='Apply custom phrase anonymization (add your Name, Company Name etc to the list of ' + \
-                          'blacklisted words/phrases one per line in anonymize_custom.conf). Matching is case ' + \
-                          'insensitive. Recommended to use to work around --host matching too many things')
+        self.add_opt('-W', '--windows', action='store_true',
+                     help='Windows Sids (UNC path hostnames are already stripped by --hostname and ' + \
+                          'DOMAIN\\user components are already stripped by --domain and --user')
         self.add_opt('-r', '--strip-cr', action='store_true',
                      help='Strip carriage returns (\'\\r\') from end of lines leaving only newlines (\'\\n\')')
         self.add_opt('--skip-java-exceptions', action='store_true',
@@ -342,6 +401,12 @@ class Anonymize(CLI):
             self.usage('must specify one or more anonymization types to apply')
         if self.anonymizations['ip'] and self.anonymizations['ip_prefix']:
             self.usage('cannot specify both --ip and --ip-prefix, they are mutually exclusive behaviours')
+        if self.anonymizations['email'] and self.anonymizations['kerberos']:
+            # assert that we are going to change the one we expect to protect against changing these above and
+            # forgetting to update this
+            assert self.replacements['kerberos5'] == '<kerberos_principal>'
+            # this match could be either one so change the token to reflect this
+            self.replacements['kerberos5'] = '<email_or_kerberos_principal>'
 
     def _validate_filenames(self):
         for filename in self.file_list:
@@ -361,6 +426,9 @@ class Anonymize(CLI):
         if self.get_opt('host'):
             for _ in ('hostname', 'fqdn', 'domain'):
                 self.anonymizations[_] = True
+        if self.anonymizations['kerberos']:
+            self.anonymizations['domain'] = True
+            self.anonymizations['fqdn'] = True
         if self.anonymizations['proxy']:
             self.anonymizations['http_auth'] = True
 
@@ -390,7 +458,6 @@ class Anonymize(CLI):
     def load_file(filename, boundary=False):
         log.info('loading custom regex patterns from %s', filename)
         regex_list = []
-        raw = ''
         re_ending_pipe = re.compile(r'\|\s*$')
         re_leading_space = re.compile(r'^\s*')
         with open(filename) as filehandle:
