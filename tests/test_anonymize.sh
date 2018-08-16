@@ -135,8 +135,133 @@ dest[32]="https://<hostname>:443/path"
 src[33]="tcp://blah:8080"
 dest[33]="tcp://<hostname>:8080"
 
-src[34]="AA-BB-CC-DD-EE-FF"
+src[34]="A1:B2:C3:D4:E4:F6"
 dest[34]="<mac>"
+
+src[35]="A1-B2-C3-D4-E4-F6"
+dest[35]="<mac>"
+
+src[36]='\\blah'
+dest[36]='\\<hostname>'
+
+src[37]='\\blah\path\to\data'
+dest[37]='\\<hostname>\path\to\data'
+
+src[38]='MYDOMAIN\hari'
+dest[38]='<domain>\<user>'
+
+src[39]="S-1-5-21-3623811015-3361044348-30300820-1013"
+dest[39]="<windows_SID>"
+
+src[40]="hari/host.domain.com@REALM.COM"
+dest[40]="<kerberos_primary>/<kerberos_instance>@<kerberos_realm>"
+
+src[41]="host/host.domain.com@REALM.ORG"
+dest[41]="host/<kerberos_instance>@<kerberos_realm>"
+
+src[42]="hive/_HOST@REALM.NET"
+dest[42]="<kerberos_primary>/_HOST@<kerberos_realm>"
+
+src[43]="hdfs/HTTP@REALM.COM"
+dest[43]="<kerberos_primary>/HTTP@<kerberos_realm>"
+
+src[44]="/tmp/krb5cc_12345"
+dest[44]="/tmp/krb5cc_<uid>"
+
+# LDAP too many tests!!
+src[50]="CN=Hari Sekhon,OU=MyOU,DC=MyDomain,DC=com"
+dest[50]="CN=<cn>,OU=<ou>,DC=<dc>,DC=<dc>"
+
+# TODO: mix case
+src[51]="OU=blah"
+dest[51]="OU=<ou>"
+
+src[52]="DC=blah"
+dest[52]="DC=<dc>"
+
+src[53]="dn: CN=Hari Sekhon,OU=My OU,DC=MyDomain,DC=com"
+#dest[53]="dn: CN=<cn>,OU=<ou>,DC=<dc>,DC=<dc>"
+dest[53]="dn: <dn>"
+
+src[54]="cn: Hari Sekhon"
+dest[54]="cn: <cn>"
+
+src[55]="sn: Sekhon"
+dest[55]="sn: <sn>"
+
+src[56]="title: Awesome Techie"
+dest[56]="title: <title>"
+
+src[57]="description: Awesome Techie"
+dest[57]="description: <description>"
+
+src[58]="givenName: Hari"
+dest[58]="givenName: <givenname>"
+
+src[59]="distinguishedName: CN=Hari Sekhon,OU=MyOU,DC=MyDomain,DC=com"
+dest[59]="distinguishedName: <distinguishedname>"
+
+src[60]="memberOf: CN=MyGroup1,OU=MyOU,OU=Ops,DC=MyDomain,DC=com"
+dest[60]="memberOf: <memberof>"
+
+src[61]="department: My IT Dept"
+dest[61]="department: <department>"
+
+src[62]="name: Hari Sekhon"
+dest[62]="name: <name>"
+
+src[63]="objectGUID:: a1b2c3d4T=="
+dest[63]="objectGUID:: <objectguid>"
+
+src[64]="primaryGroupID: 123"
+dest[64]="primaryGroupID: <primarygroupid>"
+
+src[65]="objectSid:: ABCDEF12345678+RmG+abcdef12345678=="
+dest[65]="objectSid:: <objectsid>"
+
+src[66]="sAMAccountName: hari"
+dest[66]="sAMAccountName: <samaccountname>"
+
+#src[67]="sAMAccountName: hari"
+#dest[67]="sAMAccountName: <sAMAccountName>"
+
+src[68]="objectCategory: CN=Person,CN=Schema,CN=Configuration,DC=MyDomain,DC=com"
+#dest[68]="objectCategory: CN=Person,CN=Schema,CN=Configuration,DC=<domain>,DC=<domain>"
+dest[68]="objectCategory: <objectcategory>"
+
+src[69]="msDS-AuthenticatedAtDC: CN=MyDC1,OU=Domain Controllers,DC=MyDomain,DC=com"
+#dest[69]="msDS-AuthenticatedAtDC: <msDS-AuthenticatedAtDC>"
+dest[69]="msDS-AuthenticatedAtDC: CN=<cn>,OU=<ou>,DC=<dc>,DC=<dc>"
+
+src[70]="uid: hari"
+dest[70]="uid: <uid>"
+
+src[71]="gidNumber: 10001"
+dest[71]="gidNumber: <gidnumber>"
+
+src[72]="uidNumber: 30001"
+dest[72]="uidNumber: <uidnumber>"
+
+src[73]="msSFU30Name: hari"
+dest[73]="msSFU30Name: <mssfu30name>"
+
+src[74]="msSFU30NisDomain: MyDomain"
+#dest[74]="msSFU30NisDomain: <domain>"
+dest[74]="msSFU30NisDomain: <mssfu30nisdomain>"
+
+src[75]="unixHomeDirectory: /home/hari"
+dest[75]="unixHomeDirectory: /home/<user>"
+
+src[76]="member: CN=Hari Sekhon,OU=MyOU,DC=MyDomain,DC=com"
+#dest[76]="member: CN=<cn>"
+dest[76]="member: <member>"
+
+# TODO
+#src[77]="ldap:///dc=example,dc=com??sub?(givenName=John)"
+#dest[77]="ldap:///dc=<dc>,dc=<dc>??sub?(givenName=<givenName>)"
+
+#src[78]="ldap://ldap.example.com/cn=John%20Doe,dc=example,dc=com"
+#dest[78]="ldap://<fqdn>/cn=<cn>,dc=<dc>,dc=<dc>"
 
 args="-aPe"
 test_anonymize(){
