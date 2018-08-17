@@ -168,13 +168,18 @@ dest[43]="<kerberos_primary>/HTTP@<kerberos_realm>"
 src[44]="/tmp/krb5cc_12345"
 dest[44]="/tmp/krb5cc_<uid>"
 
+src[45]=" --user=hari"
+dest[45]=" --user=<user>"
+
+src[45]=" --group-name=techies"
+dest[45]=" --group-name=<group>"
+
 # LDAP too many tests!!
 src[50]="CN=Hari Sekhon,OU=MyOU,DC=MyDomain,DC=com"
 dest[50]="CN=<cn>,OU=<ou>,DC=<dc>,DC=<dc>"
 
-# TODO: mix case
-src[51]="OU=blah"
-dest[51]="OU=<ou>"
+src[51]="Ou=blah"
+dest[51]="Ou=<ou>"
 
 src[52]="DC=blah"
 dest[52]="DC=<dc>"
@@ -327,7 +332,7 @@ dest[101]="reading password from foo"
 src[102]="some description = blah, module = foo"
 dest[102]="some description = blah, module = foo"
 
-args="-Hiukex"
+args="-HKEiux"
 run_tests 101 102  # ignore_run_unqualified
 
 # now check --network / --cisco / --juniper do strip these
