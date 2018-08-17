@@ -37,7 +37,7 @@ Ignore phrases are in a similar file anonymize_ignore.conf, also adjacent to thi
 
 Based on Perl Anonymize.pl from https://github.com/harisekhon/devops-perl-tools
 
-My Perl version is incredibly faster than this Python version at this time
+The Perl version is incredibly faster than Python due to the better regex engine
 
 """
 
@@ -85,7 +85,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 
 
 class Anonymize(CLI):
@@ -115,6 +115,7 @@ class Anonymize(CLI):
             ('email', False),
             ('password', False),
             ('user', False),
+            ('group', False),
             ('proxy', False),
             ('http_auth', False),
             ('cisco', False),
@@ -137,10 +138,24 @@ class Anonymize(CLI):
         # don't use this simpler one as we want to catch everything inside quotes eg. 'my secret'
         #password_quoted = r'\S+'
         password_quoted = r'(?:\'[^\']+\'|"[^"]+"|\S+)'
-        user_name = r'\buser(?:name)?'
+        user_name = r'user(?:-?name)?'
+        group_name = r'group(?:-?name)?'
         arg_sep = r'[=\s:]+'
         # openssl uses -passin switch
         pass_word_phrase = r'pass(?:word|phrase|in)?'
+        ldap_rdn_list = [
+            'C',
+            'CN',
+            'DC',
+            'L',
+            'O',
+            'OU',
+            'ST',
+            'STREET',
+            'UID',
+        ]
+        # hard for this to be 100% since this can be anything backslash escaped but getting what we really care about
+        ldap_values = r'[\\\%\s\w-]+'
         ldap_attributes = [
             # this will be a CN, let general case strip it
             #'msDS-AuthenticatedAtDC'
@@ -176,10 +191,14 @@ class Anonymize(CLI):
                          r'ip-192-168-\d+-\d+)\b(?!-\d)',
             'hostname3': r'(\w+://){host}'.format(host=hostname_regex),
             'hostname4': r'\\\\{host}'.format(host=hostname_regex),
+            'group': r'(-{group_name}{sep})\S+'.format(group_name=group_name, sep=arg_sep),
+            'group2': r'({group_name}{sep}){user}'.format(group_name=group_name, sep=arg_sep, user=user_regex),
+            'group3': r'for\s+group\s+{group}'.format(group=user_regex),
             'user': r'(-{user_name}{sep})\S+'.format(user_name=user_name, sep=arg_sep),
             'user2': r'/home/{user}'.format(user=user_regex),
             'user3': r'({user_name}{sep}){user}'.format(user_name=user_name, sep=arg_sep, user=user_regex),
             'user4': r'(?<![\w\\])\w+\\{user}(?!\\)'.format(user=user_regex),
+            'user5': r'for\s+user\s+{user}'.format(user=user_regex),
             'password': r'(-{pass_word_phrase}{sep}){pw}'\
                         .format(pass_word_phrase=pass_word_phrase,
                                 sep=arg_sep,
@@ -204,8 +223,9 @@ class Anonymize(CLI):
             # https://tools.ietf.org/html/rfc4514
             #'ldap': '(CN=)[^,]+(?:,OU=[^,]+)+(?:,DC=[\w-]+)+',
             # replace individual components instead
-            'ldap': r'(\b(CN|L|OU|ST|O|C|STREET|DC|UID)\s*[:=]+\s*)(?!(?:Person|Schema|Configuration),)[\\\%\s\w-]+',
-            'ldap2': r'^(\s*({})\s*[:=]+\s*).*$'.format('|'.join(ldap_attributes)),
+            'ldap': r'(\b({ldap_rdn_list})\s*[:=]+\s*)(?!(?:Person|Schema|Configuration),){ldap_values}'\
+                    .format(ldap_rdn_list='|'.join(ldap_rdn_list), ldap_values=ldap_values),
+            'ldap2': r'^(\s*({})\s*:+\s*).*$'.format('|'.join(ldap_attributes)),
             'port': r'{host}:\d+(?!\.?[\w-])'.format(host=host_regex),
             'proxy': r'proxy {} port \d+'.format(host_regex),
             'proxy2': 'Trying' + ip_regex,
@@ -244,6 +264,10 @@ class Anonymize(CLI):
             'user2': '/home/<user>',
             'user3': r'\1<user>',
             'user4': r'<domain>\\<user>',
+            'user5': 'for user <user>',
+            'group': r'\1<group>',
+            'group2': r'\1<group>',
+            'group3': r'for group\ <group>',
             'password': r'\1<password>',
             'password2': r'\1<user>:<password>',
             'password3': r'\1<user>\2<password>',
@@ -391,7 +415,7 @@ class Anonymize(CLI):
                 self.anonymizations[_] = True
         else:
             for _ in self.anonymizations:
-                if _ in ('subnet_mask', 'mac'):
+                if _ in ('subnet_mask', 'mac', 'group'):
                     continue
                 self.anonymizations[_] = self.get_opt(_)
         self._process_options_host()
@@ -407,6 +431,8 @@ class Anonymize(CLI):
             assert self.replacements['kerberos5'] == '<kerberos_principal>'
             # this match could be either one so change the token to reflect this
             self.replacements['kerberos5'] = '<email_or_kerberos_principal>'
+        if self.anonymizations['user']:
+            self.anonymizations['group'] = True
 
     def _validate_filenames(self):
         for filename in self.file_list:
@@ -489,9 +515,9 @@ class Anonymize(CLI):
 
     # allow to easily switch pre-compilation on/off for testing
     # testing shows on a moderate sized file that it is a couple secs quicker to use pre-compiled regex
-    def compile(self, regex_name, regex):
-        self.regex[regex_name] = re.compile(regex, re.I)
-        #self.regex[regex_name] = regex
+    def compile(self, name, regex):
+        self.regex[name] = re.compile(regex, re.I)
+        #self.regex[name] = regex
 
     def prepare_regex(self):
         self.compile('hostname',
@@ -504,7 +530,6 @@ class Anonymize(CLI):
                      # don't match 2018-01-01T00:00:00 => 2018-01-<hostname>:00:00
                      r'(?!\d+T\d+:\d+)' + \
                      r'(?!\d+[^A-Za-z0-9]|' + \
-                     # XXX: this is unfortunately very expensive in the Python regex implementation compared to Perl
                      self.custom_ignores_raw + ')' + \
                      hostname_regex + \
                      self.negative_host_lookbehind + r':(\d{1,5}(?!\.?\w))',
@@ -535,7 +560,8 @@ class Anonymize(CLI):
                     re_regex_ending.sub('', _) not in self.regex:
                 self.regex[re.sub('_regex$', '', _)] = globals()[_]
         for _ in self.regex:
-            self.regex[_] = re.compile(self.regex[_])
+            if isStr(self.regex[_]):
+                self.compile(_, self.regex[_])
 
     def process_file(self, filename):
         anonymize = self.anonymize
