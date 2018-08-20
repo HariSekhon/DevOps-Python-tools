@@ -372,8 +372,10 @@ if [ `$anonymize -ae README.md | wc -l` -lt 100 ]; then
     echo "Suspicious readme file arg result came to < 100 lines"
     exit 1
 fi
+echo
 
 echo "testing --email replacememnt format"
 run_grep "<user>@<domain>" $anonymize -E <<< "hari@domain.com"
+echo
 
 echo "All Anonymize tests succeeded!"
