@@ -373,4 +373,7 @@ if [ `$anonymize -ae README.md | wc -l` -lt 100 ]; then
     exit 1
 fi
 
-exit 0
+echo "testing --email replacememnt format"
+run_grep "<user>@<domain>" $anonymize -E <<< "hari@domain.com"
+
+echo "All Anonymize tests succeeded!"
