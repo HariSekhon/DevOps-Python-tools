@@ -89,6 +89,8 @@ dest[17]="/usr/hdp/2.3.0.0-2557"
 # can't safely prevent this without potentially exposing real IPs
 #src[18]="/usr/hdp/2.3.0.0"
 #dest[18]="/usr/hdp/2.3.0.0"
+src[18]="hari/blah@realm"
+dest[18]="<user>/<instance>@<domain>"
 
 src[19]="ranger-plugins-audit-0.5.0.2.3.0.0-2557.jar"
 dest[19]="ranger-plugins-audit-0.5.0.2.3.0.0-2557.jar"
