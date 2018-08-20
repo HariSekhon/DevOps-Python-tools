@@ -85,7 +85,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.3'
+__version__ = '0.7.4'
 
 
 class Anonymize(CLI):
@@ -217,14 +217,16 @@ class Anonymize(CLI):
             # network device format Mac address
             'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',
             # _HOST and HTTP are commonly use in Hadoop clusters, let's make sure they are left for debugging purposes
-            'kerberos': r'\bhost/(_HOST|HTTP)@{realm}'.format(realm=domain_regex),
-            'kerberos2': r'\bhost/{instance}@{realm}'.format(instance=host_regex, realm=domain_regex),
-            'kerberos3': '{primary}/(_HOST|HTTP)@{realm}'.format(primary=user_regex, realm=domain_regex),
+            # must use hostname_regex to be permission enough to match @REALM since Krb5 realms do not have to be
+            # domains even though they usually are
+            'kerberos': r'\bhost/(_HOST|HTTP)@{realm}'.format(realm=hostname_regex),
+            'kerberos2': r'\bhost/{instance}@{realm}'.format(instance=host_regex, realm=hostname_regex),
+            'kerberos3': '{primary}/(_HOST|HTTP)@{realm}'.format(primary=user_regex, realm=hostname_regex),
             'kerberos4': r'{primary}/{instance}@{realm}'\
-                         .format(primary=user_regex, instance=host_regex, realm=domain_regex),
+                         .format(primary=user_regex, instance=host_regex, realm=hostname_regex),
             'kerberos5': r'/krb5cc_\d+',
             # auto-enables --email to handle this instead now
-            #'kerberos6': r'{primary}@{realm}'.format(primary=user_regex, realm=domain_regex),
+            #'kerberos6': r'{primary}@{realm}'.format(primary=user_regex, realm=hostname_regex),
             # https://tools.ietf.org/html/rfc4514
             #'ldap': '(CN=)[^,]+(?:,OU=[^,]+)+(?:,DC=[\w-]+)+',
             # replace individual components instead
