@@ -154,16 +154,16 @@ src[39]="S-1-5-21-3623811015-3361044348-30300820-1013"
 dest[39]="<windows_SID>"
 
 src[40]="hari/host.domain.com@REALM.COM"
-dest[40]="<kerberos_primary>/<kerberos_instance>@<kerberos_realm>"
+dest[40]="<user>/<instance>@<domain>"
 
 src[41]="host/host.domain.com@REALM.ORG"
-dest[41]="host/<kerberos_instance>@<kerberos_realm>"
+dest[41]="host/<instance>@<domain>"
 
 src[42]="hive/_HOST@REALM.NET"
-dest[42]="<kerberos_primary>/_HOST@<kerberos_realm>"
+dest[42]="<user>/_HOST@<domain>"
 
 src[43]="hdfs/HTTP@REALM.COM"
-dest[43]="<kerberos_primary>/HTTP@<kerberos_realm>"
+dest[43]="<user>/HTTP@<domain>"
 
 src[44]="/tmp/krb5cc_12345"
 dest[44]="/tmp/krb5cc_<uid>"
@@ -173,6 +173,18 @@ dest[45]=" --user=<user>"
 
 src[45]=" --group-name=techies"
 dest[45]=" --group-name=<group>"
+
+src[46]=" 1.2.3.4/24"
+dest[46]=" <ip_x.x.x.x>/<cidr_mask>"
+
+src[47]="blah@MyREALM1"
+dest[47]="<user>@<domain>"
+
+src[48]="@MyREALM"
+dest[48]="@<domain>"
+
+src[49]="hari@"
+dest[49]="<user>@"
 
 # LDAP too many tests!!
 src[50]="CN=Hari Sekhon,OU=MyOU,DC=MyDomain,DC=com"
