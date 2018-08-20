@@ -85,7 +85,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 
 class Anonymize(CLI):
@@ -191,6 +191,8 @@ class Anonymize(CLI):
                          r'ip-192-168-\d+-\d+)\b(?!-\d)',
             'hostname3': r'(\w+://){host}'.format(host=hostname_regex),
             'hostname4': r'\\\\{host}'.format(host=hostname_regex),
+            # use more permissive hostname_regex to catch Kerberos @REALM etc
+            'domain2': '@{host}'.format(host=hostname_regex),
             'group': r'(-{group_name}{sep})\S+'.format(group_name=group_name, sep=arg_sep),
             'group2': r'({group_name}{sep}){user}'.format(group_name=group_name, sep=arg_sep, user=user_regex),
             'group3': r'for\s+group\s+{group}'.format(group=user_regex),
@@ -199,6 +201,8 @@ class Anonymize(CLI):
             'user3': r'({user_name}{sep}){user}'.format(user_name=user_name, sep=arg_sep, user=user_regex),
             'user4': r'(?<![\w\\])\w+\\{user}(?!\\)'.format(user=user_regex),
             'user5': r'for\s+user\s+{user}'.format(user=user_regex),
+            # (?<!>/) exclude patterns '>/' where we have already matched and token replaced
+            'user6': r'(?<!<user>/){user}@'.format(user=user_regex),
             'password': r'(-{pass_word_phrase}{sep}){pw}'\
                         .format(pass_word_phrase=pass_word_phrase,
                                 sep=arg_sep,
@@ -218,8 +222,9 @@ class Anonymize(CLI):
             'kerberos3': '{primary}/(_HOST|HTTP)@{realm}'.format(primary=user_regex, realm=domain_regex),
             'kerberos4': r'{primary}/{instance}@{realm}'\
                          .format(primary=user_regex, instance=host_regex, realm=domain_regex),
-            'kerberos5': r'{primary}@{realm}'.format(primary=user_regex, realm=domain_regex),
-            'kerberos6': r'/krb5cc_\d+',
+            'kerberos5': r'/krb5cc_\d+',
+            # auto-enables --email to handle this instead now
+            #'kerberos6': r'{primary}@{realm}'.format(primary=user_regex, realm=domain_regex),
             # https://tools.ietf.org/html/rfc4514
             #'ldap': '(CN=)[^,]+(?:,OU=[^,]+)+(?:,DC=[\w-]+)+',
             # replace individual components instead
@@ -259,27 +264,30 @@ class Anonymize(CLI):
             'hostname2': '<aws_hostname>',
             'hostname3': r'\1<hostname>',
             'hostname4': r'\\\\<hostname>'.format(host=hostname_regex),
+            'domain2': '@<domain>',
             'port': ':<port>',
             'user': r'\1<user>',
             'user2': '/home/<user>',
             'user3': r'\1<user>',
             'user4': r'<domain>\\<user>',
             'user5': 'for user <user>',
+            'user6': '<user>@',
             'group': r'\1<group>',
             'group2': r'\1<group>',
             'group3': r'for group\ <group>',
             'password': r'\1<password>',
             'password2': r'\1<user>:<password>',
             'password3': r'\1<user>\2<password>',
-            'ip': r'<ip_x.x.x.x>',
+            'ip': r'<ip_x.x.x.x>/<cidr_mask>',
+            'ip2': r'<ip_x.x.x.x>',
             'ip_prefix': r'<ip_x.x.x>.',
             'subnet_mask': r'<subnet_x.x.x.x>',
-            'kerberos': r'host/\1@<kerberos_realm>',
-            'kerberos2': r'host/<kerberos_instance>@<kerberos_realm>',
-            'kerberos3': r'<kerberos_primary>/\1@<kerberos_realm>',
-            'kerberos4': r'<kerberos_primary>/<kerberos_instance>@<kerberos_realm>',
-            'kerberos5': r'<kerberos_principal>',
-            'kerberos6': '/krb5cc_<uid>',
+            'kerberos': r'host/\1@<domain>',
+            'kerberos2': r'host/<instance>@<domain>',
+            'kerberos3': r'<user>/\1@<domain>',
+            'kerberos4': r'<user>/<instance>@<domain>',
+            'kerberos5': '/krb5cc_<uid>',
+            #'kerberos6': r'<kerberos_principal>',
             #'ldap': r'\1<cn>',
             'ldap': lambda m: r'{}<{}>'.format(m.group(1), m.group(2).lower()),
             'ldap2': lambda m: r'{}<{}>'.format(m.group(1), m.group(2).lower()),
@@ -367,7 +375,7 @@ class Anonymize(CLI):
                           'those cases (if wanting to retain NN/_HOST then use --domain instead of --kerberos). ' + \
                           'This is applied before --email in order to not prevent the email replacement leaving ' + \
                           r'this as user/host\@realm to user/<email_regex>, which would have exposed \'user\'' + \
-                          '. Auto enables --domain and --fqdn')
+                          '. Auto enables --email, --domain and --fqdn')
         self.add_opt('-L', '--ldap', action='store_true',
                      help='Apply LDAP anonymization (CN, DN, OU, user/group ldap object attributes)')
         self.add_opt('-E', '--email', action='store_true',
@@ -425,12 +433,6 @@ class Anonymize(CLI):
             self.usage('must specify one or more anonymization types to apply')
         if self.anonymizations['ip'] and self.anonymizations['ip_prefix']:
             self.usage('cannot specify both --ip and --ip-prefix, they are mutually exclusive behaviours')
-        if self.anonymizations['email'] and self.anonymizations['kerberos']:
-            # assert that we are going to change the one we expect to protect against changing these above and
-            # forgetting to update this
-            assert self.replacements['kerberos5'] == '<kerberos_principal>'
-            # this match could be either one so change the token to reflect this
-            self.replacements['kerberos5'] = '<email_or_kerberos_principal>'
         if self.anonymizations['user']:
             self.anonymizations['group'] = True
 
@@ -453,6 +455,7 @@ class Anonymize(CLI):
             for _ in ('hostname', 'fqdn', 'domain'):
                 self.anonymizations[_] = True
         if self.anonymizations['kerberos']:
+            self.anonymizations['email'] = True
             self.anonymizations['domain'] = True
             self.anonymizations['fqdn'] = True
         if self.anonymizations['proxy']:
@@ -550,7 +553,9 @@ class Anonymize(CLI):
                      r'(?!\(\w+\.java:\d+\))' + \
                      self.negative_host_lookbehind
                     )
-        self.compile('ip', r'(?<!\d\.)' + ip_regex + r'(?![^:]\d+)')
+        ip_regex_strict = r'(?<!\d\.)' + ip_regex + r'(?![^:/]\d+)'
+        self.compile('ip', ip_regex_strict + r'/\d{1,2}')
+        self.compile('ip2', ip_regex_strict)
         self.compile('subnet_mask', r'(?<!\d\.)' + subnet_mask_regex + r'(?![^:]\d+)')
         self.compile('ip_prefix', r'(?<!\d\.)' + ip_prefix_regex + r'(?!\.\d+\.\d+)')
         re_regex_ending = re.compile('_regex$')
