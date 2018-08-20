@@ -85,7 +85,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.2'
+__version__ = '0.7.3'
 
 
 class Anonymize(CLI):
@@ -274,7 +274,7 @@ class Anonymize(CLI):
             'user6': '<user>@',
             'group': r'\1<group>',
             'group2': r'\1<group>',
-            'group3': r'for group\ <group>',
+            'group3': r'for group <group>',
             'password': r'\1<password>',
             'password2': r'\1<user>:<password>',
             'password3': r'\1<user>\2<password>',
@@ -288,6 +288,7 @@ class Anonymize(CLI):
             'kerberos4': r'<user>/<instance>@<domain>',
             'kerberos5': '/krb5cc_<uid>',
             #'kerberos6': r'<kerberos_principal>',
+            'email': '<user>@<domain>',
             #'ldap': r'\1<cn>',
             'ldap': lambda m: r'{}<{}>'.format(m.group(1), m.group(2).lower()),
             'ldap2': lambda m: r'{}<{}>'.format(m.group(1), m.group(2).lower()),
