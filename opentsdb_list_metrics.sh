@@ -80,7 +80,10 @@ check_bin(){
 check_bin curl
 check_bin jq
 
-curl -s $curl_options "$tsd_url/api/suggest?type=$metrics&q=&max=2000000000" |
+if [ -z "${DEBUG:-}" ]; then
+    curl_options="$curl_options -s"
+fi
+curl $curl_options "$tsd_url/api/suggest?type=$metrics&q=&max=2000000000" |
 jq '.[]' |
 sed 's/"//g' |
 sort
