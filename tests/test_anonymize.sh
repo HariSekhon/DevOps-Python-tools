@@ -285,6 +285,9 @@ dest[76]="member: <member>"
 src[80]=" Authorization: Basic 123456ABCDEF"
 dest[80]=" Authorization: Basic <token>"
 
+src[81]="https://mylonggithubtoken@github.com/harisekhon/nagios-plugins"
+dest[81]="https://<user>@<domain>/<custom>/nagios-plugins"
+
 args="-aPe"
 test_anonymize(){
     src="$1"
