@@ -31,7 +31,7 @@ Metrics output - one metric per line
 
 Tested on OpenTSDB 2.3 on HBase 1.4
 
-See opentsdb_list_metrics_hbase.sh for a version which can show metrics registered dates ordered by date
+See also opentsdb_list_metrics_hbase.sh - this version is 6-9x faster but that version which can show metrics registered dates ordered by date as that info isn't returned by the OpenTSDB Suggest API
 
 
 usage: ${0##*/} [options] <curl_options>
