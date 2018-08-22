@@ -282,6 +282,9 @@ dest[76]="member: <member>"
 #src[78]="ldap://ldap.example.com/cn=John%20Doe,dc=example,dc=com"
 #dest[78]="ldap://<fqdn>/cn=<cn>,dc=<dc>,dc=<dc>"
 
+src[80]=" Authorization: Basic 123456ABCDEF"
+dest[80]=" Authorization: Basic <token>"
+
 args="-aPe"
 test_anonymize(){
     src="$1"
