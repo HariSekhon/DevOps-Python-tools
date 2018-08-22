@@ -86,4 +86,6 @@ fi
 curl $curl_options "$tsd_url/api/suggest?type=$metrics&q=&max=2000000000" |
 jq '.[]' |
 sed 's/"//g' |
-sort
+sort ||
+# this is here mainly just to output the error message without DEBUG=1 mode being necessary
+curl ${curl_options/ -s/} "$tsd_url/api/suggest?type=$metrics&q=&max=2000000000"
