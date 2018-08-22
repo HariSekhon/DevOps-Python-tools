@@ -138,13 +138,14 @@ class Anonymize(CLI):
         # don't use this simpler one as we want to catch everything inside quotes eg. 'my secret'
         #password_quoted = r'\S+'
         password_quoted = r'(?:\'[^\']+\'|"[^"]+"|\S+)'
-        user_name = r'user(?:-?name)?'
+        user_name = r'(?:user(?:-?name)?|uid)'
         group_name = r'group(?:-?name)?'
         arg_sep = r'[=\s:]+'
         # openssl uses -passin switch
-        pass_word_phrase = r'pass(?:word|phrase|in)?'
+        pass_word_phrase = r'(?:pass(?:word|phrase|in)?|userPassword)'
         ldap_rdn_list = [
-            'C',
+            # country isn't exactly secret information worth anonymizing in most cases
+            #'C',
             'CN',
             'DC',
             'L',
@@ -156,9 +157,8 @@ class Anonymize(CLI):
         ]
         # hard for this to be 100% since this can be anything backslash escaped but getting what we really care about
         ldap_values = r'[\\\%\s\w-]+'
+        # AD user + group objects - from real world sample
         ldap_attributes = [
-            # this will be a CN, let general case strip it
-            #'msDS-AuthenticatedAtDC'
             'cn',
             'department',
             'description',
@@ -166,6 +166,7 @@ class Anonymize(CLI):
             'dn',
             'gidNumber',
             'givenName',
+            'homeDirectory',
             'member',
             'memberOf',
             'msSFU30Name',
@@ -183,6 +184,90 @@ class Anonymize(CLI):
             # let /home/hari => /home/<user>
             #'unixHomeDirectory',
         ]
+        # IPA / OpenLDAP attributes
+        # http://www.zytrax.com/books/ldap/ape/
+        ldap_attributes.extend([
+            'userPassword',
+            'gn',
+            'mail',
+            'surname',
+            #'localityName'  # city, same as l below
+            'facsimileTelephoneNumber',
+            'rfc822Mailbox',
+            'homeTelephoneNumber',
+            'pagerTelephoneNumber',
+            'uniqueMember',
+        ])
+        # From documentation of possible standard attributes
+        # https://docs.microsoft.com/en-us/windows/desktop/ad/group-objects
+        # http://www.kouti.com/tables/userattributes.htm
+        # https://docs.microsoft.com/en-us/windows/desktop/adschema/attributes-all
+        extra_ldap_attribs = [
+            # this will be a CN, let general case strip it
+            #'msDS-AuthenticatedAtDC'
+            'adminDescription',
+            'adminDisplayName',
+            'canonicalName',
+            'comment',
+            #'co', # (country)
+            #'countryCode',
+            'displayName',
+            'displayNamePrintable',
+            'division'
+            'employeeID',
+            'groupMembershipSAM',
+            'info',
+            'initials',
+            #'l' # city
+            'logonWorkstation',
+            'manager',
+            'middleName',
+            'mobile',
+            'otherHomePhone',
+            'otherIpPhone',
+            'otherLoginWorkstations',
+            'otherMailbox',
+            'otherMobile',
+            'otherPager',
+            'otherTelephone',
+            'pager',
+            'personalTitle',
+            'physicalDeliveryOfficeName',
+            'possibleInferiors',
+            'postalAddress',
+            'postalCode',
+            'postOfficeBox',
+            'preferredOU',
+            'primaryInternationalISDNNumber',
+            'primaryTelexNumber',
+            'profilePath',
+            'proxiedObjectName',
+            'proxyAddresses',
+            'registeredAddress',
+            'scriptPath',
+            'securityIdentifier',
+            'servicePrincipalName',
+            'street',
+            'streetAddress',
+            'supplementalCredentials',
+            'telephoneNumber',
+            'teletexTerminalIdentifier',
+            'telexNumber',
+            'url',
+            'userWorkstations',
+            'wWWHomePage',
+            'x121Address',
+            'userCert',
+            'userCertificate',
+            'userParameters',
+            'userPassword',
+            'userPrincipalName',
+            'userSharedFolder',
+            'userSharedFolderOther',
+            'userSMIMECertificate',
+        ]
+        # comment this line out for performance if you're positive you don't use these attributes
+        ldap_attributes.extend(extra_ldap_attribs)
         self.regex = {
             'hostname2': r'\b(?:ip-10-\d+-\d+-\d+|' + \
                          r'ip-172-1[6-9]-\d+-\d+|' + \
@@ -203,7 +288,7 @@ class Anonymize(CLI):
             'user5': r'for\s+user\s+{user}'.format(user=user_regex),
             # (?<!>/) exclude patterns '>/' where we have already matched and token replaced
             'user6': r'(?<!<user>/){user}@'.format(user=user_regex),
-            'password': r'(-{pass_word_phrase}{sep}){pw}'\
+            'password': r'(-?{pass_word_phrase}{sep}){pw}'\
                         .format(pass_word_phrase=pass_word_phrase,
                                 sep=arg_sep,
                                 pw=password_quoted),
@@ -230,9 +315,9 @@ class Anonymize(CLI):
             # https://tools.ietf.org/html/rfc4514
             #'ldap': '(CN=)[^,]+(?:,OU=[^,]+)+(?:,DC=[\w-]+)+',
             # replace individual components instead
-            'ldap': r'(\b({ldap_rdn_list})\s*[:=]+\s*)(?!(?:Person|Schema|Configuration),){ldap_values}'\
+            'ldap': r'(\b({ldap_rdn_list})\s*[=:]+\s*)(?!(?:Person|Schema|Configuration),){ldap_values}'\
                     .format(ldap_rdn_list='|'.join(ldap_rdn_list), ldap_values=ldap_values),
-            'ldap2': r'^(\s*({})\s*:+\s*).*$'.format('|'.join(ldap_attributes)),
+            'ldap2': r'^(\s*({})\s*[:]+\s*).*$'.format('|'.join(ldap_attributes)),
             'port': r'{host}:\d+(?!\.?[\w-])'.format(host=host_regex),
             'proxy': r'proxy {} port \d+'.format(host_regex),
             'proxy2': 'Trying' + ip_regex,
@@ -240,6 +325,7 @@ class Anonymize(CLI):
             'proxy4': r'(Via:\s\S+\s)' + ip_regex + '.*',
             'http_auth': r'(https?:\/\/)[^:]+:[^\@]*\@',
             'http_auth2': r'(Proxy auth using \w+ with user )([\'"]).+([\'"])',
+            'http_auth3': r'\bAuthorization:\s+Basic\s+[A-Za-z0-9]+',
             'cisco': r'username .+ (?:password|secret) .*?$',
             'cisco2': r'password .*?$',
             'cisco3': r'\ssecret\s.*?$',
@@ -299,6 +385,7 @@ class Anonymize(CLI):
             'proxy3': r'Connected to <proxy_host> (<proxy_ip>) port <proxy_port>',
             'http_auth': r'$1<user>:<password>@',
             'http_auth2': r'\1\'<proxy_user>\2\3/',
+            'http_auth3': r'Authorization: Basic <token>',
             'proxy4': r'\1<proxy_ip>',
             'cisco': r'username <username> password <password>',
             'cisco2': r'password <cisco_password>',
@@ -364,9 +451,10 @@ class Anonymize(CLI):
         self.add_opt('-p', '--password', action='store_true',
                      help='Apply password anonymization against --password switches (can\'t catch MySQL ' + \
                           '-p<password> since it\'s too ambiguous with bunched arguments, can use --custom ' + \
-                          'to work around). Also covers curl -u user:password')
+                          'to work around). Also covers curl -u user:password and auto enables --http-auth')
         self.add_opt('-T', '--http-auth', action='store_true',
-                     help=r'Apply HTTP auth anonymization to replace http://username:password\@ => ' + \
+                     help=r'Apply HTTP auth anonymization to replace Basic Authorization tokens and' + \
+                          r'http://username:password\@ => ' + \
                           r'http://<user>:<password>\@. Also works with https://')
         self.add_opt('-K', '--kerberos', action='store_true',
                      help=r'Kerberos 5 principals in the form <primary>@<realm> or <primary>/<instance>@<realm> ' + \
@@ -386,7 +474,7 @@ class Anonymize(CLI):
         self.add_opt('-x', '--proxy', action='store_true',
                      help='Apply anonymization to remove proxy host, user etc (eg. from curl -iv output). You ' + \
                           'should probably also apply --ip and --host if using this. Auto enables --http-auth')
-        self.add_opt('-n', '--network', action='store_true',
+        self.add_opt('-N', '--network', action='store_true',
                      help='Apply all network anonymization, whether Cisco, ScreenOS, JunOS for secrets, auth, ' + \
                           'usernames, passwords, md5s, PSKs, AS, SNMP etc.')
         self.add_opt('-c', '--cisco', action='store_true',
@@ -398,7 +486,7 @@ class Anonymize(CLI):
                           'for extra matches to be added)')
         self.add_opt('-W', '--windows', action='store_true',
                      help='Windows Sids (UNC path hostnames are already stripped by --hostname and ' + \
-                          'DOMAIN\\user components are already stripped by --domain and --user')
+                          'DOMAIN\\user components are already stripped by --user)')
         self.add_opt('-r', '--strip-cr', action='store_true',
                      help='Strip carriage returns (\'\\r\') from end of lines leaving only newlines (\'\\n\')')
         self.add_opt('--skip-java-exceptions', action='store_true',
