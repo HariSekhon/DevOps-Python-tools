@@ -275,6 +275,9 @@ src[76]="member: CN=Hari Sekhon,OU=MyOU,DC=MyDomain,DC=com"
 #dest[76]="member: CN=<cn>"
 dest[76]="member: <member>"
 
+src[77]="adminDisplayName: Administrator"
+dest[77]="adminDisplayName: <admindisplayname>"
+
 # TODO
 #src[77]="ldap:///dc=example,dc=com??sub?(givenName=John)"
 #dest[77]="ldap:///dc=<dc>,dc=<dc>??sub?(givenName=<givenName>)"
@@ -282,11 +285,19 @@ dest[76]="member: <member>"
 #src[78]="ldap://ldap.example.com/cn=John%20Doe,dc=example,dc=com"
 #dest[78]="ldap://<fqdn>/cn=<cn>,dc=<dc>,dc=<dc>"
 
+src[79]="userPassword=mysecret"
+#dest[79]="userPassword=<userpassword>"
+dest[79]="userPassword=<password>"
+
 src[80]=" Authorization: Basic 123456ABCDEF"
 dest[80]=" Authorization: Basic <token>"
 
 src[81]="https://mylonggithubtoken@github.com/harisekhon/nagios-plugins"
 dest[81]="https://<user>@<domain>/<custom>/nagios-plugins"
+
+# --ldap attribute matches are done before --user matches
+src[82]="uid=hari"
+dest[82]="uid=<uid>"
 
 args="-aPe"
 test_anonymize(){
