@@ -4,10 +4,11 @@
 #
 #  Author: Hari Sekhon
 #  Date: 2018-08-08 19:02:02 +0100 (Wed, 08 Aug 2018)
-#  ported from Perl version from DevOps Perl Tools repo (https://github.com/harisekhon/devops-perl-tools)
-#  Date: 2013-07-18 21:17:41 +0100 (Thu, 18 Jul 2013)
+#  Original Date: 2013-07-18 21:17:41 +0100 (Thu, 18 Jul 2013)
 #
 #  https://github.com/harisekhon/devops-python-tools
+#
+#  ported from Perl version from DevOps Perl Tools repo (https://github.com/harisekhon/devops-perl-tools)
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
@@ -85,7 +86,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.4'
+__version__ = '0.7.5'
 
 
 class Anonymize(CLI):
@@ -111,9 +112,9 @@ class Anonymize(CLI):
             ('subnet_mask', False),
             ('mac', False),
             ('kerberos', False),
-            ('ldap', False),
             ('email', False),
             ('password', False),
+            ('ldap', False),
             ('user', False),
             ('group', False),
             ('proxy', False),
@@ -123,9 +124,9 @@ class Anonymize(CLI):
             ('junos', False),
             ('network', False),
             ('fqdn', False),
-            ('windows', False),
             ('domain', False),
             ('hostname', False),
+            ('windows', False),
             ('custom', False),
         ])
         self.exceptions = {
@@ -315,9 +316,10 @@ class Anonymize(CLI):
             # https://tools.ietf.org/html/rfc4514
             #'ldap': '(CN=)[^,]+(?:,OU=[^,]+)+(?:,DC=[\w-]+)+',
             # replace individual components instead
-            'ldap': r'(\b({ldap_rdn_list})\s*[=:]+\s*)(?!(?:Person|Schema|Configuration),){ldap_values}'\
+            'ldap': r'(\b({ldap_rdn_list})\s*[=:]+\s*)(?!(?:Person|Schema|Configuration),|\s){ldap_values}'\
                     .format(ldap_rdn_list='|'.join(ldap_rdn_list), ldap_values=ldap_values),
-            'ldap2': r'^(\s*({})\s*[:]+\s*).*$'.format('|'.join(ldap_attributes)),
+            'ldap2': r'^(\s*({ldap_attribs})\s*:+\s*).*$'.format(ldap_attribs='|'.join(ldap_attributes)),
+            'ldap3': r'(\s*\b({ldap_attribs})\s*=\s*)(!\s){ldap_values}'.format(ldap_attribs='|'.join(ldap_attributes), ldap_values=ldap_values),
             'port': r'{host}:\d+(?!\.?[\w-])'.format(host=host_regex),
             'proxy': r'proxy {} port \d+'.format(host_regex),
             'proxy2': 'Trying' + ip_regex,
@@ -346,6 +348,7 @@ class Anonymize(CLI):
             'network2': r'syscontact .*',
             'windows': r'S-\d+-\d+-\d+-\d+-\d+-\d+-\d+'
         }
+        ldap_lambda_lowercase = lambda m: r'{}<{}>'.format(m.group(1), m.group(2).lower())
         # will auto-infer replacements to not have to be explicit, use this only for override mappings
         self.replacements = {
             'hostname': r'<hostname>:\1',
@@ -377,9 +380,9 @@ class Anonymize(CLI):
             'kerberos5': '/krb5cc_<uid>',
             #'kerberos6': r'<kerberos_principal>',
             'email': '<user>@<domain>',
-            #'ldap': r'\1<cn>',
-            'ldap': lambda m: r'{}<{}>'.format(m.group(1), m.group(2).lower()),
-            'ldap2': lambda m: r'{}<{}>'.format(m.group(1), m.group(2).lower()),
+            'ldap': ldap_lambda_lowercase,
+            'ldap2': ldap_lambda_lowercase,
+            'ldap3': ldap_lambda_lowercase,
             'proxy': r'proxy <proxy_host> port <proxy_port>',
             'proxy2': r'Trying <proxy_ip>',
             'proxy3': r'Connected to <proxy_host> (<proxy_ip>) port <proxy_port>',
@@ -725,6 +728,7 @@ class Anonymize(CLI):
         return line
 
     def dynamic_replace(self, name, line):
+        #log.debug('dynamic_replace: %s, %s', name, line)
         replacement = self.replacements.get(name, '<{}>'.format(name))
         #log.debug('%s replacement = %s', name, replacement)
         line = self.regex[name].sub(replacement, line)
