@@ -18,11 +18,11 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-test_num="${1:-}"
+test_nums="${@:-}"
 parallel=""
-if [ "$test_num" = "p" ]; then
+if [ "$test_nums" = "p" ]; then
     parallel="1"
-    test_num=""
+    test_nums=""
 fi
 
 cd "$srcdir/..";
@@ -273,17 +273,17 @@ dest[75]="unixHomeDirectory: /home/<user>"
 
 src[76]="member: CN=Hari Sekhon,OU=MyOU,DC=MyDomain,DC=com"
 #dest[76]="member: CN=<cn>"
+#dest[76]="member: CN=<cn>,OU=<ou>,DC=<dc>,DC=<dc>"
 dest[76]="member: <member>"
 
 src[77]="adminDisplayName: Administrator"
 dest[77]="adminDisplayName: <admindisplayname>"
 
-# TODO
-#src[77]="ldap:///dc=example,dc=com??sub?(givenName=John)"
-#dest[77]="ldap:///dc=<dc>,dc=<dc>??sub?(givenName=<givenName>)"
+src[77]="ldap:///dc=example,dc=com??sub?(givenName=John)"
+dest[77]="ldap:///dc=<dc>,dc=<dc>??sub?(givenName=<givenname>)"
 
-#src[78]="ldap://ldap.example.com/cn=John%20Doe,dc=example,dc=com"
-#dest[78]="ldap://<fqdn>/cn=<cn>,dc=<dc>,dc=<dc>"
+src[78]="ldap://ldap.example.com/cn=John%20Doe,dc=example,dc=com"
+dest[78]="ldap://<fqdn>/cn=<cn>,dc=<dc>,dc=<dc>"
 
 src[79]="userPassword=mysecret"
 #dest[79]="userPassword=<userpassword>"
@@ -296,8 +296,8 @@ src[81]="https://mylonggithubtoken@github.com/harisekhon/nagios-plugins"
 dest[81]="https://<user>@<domain>/<custom>/nagios-plugins"
 
 # --ldap attribute matches are done before --user matches
-src[82]="uid=hari"
-dest[82]="uid=<uid>"
+src[82]="uid = hari"
+dest[82]="uid = <uid>"
 
 args="-aPe"
 test_anonymize(){
@@ -316,12 +316,14 @@ test_anonymize(){
     fi
 }
 
-if [ -n "$test_num" ]; then
-    grep -q '^[[:digit:]]\+$' <<< "$test_num" || { echo "invalid test '$test_num', not a positive integer"; exit 2; }
-    i=$test_num
-    [ -n "${src[$i]:-}" ]  || { echo "invalid test number given: src[$i] not defined"; exit 1; }
-    [ -n "${dest[$i]:-}" ] || { echo "code error: dest[$i] not defined"; exit 1; }
-    test_anonymize "${src[$i]}" "${dest[$i]}"
+if [ -n "$test_nums" ]; then
+    for test_num in $test_nums; do
+        grep -q '^[[:digit:]]\+$' <<< "$test_num" || { echo "invalid test '$test_num', not a positive integer"; exit 2; }
+        i=$test_num
+        [ -n "${src[$i]:-}" ]  || { echo "invalid test number given: src[$i] not defined"; exit 1; }
+        [ -n "${dest[$i]:-}" ] || { echo "code error: dest[$i] not defined"; exit 1; }
+        test_anonymize "${src[$i]}" "${dest[$i]}"
+    done
     exit 0
 fi
 
