@@ -304,7 +304,7 @@ class TravisLastBuildLog(CLI):
         #if self.plaintext:
             # leaves a few characters behind which are printable
             #content = re.sub('[^{0}]'.format(string.printable), '', content)
-        # mandatory stripping ANI control sequences for now as although color coding is nice
+        # mandatory stripping ANSI control sequences for now as although color coding is nice
         # Travis has too many other control sequences that mess up my terminal
         # strip all control sequences
         content = re.sub(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]', '', content)
