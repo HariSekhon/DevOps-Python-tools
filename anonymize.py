@@ -86,7 +86,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.5'
+__version__ = '0.7.6'
 
 
 class Anonymize(CLI):
@@ -318,8 +318,10 @@ class Anonymize(CLI):
             # replace individual components instead
             'ldap': r'(\b({ldap_rdn_list})\s*[=:]+\s*)(?!(?:Person|Schema|Configuration),|\s){ldap_values}'\
                     .format(ldap_rdn_list='|'.join(ldap_rdn_list), ldap_values=ldap_values),
-            'ldap2': r'^(\s*({ldap_attribs})\s*:+\s*).*$'.format(ldap_attribs='|'.join(ldap_attributes)),
-            'ldap3': r'(\s*\b({ldap_attribs})\s*=\s*)(!\s){ldap_values}'.format(ldap_attribs='|'.join(ldap_attributes), ldap_values=ldap_values),
+            'ldap2': r'^(\s*({ldap_attribs})\s*:+\s*).*$'\
+                     .format(ldap_attribs='|'.join(ldap_attributes)),
+            'ldap3': r'(\s*\b({ldap_attribs})\s*=\s*)(?!\s){ldap_values}'\
+                     .format(ldap_attribs='|'.join(ldap_attributes), ldap_values=ldap_values),
             'port': r'{host}:\d+(?!\.?[\w-])'.format(host=host_regex),
             'proxy': r'proxy {} port \d+'.format(host_regex),
             'proxy2': 'Trying' + ip_regex,
@@ -348,6 +350,9 @@ class Anonymize(CLI):
             'network2': r'syscontact .*',
             'windows': r'S-\d+-\d+-\d+-\d+-\d+-\d+-\d+'
         }
+        # dump computer generated regexes to debug complex regex
+        #import pprint
+        #pprint.pprint(self.regex)
         ldap_lambda_lowercase = lambda m: r'{}<{}>'.format(m.group(1), m.group(2).lower())
         # will auto-infer replacements to not have to be explicit, use this only for override mappings
         self.replacements = {
@@ -733,6 +738,7 @@ class Anonymize(CLI):
         #log.debug('%s replacement = %s', name, replacement)
         line = self.regex[name].sub(replacement, line)
         #line = re.sub(self.regex[name], replacement, line)
+        log.debug('dynamic_replace: %s => %s', name, line)
         return line
 
     def anonymize_custom(self, line):
