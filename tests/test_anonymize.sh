@@ -72,10 +72,10 @@ dest[12]=" main.py:74 - loglevel=logging.INFO"
 
 # creating an exception for this would prevent anonymization legitimate .PY domains after a leading timestamp, which is legit, added main.py to
 src[13]="INFO 1111-22-33 44:55:66,777 main.py:8 -  Connecting to Ambari server at https://ip-1-2-3-4.eu-west-1.compute.internal:8440 (1.2.3.4)"
-dest[13]="INFO 1111-22-33 44:55:66,777 main.py:8 -  Connecting to Ambari server at https://<fqdn>:8440 (<ip_x.x.x.x>)"
+dest[13]="INFO 1111-22-33 44:55:66,777 main.py:8 -  Connecting to Ambari server at https://<ip-x-x-x-x>.<fqdn>:8440 (<ip_x.x.x.x>)"
 
 src[14]=" Connecting to Ambari server at https://ip-1-2-3-4.eu-west-1.compute.internal:8440 (1.2.3.4)"
-dest[14]=" Connecting to Ambari server at https://<fqdn>:8440 (<ip_x.x.x.x>)"
+dest[14]=" Connecting to Ambari server at https://<ip-x-x-x-x>.<fqdn>:8440 (<ip_x.x.x.x>)"
 
 src[15]="INFO 2015-12-01 19:52:21,066 DataCleaner.py:39 - Data cleanup thread started"
 dest[15]="INFO 2015-12-01 19:52:21,066 DataCleaner.py:39 - Data cleanup thread started"
@@ -96,7 +96,7 @@ src[19]="ranger-plugins-audit-0.5.0.2.3.0.0-2557.jar"
 dest[19]="ranger-plugins-audit-0.5.0.2.3.0.0-2557.jar"
 
 src[20]="yarn-yarn-resourcemanager-ip-172-31-1-2.log"
-dest[20]="yarn-yarn-resourcemanager-<aws_hostname>.log"
+dest[20]="yarn-yarn-resourcemanager-<ip-x-x-x-x>.log"
 
 src[21]="192.168.99.100:9092"
 dest[21]="<ip_x.x.x.x>:9092"
@@ -172,9 +172,6 @@ dest[44]="/tmp/krb5cc_<uid>"
 
 src[45]=" --user=hari"
 dest[45]=" --user=<user>"
-
-src[45]=" --group-name=techies"
-dest[45]=" --group-name=<group>"
 
 src[46]=" 1.2.3.4/24"
 dest[46]=" <ip_x.x.x.x>/<cidr_mask>"
@@ -279,9 +276,6 @@ dest[76]="member: <member>"
 src[77]="adminDisplayName: Administrator"
 dest[77]="adminDisplayName: <admindisplayname>"
 
-src[77]="ldap:///dc=example,dc=com??sub?(givenName=John)"
-dest[77]="ldap:///dc=<dc>,dc=<dc>??sub?(givenName=<givenname>)"
-
 src[78]="ldap://ldap.example.com/cn=John%20Doe,dc=example,dc=com"
 dest[78]="ldap://<fqdn>/cn=<cn>,dc=<dc>,dc=<dc>"
 
@@ -298,6 +292,21 @@ dest[81]="https://<user>@<domain>/<custom>/nagios-plugins"
 # --ldap attribute matches are done before --user matches
 src[82]="uid = hari"
 dest[82]="uid = <uid>"
+
+src[83]=" --group-name=techies"
+dest[83]=" --group-name=<group>"
+
+src[84]="ldap:///dc=example,dc=com??sub?(givenName=John)"
+dest[84]="ldap:///dc=<dc>,dc=<dc>??sub?(givenName=<givenname>)"
+
+src[85]="ip-1-2-3-4-5"
+dest[85]="ip-1-2-3-4-5"
+
+src[86]="dip-1-2-3-4-5"
+dest[86]="dip-1-2-3-4-5"
+
+src[87]="1.2.3.4.5"
+dest[87]="1.2.3.4.5"
 
 args="-aPe"
 test_anonymize(){
@@ -387,6 +396,12 @@ if [ -n "$parallel" ]; then
 #        [ $? -eq 0 ] || { echo "FAILED"; exit $?; }
 #    done
 fi
+
+# can't really test this as the hash changes for every update of the program, very hard to predict or retro-engineer
+#src[201]="http://test"
+#dest[201]="http://dfa7561a3dc8"
+#args="--hash-hostnames"
+#run_tests 201  # ignore_run_unqualified
 
 echo "checking file args"
 if [ `$anonymize -ae README.md | wc -l` -lt 100 ]; then
