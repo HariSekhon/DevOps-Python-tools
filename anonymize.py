@@ -48,6 +48,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from collections import OrderedDict
+from hashlib import md5
 import os
 import re
 import sys
@@ -68,6 +69,7 @@ try:
     # used dynamically
     # pylint: disable=unused-import
     from harisekhon.utils import \
+        aws_host_ip_regex, \
         domain_regex, \
         domain_regex_strict, \
         email_regex, \
@@ -86,7 +88,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.6'
+__version__ = '0.8.0'
 
 
 class Anonymize(CLI):
@@ -105,6 +107,7 @@ class Anonymize(CLI):
         self.file_list = set()
         self.re_line_ending = re.compile(r'(\r?\n)$')
         self.strip_cr = False
+        self.hash_salt = None
         # order of iteration of application matters because we must do more specific matches before less specific ones
         self.anonymizations = OrderedDict([
             ('ip', False),
@@ -270,13 +273,11 @@ class Anonymize(CLI):
         # comment this line out for performance if you're positive you don't use these attributes
         ldap_attributes.extend(extra_ldap_attribs)
         self.regex = {
-            'hostname2': r'\b(?:ip-10-\d+-\d+-\d+|' + \
-                         r'ip-172-1[6-9]-\d+-\d+|' + \
-                         r'ip-172-2[0-9]-\d+-\d+|' + \
-                         r'ip-172-3[0-1]-\d+-\d+|' +
-                         r'ip-192-168-\d+-\d+)\b(?!-\d)',
-            'hostname3': r'(\w+://){host}'.format(host=hostname_regex),
-            'hostname4': r'\\\\{host}'.format(host=hostname_regex),
+            # don't change hostname or fqdn regex without updating hash_hostnames() option parse
+            # since that replaces these replacements and needs to match the grouping captures and surrounding format
+            'hostname2': r'({aws_host_ip})(?!-\d)'.format(aws_host_ip=aws_host_ip_regex),
+            'hostname3': r'(\w+://)({hostname})'.format(hostname=hostname_regex),
+            'hostname4': r'\\\\({hostname})'.format(hostname=hostname_regex),
             # use more permissive hostname_regex to catch Kerberos @REALM etc
             'domain2': '@{host}'.format(host=hostname_regex),
             'group': r'(-{group_name}{sep})\S+'.format(group_name=group_name, sep=arg_sep),
@@ -299,6 +300,7 @@ class Anonymize(CLI):
                                  sep=arg_sep,
                                  pass_word_phrase=pass_word_phrase,
                                  pw=password_quoted),
+            'ip3': aws_host_ip_regex + r'(?!-\d)',
             'ip_prefix': r'{}(?!\.\d+\.\d+)'.format(ip_prefix_regex),
             # network device format Mac address
             'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',
@@ -356,8 +358,9 @@ class Anonymize(CLI):
         ldap_lambda_lowercase = lambda m: r'{}<{}>'.format(m.group(1), m.group(2).lower())
         # will auto-infer replacements to not have to be explicit, use this only for override mappings
         self.replacements = {
-            'hostname': r'<hostname>:\1',
-            'hostname2': '<aws_hostname>',
+            'hostname': r'<hostname>:\2',
+            #'hostname2': '<aws_hostname>',
+            'hostname2': r'<ip-x-x-x-x>',
             'hostname3': r'\1<hostname>',
             'hostname4': r'\\\\<hostname>'.format(host=hostname_regex),
             'domain2': '@<domain>',
@@ -376,6 +379,7 @@ class Anonymize(CLI):
             'password3': r'\1<user>\2<password>',
             'ip': r'<ip_x.x.x.x>/<cidr_mask>',
             'ip2': r'<ip_x.x.x.x>',
+            'ip3': r'<ip-x-x-x-x>',
             'ip_prefix': r'<ip_x.x.x>.',
             'subnet_mask': r'<subnet_x.x.x.x>',
             'kerberos': r'host/\1@<domain>',
@@ -447,10 +451,16 @@ class Anonymize(CLI):
                      help='Apply hostname format anonymization (only works on \'<host>:<port>\' otherwise this ' + \
                           'would match everything (consider using --custom and putting your hostname convention ' + \
                           'regex in anonymize_custom.conf to catch other shortname references)')
+        self.add_opt('--hash-hostnames', action='store_true',
+                     help='Hash hostnames / FQDNs to still be able to distinguish different nodes for cluster' + \
+                          'debugging, these are salted and truncated to be indistinguishable from temporal docker ' + \
+                          'container IDs, but someone with enough computing power and time could theoretically ' + \
+                          'calculate the source hostnames so don\'t put these on the public internet, it is more ' + \
+                          'for private vendor tickets)')
         self.add_opt('-d', '--domain', action='store_true',
                      help='Apply domain format anonymization')
         self.add_opt('-F', '--fqdn', action='store_true',
-                     help='Apply fqdn format anonymization')
+                     help='Apply FQDN format anonymization')
         self.add_opt('-P', '--port', action='store_true',
                      help='Apply port anonymization (not included in --all since you usually want to include port ' + \
                           'numbers for cluster or service debugging)')
@@ -550,7 +560,21 @@ class Anonymize(CLI):
            self.anonymizations['ip_prefix']:
             self.anonymizations['subnet_mask'] = True
             self.anonymizations['mac'] = True
-        if self.get_opt('host'):
+        host = self.get_opt('host')
+        if self.get_opt('hash_hostnames'):
+            host = True
+            self.hash_salt = md5(open(__file__).read()).hexdigest()
+            self.replacements['hostname'] = lambda match: r'{hostname}:{port}'\
+                                            .format(hostname=self.hash_host(match.group(1)), port=match.group(2))
+            self.replacements['hostname2'] = lambda match: r'{ip}'.format(ip=self.hash_host(match.group(1)))
+            self.replacements['hostname3'] = lambda match: r'{protocol}{hostname}'\
+                                             .format(protocol=match.group(1),
+                                                     hostname=self.hash_host(match.group(2))
+                                                    )
+            self.replacements['hostname4'] = lambda match: r'\\\\{hostname}'\
+                                             .format(hostname=self.hash_host(match.group(1)))
+            self.replacements['fqdn'] = lambda match: self.hash_host(match.group(1))
+        if host:
             for _ in ('hostname', 'fqdn', 'domain'):
                 self.anonymizations[_] = True
         if self.anonymizations['kerberos']:
@@ -575,6 +599,17 @@ class Anonymize(CLI):
         else:
             for _ in self.exceptions:
                 self.exceptions[_] = self.get_opt('skip_' + _)
+
+    def hash_host(self, host):
+        parts = host.split('.', 2)
+        shortname = parts[0]
+        domain = None
+        if len(parts) > 1:
+            domain = parts[1]
+        hashed_hostname = md5(self.hash_salt + shortname).hexdigest()[:12]
+        if domain:
+            hashed_hostname += '.' + '<domain>'
+        return hashed_hostname
 
     def _is_anonymization_selected(self):
         for _ in self.anonymizations:
@@ -633,7 +668,7 @@ class Anonymize(CLI):
                      r'(?!\d+T\d+:\d+)' + \
                      r'(?!\d+[^A-Za-z0-9]|' + \
                      self.custom_ignores_raw + ')' + \
-                     hostname_regex + \
+                     '(' + hostname_regex + ')' + \
                      self.negative_host_lookbehind + r':(\d{1,5}(?!\.?\w))',
                     )
         self.compile('domain',
@@ -646,7 +681,7 @@ class Anonymize(CLI):
                     )
         self.compile('fqdn',
                      r'(?!' + self.custom_ignores_raw + ')' + \
-                     fqdn_regex + \
+                     '(' + fqdn_regex + ')' + \
                      r'(?!\.[A-Za-z])(\b|$)' + \
                      # ignore Java stack traces eg. at SomeClass(Thread.java;789)
                      r'(?!\(\w+\.java:\d+\))' + \
