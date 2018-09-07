@@ -123,7 +123,7 @@ dest[27]="SomeClass\$method:20 something happened"
 #dest[28]="-passphrase '<password>'"
 
 src[29]=" at host.domain.com(Thread.java:789)"
-dest[29]=" at host.domain.com(Thread.java:789"
+dest[29]=" at host.domain.com(Thread.java:789)"
 
 src[30]="jdbc:hive2://hiveserver2:10000/myDB"
 dest[30]="jdbc:hive2://<hostname>:10000/myDB"
@@ -308,13 +308,17 @@ dest[86]="dip-1-2-3-4-5"
 src[87]="1.2.3.4.5"
 dest[87]="1.2.3.4.5"
 
+# check escape codes get stripped if present (eg. if piping from grep --color-yes)
+#src[88]="some^[[01;31m^[[Khost^[[m^[[K:443"
+#dest[88]="<hostname>:443"
+
 args="-aPe"
 test_anonymize(){
     src="$1"
     dest="$2"
     #[ -z "${src[$i]:-}" ] && { echo "skipping test $i..."; continue; }
     result="$($anonymize $args <<< "$src")"
-    if grep -Fq "$dest" <<< "$result"; then
+    if grep -xFq "$dest" <<< "$result"; then
         echo "SUCCEEDED anonymization test $i"
     else
         echo "FAILED to anonymize line during test $i"
