@@ -164,6 +164,12 @@ EOF
     run ./hbase_generate_data.py -n 10000 --use-existing-table -T HexStringSplitTable
 
     # ============================================================================ #
+
+    run ./hbase_table_regions_by_regionserver.sh "$HBASE_HOST"
+
+    run_usage ./hbase_table_regions_by_regionserver.sh
+
+    # ============================================================================ #
     run_fail 3 ./hbase_compact_tables.py --list-tables
 
     run ./hbase_compact_tables.py -H "$HBASE_HOST"
