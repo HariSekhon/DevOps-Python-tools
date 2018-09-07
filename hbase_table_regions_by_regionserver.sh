@@ -81,8 +81,11 @@ for regionserver in $(tr ' ' '\n' <<< "$regionservers" | sort -u); do
     echo "$regionserver:"
     curl $curl_options "$regionserver:$port/jmx" |
     grep "_table_.*${table}.*_region_" |
-    sed 's/.*_table_//; s/_region_.*//' |
-    sort |
-    uniq -c || :
+    sed 's/.*_table_//; s/_region_/ /; s/_.*$//' |
+    sort -u |
+    awk '{print $1}' |
+    uniq -c |
+    sort -k1nr ||
+    curl ${curl_options% -s} "$regionserver:$port/jmx"
     echo
 done
