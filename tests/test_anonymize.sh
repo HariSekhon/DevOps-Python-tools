@@ -309,14 +309,18 @@ src[87]="1.2.3.4.5"
 dest[87]="1.2.3.4.5"
 
 # check escape codes get stripped if present (eg. if piping from grep --color-yes)
-#src[88]="some^[[01;31m^[[Khost^[[m^[[K:443"
-#dest[88]="<hostname>:443"
+#src[88]="some^[[01;31m^[[Khost^[[m^[[Kname:443"
+#src[88]="some\e[01;31m\e[Khost\e[m\e[K:443"
+src[88]="$(echo somehost:443 | grep --color=yes host)"
+dest[88]="<hostname>:443"
 
 args="-aPe"
 test_anonymize(){
     src="$1"
     dest="$2"
     #[ -z "${src[$i]:-}" ] && { echo "skipping test $i..."; continue; }
+    # didn't work for \e escape codes for ANSI stripping test
+    #result="$(echo -e "$src" | $anonymize $args)"
     result="$($anonymize $args <<< "$src")"
     if grep -xFq "$dest" <<< "$result"; then
         echo "SUCCEEDED anonymization test $i"
