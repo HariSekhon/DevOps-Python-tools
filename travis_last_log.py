@@ -30,6 +30,11 @@ there are a lot of other control sequences in Travis CI that mess terminals up
 
 If specifying a --repo be aware the API is case sensitive for repo names
 
+If repo starts with / and $TRAVIS_USER is set, will prepend $TRAVIS_USER for convenience, eg.
+
+export TRAVIS_USER=HariSekhon # put this in .bashrc
+travis_last_log.py /pytools   # shorter to type '/pytools' than 'HariSekhon/pytools'
+
 As a convenience you may supply either job id or repo as an argument without any switch and it'll infer it as a repo if
 if contains a slash but no url (eg. HariSekhon/nagios-plugins) otherwise it'll assume it's a job id, strip any leading
 URL so you can simply paste the path to a failing build and it'll just work. The switch versions of --job-id and --repo
@@ -70,7 +75,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.1'
+__version__ = '0.5.0'
 
 
 class TravisLastBuildLog(CLI):
@@ -100,9 +105,9 @@ class TravisLastBuildLog(CLI):
 
     def add_options(self):
         self.add_opt('-R', '--repo', default=os.getenv('TRAVIS_REPO'),
-                     help='Travis CI repo to find last failed build')
-        self.add_opt('-J', '--job-id', default=os.getenv('JOB_ID'),
-                     help='Job ID to download log for a specific job')
+                     help='Travis CI repo to find last failed build ($TRAVIS_REPO)')
+        self.add_opt('-J', '--job-id', default=os.getenv('TRAVIS_JOB_ID'),
+                     help='Job ID to download log for a specific job ($TRAVIS_JOB_ID)')
         self.add_opt('-T', '--travis-token', default=os.getenv('TRAVIS_TOKEN'),
                      help='Travis token required to authenticate to the API ($TRAVIS_TOKEN)')
         self.add_opt('-n', '--num', default=1, help='Number of builds to pull logs from (default: 1)')
@@ -134,6 +139,9 @@ class TravisLastBuildLog(CLI):
             self.job_id = self.job_id.split('/')[-1].split('#')[0]
             validate_chars(self.job_id, 'job id', '0-9')
         elif self.repo:
+            travis_user = os.getenv('TRAVIS_USER')
+            if self.repo[0] == '/' and travis_user:
+                self.repo = travis_user + self.repo
             validate_chars(self.repo, 'repo', r'\/\w\.-')
         else:
             self.usage('--job-id / --repo not specified')
