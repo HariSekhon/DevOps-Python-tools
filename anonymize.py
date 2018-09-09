@@ -65,6 +65,7 @@ try:
         isStr, \
         log, \
         log_option, \
+        strip_ansi_escape_codes, \
         validate_file
     # used dynamically
     # pylint: disable=unused-import
@@ -88,7 +89,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.0'
+__version__ = '0.8.1'
 
 
 class Anonymize(CLI):
@@ -731,6 +732,7 @@ class Anonymize(CLI):
         if self.strip_cr:
             line_ending = '\n'
         line = self.re_line_ending.sub('', line)
+        line = strip_ansi_escape_codes(line)
         for _ in self.anonymizations:
             if not self.anonymizations[_]:
                 continue
