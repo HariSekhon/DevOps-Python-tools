@@ -61,7 +61,7 @@ sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
     from harisekhon.utils import prog, log, support_msg_api, jsonpp, qquit, isInt, isStr, isJson
-    from harisekhon.utils import UnknownError, code_error
+    from harisekhon.utils import UnknownError, code_error, strip_ansi_escape_codes
     from harisekhon.utils import validate_chars, validate_alnum, validate_int
     from harisekhon import CLI
     from harisekhon import RequestHandler
@@ -70,7 +70,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 
 
 class TravisLastBuildLog(CLI):
@@ -307,7 +307,7 @@ class TravisLastBuildLog(CLI):
         # mandatory stripping ANSI control sequences for now as although color coding is nice
         # Travis has too many other control sequences that mess up my terminal
         # strip all control sequences
-        content = re.sub(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]', '', content)
+        content = strip_ansi_escape_codes(content)
         print(content)
 
 
