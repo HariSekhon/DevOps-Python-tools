@@ -140,6 +140,8 @@ class TravisLastBuildLog(CLI):
             validate_chars(self.job_id, 'job id', '0-9')
         elif self.repo:
             travis_user = os.getenv('TRAVIS_USER')
+            if '/' not in self.repo:
+                self.repo = '/' + self.repo
             if self.repo[0] == '/' and travis_user:
                 self.repo = travis_user + self.repo
             validate_chars(self.repo, 'repo', r'\/\w\.-')
