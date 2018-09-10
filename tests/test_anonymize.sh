@@ -433,5 +433,5 @@ fi
 
 echo
 echo "Total Tests run: $run_count"
-time_taken "$start_time" "SUCCESS! All version tests for $anonymize completed in"
+time_taken "$start_time" "SUCCESS! All tests for $anonymize completed in"
 echo
