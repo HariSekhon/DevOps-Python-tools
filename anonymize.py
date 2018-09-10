@@ -453,7 +453,7 @@ class Anonymize(CLI):
                           'would match everything (consider using --custom and putting your hostname convention ' + \
                           'regex in anonymize_custom.conf to catch other shortname references)')
         self.add_opt('--hash-hostnames', action='store_true',
-                     help='Hash hostnames / FQDNs to still be able to distinguish different nodes for cluster' + \
+                     help='Hash hostnames / FQDNs to still be able to distinguish different nodes for cluster ' + \
                           'debugging, these are salted and truncated to be indistinguishable from temporal docker ' + \
                           'container IDs, but someone with enough computing power and time could theoretically ' + \
                           'calculate the source hostnames so don\'t put these on the public internet, it is more ' + \
