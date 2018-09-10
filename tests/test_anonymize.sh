@@ -43,7 +43,7 @@ if [ -z "$test_nums" ]; then
     echo "checking file args:"
     run++
     if [ `$anonymize -ae README.md | wc -l` -gt 100 ]; then
-        echo "SUCCEEEDED - anonymized README.md > 100 lines"
+        echo "SUCCEEDED - anonymized README.md > 100 lines"
     else
         echo "FAILED - suspicious README.md file arg result came to <= 100 lines"
         exit 1
