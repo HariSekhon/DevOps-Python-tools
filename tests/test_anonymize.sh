@@ -397,9 +397,9 @@ run_tests(){
         fi
     done
 }
-run_tests  # ignore_run_unqualified
+#run_tests  # ignore_run_unqualified
 
-echo "network specific tests:"
+echo "tests preseving text without --network enabled:"
 # check normal don't strip these
 src[101]="reading password from foo"
 dest[101]="reading password from foo"
@@ -410,6 +410,7 @@ dest[102]="some description = blah, module = foo"
 args="-HKEiux"
 run_tests 101 102  # ignore_run_unqualified
 
+echo "network specific tests:"
 # now check --network / --cisco / --juniper do strip these
 src[103]="reading password from bar"
 dest[103]="reading password <cisco_password>"
@@ -431,6 +432,6 @@ if [ -n "$parallel" ]; then
 fi
 
 echo
-echo "Total Tests run: $total_run_count"
+echo "Total Tests run: $run_count"
 time_taken "$start_time" "SUCCESS! All version tests for $anonymize completed in"
 echo
