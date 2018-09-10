@@ -28,8 +28,8 @@ or pastebin like websites
 Also has support for network device configurations including Cisco and Juniper,
 and should work on devices with similar configs as well.
 
-Works like a standard unix filter program, taking input from standard input or file(s) given as arguments and
-prints the modified output to standard output (to redirect to a new file or copy buffer).
+Works like a standard unix filter program, reading from file arguments or standard input and
+printing the modified output to standard output (to redirect to a new file or copy buffer).
 
 Create a list of phrases to anonymize from config by placing them in anonymize_custom.conf in the same directory
 as this program, one PCRE format regex per line, blank lines and lines prefixed with # are ignored.
@@ -89,7 +89,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.1'
+__version__ = '0.8.2'
 
 
 class Anonymize(CLI):
@@ -602,14 +602,17 @@ class Anonymize(CLI):
                 self.exceptions[_] = self.get_opt('skip_' + _)
 
     def hash_host(self, host):
-        parts = host.split('.', 2)
-        shortname = parts[0]
-        domain = None
-        if len(parts) > 1:
-            domain = parts[1]
-        hashed_hostname = md5(self.hash_salt + shortname).hexdigest()[:12]
-        if domain:
-            hashed_hostname += '.' + '<domain>'
+        # hash entire hostname and do not preserve .<domain> suffix
+        # to avoid being able to differentiate from temporal Docker container IDs
+        #parts = host.split('.', 2)
+        #shortname = parts[0]
+        #domain = None
+        #if len(parts) > 1:
+        #    domain = parts[1]
+        #hashed_hostname = md5(self.hash_salt + shortname).hexdigest()[:12]
+        #if domain:
+        #    hashed_hostname += '.' + '<domain>'
+        hashed_hostname = md5(self.hash_salt + host).hexdigest()[:12]
         return hashed_hostname
 
     def _is_anonymization_selected(self):
