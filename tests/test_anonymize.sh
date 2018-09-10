@@ -397,7 +397,7 @@ run_tests(){
         fi
     done
 }
-#run_tests  # ignore_run_unqualified
+run_tests  # ignore_run_unqualified
 
 echo "tests preseving text without --network enabled:"
 # check normal don't strip these
