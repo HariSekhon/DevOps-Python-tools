@@ -16,8 +16,9 @@
 
 """
 
-Tool to show the first and last N lines. Works like a standard unix filter program for all files passed as arguments
-or if no files are given then it applies to standard input.
+Strip ANSI Escape Codes from Text String input
+
+Works as a standard unix filter program, reading from file arguments or standard input and printing to standard output
 
 """
 
@@ -48,11 +49,11 @@ __version__ = '0.1'
 
 class StripAnsiEscapeCodes(CLI):
 
-    def __init__(self):
-        # Python 2.x
-        super(StripAnsiEscapeCodes, self).__init__()
-        # Python 3.x
-        # super().__init__()
+#    def __init__(self):
+#        # Python 2.x
+#        super(StripAnsiEscapeCodes, self).__init__()
+#        # Python 3.x
+#        # super().__init__()
 
     def run(self):
         if not self.args:
