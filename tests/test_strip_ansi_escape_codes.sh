@@ -40,6 +40,6 @@ if echo "some highlighted content" |
 fi
 
 echo
-echo "Total Tests run: $total_run_count"
+echo "Total Tests run: $run_count"
 time_taken "$start_time" "All version tests for $name completed in"
 echo
