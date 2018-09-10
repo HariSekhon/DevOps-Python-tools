@@ -29,7 +29,39 @@ cd "$srcdir/..";
 
 . ./tests/utils.sh
 
+section "Anonymize"
+
 anonymize="./anonymize.py"
+
+start_time="$(start_timer "$anonymize")"
+
+# ============================================================================ #
+#                                  Custom Tests
+# ============================================================================ #
+
+if [ -z "$test_nums" ]; then
+    echo "checking file args:"
+    run++
+    if [ `$anonymize -ae README.md | wc -l` -gt 100 ]; then
+        echo "SUCCEEEDED - anonymized README.md > 100 lines"
+    else
+        echo "FAILED - suspicious README.md file arg result came to <= 100 lines"
+        exit 1
+    fi
+    hr
+
+    echo "testing --email replacememnt format:"
+    run_grep "<user>@<domain>" $anonymize --email <<< "hari@domain.com"
+    run_grep "<user>@<domain>" $anonymize -E <<< "hari@domain.com"
+
+    echo "testing --ip-prefix behaviour:"
+    run_grep "<ip_x.x.x>.1" $anonymize --ip-prefix <<< "4.3.2.1"
+
+    echo "testing --hash-hostnames:"
+    run_grep "^http://[a-f0-9]{12}:80/path$" $anonymize --hash-hostnames <<< "http://test.domain.com:80/path"
+fi
+
+# ============================================================================ #
 
 src[0]="2015-11-19 09:59:59,893 - Execution of 'mysql -u root --password=somep@ssword! -h myHost.internal  -s -e \"select version();\"' returned 1. ERROR 2003 (HY000): Can't connect to MySQL server on 'host.domain.com' (111)"
 dest[0]="2015-11-19 09:59:59,893 - Execution of 'mysql -u root --password=<password> -h <fqdn>  -s -e \"select version();\"' returned 1. ERROR 2003 (HY000): Can't connect to MySQL server on '<fqdn>' (111)"
@@ -316,6 +348,7 @@ dest[88]="<hostname>:443"
 
 args="-aPe"
 test_anonymize(){
+    run++
     src="$1"
     dest="$2"
     #[ -z "${src[$i]:-}" ] && { echo "skipping test $i..."; continue; }
@@ -323,7 +356,12 @@ test_anonymize(){
     #result="$(echo -e "$src" | $anonymize $args)"
     result="$($anonymize $args <<< "$src")"
     if grep -xFq "$dest" <<< "$result"; then
-        echo "SUCCEEDED anonymization test $i"
+        echo -n "SUCCEEDED anonymization test $i"
+        if [ -n "${SHOW_OUTPUT:-}" ]; then
+            echo " => $dest"
+        else
+            echo
+        fi
     else
         echo "FAILED to anonymize line during test $i"
         echo "input:    $src"
@@ -361,20 +399,7 @@ run_tests(){
 }
 run_tests  # ignore_run_unqualified
 
-# test ip prefix
-src="4.3.2.1"
-dest="<ip_x.x.x>.1"
-result="$($anonymize --ip-prefix <<< "$src")"
-if grep -Fq "<ip_x.x.x>.1" <<< "$result"; then
-    echo "SUCCEEDED anonymization test ip_prefix"
-else
-    echo "FAILED to anonymize line during test ip_prefix"
-    echo "input:    $src"
-    echo "expected: $dest"
-    echo "got:      $result"
-    exit 1
-fi
-
+echo "network specific tests:"
 # check normal don't strip these
 src[101]="reading password from foo"
 dest[101]="reading password from foo"
@@ -405,21 +430,7 @@ if [ -n "$parallel" ]; then
 #    done
 fi
 
-# can't really test this as the hash changes for every update of the program, very hard to predict or retro-engineer
-#src[201]="http://test"
-#dest[201]="http://dfa7561a3dc8"
-#args="--hash-hostnames"
-#run_tests 201  # ignore_run_unqualified
-
-echo "checking file args"
-if [ `$anonymize -ae README.md | wc -l` -lt 100 ]; then
-    echo "Suspicious readme file arg result came to < 100 lines"
-    exit 1
-fi
 echo
-
-echo "testing --email replacememnt format"
-run_grep "<user>@<domain>" $anonymize -E <<< "hari@domain.com"
+echo "Total Tests run: $total_run_count"
+time_taken "$start_time" "SUCCESS! All version tests for $anonymize completed in"
 echo
-
-echo "All Anonymize tests succeeded!"
