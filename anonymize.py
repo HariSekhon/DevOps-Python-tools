@@ -284,7 +284,7 @@ class Anonymize(CLI):
             'hostname3': r'(\w+://)({hostname})'.format(hostname=hostname_regex),
             'hostname4': r'\\\\({hostname})'.format(hostname=hostname_regex),
             # no \bhost - want to match KrbHost
-            'hostname5': r'(-host(?:name)?|host(?:name)?{sep})({hostname})'\
+            'hostname5': r'(-host(?:name)?{sep}|host(?:name)?\s*=\s*)({hostname})'\
                          .format(sep=arg_sep, hostname=hostname_regex),
             # use more permissive hostname_regex to catch Kerberos @REALM etc
             'domain2': '@{host}'.format(host=hostname_regex),
