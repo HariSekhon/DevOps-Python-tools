@@ -349,8 +349,8 @@ dest[87]="1.2.3.4.5"
 src[88]="-host blah"
 dest[88]="-host <hostname>"
 
-src[88]="--hostname=blah --anotherswitch"
-dest[88]="-hostname=<hostname> --anotherswitch"
+src[89]="--hostname=blah --anotherswitch"
+dest[89]="-hostname=<hostname> --anotherswitch"
 
 src[90]="host=test"
 dest[90]="host=<hostname>"
