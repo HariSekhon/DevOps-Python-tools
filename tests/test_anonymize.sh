@@ -336,6 +336,7 @@ dest[83]=" --group-name=<group>"
 src[84]="ldap:///dc=example,dc=com??sub?(givenName=John)"
 dest[84]="ldap:///dc=<dc>,dc=<dc>??sub?(givenName=<givenname>)"
 
+# check we don't replace IP type things that are not really IPs because too many octets
 src[85]="ip-1-2-3-4-5"
 dest[85]="ip-1-2-3-4-5"
 
@@ -348,21 +349,28 @@ dest[87]="1.2.3.4.5"
 src[88]="-host blah"
 dest[88]="-host <hostname>"
 
-src[89]="hostname=blah"
-dest[89]="hostname=<hostname>"
+src[88]="--hostname=blah --anotherswitch"
+dest[88]="-hostname=<hostname> --anotherswitch"
 
-src[90]="hostname=test.domain.com"
-dest[90]="hostname=<fqdn>"
+src[90]="host=test"
+dest[90]="host=<hostname>"
 
 src[91]="host went away"
 dest[91]="host went away"
+
+src[92]="hostname=blah;port=92"
+dest[92]="hostname=<hostname>;port=92"
+
+# check we replace all occurences along line
+src[93]="hari@domain.com, hari@domain2.co.uk"
+dest[93]="<user>@<domain>, <user>@<domain>"
 
 
 # check escape codes get stripped if present (eg. if piping from grep --color-yes)
 #src[88]="some^[[01;31m^[[Khost^[[m^[[Kname:443"
 #src[88]="some\e[01;31m\e[Khost\e[m\e[K:443"
-src[88]="$(echo somehost:443 | grep --color=yes host)"
-dest[88]="<hostname>:443"
+src[99]="$(echo somehost:443 | grep --color=yes host)"
+dest[99]="<hostname>:443"
 
 args="-aPe"
 test_anonymize(){
