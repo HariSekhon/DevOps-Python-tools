@@ -63,6 +63,7 @@ if [ -z "$test_nums" ]; then
     echo "testing --hash-hostnames:"
     run_grep "^http://[a-f0-9]{12}:80/path$" $anonymize --hash-hostnames <<< "http://test.domain.com:80/path"
     run_grep '^\\\\[a-f0-9]{12}\\mydir$' $anonymize --hash-hostnames <<< '\\test.domain.com\mydir'
+    run_grep '-host [a-f0-9]{12}' $anonymize --hash-hostnames <<< '-host blah'
 fi
 
 # ============================================================================ #
@@ -352,6 +353,9 @@ dest[89]="hostname=<hostname>"
 
 src[90]="hostname=test.domain.com"
 dest[90]="hostname=<fqdn>"
+
+src[91]="host went away"
+dest[91]="host went away"
 
 
 # check escape codes get stripped if present (eg. if piping from grep --color-yes)
