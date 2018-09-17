@@ -40,6 +40,9 @@ start_time="$(start_timer "$anonymize")"
 # ============================================================================ #
 
 if [ -z "$test_nums" ]; then
+    echo
+    echo "Running Custom Tests:"
+    echo
     echo "checking file args:"
     run++
     if [ `$anonymize -ae README.md | wc -l` -gt 100 ]; then
@@ -59,6 +62,8 @@ if [ -z "$test_nums" ]; then
 
     echo "testing --hash-hostnames:"
     run_grep "^http://[a-f0-9]{12}:80/path$" $anonymize --hash-hostnames <<< "http://test.domain.com:80/path"
+    run_grep '^\\\\[a-f0-9]{12}\\mydir$' $anonymize --hash-hostnames <<< '\\test.domain.com\mydir'
+    run_grep '-host [a-f0-9]{12}' $anonymize --hash-hostnames <<< '-host blah'
 fi
 
 # ============================================================================ #
@@ -151,8 +156,8 @@ dest[26]="user: <user> password: <password> bar"
 src[27]="SomeClass\$method:20 something happened"
 dest[27]="SomeClass\$method:20 something happened"
 
-#src[28]="-passphase 'foo'"
-#dest[28]="-passphrase '<password>'"
+src[28]="-passphrase 'foo'"
+dest[28]="-passphrase <password>"
 
 src[29]=" at host.domain.com(Thread.java:789)"
 dest[29]=" at host.domain.com(Thread.java:789)"
@@ -270,8 +275,8 @@ dest[65]="objectSid:: <objectsid>"
 src[66]="sAMAccountName: hari"
 dest[66]="sAMAccountName: <samaccountname>"
 
-#src[67]="sAMAccountName: hari"
-#dest[67]="sAMAccountName: <sAMAccountName>"
+src[67]="sAMAccountName: hari"
+dest[67]="sAMAccountName: <samaccountname>"
 
 src[68]="objectCategory: CN=Person,CN=Schema,CN=Configuration,DC=MyDomain,DC=com"
 #dest[68]="objectCategory: CN=Person,CN=Schema,CN=Configuration,DC=<domain>,DC=<domain>"
@@ -331,6 +336,7 @@ dest[83]=" --group-name=<group>"
 src[84]="ldap:///dc=example,dc=com??sub?(givenName=John)"
 dest[84]="ldap:///dc=<dc>,dc=<dc>??sub?(givenName=<givenname>)"
 
+# check we don't replace IP type things that are not really IPs because too many octets
 src[85]="ip-1-2-3-4-5"
 dest[85]="ip-1-2-3-4-5"
 
@@ -340,11 +346,31 @@ dest[86]="dip-1-2-3-4-5"
 src[87]="1.2.3.4.5"
 dest[87]="1.2.3.4.5"
 
+src[88]="-host blah"
+dest[88]="-host <hostname>"
+
+src[89]="--hostname=blah --anotherswitch"
+dest[89]="-hostname=<hostname> --anotherswitch"
+
+src[90]="host=test"
+dest[90]="host=<hostname>"
+
+src[91]="host went away"
+dest[91]="host went away"
+
+src[92]="hostname=blah;port=92"
+dest[92]="hostname=<hostname>;port=92"
+
+# check we replace all occurences along line
+src[93]="hari@domain.com, hari@domain2.co.uk"
+dest[93]="<user>@<domain>, <user>@<domain>"
+
+
 # check escape codes get stripped if present (eg. if piping from grep --color-yes)
 #src[88]="some^[[01;31m^[[Khost^[[m^[[Kname:443"
 #src[88]="some\e[01;31m\e[Khost\e[m\e[K:443"
-src[88]="$(echo somehost:443 | grep --color=yes host)"
-dest[88]="<hostname>:443"
+src[99]="$(echo somehost:443 | grep --color=yes host)"
+dest[99]="<hostname>:443"
 
 args="-aPe"
 test_anonymize(){
@@ -355,7 +381,7 @@ test_anonymize(){
     # didn't work for \e escape codes for ANSI stripping test
     #result="$(echo -e "$src" | $anonymize $args)"
     result="$($anonymize $args <<< "$src")"
-    if grep -xFq "$dest" <<< "$result"; then
+    if grep -xFq -- "$dest" <<< "$result"; then
         echo -n "SUCCEEDED anonymization test $i"
         if [ -n "${SHOW_OUTPUT:-}" ]; then
             echo " => $dest"
@@ -373,7 +399,7 @@ test_anonymize(){
 
 if [ -n "$test_nums" ]; then
     for test_num in $test_nums; do
-        grep -q '^[[:digit:]]\+$' <<< "$test_num" || { echo "invalid test '$test_num', not a positive integer"; exit 2; }
+        grep -q -- '^[[:digit:]]\+$' <<< "$test_num" || { echo "invalid test '$test_num', not a positive integer"; exit 2; }
         i=$test_num
         [ -n "${src[$i]:-}" ]  || { echo "invalid test number given: src[$i] not defined"; exit 1; }
         [ -n "${dest[$i]:-}" ] || { echo "code error: dest[$i] not defined"; exit 1; }
@@ -397,9 +423,15 @@ run_tests(){
         fi
     done
 }
+
+echo
+echo "Running Standard Tests with --all --skip-exceptions"
+echo
 run_tests  # ignore_run_unqualified
 
-echo "tests preseving text without --network enabled:"
+echo
+echo "Running Tests preseving text without --network enabled:"
+echo
 # check normal don't strip these
 src[101]="reading password from foo"
 dest[101]="reading password from foo"
@@ -410,7 +442,9 @@ dest[102]="some description = blah, module = foo"
 args="-HKEiux"
 run_tests 101 102  # ignore_run_unqualified
 
-echo "network specific tests:"
+echo
+echo "Running Network Specific Tests:"
+echo
 # now check --network / --cisco / --juniper do strip these
 src[103]="reading password from bar"
 dest[103]="reading password <cisco_password>"

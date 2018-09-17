@@ -89,7 +89,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.2'
+__version__ = '0.8.3'
 
 
 class Anonymize(CLI):
@@ -140,14 +140,6 @@ class Anonymize(CLI):
         self.negative_host_lookbehind = r'(?<!\.java)' + \
                                         r'(?<!\.py)' + \
                                         r'(?<!\sid)'
-        # don't use this simpler one as we want to catch everything inside quotes eg. 'my secret'
-        #password_quoted = r'\S+'
-        password_quoted = r'(?:\'[^\']+\'|"[^"]+"|\S+)'
-        user_name = r'(?:user(?:-?name)?|uid)'
-        group_name = r'group(?:-?name)?'
-        arg_sep = r'[=\s:]+'
-        # openssl uses -passin switch
-        pass_word_phrase = r'(?:pass(?:word|phrase|in)?|userPassword)'
         ldap_rdn_list = [
             # country isn't exactly secret information worth anonymizing in most cases
             #'C',
@@ -273,12 +265,27 @@ class Anonymize(CLI):
         ]
         # comment this line out for performance if you're positive you don't use these attributes
         ldap_attributes.extend(extra_ldap_attribs)
+        # MSSQL ODBC
+        #ldap_attributes.extend(['DatabaseName'])
+        # Hive ODBC / JDBC
+        #ldap_attributes.extend(['HS2KrbRealm', 'dbName'])
+        # don't use this simpler one as we want to catch everything inside quotes eg. 'my secret'
+        #password_quoted = r'\S+'
+        password_quoted = r'(?:\'[^\']+\'|"[^"]+"|\S+)'
+        user_name = r'(?:user(?:-?name)?|uid)'
+        group_name = r'group(?:-?name)?'
+        arg_sep = r'[=\s:]+'
+        # openssl uses -passin switch
+        pass_word_phrase = r'(?:pass(?:word|phrase|in)?|userPassword)'
         self.regex = {
             # don't change hostname or fqdn regex without updating hash_hostnames() option parse
             # since that replaces these replacements and needs to match the grouping captures and surrounding format
             'hostname2': r'({aws_host_ip})(?!-\d)'.format(aws_host_ip=aws_host_ip_regex),
             'hostname3': r'(\w+://)({hostname})'.format(hostname=hostname_regex),
             'hostname4': r'\\\\({hostname})'.format(hostname=hostname_regex),
+            # no \bhost - want to match KrbHost
+            'hostname5': r'(-host(?:name)?{sep}|host(?:name)?\s*=\s*)({hostname})'\
+                         .format(sep=arg_sep, hostname=hostname_regex),
             # use more permissive hostname_regex to catch Kerberos @REALM etc
             'domain2': '@{host}'.format(host=hostname_regex),
             'group': r'(-{group_name}{sep})\S+'.format(group_name=group_name, sep=arg_sep),
@@ -363,7 +370,8 @@ class Anonymize(CLI):
             #'hostname2': '<aws_hostname>',
             'hostname2': r'<ip-x-x-x-x>',
             'hostname3': r'\1<hostname>',
-            'hostname4': r'\\\\<hostname>'.format(host=hostname_regex),
+            'hostname4': r'\\\\<hostname>',
+            'hostname5': r'\1<hostname>',
             'domain2': '@<domain>',
             'port': ':<port>',
             'user': r'\1<user>',
@@ -487,7 +495,7 @@ class Anonymize(CLI):
                           r'this as user/host\@realm to user/<email_regex>, which would have exposed \'user\'' + \
                           '. Auto enables --email, --domain and --fqdn')
         self.add_opt('-L', '--ldap', action='store_true',
-                     help='Apply LDAP anonymization (CN, DN, OU, user/group ldap object attributes)')
+                     help='Apply LDAP anonymization (~100 attribs eg. CN, DN, OU, UID, sAMAccountName, memberOf...)')
         self.add_opt('-E', '--email', action='store_true',
                      help='Apply email format anonymization')
         self.add_opt('-x', '--proxy', action='store_true',
@@ -565,6 +573,7 @@ class Anonymize(CLI):
         if self.get_opt('hash_hostnames'):
             host = True
             self.hash_salt = md5(open(__file__).read()).hexdigest()
+            # will end up double hashing FQDNs that are already hashed to 12 char alnum
             self.replacements['hostname'] = lambda match: r'{hostname}:{port}'\
                                             .format(hostname=self.hash_host(match.group(1)), port=match.group(2))
             self.replacements['hostname2'] = lambda match: r'{ip}'.format(ip=self.hash_host(match.group(1)))
@@ -572,8 +581,10 @@ class Anonymize(CLI):
                                              .format(protocol=match.group(1),
                                                      hostname=self.hash_host(match.group(2))
                                                     )
-            self.replacements['hostname4'] = lambda match: r'\\\\{hostname}'\
+            self.replacements['hostname4'] = lambda match: r'\\{hostname}'\
                                              .format(hostname=self.hash_host(match.group(1)))
+            self.replacements['hostname5'] = lambda match: r'{switch}{hostname}'\
+                                             .format(switch=match.group(1), hostname=self.hash_host(match.group(2)))
             self.replacements['fqdn'] = lambda match: self.hash_host(match.group(1))
         if host:
             for _ in ('hostname', 'fqdn', 'domain'):
