@@ -99,7 +99,7 @@ Environment variables are supported for convenience and also to hide credentials
   - ```hbase_regions_least_used.py``` - finds topN biggest/smallest regions across given RegionServers than have received the least requests (requests below a given threshold)
 - [OpenTSDB](http://opentsdb.net/):
   - ```opentsdb_import_metric_distribution.py``` - calculates metric distribution in bulk import file(s) to find data skew and help avoid HBase region hotspotting
-  - ```opentsdb_list_metrics.sh``` - lists OpenTSDB metric names, tagk or tagv from HBase and optionally their created date, sorted ascending
+  - ```opentsdb_list_metrics*.sh``` - lists OpenTSDB metric names, tagk or tagv via OpenTSDB API or directly from HBase tables with optionally their created date, sorted ascending
 - [Pig](https://pig.apache.org/)
   - ```pig-text-to-elasticsearch.pig``` - bulk index unstructured files in [Hadoop](http://hadoop.apache.org/) to [Elasticsearch](https://www.elastic.co/products/elasticsearch)
   - ```pig-text-to-solr.pig``` - bulk index unstructured files in [Hadoop](http://hadoop.apache.org/) to [Solr](http://lucene.apache.org/solr/) / [SolrCloud clusters](https://wiki.apache.org/solr/SolrCloud)
