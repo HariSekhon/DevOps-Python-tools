@@ -119,7 +119,6 @@ import Queue
 import traceback
 from random import shuffle
 try:
-    #from bs4 import BeautifulSoup
     import requests
 except ImportError:
     print(traceback.format_exc(), end='')
