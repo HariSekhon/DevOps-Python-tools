@@ -53,14 +53,19 @@ if [ -z "$test_nums" ]; then
     fi
     hr
 
-    echo "testing --email replacememnt format:"
     run_grep "<user>@<domain>" $anonymize --email <<< "hari@domain.com"
     run_grep "<user>@<domain>" $anonymize -E <<< "hari@domain.com"
 
-    echo "testing --ip-prefix behaviour:"
+    run_grep "<ip_x.x.x>.1" $anonymize -a --ip-prefix <<< "4.3.2.1"
+    run_grep "<ip_x.x.x>.1/<cidr_mask>" $anonymize --ip-prefix <<< "4.3.2.1/24"
     run_grep "<ip_x.x.x>.1" $anonymize --ip-prefix <<< "4.3.2.1"
+    run_grep "<ip-x-x-x>.4" $anonymize --ip-prefix <<< "ip-1-2-3-4"
+    run_grep "ip-1-2-3-4-5" $anonymize --ip-prefix <<< "ip-1-2-3-4-5"
+    run_grep "dip-1-2-3-4" $anonymize --ip-prefix <<< "dip-1-2-3-4"
+    run_grep "5.4.3.2.1" $anonymize --ip-prefix <<< "5.4.3.2.1"
+    run_grep "log4j-1.2.3.4.jar" $anonymize --ip-prefix <<< "log4j-1.2.3.4.jar"
+    run_grep "/usr/hdp/2.6.2.0-123" $anonymize --ip-prefix <<< "/usr/hdp/2.6.2.0-123"
 
-    echo "testing --hash-hostnames:"
     run_grep "^http://[a-f0-9]{12}:80/path$" $anonymize --hash-hostnames <<< "http://test.domain.com:80/path"
     run_grep '^\\\\[a-f0-9]{12}\\mydir$' $anonymize --hash-hostnames <<< '\\test.domain.com\mydir'
     run_grep '-host [a-f0-9]{12}' $anonymize --hash-hostnames <<< '-host blah'
@@ -340,8 +345,8 @@ dest[84]="ldap:///dc=<dc>,dc=<dc>??sub?(givenName=<givenname>)"
 src[85]="ip-1-2-3-4-5"
 dest[85]="ip-1-2-3-4-5"
 
-src[86]="dip-1-2-3-4-5"
-dest[86]="dip-1-2-3-4-5"
+src[86]="dip-1-2-3-4"
+dest[86]="dip-1-2-3-4"
 
 src[87]="1.2.3.4.5"
 dest[87]="1.2.3.4.5"
@@ -350,7 +355,7 @@ src[88]="-host blah"
 dest[88]="-host <hostname>"
 
 src[89]="--hostname=blah --anotherswitch"
-dest[89]="-hostname=<hostname> --anotherswitch"
+dest[89]="--hostname=<hostname> --anotherswitch"
 
 src[90]="host=test"
 dest[90]="host=<hostname>"
@@ -364,6 +369,15 @@ dest[92]="hostname=<hostname>;port=92"
 # check we replace all occurences along line
 src[93]="hari@domain.com, hari@domain2.co.uk"
 dest[93]="<user>@<domain>, <user>@<domain>"
+
+src[94]="spark://hari@192.168.0.1"
+dest[94]="spark://<user>@<ip_x.x.x.x>"
+
+src[95]="/usr/hdp/2.6.2.0-123/blah"
+dest[95]="/usr/hdp/2.6.2.0-123/blah"
+
+src[96]="log4j-1.2.3.4.jar"
+dest[96]="log4j-1.2.3.4.jar"
 
 
 # check escape codes get stripped if present (eg. if piping from grep --color-yes)
