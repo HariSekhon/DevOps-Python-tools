@@ -89,7 +89,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.3'
+__version__ = '0.8.4'
 
 
 class Anonymize(CLI):
@@ -111,8 +111,8 @@ class Anonymize(CLI):
         self.hash_salt = None
         # order of iteration of application matters because we must do more specific matches before less specific ones
         self.anonymizations = OrderedDict([
-            ('ip', False),
             ('ip_prefix', False),
+            ('ip', False),
             ('subnet_mask', False),
             ('mac', False),
             ('kerberos', False),
@@ -308,8 +308,13 @@ class Anonymize(CLI):
                                  sep=arg_sep,
                                  pass_word_phrase=pass_word_phrase,
                                  pw=password_quoted),
+            'ip': r'(?<!\d\.)' + ip_regex + r'/\d{1,2}',
+            'ip2': r'(?<!\d\.)' + ip_regex + r'(?![.-]\w)',
             'ip3': aws_host_ip_regex + r'(?!-\d)',
-            'ip_prefix': r'{}(?!\.\d+\.\d+)'.format(ip_prefix_regex),
+            'ip_prefix': r'(?<!\d\.)' + ip_prefix_regex + r'(\d+)/\d{1,2}',
+            'ip_prefix2': r'(?<!\d\.)' + ip_prefix_regex + r'(\d+)(?![.-]\w)',
+            'ip_prefix3': r'\bip-\d+-\d+-\d+-(\d+)(?!-\d)',
+            'subnet_mask': r'(?<!\d\.)' + subnet_mask_regex + r'(?![^:]\w)',
             # network device format Mac address
             'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',
             # _HOST and HTTP are commonly use in Hadoop clusters, let's make sure they are left for debugging purposes
@@ -389,7 +394,9 @@ class Anonymize(CLI):
             'ip': r'<ip_x.x.x.x>/<cidr_mask>',
             'ip2': r'<ip_x.x.x.x>',
             'ip3': r'<ip-x-x-x-x>',
-            'ip_prefix': r'<ip_x.x.x>.',
+            'ip_prefix': r'<ip_x.x.x>.\1/<cidr_mask>',
+            'ip_prefix2': r'<ip_x.x.x>.\1',
+            'ip_prefix3': r'<ip-x-x-x>.\1',
             'subnet_mask': r'<subnet_x.x.x.x>',
             'kerberos': r'host/\1@<domain>',
             'kerberos2': r'host/<instance>@<domain>',
@@ -539,6 +546,9 @@ class Anonymize(CLI):
                 if _ == 'ip_prefix':
                     continue
                 self.anonymizations[_] = True
+            if self.get_opt('ip_prefix'):
+                self.anonymizations['ip_prefix'] = True
+                self.anonymizations['ip'] = False
         else:
             for _ in self.anonymizations:
                 if _ in ('subnet_mask', 'mac', 'group'):
@@ -702,11 +712,6 @@ class Anonymize(CLI):
                      r'(?!\(\w+\.java:\d+\))' + \
                      self.negative_host_lookbehind
                     )
-        ip_regex_strict = r'(?<!\d\.)' + ip_regex + r'(?![^:/]\d+)'
-        self.compile('ip', ip_regex_strict + r'/\d{1,2}')
-        self.compile('ip2', ip_regex_strict)
-        self.compile('subnet_mask', r'(?<!\d\.)' + subnet_mask_regex + r'(?![^:]\d+)')
-        self.compile('ip_prefix', r'(?<!\d\.)' + ip_prefix_regex + r'(?!\.\d+\.\d+)')
         re_regex_ending = re.compile('_regex$')
         # auto-populate any *_regex to self.regex[name] = name_regex
         for _ in globals():
