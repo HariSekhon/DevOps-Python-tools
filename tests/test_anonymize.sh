@@ -379,12 +379,27 @@ dest[95]="/usr/hdp/2.6.2.0-123/blah"
 src[96]="log4j-1.2.3.4.jar"
 dest[96]="log4j-1.2.3.4.jar"
 
-
 # check escape codes get stripped if present (eg. if piping from grep --color-yes)
 #src[88]="some^[[01;31m^[[Khost^[[m^[[Kname:443"
 #src[88]="some\e[01;31m\e[Khost\e[m\e[K:443"
 src[99]="$(echo somehost:443 | grep --color=yes host)"
 dest[99]="<hostname>:443"
+
+src[100]="-Dhost=blah"
+dest[100]="-Dhost=<hostname>"
+
+src[101]="-Ddomain.com=blah"
+dest[101]="-Ddomain.com=blah"
+
+src[102]="-Dhost.domain.com=blah"
+dest[102]="-Dhost.domain.com=blah"
+
+# TODO: move proxy hosts to host matches and re-enable
+#src[103]="proxy blah port 8080"
+#dest[103]="proxy <proxy_host> port <proxy_port>"
+
+#src[104]="Connected to blah (1.2.3.4) port 8080"
+#dest[104]="Connected to <proxy_host> (<proxy_ip>) port <proxy_port>"
 
 args="-aPe"
 test_anonymize(){
@@ -447,27 +462,27 @@ echo
 echo "Running Tests preseving text without --network enabled:"
 echo
 # check normal don't strip these
-src[101]="reading password from foo"
-dest[101]="reading password from foo"
+src[901]="reading password from foo"
+dest[901]="reading password from foo"
 
-src[102]="some description = blah, module = foo"
-dest[102]="some description = blah, module = foo"
+src[902]="some description = blah, module = foo"
+dest[902]="some description = blah, module = foo"
 
-args="-HKEiux"
-run_tests 101 102  # ignore_run_unqualified
+args="-HKEiu"
+run_tests 901 902  # ignore_run_unqualified
 
 echo
 echo "Running Network Specific Tests:"
 echo
 # now check --network / --cisco / --juniper do strip these
-src[103]="reading password from bar"
-dest[103]="reading password <cisco_password>"
+src[903]="reading password from bar"
+dest[903]="reading password <cisco_password>"
 
-src[104]="some description = blah, module=bar"
-dest[104]="some description <cisco_description>"
+src[904]="some description = blah, module=bar"
+dest[904]="some description <cisco_description>"
 
 args="--network"
-run_tests 103 104  # ignore_run_unqualified
+run_tests 903 904  # ignore_run_unqualified
 
 if [ -n "$parallel" ]; then
     # can't trust exit code for parallel yet, only for quick local testing
