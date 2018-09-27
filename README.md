@@ -69,7 +69,7 @@ Environment variables are supported for convenience and also to hide credentials
   - ```anonymize_custom.conf``` - put regex of your Name/Company/Project/Database/Tables to anonymize to ```<custom>```
   - placeholder tokens indicate what was stripped out (eg. ```<fqdn>```, ```<password>```, ```<custom>```)
   - ```--ip-prefix``` leaves the last IP octect to aid in cluster debugging to still see differentiated nodes communicating with each other to compare configs and log communications
-  - ```--hash-hostnames``` - generates salted hashes that look like Docker temporary container ids so that vendors support teams can differentiate hosts in clusters
+  - ```--hash-hostnames``` - generates salted hostname hashes that look like Docker temporary container IDs so that vendors support teams can differentiate hosts in clusters
 - [Spark](https://spark.apache.org/) & Data Format Converters:
   - ```spark_avro_to_parquet.py``` - PySpark Avro => Parquet converter
   - ```spark_parquet_to_avro.py``` - PySpark Parquet => Avro converter
