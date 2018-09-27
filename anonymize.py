@@ -89,7 +89,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.4'
+__version__ = '0.8.5'
 
 
 class Anonymize(CLI):
@@ -121,7 +121,6 @@ class Anonymize(CLI):
             ('ldap', False),
             ('user', False),
             ('group', False),
-            ('proxy', False),
             ('http_auth', False),
             ('cisco', False),
             ('screenos', False),
@@ -130,6 +129,7 @@ class Anonymize(CLI):
             ('fqdn', False),
             ('domain', False),
             ('hostname', False),
+            #('proxy', False),
             ('windows', False),
             ('custom', False),
         ])
@@ -339,9 +339,8 @@ class Anonymize(CLI):
                      .format(ldap_attribs='|'.join(ldap_attributes), ldap_values=ldap_values),
             'port': r'{host}:\d+(?!\.?[\w-])'.format(host=host_regex),
             'proxy': r'proxy {} port \d+'.format(host_regex),
-            'proxy2': 'Trying' + ip_regex,
-            'proxy3': 'Connected to ' + host_regex + r'\($ip_regex\) port \d+',
-            'proxy4': r'(Via:\s\S+\s)' + ip_regex + '.*',
+            'proxy2': 'Connected to ' + host_regex + r'\s*\(' + ip_regex + r'|[^\)]+\) port \d+',
+            #'proxy3': r'(Via:\s\S+\s)' + ip_regex + '.*',
             'http_auth': r'(https?:\/\/)[^:]+:[^\@]*\@',
             'http_auth2': r'(Proxy auth using \w+ with user )([\'"]).+([\'"])',
             'http_auth3': r'\bAuthorization:\s+Basic\s+[A-Za-z0-9]+',
@@ -409,12 +408,11 @@ class Anonymize(CLI):
             'ldap2': ldap_lambda_lowercase,
             'ldap3': ldap_lambda_lowercase,
             'proxy': r'proxy <proxy_host> port <proxy_port>',
-            'proxy2': r'Trying <proxy_ip>',
-            'proxy3': r'Connected to <proxy_host> (<proxy_ip>) port <proxy_port>',
+            'proxy2': r'Connected to <proxy_host> (<proxy_ip>) port <proxy_port>',
+            'proxy3': r'\1<proxy_ip>',
             'http_auth': r'$1<user>:<password>@',
             'http_auth2': r'\1\'<proxy_user>\2\3/',
             'http_auth3': r'Authorization: Basic <token>',
-            'proxy4': r'\1<proxy_ip>',
             'cisco': r'username <username> password <password>',
             'cisco2': r'password <cisco_password>',
             'cisco3': r'secret <secret>',
@@ -505,9 +503,9 @@ class Anonymize(CLI):
                      help='Apply LDAP anonymization (~100 attribs eg. CN, DN, OU, UID, sAMAccountName, memberOf...)')
         self.add_opt('-E', '--email', action='store_true',
                      help='Apply email format anonymization')
-        self.add_opt('-x', '--proxy', action='store_true',
-                     help='Apply anonymization to remove proxy host, user etc (eg. from curl -iv output). You ' + \
-                          'should probably also apply --ip and --host if using this. Auto enables --http-auth')
+        #self.add_opt('-x', '--proxy', action='store_true',
+        #             help='Apply anonymization to remove proxy host, user etc (eg. from curl -iv output). You ' + \
+        #                  'should probably also apply --ip and --host if using this. Auto enables --http-auth')
         self.add_opt('-N', '--network', action='store_true',
                      help='Apply all network anonymization, whether Cisco, ScreenOS, JunOS for secrets, auth, ' + \
                           'usernames, passwords, md5s, PSKs, AS, SNMP etc.')
@@ -603,8 +601,8 @@ class Anonymize(CLI):
             self.anonymizations['email'] = True
             self.anonymizations['domain'] = True
             self.anonymizations['fqdn'] = True
-        if self.anonymizations['proxy']:
-            self.anonymizations['http_auth'] = True
+        #if self.anonymizations['proxy']:
+        #    self.anonymizations['http_auth'] = True
 
     def _process_options_network(self):
         if self.anonymizations['network']:
@@ -661,7 +659,7 @@ class Anonymize(CLI):
                     log.warning('ignoring invalid regex from %s: %s', os.path.basename(filename), line)
                     continue
                 if boundary:
-                    line = r'(\b|[^A-Za-z])' + line + r'(\b|[^A-Za-z])'
+                    line = r'(?:(?<=\b)|(?<=[^A-Za-z]))' + line + r'(?=\b|[^A-Za-z])'
                 regex_list.append(line)
         raw = '|'.join(regex_list)
         #log.debug('custom_raw: %s', raw)
@@ -697,16 +695,24 @@ class Anonymize(CLI):
                      self.negative_host_lookbehind + r':(\d{1,5}(?!\.?\w))',
                     )
         self.compile('domain',
+                     # don't match java -some.net.property
+                     #r'(?<!-)' + \
                      r'(?!' + self.custom_ignores_raw + ')' + \
                      domain_regex_strict + \
+                     # don't match java -Dsome.net.property=
+                     r'(?!=)' + \
                      r'(?!\.[A-Za-z])(\b|$)' + \
                      # ignore Java stack traces eg. at SomeClass(Thread.java;789)
                      r'(?!\(\w+\.java:\d+\))' + \
                      self.negative_host_lookbehind
                     )
         self.compile('fqdn',
+                     # don't match java -some.net.property
+                     #r'(?<!-)' + \
                      r'(?!' + self.custom_ignores_raw + ')' + \
                      '(' + fqdn_regex + ')' + \
+                     # don't match java -Dsome.net.property=
+                     r'(?!=)' + \
                      r'(?!\.[A-Za-z])(\b|$)' + \
                      # ignore Java stack traces eg. at SomeClass(Thread.java;789)
                      r'(?!\(\w+\.java:\d+\))' + \
@@ -798,9 +804,12 @@ class Anonymize(CLI):
         return line
 
     def anonymize_custom(self, line):
+        i = 0
         for regex in self.custom_anonymizations:
-            line = regex.sub(r'\1<custom>\2', line)
+            i += 1
+            line = regex.sub(r'<custom>', line)
             #line = re.sub(regex, r'\1<custom>\2', line)
+            log.debug('anonymize_custom: %s => %s', i, line)
         return line
 
     @staticmethod
