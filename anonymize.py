@@ -500,7 +500,8 @@ class Anonymize(CLI):
                           r'this as user/host\@realm to user/<email_regex>, which would have exposed \'user\'' + \
                           '. Auto enables --email, --domain and --fqdn')
         self.add_opt('-L', '--ldap', action='store_true',
-                     help='Apply LDAP anonymization (~100 attribs eg. CN, DN, OU, UID, sAMAccountName, memberOf...)')
+                     help='Apply LDAP anonymization ' + \
+                          '(~100 attribs eg. CN, DN, OU, UID, sAMAccountName, member, memberOf...)')
         self.add_opt('-E', '--email', action='store_true',
                      help='Apply email format anonymization')
         #self.add_opt('-x', '--proxy', action='store_true',
