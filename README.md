@@ -69,7 +69,8 @@ Environment variables are supported for convenience and also to hide credentials
   - ```anonymize_custom.conf``` - put regex of your Name/Company/Project/Database/Tables to anonymize to ```<custom>```
   - placeholder tokens indicate what was stripped out (eg. ```<fqdn>```, ```<password>```, ```<custom>```)
   - ```--ip-prefix``` leaves the last IP octect to aid in cluster debugging to still see differentiated nodes communicating with each other to compare configs and log communications
-  - ```--hash-hostnames``` - generates salted hostname hashes that look like Docker temporary container IDs so that vendors support teams can differentiate hosts in clusters
+  - ```--hash-hostnames``` - hashes hostnames to look like Docker temporary container ID hostnames so that vendors support teams can differentiate hosts in clusters
+- ```find_duplicate_files.py``` - finds duplicate files in one or more directory trees via multiple methods including file basename, size, MD5 comparison of same sized files, or bespoke regex capture of partial file basename
 - [Spark](https://spark.apache.org/) & Data Format Converters:
   - ```spark_avro_to_parquet.py``` - PySpark Avro => Parquet converter
   - ```spark_parquet_to_avro.py``` - PySpark Parquet => Avro converter
@@ -81,7 +82,6 @@ Environment variables are supported for convenience and also to hide credentials
   - ```xml_to_json.py``` - XML to JSON converter
   - ```json_docs_to_bulk_multiline.py``` - converts json files to bulk multi-record one-line-per-json-document format for pre-processing and loading to big data systems like [Hadoop](http://hadoop.apache.org/) and [MongoDB](https://www.mongodb.com/), can recurse directory trees, and mix json-doc-per-file / bulk-multiline-json / directories / standard input, combines all json documents and outputs bulk-one-json-document-per-line to standard output for convenient command line chaining and redirection, optionally continues on error, collects broken records to standard error for logging and later reprocessing for bulk batch jobs, even supports single quoted json while not technically valid json is used by MongoDB and even handles embedded double quotes in 'single quoted json'
   - see also ```validate_*.py``` further down for all these formats and more
-- ```find_duplicate_files.py``` - finds duplicate files in one or more directory trees via multiple methods including file basename, size, MD5 comparison of same sized files, or bespoke regex capture of partial file basename
 - [Ambari](https://hortonworks.com/apache/ambari/):
   - ```ambari_blueprints.py``` - Blueprint cluster templating and deployment tool using Ambari API
     - list blueprints
