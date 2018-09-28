@@ -142,7 +142,7 @@ Environment variables are supported for convenience and also to hide credentials
     - ```travis_last_log.py``` - fetches [Travis CI](https://travis-ci.org/) latest running / completed / failed build log for given repo - useful for quickly getting the log of the last failed build when CCMenu or BuildNotify applets turn red
     - ```travis_debug_session.py``` - launches a [Travis CI](https://travis-ci.org/) interactive debug build session via Travis API, tracks session creation and drops user straight in to the SSH shell on the remote Travis build, very convenient one shot debug launcher for Travis CI
 - Data Validation (useful in CI):
-- ```validate_*.py``` - validate files, directory trees and/or standard input streams
+  - ```validate_*.py``` - validate files, directory trees and/or standard input streams
     - supports the following file formats:
       - Avro
       - CSV
