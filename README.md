@@ -73,7 +73,7 @@ Environment variables are supported for convenience and also to hide credentials
     - ```--hash-hostnames``` - hashes hostnames to look like Docker temporary container ID hostnames so that vendors support teams can differentiate hosts in clusters
   - ```find_duplicate_files.py``` - finds duplicate files in one or more directory trees via multiple methods including file basename, size, MD5 comparison of same sized files, or bespoke regex capture of partial file basename
   - ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user to put in your shell's ```.profile``` (there is also a perl version in my [DevOps Perl Tools](https://github.com/harisekhon/perl-tools) repo)
-- Hadoop Ecosystem:
+- Hadoop & NoSQL:
   - [Spark](https://spark.apache.org/) & Data Format Converters:
     - ```spark_avro_to_parquet.py``` - PySpark Avro => Parquet converter
     - ```spark_parquet_to_avro.py``` - PySpark Parquet => Avro converter
