@@ -89,7 +89,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.5'
+__version__ = '0.8.6'
 
 
 class Anonymize(CLI):
@@ -309,12 +309,12 @@ class Anonymize(CLI):
                                  pass_word_phrase=pass_word_phrase,
                                  pw=password_quoted),
             'ip': r'(?<!\d\.)' + ip_regex + r'/\d{1,2}',
-            'ip2': r'(?<!\d\.)' + ip_regex + r'(?![.-]\w)',
-            'ip3': aws_host_ip_regex + r'(?!-\d)',
+            'ip2': r'(?<!\d\.)' + ip_regex + r'(?!\w*[.-]\w)',
+            'ip3': aws_host_ip_regex + r'(?!-)',
             'ip_prefix': r'(?<!\d\.)' + ip_prefix_regex + r'(\d+)/\d{1,2}',
-            'ip_prefix2': r'(?<!\d\.)' + ip_prefix_regex + r'(\d+)(?![.-]\w)',
-            'ip_prefix3': r'\bip-\d+-\d+-\d+-(\d+)(?!-\d)',
-            'subnet_mask': r'(?<!\d\.)' + subnet_mask_regex + r'(?![^:]\w)',
+            'ip_prefix2': r'(?<!\d\.)' + ip_prefix_regex + r'(\d+)(?!\w*[.-]\w)',
+            'ip_prefix3': r'\bip-\d+-\d+-\d+-(\d+)(?!-)',
+            'subnet_mask': r'(?<!\d\.)' + subnet_mask_regex + r'(?!-|\w*[.-:]\w)',
             # network device format Mac address
             'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',
             # _HOST and HTTP are commonly use in Hadoop clusters, let's make sure they are left for debugging purposes
