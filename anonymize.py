@@ -89,7 +89,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.6'
+__version__ = '0.8.7'
 
 
 class Anonymize(CLI):
@@ -294,7 +294,8 @@ class Anonymize(CLI):
             'user': r'(-{user_name}{sep})\S+'.format(user_name=user_name, sep=arg_sep),
             'user2': r'/home/{user}'.format(user=user_regex),
             'user3': r'({user_name}{sep}){user}'.format(user_name=user_name, sep=arg_sep, user=user_regex),
-            'user4': r'(?<![\w\\])\w+\\{user}(?!\\)'.format(user=user_regex),
+            'user4': r'(?<![\w\\]){NT_DOMAIN}(?!\\n\d\d\d\d-\d\d-\d\d)\\{user}(?!\\)'\
+                     .format(NT_DOMAIN=r'\b[\w-]{1,15}\b', user=user_regex),
             'user5': r'for\s+user\s+{user}'.format(user=user_regex),
             # (?<!>/) exclude patterns '>/' where we have already matched and token replaced
             'user6': r'(?<!<user>/){user}@'.format(user=user_regex),
