@@ -137,7 +137,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.2'
+__version__ = '0.8.3'
 
 
 class FindActiveServer(CLI):
@@ -419,7 +419,8 @@ class FindActiveServer(CLI):
             log.info('%s - checking regex against content', url)
             # if this ends up not being processed properly and remains a string instead
             # of the expected compiled regex, then .search() will hang
-            assert not isStr(self.regex)
+            if not isStr(self.regex):
+                die('non-string supplied for regex!')
             if self.regex.search(req.content):
                 log.info('%s - regex matched http output', url)
             else:
