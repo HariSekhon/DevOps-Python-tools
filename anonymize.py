@@ -89,7 +89,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.7'
+__version__ = '0.8.8'
 
 
 class Anonymize(CLI):
@@ -286,11 +286,13 @@ class Anonymize(CLI):
             # no \bhost - want to match KrbHost
             'hostname5': r'(-host(?:name)?{sep}|host(?:name)?\s*=\s*)({hostname})'\
                          .format(sep=arg_sep, hostname=hostname_regex),
+            'hostname6': r'(["\']host(?:name)?["\']\s*:\s*["\']?){hostname}'.format(hostname=hostname_regex),
             # use more permissive hostname_regex to catch Kerberos @REALM etc
             'domain2': '@{host}'.format(host=hostname_regex),
             'group': r'(-{group_name}{sep})\S+'.format(group_name=group_name, sep=arg_sep),
             'group2': r'({group_name}{sep}){user}'.format(group_name=group_name, sep=arg_sep, user=user_regex),
             'group3': r'for\s+group\s+{group}'.format(group=user_regex),
+            'group4': r'(["\']{group_name}["\']\s*:\s*["\']?){group}'.format(group_name=group_name, group=user_regex),
             'user': r'(-{user_name}{sep})\S+'.format(user_name=user_name, sep=arg_sep),
             'user2': r'/home/{user}'.format(user=user_regex),
             'user3': r'({user_name}{sep}){user}'.format(user_name=user_name, sep=arg_sep, user=user_regex),
@@ -299,6 +301,7 @@ class Anonymize(CLI):
             'user5': r'for\s+user\s+{user}'.format(user=user_regex),
             # (?<!>/) exclude patterns '>/' where we have already matched and token replaced
             'user6': r'(?<!<user>/){user}@'.format(user=user_regex),
+            'user7': r'(["\'](?:{user_name}|owner)["\']\s*:\s*["\']?){user}'.format(user_name=user_name, user=user_regex),
             'password': r'(-?{pass_word_phrase}{sep}){pw}'\
                         .format(pass_word_phrase=pass_word_phrase,
                                 sep=arg_sep,
@@ -377,6 +380,7 @@ class Anonymize(CLI):
             'hostname3': r'\1<hostname>',
             'hostname4': r'\\\\<hostname>',
             'hostname5': r'\1<hostname>',
+            'hostname6': r'\1<hostname>',
             'domain2': '@<domain>',
             'port': ':<port>',
             'user': r'\1<user>',
@@ -385,9 +389,11 @@ class Anonymize(CLI):
             'user4': r'<domain>\\<user>',
             'user5': 'for user <user>',
             'user6': '<user>@',
+            'user7': r'\1<user>',
             'group': r'\1<group>',
             'group2': r'\1<group>',
             'group3': r'for group <group>',
+            'group4': r'\1<group>',
             'password': r'\1<password>',
             'password2': r'\1<user>:<password>',
             'password3': r'\1<user>\2<password>',
