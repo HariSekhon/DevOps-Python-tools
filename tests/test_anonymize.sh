@@ -409,6 +409,15 @@ dest[104]='..., "user": "<user>", "group": "<group>", "host": "<hostname>", ...'
 src[105]='...,"owner":"blah","hostname":"blah2",...'
 dest[105]='...,"owner":"<user>","hostname":"<hostname>",...'
 
+src[106]="ambari-sudo.sh"
+dest[106]="ambari-sudo.sh"
+
+src[107]="hdfs://user/blah"
+dest[107]="hdfs://<hostname>/<user>"
+
+src[108]="hdfs:///user/blah"
+dest[108]="hdfs:///user/<user>"
+
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
 #dest[103]="proxy <proxy_host> port <proxy_port>"
