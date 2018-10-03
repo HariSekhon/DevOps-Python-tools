@@ -403,6 +403,12 @@ dest[102]="-Dhost.domain.com=blah"
 src[103]="$(echo somehost:443 | grep --color=yes host)"
 dest[103]="<hostname>:443"
 
+src[104]='..., "user": "blah", "group": "blah2", "host": "blah3", ...'
+dest[104]='..., "user": "<user>", "group": "<group>", "host": "<hostname>", ...'
+
+src[105]='...,"owner":"blah","hostname":"blah2",...'
+dest[105]='...,"owner":"<user>","hostname":"<hostname>",...'
+
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
 #dest[103]="proxy <proxy_host> port <proxy_port>"
