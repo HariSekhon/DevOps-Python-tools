@@ -379,11 +379,14 @@ dest[95]="/usr/hdp/2.6.2.0-123/blah"
 src[96]="log4j-1.2.3.4.jar"
 dest[96]="log4j-1.2.3.4.jar"
 
-# check escape codes get stripped if present (eg. if piping from grep --color-yes)
-#src[88]="some^[[01;31m^[[Khost^[[m^[[Kname:443"
-#src[88]="some\e[01;31m\e[Khost\e[m\e[K:443"
-src[99]="$(echo somehost:443 | grep --color=yes host)"
-dest[99]="<hostname>:443"
+src[97]='MYDOMAIN\n2018-10-03 01:23:45'
+dest[97]='MYDOMAIN\n2018-10-03 01:23:45'
+
+src[98]='domain789012345\blah'
+dest[98]='<domain>\<user>'
+
+src[99]='domain7890123456\blah'
+dest[99]='domain7890123456\blah'
 
 src[100]="-Dhost=blah"
 dest[100]="-Dhost=<hostname>"
@@ -393,6 +396,12 @@ dest[101]="-Ddomain.com=blah"
 
 src[102]="-Dhost.domain.com=blah"
 dest[102]="-Dhost.domain.com=blah"
+
+# check escape codes get stripped if present (eg. if piping from grep --color-yes)
+#src[88]="some^[[01;31m^[[Khost^[[m^[[Kname:443"
+#src[88]="some\e[01;31m\e[Khost\e[m\e[K:443"
+src[103]="$(echo somehost:443 | grep --color=yes host)"
+dest[103]="<hostname>:443"
 
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
