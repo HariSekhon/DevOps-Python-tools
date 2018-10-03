@@ -89,7 +89,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.8'
+__version__ = '0.8.9'
 
 
 class Anonymize(CLI):
@@ -137,8 +137,9 @@ class Anonymize(CLI):
             'java_exceptions': False,
             'python_tracebacks': False,
         }
-        self.negative_host_lookbehind = r'(?<!\.java)' + \
-                                        r'(?<!\.py)' + \
+        # Poland is more prominent, cannot exclude .pl from host/domain/fqdn negative lookbehinds
+        ignore_file_exts = ['java', 'py', 'sh', 'pid', 'scala', 'groovy']
+        self.negative_host_lookbehind = ''.join(r'(?<!\.{})'.format(_) for _ in ignore_file_exts) + \
                                         r'(?<!\sid)'
         ldap_rdn_list = [
             # country isn't exactly secret information worth anonymizing in most cases
@@ -294,7 +295,7 @@ class Anonymize(CLI):
             'group3': r'for\s+group\s+{group}'.format(group=user_regex),
             'group4': r'(["\']{group_name}["\']\s*:\s*["\']?){group}'.format(group_name=group_name, group=user_regex),
             'user': r'(-{user_name}{sep})\S+'.format(user_name=user_name, sep=arg_sep),
-            'user2': r'/home/{user}'.format(user=user_regex),
+            'user2': r'/(home|user)/{user}'.format(user=user_regex),
             'user3': r'({user_name}{sep}){user}'.format(user_name=user_name, sep=arg_sep, user=user_regex),
             'user4': r'(?<![\w\\]){NT_DOMAIN}(?!\\n\d\d\d\d-\d\d-\d\d)\\{user}(?!\\)'\
                      .format(NT_DOMAIN=r'\b[\w-]{1,15}\b', user=user_regex),
@@ -384,7 +385,7 @@ class Anonymize(CLI):
             'domain2': '@<domain>',
             'port': ':<port>',
             'user': r'\1<user>',
-            'user2': '/home/<user>',
+            'user2': r'/\1/<user>',
             'user3': r'\1<user>',
             'user4': r'<domain>\\<user>',
             'user5': 'for user <user>',
