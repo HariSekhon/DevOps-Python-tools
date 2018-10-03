@@ -58,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.2.1'
 
 
 class AmbariTriggerServiceChecks(CLI):
@@ -287,8 +287,9 @@ class AmbariTriggerServiceChecks(CLI):
             request_schedule_id = _['resources'][0]['RequestSchedule']['id']
             log.info('RequestSchedule %s submitted', request_schedule_id)
             href = _['resources'][0]['href']
-            assert href == self.url_base.rstrip('/') + '/clusters/{0}/request_schedules/{1}'\
-                           .format(self.cluster, request_schedule_id)
+            if href != self.url_base.rstrip('/') + '/clusters/{0}/request_schedules/{1}'\
+                                                   .format(self.cluster, request_schedule_id):
+                raise ValueError('href does not match expected request_schedules URI!')
             if self.watch:
                 self.watch_scheduled_request(request_schedule_id)
         except (KeyError, ValueError) as _:
