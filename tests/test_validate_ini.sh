@@ -49,6 +49,10 @@ run_fail2(){
     run_fail "${@/validate_ini/validate_ini2}"  # ignore_run_unqualified
 }
 
+if [ -f /etc/sssd/sssd.conf -a -r /etc/sssd/sssd.conf ]; then
+    run ./validate_ini.py /etc/sssd/sssd.conf
+fi
+
 run ./validate_ini.py --exclude "$exclude" .
 run_fail 2 ./validate_ini2.py --exclude "$exclude" .
 echo
