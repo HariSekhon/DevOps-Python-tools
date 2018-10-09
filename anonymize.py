@@ -61,6 +61,7 @@ try:
     from harisekhon.utils import \
         isJavaException, \
         isPythonTraceback, \
+        isPythonMinVersion, \
         isRegex, \
         isStr, \
         log, \
@@ -89,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.9'
+__version__ = '0.9.0'
 
 
 class Anonymize(CLI):
@@ -302,7 +303,8 @@ class Anonymize(CLI):
             'user5': r'for\s+user\s+{user}'.format(user=user_regex),
             # (?<!>/) exclude patterns '>/' where we have already matched and token replaced
             'user6': r'(?<!<user>/){user}@'.format(user=user_regex),
-            'user7': r'(["\'](?:{user_name}|owner)["\']\s*:\s*["\']?){user}'.format(user_name=user_name, user=user_regex),
+            'user7': r'(["\'](?:{user_name}|owner)["\']\s*:\s*["\']?){user}'\
+                     .format(user_name=user_name, user=user_regex),
             'password': r'(-?{pass_word_phrase}{sep}){pw}'\
                         .format(pass_word_phrase=pass_word_phrase,
                                 sep=arg_sep,
@@ -765,8 +767,10 @@ class Anonymize(CLI):
             line_ending = match.group(1)
         if self.strip_cr:
             line_ending = '\n'
-        line = self.re_line_ending.sub('', line)
+        if not isPythonMinVersion(3):
+            line = line.decode('utf-8').encode('ascii', errors='?')
         line = strip_ansi_escape_codes(line)
+        line = self.re_line_ending.sub('', line)
         for _ in self.anonymizations:
             if not self.anonymizations[_]:
                 continue
