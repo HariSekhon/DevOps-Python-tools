@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.9.0'
+__version__ = '0.9.1'
 
 
 class Anonymize(CLI):
@@ -768,7 +768,7 @@ class Anonymize(CLI):
         if self.strip_cr:
             line_ending = '\n'
         if not isPythonMinVersion(3):
-            line = line.decode('utf-8').encode('ascii', errors='?')
+            line = line.decode('utf-8').encode('ascii', errors='replace')
         line = strip_ansi_escape_codes(line)
         line = self.re_line_ending.sub('', line)
         for _ in self.anonymizations:
