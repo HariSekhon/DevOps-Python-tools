@@ -29,7 +29,7 @@ cd "$srcdir/..";
 
 until [ $# -lt 1 ]; do
     case $1 in
-        -*) shift
+        -*) shift || :
     esac
 done
 

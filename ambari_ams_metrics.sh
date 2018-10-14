@@ -64,10 +64,10 @@ EOF
 until [ $# -lt 1 ]; do
     case $1 in
         -H|--host)  ams_host="${2:-}"
-                    shift
+                    shift || :
                     ;;
         -P|--port)  ams_host="${2:-}"
-                    shift
+                    shift || :
                     ;;
    --list-metrics)  list_metrics=true
                     [ "$list_nodes" = true ] && usage '--list-metrics and --list-nodes are mutually exclusive!'
@@ -76,10 +76,10 @@ until [ $# -lt 1 ]; do
                     [ "$list_metrics" = true ] && usage '--list-metrics and --list-nodes are mutually exclusive!'
                     ;;
       -m|--metric)  metric="${2:-}"
-                    shift
+                    shift || :
                     ;;
 -n|--node|--nodes)  node_list="${2:-}"
-                    shift
+                    shift || :
                     ;;
         -h|--help)  usage
                     ;;

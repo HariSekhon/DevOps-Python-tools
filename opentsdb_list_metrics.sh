@@ -16,10 +16,8 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
-PATH="$PATH:/opt/hbase/bin:/hbase/bin"
-
+tsd_url="http://localhost:4242"
 metrics="metrics"
-by_age=0
 
 usage(){
     if [ -n "$*" ]; then
@@ -27,22 +25,20 @@ usage(){
         echo
     fi
     cat <<EOF
-Quick script to list OpenTSDB metrics via local HBase Shell
+Quick script to list OpenTSDB metrics via OpenTSDB Suggest API
 
 Metrics output - one metric per line
 
-Metrics By Age - output:
-
-<timestamp_epoch_millis>  <human_timestamp>   <metric>
-
 Tested on OpenTSDB 2.3 on HBase 1.4
 
+See also opentsdb_list_metrics_hbase.sh - this version is 6-9x faster but that version can show metrics registered dates ordered by date as that info isn't returned by the OpenTSDB Suggest API
 
-usage: ${0##*/} [options]
 
+usage: ${0##*/} [options] <curl_options>
+
+-T --tsd    TSD url (default: http://localhost:4242)
 --tagk      List tagk values (default lists metrics)
 --tagv      List tagv values (default lists metrics, mutually exclusive with --tagk)
---by-age    List by age, oldest first with epoch, human time and metric columns
 
 EOF
     exit 1
@@ -55,17 +51,20 @@ set_metric_type(){
     metrics="$1"
 }
 
+curl_options=""
 until [ $# -lt 1 ]; do
     case $1 in
+     -T|--tsd)  tsd_url="${2:-}"
+                shift || :
+                ;;
        --tagk)  set_metric_type tagk
                 ;;
        --tagv)  set_metric_type tagv
                 ;;
-     --by-age)  by_age=1
-                ;;
     -h|--help)  usage
                 ;;
-            *)  usage "unknown argument: $1"
+            *)  #usage "unknown argument: $1"
+                curl_options="$curl_options $1"
                 ;;
     esac
     shift || :
@@ -78,45 +77,15 @@ check_bin(){
         exit 1
     fi
 }
-check_bin hbase
-check_bin python
+check_bin curl
+check_bin jq
 
-print_metrics(){
-    hbase shell <<< "scan 'tsdb-uid', { COLUMNS => 'name:$metrics', VERSIONS => 1 }" 2>/dev/null |
-    grep 'value=' |
-    sed 's/^.*, value=//' |
-    sort -u
-}
-
-print_metrics_by_age(){
-    # hackish but convenient - forking to the date command thousands or hundreds of thousands of times can take hours, python takes 10 secs even for 250,000+ metrics
-    tmp_python_script=$(mktemp)
-    cat > "$tmp_python_script" <<EOF
-from __future__ import print_function
-import sys, time
-metrics = {}
-for line in sys.stdin:
-    try:
-        (ts, metric) = line.split()
-    except ValueError as _:
-        print('ValueError: {}, line: {}'.format(_, line), file=sys.stderr)
-#    if  metric not in metrics or ts < metrics[metric]:
-#        metric[metric] = ts
-#for metric in metrics:
-#    ts = metrics[metric]
-    print("{}\t{}\t{}".format(ts, time.strftime("%F %T", time.localtime(int(ts)/1000)), metric))
-EOF
-    trap "rm '$tmp_python_script'" EXIT
-
-    hbase shell <<< "scan 'tsdb-uid', { COLUMNS => 'name:$metrics', VERSIONS => 1 }" 2>/dev/null |
-    grep 'value=' |
-    sed 's/^.*, timestamp=//; s/, value=/ /' |
-    python "$tmp_python_script" |
-    sort -k1n
-}
-
-if [ $by_age = 0 ]; then
-    print_metrics
-else
-    print_metrics_by_age
+if [ -z "${DEBUG:-}" ]; then
+    curl_options="$curl_options -s"
 fi
+curl $curl_options "$tsd_url/api/suggest?type=$metrics&q=&max=2000000000" |
+jq '.[]' |
+sed 's/"//g' |
+sort ||
+# this is here mainly just to output the error message without DEBUG=1 mode being necessary
+curl ${curl_options% -s} "$tsd_url/api/suggest?type=$metrics&q=&max=2000000000"

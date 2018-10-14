@@ -33,7 +33,7 @@ until [ $# -lt 1 ]; do
     case $1 in
         -t|--table)
             table="$2"
-            shift
+            shift || :
             ;;
          *) usage
             ;;

@@ -18,18 +18,60 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-test_num="${1:-}"
+test_nums="${@:-}"
 parallel=""
-if [ "$test_num" = "p" ]; then
+if [ "$test_nums" = "p" ]; then
     parallel="1"
-    test_num=""
+    test_nums=""
 fi
 
 cd "$srcdir/..";
 
 . ./tests/utils.sh
 
+section "Anonymize"
+
 anonymize="./anonymize.py"
+
+start_time="$(start_timer "$anonymize")"
+
+# ============================================================================ #
+#                                  Custom Tests
+# ============================================================================ #
+
+if [ -z "$test_nums" ]; then
+    echo
+    echo "Running Custom Tests:"
+    echo
+    echo "checking file args:"
+    run++
+    if [ `$anonymize -ae README.md | wc -l` -gt 100 ]; then
+        echo "SUCCEEDED - anonymized README.md > 100 lines"
+    else
+        echo "FAILED - suspicious README.md file arg result came to <= 100 lines"
+        exit 1
+    fi
+    hr
+
+    run_grep "<user>@<domain>" $anonymize --email <<< "hari@domain.com"
+    run_grep "<user>@<domain>" $anonymize -E <<< "hari@domain.com"
+
+    run_grep "<ip_x.x.x>.1" $anonymize -a --ip-prefix <<< "4.3.2.1"
+    run_grep "<ip_x.x.x>.1/<cidr_mask>" $anonymize --ip-prefix <<< "4.3.2.1/24"
+    run_grep "<ip_x.x.x>.1" $anonymize --ip-prefix <<< "4.3.2.1"
+    run_grep "<ip-x-x-x>.4" $anonymize --ip-prefix <<< "ip-1-2-3-4"
+    run_grep "ip-1-2-3-4-5" $anonymize --ip-prefix <<< "ip-1-2-3-4-5"
+    run_grep "dip-1-2-3-4" $anonymize --ip-prefix <<< "dip-1-2-3-4"
+    run_grep "5.4.3.2.1" $anonymize --ip-prefix <<< "5.4.3.2.1"
+    run_grep "log4j-1.2.3.4.jar" $anonymize --ip-prefix <<< "log4j-1.2.3.4.jar"
+    run_grep "/usr/hdp/2.6.2.0-123" $anonymize --ip-prefix <<< "/usr/hdp/2.6.2.0-123"
+
+    run_grep "^http://[a-f0-9]{12}:80/path$" $anonymize --hash-hostnames <<< "http://test.domain.com:80/path"
+    run_grep '^\\\\[a-f0-9]{12}\\mydir$' $anonymize --hash-hostnames <<< '\\test.domain.com\mydir'
+    run_grep '-host [a-f0-9]{12}' $anonymize --hash-hostnames <<< '-host blah'
+fi
+
+# ============================================================================ #
 
 src[0]="2015-11-19 09:59:59,893 - Execution of 'mysql -u root --password=somep@ssword! -h myHost.internal  -s -e \"select version();\"' returned 1. ERROR 2003 (HY000): Can't connect to MySQL server on 'host.domain.com' (111)"
 dest[0]="2015-11-19 09:59:59,893 - Execution of 'mysql -u root --password=<password> -h <fqdn>  -s -e \"select version();\"' returned 1. ERROR 2003 (HY000): Can't connect to MySQL server on '<fqdn>' (111)"
@@ -72,10 +114,10 @@ dest[12]=" main.py:74 - loglevel=logging.INFO"
 
 # creating an exception for this would prevent anonymization legitimate .PY domains after a leading timestamp, which is legit, added main.py to
 src[13]="INFO 1111-22-33 44:55:66,777 main.py:8 -  Connecting to Ambari server at https://ip-1-2-3-4.eu-west-1.compute.internal:8440 (1.2.3.4)"
-dest[13]="INFO 1111-22-33 44:55:66,777 main.py:8 -  Connecting to Ambari server at https://<fqdn>:8440 (<ip_x.x.x.x>)"
+dest[13]="INFO 1111-22-33 44:55:66,777 main.py:8 -  Connecting to Ambari server at https://<ip-x-x-x-x>.<fqdn>:8440 (<ip_x.x.x.x>)"
 
 src[14]=" Connecting to Ambari server at https://ip-1-2-3-4.eu-west-1.compute.internal:8440 (1.2.3.4)"
-dest[14]=" Connecting to Ambari server at https://<fqdn>:8440 (<ip_x.x.x.x>)"
+dest[14]=" Connecting to Ambari server at https://<ip-x-x-x-x>.<fqdn>:8440 (<ip_x.x.x.x>)"
 
 src[15]="INFO 2015-12-01 19:52:21,066 DataCleaner.py:39 - Data cleanup thread started"
 dest[15]="INFO 2015-12-01 19:52:21,066 DataCleaner.py:39 - Data cleanup thread started"
@@ -96,7 +138,7 @@ src[19]="ranger-plugins-audit-0.5.0.2.3.0.0-2557.jar"
 dest[19]="ranger-plugins-audit-0.5.0.2.3.0.0-2557.jar"
 
 src[20]="yarn-yarn-resourcemanager-ip-172-31-1-2.log"
-dest[20]="yarn-yarn-resourcemanager-<aws_hostname>.log"
+dest[20]="yarn-yarn-resourcemanager-<ip-x-x-x-x>.log"
 
 src[21]="192.168.99.100:9092"
 dest[21]="<ip_x.x.x.x>:9092"
@@ -119,11 +161,11 @@ dest[26]="user: <user> password: <password> bar"
 src[27]="SomeClass\$method:20 something happened"
 dest[27]="SomeClass\$method:20 something happened"
 
-#src[28]="-passphase 'foo'"
-#dest[28]="-passphrase '<password>'"
+src[28]="-passphrase 'foo'"
+dest[28]="-passphrase <password>"
 
 src[29]=" at host.domain.com(Thread.java:789)"
-dest[29]=" at host.domain.com(Thread.java:789"
+dest[29]=" at host.domain.com(Thread.java:789)"
 
 src[30]="jdbc:hive2://hiveserver2:10000/myDB"
 dest[30]="jdbc:hive2://<hostname>:10000/myDB"
@@ -172,9 +214,6 @@ dest[44]="/tmp/krb5cc_<uid>"
 
 src[45]=" --user=hari"
 dest[45]=" --user=<user>"
-
-src[45]=" --group-name=techies"
-dest[45]=" --group-name=<group>"
 
 src[46]=" 1.2.3.4/24"
 dest[46]=" <ip_x.x.x.x>/<cidr_mask>"
@@ -241,8 +280,8 @@ dest[65]="objectSid:: <objectsid>"
 src[66]="sAMAccountName: hari"
 dest[66]="sAMAccountName: <samaccountname>"
 
-#src[67]="sAMAccountName: hari"
-#dest[67]="sAMAccountName: <sAMAccountName>"
+src[67]="sAMAccountName: hari"
+dest[67]="sAMAccountName: <samaccountname>"
 
 src[68]="objectCategory: CN=Person,CN=Schema,CN=Configuration,DC=MyDomain,DC=com"
 #dest[68]="objectCategory: CN=Person,CN=Schema,CN=Configuration,DC=<domain>,DC=<domain>"
@@ -273,23 +312,135 @@ dest[75]="unixHomeDirectory: /home/<user>"
 
 src[76]="member: CN=Hari Sekhon,OU=MyOU,DC=MyDomain,DC=com"
 #dest[76]="member: CN=<cn>"
+#dest[76]="member: CN=<cn>,OU=<ou>,DC=<dc>,DC=<dc>"
 dest[76]="member: <member>"
 
-# TODO
-#src[77]="ldap:///dc=example,dc=com??sub?(givenName=John)"
-#dest[77]="ldap:///dc=<dc>,dc=<dc>??sub?(givenName=<givenName>)"
+src[77]="adminDisplayName: Administrator"
+dest[77]="adminDisplayName: <admindisplayname>"
 
-#src[78]="ldap://ldap.example.com/cn=John%20Doe,dc=example,dc=com"
-#dest[78]="ldap://<fqdn>/cn=<cn>,dc=<dc>,dc=<dc>"
+src[78]="ldap://ldap.example.com/cn=John%20Doe,dc=example,dc=com"
+dest[78]="ldap://<fqdn>/cn=<cn>,dc=<dc>,dc=<dc>"
+
+src[79]="userPassword=mysecret"
+#dest[79]="userPassword=<userpassword>"
+dest[79]="userPassword=<password>"
+
+src[80]=" Authorization: Basic 123456ABCDEF"
+dest[80]=" Authorization: Basic <token>"
+
+src[81]="https://mylonggithubtoken@github.com/harisekhon/nagios-plugins"
+dest[81]="https://<user>@<domain>/<custom>/nagios-plugins"
+
+# --ldap attribute matches are done before --user matches
+src[82]="uid = hari"
+dest[82]="uid = <uid>"
+
+src[83]=" --group-name=techies"
+dest[83]=" --group-name=<group>"
+
+src[84]="ldap:///dc=example,dc=com??sub?(givenName=John)"
+dest[84]="ldap:///dc=<dc>,dc=<dc>??sub?(givenName=<givenname>)"
+
+# check we don't replace IP type things that are not really IPs because too many octets
+src[85]="ip-1-2-3-4-5"
+dest[85]="ip-1-2-3-4-5"
+
+src[86]="dip-1-2-3-4"
+dest[86]="dip-1-2-3-4"
+
+src[87]="1.2.3.4.5"
+dest[87]="1.2.3.4.5"
+
+src[88]="-host blah"
+dest[88]="-host <hostname>"
+
+src[89]="--hostname=blah --anotherswitch"
+dest[89]="--hostname=<hostname> --anotherswitch"
+
+src[90]="host=test"
+dest[90]="host=<hostname>"
+
+src[91]="host went away"
+dest[91]="host went away"
+
+src[92]="hostname=blah;port=92"
+dest[92]="hostname=<hostname>;port=92"
+
+# check we replace all occurences along line
+src[93]="hari@domain.com, hari@domain2.co.uk"
+dest[93]="<user>@<domain>, <user>@<domain>"
+
+src[94]="spark://hari@192.168.0.1"
+dest[94]="spark://<user>@<ip_x.x.x.x>"
+
+src[95]="/usr/hdp/2.6.2.0-123/blah"
+dest[95]="/usr/hdp/2.6.2.0-123/blah"
+
+src[96]="log4j-1.2.3.4.jar"
+dest[96]="log4j-1.2.3.4.jar"
+
+src[97]='MYDOMAIN\n2018-10-03 01:23:45'
+dest[97]='MYDOMAIN\n2018-10-03 01:23:45'
+
+src[98]='domain789012345\blah'
+dest[98]='<domain>\<user>'
+
+src[99]='domain7890123456\blah'
+dest[99]='domain7890123456\blah'
+
+src[100]="-Dhost=blah"
+dest[100]="-Dhost=<hostname>"
+
+src[101]="-Ddomain.com=blah"
+dest[101]="-Ddomain.com=blah"
+
+src[102]="-Dhost.domain.com=blah"
+dest[102]="-Dhost.domain.com=blah"
+
+# check escape codes get stripped if present (eg. if piping from grep --color-yes)
+#src[88]="some^[[01;31m^[[Khost^[[m^[[Kname:443"
+#src[88]="some\e[01;31m\e[Khost\e[m\e[K:443"
+src[103]="$(echo somehost:443 | grep --color=yes host)"
+dest[103]="<hostname>:443"
+
+src[104]='..., "user": "blah", "group": "blah2", "host": "blah3", ...'
+dest[104]='..., "user": "<user>", "group": "<group>", "host": "<hostname>", ...'
+
+src[105]='...,"owner":"blah","hostname":"blah2",...'
+dest[105]='...,"owner":"<user>","hostname":"<hostname>",...'
+
+src[106]="ambari-sudo.sh"
+dest[106]="ambari-sudo.sh"
+
+src[107]="hdfs://user/blah"
+dest[107]="hdfs://<hostname>/<user>"
+
+src[108]="hdfs:///user/blah"
+dest[108]="hdfs:///user/<user>"
+
+# TODO: move proxy hosts to host matches and re-enable
+#src[103]="proxy blah port 8080"
+#dest[103]="proxy <proxy_host> port <proxy_port>"
+
+#src[104]="Connected to blah (1.2.3.4) port 8080"
+#dest[104]="Connected to <proxy_host> (<proxy_ip>) port <proxy_port>"
 
 args="-aPe"
 test_anonymize(){
+    run++
     src="$1"
     dest="$2"
     #[ -z "${src[$i]:-}" ] && { echo "skipping test $i..."; continue; }
+    # didn't work for \e escape codes for ANSI stripping test
+    #result="$(echo -e "$src" | $anonymize $args)"
     result="$($anonymize $args <<< "$src")"
-    if grep -Fq "$dest" <<< "$result"; then
-        echo "SUCCEEDED anonymization test $i"
+    if grep -xFq -- "$dest" <<< "$result"; then
+        echo -n "SUCCEEDED anonymization test $i"
+        if [ -n "${SHOW_OUTPUT:-}" ]; then
+            echo " => $dest"
+        else
+            echo
+        fi
     else
         echo "FAILED to anonymize line during test $i"
         echo "input:    $src"
@@ -299,12 +450,14 @@ test_anonymize(){
     fi
 }
 
-if [ -n "$test_num" ]; then
-    grep -q '^[[:digit:]]\+$' <<< "$test_num" || { echo "invalid test '$test_num', not a positive integer"; exit 2; }
-    i=$test_num
-    [ -n "${src[$i]:-}" ]  || { echo "invalid test number given: src[$i] not defined"; exit 1; }
-    [ -n "${dest[$i]:-}" ] || { echo "code error: dest[$i] not defined"; exit 1; }
-    test_anonymize "${src[$i]}" "${dest[$i]}"
+if [ -n "$test_nums" ]; then
+    for test_num in $test_nums; do
+        grep -q -- '^[[:digit:]]\+$' <<< "$test_num" || { echo "invalid test '$test_num', not a positive integer"; exit 2; }
+        i=$test_num
+        [ -n "${src[$i]:-}" ]  || { echo "invalid test number given: src[$i] not defined"; exit 1; }
+        [ -n "${dest[$i]:-}" ] || { echo "code error: dest[$i] not defined"; exit 1; }
+        test_anonymize "${src[$i]}" "${dest[$i]}"
+    done
     exit 0
 fi
 
@@ -323,41 +476,37 @@ run_tests(){
         fi
     done
 }
+
+echo
+echo "Running Standard Tests with --all --skip-exceptions"
+echo
 run_tests  # ignore_run_unqualified
 
-# test ip prefix
-src="4.3.2.1"
-dest="<ip_x.x.x>.1"
-result="$($anonymize --ip-prefix <<< "$src")"
-if grep -Fq "<ip_x.x.x>.1" <<< "$result"; then
-    echo "SUCCEEDED anonymization test ip_prefix"
-else
-    echo "FAILED to anonymize line during test ip_prefix"
-    echo "input:    $src"
-    echo "expected: $dest"
-    echo "got:      $result"
-    exit 1
-fi
-
+echo
+echo "Running Tests preseving text without --network enabled:"
+echo
 # check normal don't strip these
-src[101]="reading password from foo"
-dest[101]="reading password from foo"
+src[901]="reading password from foo"
+dest[901]="reading password from foo"
 
-src[102]="some description = blah, module = foo"
-dest[102]="some description = blah, module = foo"
+src[902]="some description = blah, module = foo"
+dest[902]="some description = blah, module = foo"
 
-args="-HKEiux"
-run_tests 101 102  # ignore_run_unqualified
+args="-HKEiu"
+run_tests 901 902  # ignore_run_unqualified
 
+echo
+echo "Running Network Specific Tests:"
+echo
 # now check --network / --cisco / --juniper do strip these
-src[103]="reading password from bar"
-dest[103]="reading password <cisco_password>"
+src[903]="reading password from bar"
+dest[903]="reading password <cisco_password>"
 
-src[104]="some description = blah, module=bar"
-dest[104]="some description <cisco_description>"
+src[904]="some description = blah, module=bar"
+dest[904]="some description <cisco_description>"
 
 args="--network"
-run_tests 103 104  # ignore_run_unqualified
+run_tests 903 904  # ignore_run_unqualified
 
 if [ -n "$parallel" ]; then
     # can't trust exit code for parallel yet, only for quick local testing
@@ -369,15 +518,7 @@ if [ -n "$parallel" ]; then
 #    done
 fi
 
-echo "checking file args"
-if [ `$anonymize -ae README.md | wc -l` -lt 100 ]; then
-    echo "Suspicious readme file arg result came to < 100 lines"
-    exit 1
-fi
 echo
-
-echo "testing --email replacememnt format"
-run_grep "<user>@<domain>" $anonymize -E <<< "hari@domain.com"
+echo "Total Tests run: $run_count"
+time_taken "$start_time" "SUCCESS! All tests for $anonymize completed in"
 echo
-
-echo "All Anonymize tests succeeded!"

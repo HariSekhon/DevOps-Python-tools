@@ -25,7 +25,7 @@ section "Testing json_docs_to_bulk_multiline.py"
 
 until [ $# -lt 1 ]; do
     case $1 in
-        -*) shift
+        -*) shift || :
     esac
 done
 

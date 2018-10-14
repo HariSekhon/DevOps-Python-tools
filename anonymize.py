@@ -4,10 +4,11 @@
 #
 #  Author: Hari Sekhon
 #  Date: 2018-08-08 19:02:02 +0100 (Wed, 08 Aug 2018)
-#  ported from Perl version from DevOps Perl Tools repo (https://github.com/harisekhon/devops-perl-tools)
-#  Date: 2013-07-18 21:17:41 +0100 (Thu, 18 Jul 2013)
+#  Original Date: 2013-07-18 21:17:41 +0100 (Thu, 18 Jul 2013)
 #
 #  https://github.com/harisekhon/devops-python-tools
+#
+#  ported from Perl version from DevOps Perl Tools repo (https://github.com/harisekhon/devops-perl-tools)
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
@@ -27,8 +28,8 @@ or pastebin like websites
 Also has support for network device configurations including Cisco and Juniper,
 and should work on devices with similar configs as well.
 
-Works like a standard unix filter program, taking input from standard input or file(s) given as arguments and
-prints the modified output to standard output (to redirect to a new file or copy buffer).
+Works like a standard unix filter program, reading from file arguments or standard input and
+printing the modified output to standard output (to redirect to a new file or copy buffer).
 
 Create a list of phrases to anonymize from config by placing them in anonymize_custom.conf in the same directory
 as this program, one PCRE format regex per line, blank lines and lines prefixed with # are ignored.
@@ -47,6 +48,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from collections import OrderedDict
+from hashlib import md5
 import os
 import re
 import sys
@@ -59,14 +61,17 @@ try:
     from harisekhon.utils import \
         isJavaException, \
         isPythonTraceback, \
+        isPythonMinVersion, \
         isRegex, \
         isStr, \
         log, \
         log_option, \
+        strip_ansi_escape_codes, \
         validate_file
     # used dynamically
     # pylint: disable=unused-import
     from harisekhon.utils import \
+        aws_host_ip_regex, \
         domain_regex, \
         domain_regex_strict, \
         email_regex, \
@@ -85,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.4'
+__version__ = '0.9.1'
 
 
 class Anonymize(CLI):
@@ -104,47 +109,42 @@ class Anonymize(CLI):
         self.file_list = set()
         self.re_line_ending = re.compile(r'(\r?\n)$')
         self.strip_cr = False
+        self.hash_salt = None
         # order of iteration of application matters because we must do more specific matches before less specific ones
         self.anonymizations = OrderedDict([
-            ('ip', False),
             ('ip_prefix', False),
+            ('ip', False),
             ('subnet_mask', False),
             ('mac', False),
             ('kerberos', False),
-            ('ldap', False),
             ('email', False),
             ('password', False),
+            ('ldap', False),
             ('user', False),
             ('group', False),
-            ('proxy', False),
             ('http_auth', False),
             ('cisco', False),
             ('screenos', False),
             ('junos', False),
             ('network', False),
             ('fqdn', False),
-            ('windows', False),
             ('domain', False),
             ('hostname', False),
+            #('proxy', False),
+            ('windows', False),
             ('custom', False),
         ])
         self.exceptions = {
             'java_exceptions': False,
             'python_tracebacks': False,
         }
-        self.negative_host_lookbehind = r'(?<!\.java)' + \
-                                        r'(?<!\.py)' + \
+        # Poland is more prominent, cannot exclude .pl from host/domain/fqdn negative lookbehinds
+        ignore_file_exts = ['java', 'py', 'sh', 'pid', 'scala', 'groovy']
+        self.negative_host_lookbehind = ''.join(r'(?<!\.{})'.format(_) for _ in ignore_file_exts) + \
                                         r'(?<!\sid)'
-        # don't use this simpler one as we want to catch everything inside quotes eg. 'my secret'
-        #password_quoted = r'\S+'
-        password_quoted = r'(?:\'[^\']+\'|"[^"]+"|\S+)'
-        user_name = r'user(?:-?name)?'
-        group_name = r'group(?:-?name)?'
-        arg_sep = r'[=\s:]+'
-        # openssl uses -passin switch
-        pass_word_phrase = r'pass(?:word|phrase|in)?'
         ldap_rdn_list = [
-            'C',
+            # country isn't exactly secret information worth anonymizing in most cases
+            #'C',
             'CN',
             'DC',
             'L',
@@ -156,9 +156,8 @@ class Anonymize(CLI):
         ]
         # hard for this to be 100% since this can be anything backslash escaped but getting what we really care about
         ldap_values = r'[\\\%\s\w-]+'
+        # AD user + group objects - from real world sample
         ldap_attributes = [
-            # this will be a CN, let general case strip it
-            #'msDS-AuthenticatedAtDC'
             'cn',
             'department',
             'description',
@@ -166,6 +165,7 @@ class Anonymize(CLI):
             'dn',
             'gidNumber',
             'givenName',
+            'homeDirectory',
             'member',
             'memberOf',
             'msSFU30Name',
@@ -183,27 +183,129 @@ class Anonymize(CLI):
             # let /home/hari => /home/<user>
             #'unixHomeDirectory',
         ]
+        # IPA / OpenLDAP attributes
+        # http://www.zytrax.com/books/ldap/ape/
+        ldap_attributes.extend([
+            'userPassword',
+            'gn',
+            'mail',
+            'surname',
+            #'localityName'  # city, same as l below
+            'facsimileTelephoneNumber',
+            'rfc822Mailbox',
+            'homeTelephoneNumber',
+            'pagerTelephoneNumber',
+            'uniqueMember',
+        ])
+        # From documentation of possible standard attributes
+        # https://docs.microsoft.com/en-us/windows/desktop/ad/group-objects
+        # http://www.kouti.com/tables/userattributes.htm
+        # https://docs.microsoft.com/en-us/windows/desktop/adschema/attributes-all
+        extra_ldap_attribs = [
+            # this will be a CN, let general case strip it
+            #'msDS-AuthenticatedAtDC'
+            'adminDescription',
+            'adminDisplayName',
+            'canonicalName',
+            'comment',
+            #'co', # (country)
+            #'countryCode',
+            'displayName',
+            'displayNamePrintable',
+            'division'
+            'employeeID',
+            'groupMembershipSAM',
+            'info',
+            'initials',
+            #'l' # city
+            'logonWorkstation',
+            'manager',
+            'middleName',
+            'mobile',
+            'otherHomePhone',
+            'otherIpPhone',
+            'otherLoginWorkstations',
+            'otherMailbox',
+            'otherMobile',
+            'otherPager',
+            'otherTelephone',
+            'pager',
+            'personalTitle',
+            'physicalDeliveryOfficeName',
+            'possibleInferiors',
+            'postalAddress',
+            'postalCode',
+            'postOfficeBox',
+            'preferredOU',
+            'primaryInternationalISDNNumber',
+            'primaryTelexNumber',
+            'profilePath',
+            'proxiedObjectName',
+            'proxyAddresses',
+            'registeredAddress',
+            'scriptPath',
+            'securityIdentifier',
+            'servicePrincipalName',
+            'street',
+            'streetAddress',
+            'supplementalCredentials',
+            'telephoneNumber',
+            'teletexTerminalIdentifier',
+            'telexNumber',
+            'url',
+            'userWorkstations',
+            'wWWHomePage',
+            'x121Address',
+            'userCert',
+            'userCertificate',
+            'userParameters',
+            'userPassword',
+            'userPrincipalName',
+            'userSharedFolder',
+            'userSharedFolderOther',
+            'userSMIMECertificate',
+        ]
+        # comment this line out for performance if you're positive you don't use these attributes
+        ldap_attributes.extend(extra_ldap_attribs)
+        # MSSQL ODBC
+        #ldap_attributes.extend(['DatabaseName'])
+        # Hive ODBC / JDBC
+        #ldap_attributes.extend(['HS2KrbRealm', 'dbName'])
+        # don't use this simpler one as we want to catch everything inside quotes eg. 'my secret'
+        #password_quoted = r'\S+'
+        password_quoted = r'(?:\'[^\']+\'|"[^"]+"|\S+)'
+        user_name = r'(?:user(?:-?name)?|uid)'
+        group_name = r'group(?:-?name)?'
+        arg_sep = r'[=\s:]+'
+        # openssl uses -passin switch
+        pass_word_phrase = r'(?:pass(?:word|phrase|in)?|userPassword)'
         self.regex = {
-            'hostname2': r'\b(?:ip-10-\d+-\d+-\d+|' + \
-                         r'ip-172-1[6-9]-\d+-\d+|' + \
-                         r'ip-172-2[0-9]-\d+-\d+|' + \
-                         r'ip-172-3[0-1]-\d+-\d+|' +
-                         r'ip-192-168-\d+-\d+)\b(?!-\d)',
-            'hostname3': r'(\w+://){host}'.format(host=hostname_regex),
-            'hostname4': r'\\\\{host}'.format(host=hostname_regex),
+            # don't change hostname or fqdn regex without updating hash_hostnames() option parse
+            # since that replaces these replacements and needs to match the grouping captures and surrounding format
+            'hostname2': r'({aws_host_ip})(?!-\d)'.format(aws_host_ip=aws_host_ip_regex),
+            'hostname3': r'(\w+://)({hostname})'.format(hostname=hostname_regex),
+            'hostname4': r'\\\\({hostname})'.format(hostname=hostname_regex),
+            # no \bhost - want to match KrbHost
+            'hostname5': r'(-host(?:name)?{sep}|host(?:name)?\s*=\s*)({hostname})'\
+                         .format(sep=arg_sep, hostname=hostname_regex),
+            'hostname6': r'(["\']host(?:name)?["\']\s*:\s*["\']?){hostname}'.format(hostname=hostname_regex),
             # use more permissive hostname_regex to catch Kerberos @REALM etc
             'domain2': '@{host}'.format(host=hostname_regex),
             'group': r'(-{group_name}{sep})\S+'.format(group_name=group_name, sep=arg_sep),
             'group2': r'({group_name}{sep}){user}'.format(group_name=group_name, sep=arg_sep, user=user_regex),
             'group3': r'for\s+group\s+{group}'.format(group=user_regex),
+            'group4': r'(["\']{group_name}["\']\s*:\s*["\']?){group}'.format(group_name=group_name, group=user_regex),
             'user': r'(-{user_name}{sep})\S+'.format(user_name=user_name, sep=arg_sep),
-            'user2': r'/home/{user}'.format(user=user_regex),
+            'user2': r'/(home|user)/{user}'.format(user=user_regex),
             'user3': r'({user_name}{sep}){user}'.format(user_name=user_name, sep=arg_sep, user=user_regex),
-            'user4': r'(?<![\w\\])\w+\\{user}(?!\\)'.format(user=user_regex),
+            'user4': r'(?<![\w\\]){NT_DOMAIN}(?!\\n\d\d\d\d-\d\d-\d\d)\\{user}(?!\\)'\
+                     .format(NT_DOMAIN=r'\b[\w-]{1,15}\b', user=user_regex),
             'user5': r'for\s+user\s+{user}'.format(user=user_regex),
             # (?<!>/) exclude patterns '>/' where we have already matched and token replaced
             'user6': r'(?<!<user>/){user}@'.format(user=user_regex),
-            'password': r'(-{pass_word_phrase}{sep}){pw}'\
+            'user7': r'(["\'](?:{user_name}|owner)["\']\s*:\s*["\']?){user}'\
+                     .format(user_name=user_name, user=user_regex),
+            'password': r'(-?{pass_word_phrase}{sep}){pw}'\
                         .format(pass_word_phrase=pass_word_phrase,
                                 sep=arg_sep,
                                 pw=password_quoted),
@@ -213,7 +315,13 @@ class Anonymize(CLI):
                                  sep=arg_sep,
                                  pass_word_phrase=pass_word_phrase,
                                  pw=password_quoted),
-            'ip_prefix': r'{}(?!\.\d+\.\d+)'.format(ip_prefix_regex),
+            'ip': r'(?<!\d\.)' + ip_regex + r'/\d{1,2}',
+            'ip2': r'(?<!\d\.)' + ip_regex + r'(?!\w*[.-]\w)',
+            'ip3': aws_host_ip_regex + r'(?!-)',
+            'ip_prefix': r'(?<!\d\.)' + ip_prefix_regex + r'(\d+)/\d{1,2}',
+            'ip_prefix2': r'(?<!\d\.)' + ip_prefix_regex + r'(\d+)(?!\w*[.-]\w)',
+            'ip_prefix3': r'\bip-\d+-\d+-\d+-(\d+)(?!-)',
+            'subnet_mask': r'(?<!\d\.)' + subnet_mask_regex + r'(?!-|\w*[.-:]\w)',
             # network device format Mac address
             'mac2': r'\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b',
             # _HOST and HTTP are commonly use in Hadoop clusters, let's make sure they are left for debugging purposes
@@ -230,16 +338,19 @@ class Anonymize(CLI):
             # https://tools.ietf.org/html/rfc4514
             #'ldap': '(CN=)[^,]+(?:,OU=[^,]+)+(?:,DC=[\w-]+)+',
             # replace individual components instead
-            'ldap': r'(\b({ldap_rdn_list})\s*[:=]+\s*)(?!(?:Person|Schema|Configuration),){ldap_values}'\
+            'ldap': r'(\b({ldap_rdn_list})\s*[=:]+\s*)(?!(?:Person|Schema|Configuration),|\s){ldap_values}'\
                     .format(ldap_rdn_list='|'.join(ldap_rdn_list), ldap_values=ldap_values),
-            'ldap2': r'^(\s*({})\s*:+\s*).*$'.format('|'.join(ldap_attributes)),
+            'ldap2': r'^(\s*({ldap_attribs})\s*:+\s*).*$'\
+                     .format(ldap_attribs='|'.join(ldap_attributes)),
+            'ldap3': r'(\s*\b({ldap_attribs})\s*=\s*)(?!\s){ldap_values}'\
+                     .format(ldap_attribs='|'.join(ldap_attributes), ldap_values=ldap_values),
             'port': r'{host}:\d+(?!\.?[\w-])'.format(host=host_regex),
             'proxy': r'proxy {} port \d+'.format(host_regex),
-            'proxy2': 'Trying' + ip_regex,
-            'proxy3': 'Connected to ' + host_regex + r'\($ip_regex\) port \d+',
-            'proxy4': r'(Via:\s\S+\s)' + ip_regex + '.*',
+            'proxy2': 'Connected to ' + host_regex + r'\s*\(' + ip_regex + r'|[^\)]+\) port \d+',
+            #'proxy3': r'(Via:\s\S+\s)' + ip_regex + '.*',
             'http_auth': r'(https?:\/\/)[^:]+:[^\@]*\@',
             'http_auth2': r'(Proxy auth using \w+ with user )([\'"]).+([\'"])',
+            'http_auth3': r'\bAuthorization:\s+Basic\s+[A-Za-z0-9]+',
             'cisco': r'username .+ (?:password|secret) .*?$',
             'cisco2': r'password .*?$',
             'cisco3': r'\ssecret\s.*?$',
@@ -260,29 +371,41 @@ class Anonymize(CLI):
             'network2': r'syscontact .*',
             'windows': r'S-\d+-\d+-\d+-\d+-\d+-\d+-\d+'
         }
+        # dump computer generated regexes to debug complex regex
+        #import pprint
+        #pprint.pprint(self.regex)
+        ldap_lambda_lowercase = lambda m: r'{}<{}>'.format(m.group(1), m.group(2).lower())
         # will auto-infer replacements to not have to be explicit, use this only for override mappings
         self.replacements = {
-            'hostname': r'<hostname>:\1',
-            'hostname2': '<aws_hostname>',
+            'hostname': r'<hostname>:\2',
+            #'hostname2': '<aws_hostname>',
+            'hostname2': r'<ip-x-x-x-x>',
             'hostname3': r'\1<hostname>',
-            'hostname4': r'\\\\<hostname>'.format(host=hostname_regex),
+            'hostname4': r'\\\\<hostname>',
+            'hostname5': r'\1<hostname>',
+            'hostname6': r'\1<hostname>',
             'domain2': '@<domain>',
             'port': ':<port>',
             'user': r'\1<user>',
-            'user2': '/home/<user>',
+            'user2': r'/\1/<user>',
             'user3': r'\1<user>',
             'user4': r'<domain>\\<user>',
             'user5': 'for user <user>',
             'user6': '<user>@',
+            'user7': r'\1<user>',
             'group': r'\1<group>',
             'group2': r'\1<group>',
             'group3': r'for group <group>',
+            'group4': r'\1<group>',
             'password': r'\1<password>',
             'password2': r'\1<user>:<password>',
             'password3': r'\1<user>\2<password>',
             'ip': r'<ip_x.x.x.x>/<cidr_mask>',
             'ip2': r'<ip_x.x.x.x>',
-            'ip_prefix': r'<ip_x.x.x>.',
+            'ip3': r'<ip-x-x-x-x>',
+            'ip_prefix': r'<ip_x.x.x>.\1/<cidr_mask>',
+            'ip_prefix2': r'<ip_x.x.x>.\1',
+            'ip_prefix3': r'<ip-x-x-x>.\1',
             'subnet_mask': r'<subnet_x.x.x.x>',
             'kerberos': r'host/\1@<domain>',
             'kerberos2': r'host/<instance>@<domain>',
@@ -291,15 +414,15 @@ class Anonymize(CLI):
             'kerberos5': '/krb5cc_<uid>',
             #'kerberos6': r'<kerberos_principal>',
             'email': '<user>@<domain>',
-            #'ldap': r'\1<cn>',
-            'ldap': lambda m: r'{}<{}>'.format(m.group(1), m.group(2).lower()),
-            'ldap2': lambda m: r'{}<{}>'.format(m.group(1), m.group(2).lower()),
+            'ldap': ldap_lambda_lowercase,
+            'ldap2': ldap_lambda_lowercase,
+            'ldap3': ldap_lambda_lowercase,
             'proxy': r'proxy <proxy_host> port <proxy_port>',
-            'proxy2': r'Trying <proxy_ip>',
-            'proxy3': r'Connected to <proxy_host> (<proxy_ip>) port <proxy_port>',
+            'proxy2': r'Connected to <proxy_host> (<proxy_ip>) port <proxy_port>',
+            'proxy3': r'\1<proxy_ip>',
             'http_auth': r'$1<user>:<password>@',
             'http_auth2': r'\1\'<proxy_user>\2\3/',
-            'proxy4': r'\1<proxy_ip>',
+            'http_auth3': r'Authorization: Basic <token>',
             'cisco': r'username <username> password <password>',
             'cisco2': r'password <cisco_password>',
             'cisco3': r'secret <secret>',
@@ -352,10 +475,16 @@ class Anonymize(CLI):
                      help='Apply hostname format anonymization (only works on \'<host>:<port>\' otherwise this ' + \
                           'would match everything (consider using --custom and putting your hostname convention ' + \
                           'regex in anonymize_custom.conf to catch other shortname references)')
+        self.add_opt('--hash-hostnames', action='store_true',
+                     help='Hash hostnames / FQDNs to still be able to distinguish different nodes for cluster ' + \
+                          'debugging, these are salted and truncated to be indistinguishable from temporal docker ' + \
+                          'container IDs, but someone with enough computing power and time could theoretically ' + \
+                          'calculate the source hostnames so don\'t put these on the public internet, it is more ' + \
+                          'for private vendor tickets)')
         self.add_opt('-d', '--domain', action='store_true',
                      help='Apply domain format anonymization')
         self.add_opt('-F', '--fqdn', action='store_true',
-                     help='Apply fqdn format anonymization')
+                     help='Apply FQDN format anonymization')
         self.add_opt('-P', '--port', action='store_true',
                      help='Apply port anonymization (not included in --all since you usually want to include port ' + \
                           'numbers for cluster or service debugging)')
@@ -364,9 +493,10 @@ class Anonymize(CLI):
         self.add_opt('-p', '--password', action='store_true',
                      help='Apply password anonymization against --password switches (can\'t catch MySQL ' + \
                           '-p<password> since it\'s too ambiguous with bunched arguments, can use --custom ' + \
-                          'to work around). Also covers curl -u user:password')
+                          'to work around). Also covers curl -u user:password and auto enables --http-auth')
         self.add_opt('-T', '--http-auth', action='store_true',
-                     help=r'Apply HTTP auth anonymization to replace http://username:password\@ => ' + \
+                     help=r'Apply HTTP auth anonymization to replace Basic Authorization tokens and' + \
+                          r'http://username:password\@ => ' + \
                           r'http://<user>:<password>\@. Also works with https://')
         self.add_opt('-K', '--kerberos', action='store_true',
                      help=r'Kerberos 5 principals in the form <primary>@<realm> or <primary>/<instance>@<realm> ' + \
@@ -380,13 +510,14 @@ class Anonymize(CLI):
                           r'this as user/host\@realm to user/<email_regex>, which would have exposed \'user\'' + \
                           '. Auto enables --email, --domain and --fqdn')
         self.add_opt('-L', '--ldap', action='store_true',
-                     help='Apply LDAP anonymization (CN, DN, OU, user/group ldap object attributes)')
+                     help='Apply LDAP anonymization ' + \
+                          '(~100 attribs eg. CN, DN, OU, UID, sAMAccountName, member, memberOf...)')
         self.add_opt('-E', '--email', action='store_true',
                      help='Apply email format anonymization')
-        self.add_opt('-x', '--proxy', action='store_true',
-                     help='Apply anonymization to remove proxy host, user etc (eg. from curl -iv output). You ' + \
-                          'should probably also apply --ip and --host if using this. Auto enables --http-auth')
-        self.add_opt('-n', '--network', action='store_true',
+        #self.add_opt('-x', '--proxy', action='store_true',
+        #             help='Apply anonymization to remove proxy host, user etc (eg. from curl -iv output). You ' + \
+        #                  'should probably also apply --ip and --host if using this. Auto enables --http-auth')
+        self.add_opt('-N', '--network', action='store_true',
                      help='Apply all network anonymization, whether Cisco, ScreenOS, JunOS for secrets, auth, ' + \
                           'usernames, passwords, md5s, PSKs, AS, SNMP etc.')
         self.add_opt('-c', '--cisco', action='store_true',
@@ -398,7 +529,7 @@ class Anonymize(CLI):
                           'for extra matches to be added)')
         self.add_opt('-W', '--windows', action='store_true',
                      help='Windows Sids (UNC path hostnames are already stripped by --hostname and ' + \
-                          'DOMAIN\\user components are already stripped by --domain and --user')
+                          'DOMAIN\\user components are already stripped by --user)')
         self.add_opt('-r', '--strip-cr', action='store_true',
                      help='Strip carriage returns (\'\\r\') from end of lines leaving only newlines (\'\\n\')')
         self.add_opt('--skip-java-exceptions', action='store_true',
@@ -424,6 +555,9 @@ class Anonymize(CLI):
                 if _ == 'ip_prefix':
                     continue
                 self.anonymizations[_] = True
+            if self.get_opt('ip_prefix'):
+                self.anonymizations['ip_prefix'] = True
+                self.anonymizations['ip'] = False
         else:
             for _ in self.anonymizations:
                 if _ in ('subnet_mask', 'mac', 'group'):
@@ -454,15 +588,32 @@ class Anonymize(CLI):
            self.anonymizations['ip_prefix']:
             self.anonymizations['subnet_mask'] = True
             self.anonymizations['mac'] = True
-        if self.get_opt('host'):
+        host = self.get_opt('host')
+        if self.get_opt('hash_hostnames'):
+            host = True
+            self.hash_salt = md5(open(__file__).read()).hexdigest()
+            # will end up double hashing FQDNs that are already hashed to 12 char alnum
+            self.replacements['hostname'] = lambda match: r'{hostname}:{port}'\
+                                            .format(hostname=self.hash_host(match.group(1)), port=match.group(2))
+            self.replacements['hostname2'] = lambda match: r'{ip}'.format(ip=self.hash_host(match.group(1)))
+            self.replacements['hostname3'] = lambda match: r'{protocol}{hostname}'\
+                                             .format(protocol=match.group(1),
+                                                     hostname=self.hash_host(match.group(2))
+                                                    )
+            self.replacements['hostname4'] = lambda match: r'\\{hostname}'\
+                                             .format(hostname=self.hash_host(match.group(1)))
+            self.replacements['hostname5'] = lambda match: r'{switch}{hostname}'\
+                                             .format(switch=match.group(1), hostname=self.hash_host(match.group(2)))
+            self.replacements['fqdn'] = lambda match: self.hash_host(match.group(1))
+        if host:
             for _ in ('hostname', 'fqdn', 'domain'):
                 self.anonymizations[_] = True
         if self.anonymizations['kerberos']:
             self.anonymizations['email'] = True
             self.anonymizations['domain'] = True
             self.anonymizations['fqdn'] = True
-        if self.anonymizations['proxy']:
-            self.anonymizations['http_auth'] = True
+        #if self.anonymizations['proxy']:
+        #    self.anonymizations['http_auth'] = True
 
     def _process_options_network(self):
         if self.anonymizations['network']:
@@ -479,6 +630,20 @@ class Anonymize(CLI):
         else:
             for _ in self.exceptions:
                 self.exceptions[_] = self.get_opt('skip_' + _)
+
+    def hash_host(self, host):
+        # hash entire hostname and do not preserve .<domain> suffix
+        # to avoid being able to differentiate from temporal Docker container IDs
+        #parts = host.split('.', 2)
+        #shortname = parts[0]
+        #domain = None
+        #if len(parts) > 1:
+        #    domain = parts[1]
+        #hashed_hostname = md5(self.hash_salt + shortname).hexdigest()[:12]
+        #if domain:
+        #    hashed_hostname += '.' + '<domain>'
+        hashed_hostname = md5(self.hash_salt + host).hexdigest()[:12]
+        return hashed_hostname
 
     def _is_anonymization_selected(self):
         for _ in self.anonymizations:
@@ -505,7 +670,7 @@ class Anonymize(CLI):
                     log.warning('ignoring invalid regex from %s: %s', os.path.basename(filename), line)
                     continue
                 if boundary:
-                    line = r'(\b|[^A-Za-z])' + line + r'(\b|[^A-Za-z])'
+                    line = r'(?:(?<=\b)|(?<=[^A-Za-z]))' + line + r'(?=\b|[^A-Za-z])'
                 regex_list.append(line)
         raw = '|'.join(regex_list)
         #log.debug('custom_raw: %s', raw)
@@ -537,30 +702,33 @@ class Anonymize(CLI):
                      r'(?!\d+T\d+:\d+)' + \
                      r'(?!\d+[^A-Za-z0-9]|' + \
                      self.custom_ignores_raw + ')' + \
-                     hostname_regex + \
+                     '(' + hostname_regex + ')' + \
                      self.negative_host_lookbehind + r':(\d{1,5}(?!\.?\w))',
                     )
         self.compile('domain',
+                     # don't match java -some.net.property
+                     #r'(?<!-)' + \
                      r'(?!' + self.custom_ignores_raw + ')' + \
                      domain_regex_strict + \
+                     # don't match java -Dsome.net.property=
+                     r'(?!=)' + \
                      r'(?!\.[A-Za-z])(\b|$)' + \
                      # ignore Java stack traces eg. at SomeClass(Thread.java;789)
                      r'(?!\(\w+\.java:\d+\))' + \
                      self.negative_host_lookbehind
                     )
         self.compile('fqdn',
+                     # don't match java -some.net.property
+                     #r'(?<!-)' + \
                      r'(?!' + self.custom_ignores_raw + ')' + \
-                     fqdn_regex + \
+                     '(' + fqdn_regex + ')' + \
+                     # don't match java -Dsome.net.property=
+                     r'(?!=)' + \
                      r'(?!\.[A-Za-z])(\b|$)' + \
                      # ignore Java stack traces eg. at SomeClass(Thread.java;789)
                      r'(?!\(\w+\.java:\d+\))' + \
                      self.negative_host_lookbehind
                     )
-        ip_regex_strict = r'(?<!\d\.)' + ip_regex + r'(?![^:/]\d+)'
-        self.compile('ip', ip_regex_strict + r'/\d{1,2}')
-        self.compile('ip2', ip_regex_strict)
-        self.compile('subnet_mask', r'(?<!\d\.)' + subnet_mask_regex + r'(?![^:]\d+)')
-        self.compile('ip_prefix', r'(?<!\d\.)' + ip_prefix_regex + r'(?!\.\d+\.\d+)')
         re_regex_ending = re.compile('_regex$')
         # auto-populate any *_regex to self.regex[name] = name_regex
         for _ in globals():
@@ -599,6 +767,9 @@ class Anonymize(CLI):
             line_ending = match.group(1)
         if self.strip_cr:
             line_ending = '\n'
+        if not isPythonMinVersion(3):
+            line = line.decode('utf-8').encode('ascii', errors='replace')
+        line = strip_ansi_escape_codes(line)
         line = self.re_line_ending.sub('', line)
         for _ in self.anonymizations:
             if not self.anonymizations[_]:
@@ -637,16 +808,21 @@ class Anonymize(CLI):
         return line
 
     def dynamic_replace(self, name, line):
+        #log.debug('dynamic_replace: %s, %s', name, line)
         replacement = self.replacements.get(name, '<{}>'.format(name))
         #log.debug('%s replacement = %s', name, replacement)
         line = self.regex[name].sub(replacement, line)
         #line = re.sub(self.regex[name], replacement, line)
+        log.debug('dynamic_replace: %s => %s', name, line)
         return line
 
     def anonymize_custom(self, line):
+        i = 0
         for regex in self.custom_anonymizations:
-            line = regex.sub(r'\1<custom>\2', line)
+            i += 1
+            line = regex.sub(r'<custom>', line)
             #line = re.sub(regex, r'\1<custom>\2', line)
+            log.debug('anonymize_custom: %s => %s', i, line)
         return line
 
     @staticmethod
