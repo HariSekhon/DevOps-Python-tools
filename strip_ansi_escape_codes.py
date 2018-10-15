@@ -42,7 +42,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 # pylint: disable=too-few-public-methods
@@ -72,11 +72,11 @@ class StripAnsiEscapeCodes(CLI):
                 die("path '%s' could not be determined as either a file or directory" % arg)
         for filename in self.args:
             if filename == '-':
-                for line in sys.stdin.readlines():
+                for line in sys.stdin:
                     print(strip_ansi_escape_codes(line), end='')
             else:
-                with open(filename) as _:
-                    for line in _.readlines():
+                with open(filename) as filehandle:
+                    for line in filehandle:
                         print(strip_ansi_escape_codes(line), end='')
 
 
