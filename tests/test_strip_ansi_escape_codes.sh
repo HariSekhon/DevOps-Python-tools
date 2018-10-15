@@ -39,8 +39,30 @@ if echo "some highlighted content" |
     echo "ANSI escape code stripping FAILED"
     exit 1
 fi
+hr
+
+tmp=$(mktemp /tmp/strip_ansi_escape_codes.XXXXX)
+trap "rm $tmp" $TRAP_SIGNALS
+
+echo
+echo "creating tmp file:"
+echo "some highlighted content" | grep --color=yes highlighted > "$tmp"
+hr
+
+echo
+echo "checking stripping from file"
+run++
+if ./strip_ansi_escape_codes.py "$tmp" |
+tee /dev/stderr |
+    grep -q '^some highlighted content$'; then
+    echo "ANSI escape code stripping SUCCEEDED"
+ else
+    echo "ANSI escape code stripping FAILED"
+    exit 1
+fi
 
 echo
 echo "Total Tests run: $run_count"
 time_taken "$start_time" "All version tests for $name completed in"
 echo
+untrap
