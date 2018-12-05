@@ -18,7 +18,7 @@ services:
     extends:
       file: common.yml
       service: common
-    image: harisekhon/hadoop:${VERSION:-latest}
+    image: harisekhon/hadoop-dev:${VERSION:-latest}
     ports:
       #- 8020
       - 8042
@@ -31,6 +31,8 @@ services:
       - 50070
       - 50075
       - 50090
+    volumes:
+      - ../..:/py
     networks:
       - hadoop
 
