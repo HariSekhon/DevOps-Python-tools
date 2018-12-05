@@ -17,6 +17,7 @@ cyrus-sasl-devel
 gcc
 gcc-c++
 git
+krb5-devel
 python-devel
 unzip
 wget
