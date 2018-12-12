@@ -279,7 +279,7 @@ updatem: update-submodules
 clean:
 	cd pylib && $(MAKE) clean
 	@# the xargs option to ignore blank input doesn't work on Mac
-	@find . -maxdepth 3 -iname '*.py[co]' -o -iname '*.jy[co]' | xargs rm -f
+	@find . -iname '*.py[co]' -o -iname '*.jy[co]' | xargs rm -f
 	@find . -type d -ipath '*/tests/*' -iname 'test-*spark*.avro' | xargs rm -rf
 	@find . -type d -ipath '*/tests/*' -iname 'test-*spark*.parquet' | xargs rm -rf
 	@rm -f parquet-tools-$(PARQUET_VERSION)-bin.zip
