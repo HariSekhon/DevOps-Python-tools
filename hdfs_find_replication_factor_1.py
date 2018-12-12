@@ -57,7 +57,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 class HdfsFindReplicationFactor1(CLI):
@@ -75,8 +75,8 @@ class HdfsFindReplicationFactor1(CLI):
         self.add_opt('--hadoop-home',
                      help='Sets $HADOOP_HOME, expects to find config in $HADOOP_HOME/conf, ' + \
                           'otherwise inherits from environment or tries default paths')
-        #self.add_opt('--set-replication', metavar='N', type=int,
-        #             help='Resets any files with replication factor 1 back to this replication factor (optional)')
+        self.add_opt('--set-replication', metavar='N', type=int,
+                     help='Resets any files with replication factor 1 back to this replication factor (optional)')
 
     def process_options(self):
         super(HdfsFindReplicationFactor1, self).process_options()
@@ -125,8 +125,8 @@ class HdfsFindReplicationFactor1(CLI):
                         if self.replication_factor:
                             log.info('setting replication factor to {} on {}'\
                                      .format(self.replication_factor, file_path))
-                            # XXX: doesn't work
-                            client.setrep([file_path], self.replication_factor, recurse=False)
+                            # returns a generator so cast to list to force evaluation
+                            list(client.setrep([file_path], self.replication_factor, recurse=False))
             except (snakebite.errors.FileNotFoundException, snakebite.errors.RequestError) as _:
                 if self.verbose:
                     print('', file=sys.stderr)
