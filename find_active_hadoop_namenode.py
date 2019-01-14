@@ -32,7 +32,9 @@ override each one.
 Exits with return code 1 and NO_AVAILABLE_SERVER if none of the namenodes are active, --quiet mode will not print
 NO_AVAILABLE_SERVER.
 
-Tested on Hadoop 2.7.3 on HDP 2.6.1 and Apache Hadoop 2.3, 2.4, 2.5, 2.6, 2.7, 2.8
+Tested on Hadoop 3.0, 3.1
+
+For older Hadoop versions see adjacent find_active_hadoop2_namenode.py
 
 """
 
@@ -56,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.2'
+__version__ = '0.8.0'
 
 
 class FindActiveHadoopNamenode(FindActiveServer):
@@ -66,7 +68,7 @@ class FindActiveHadoopNamenode(FindActiveServer):
         super(FindActiveHadoopNamenode, self).__init__()
         # Python 3.x
         # super().__init__()
-        self.default_port = 50070
+        self.default_port = 9870
         self.protocol = 'http'
         self.url_path = '/jmx?qry=Hadoop:service=NameNode,name=NameNodeStatus'
         self.regex = r'"State"\s*:\s*"active"'
