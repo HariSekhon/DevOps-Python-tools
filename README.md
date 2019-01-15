@@ -128,6 +128,7 @@ Environment variables are supported for convenience and also to hide credentials
       - ```find_active_hbase_thrift.py``` - returns first available [HBase](https://hbase.apache.org/) Thrift Server (run multiple of these for load balancing)
       - ```find_active_hbase_stargate.py``` - returns first available [HBase](https://hbase.apache.org/) Stargate rest server (run multiple of these for load balancing)
       - ```find_active_apache_drill.py``` - returns first available [Apache Drill](https://drill.apache.org/) node
+      - ```find_active_cassandra.py``` - returns first available [Apache Cassandra](https://cassandra.apache.org/) node
       - ```find_active_impala*.py``` - returns first available [Impala](https://impala.apache.org/) node of either Impalad, Catalog or Statestore
       - ```find_active_presto_coordinator.py``` - returns first available [Presto](https://prestodb.io/) Coordinator
       - ```find_active_oozie.py``` - returns first active [Oozie](http://oozie.apache.org/) server
