@@ -333,7 +333,7 @@ class FindActiveServer(CLI):
     def finish(self, host, port=None):
         print(host, end='')
         if port is not None and port != self.port:
-            print(':{0}'.format(port))
+            print(':{0}'.format(port), end='')
         print()
         sys.exit(0)
 
