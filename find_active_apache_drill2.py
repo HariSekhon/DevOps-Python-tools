@@ -32,7 +32,7 @@ override each one.
 Exits with return code 1 and NO_AVAILABLE_SERVER if none of the namenodes are active, --quiet mode will not print
 NO_AVAILABLE_SERVER.
 
-Tested on Apache Drill 1.7, 1.8, 1.9, 1.10, 1.11, 1.12, 1.13
+Tested on Apache Drill 1.7, 1.8, 1.9, 1.10, 1.11, 1.12, 1.13, 1.14, 1.15
 
 (API endpoint is not available in versions <= 1.6, see find_active_apache_drill.py instead)
 
