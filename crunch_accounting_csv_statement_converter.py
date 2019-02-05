@@ -103,7 +103,9 @@ class CrunchAccountingCsvStatementConverter(CLI):
         for filename in self.args:
             target_filename = '{}_crunch.csv'.format(re.sub(r'\.csv$', '', filename))
             log.info("converting file '%s' => '%s'", filename, target_filename)
-            if not self.convert(filename, target_filename):
+            if self.convert(filename, target_filename):
+                log.info("converted '%s' => '%s'", filename, target_filename)
+            else:
                 log.error("FAILED to convert filename '%s'", filename)
 
     def convert(self, filename, target_filename):
