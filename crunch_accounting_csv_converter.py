@@ -17,8 +17,10 @@
 
 """
 
-Tool to convert Credit Card CSVs with headers to Crunch Accounting standard format - extracts the important fields,
-calculates the running balance if necessary
+Tool to convert Bank or Credit Card CSV Statements with headers to Crunch Accounting standard format
+for importing to Crunch for accounts reconciliation
+
+Extracts the important fields, calculates the running balance if necessary
 
 File arguments are read one by one and converted and output to a file of the same name with _crunch.csv at the end
 
@@ -26,8 +28,9 @@ If there is no balance column you must provide a --starting-balance from which t
 for Crunch, In that case if specifying multiple CSV statements as arguments, they must be given in chronological order
 in order for one statement's running balance to flow on to the next in the correct order
 
-Can be easily extended for other banks CSV formats, as it's just simple matching of the headers, all that is required
-is a sample
+Can easily be extended for other Banks CSV formats, as it's just simple matching of the headers
+
+For additional formats just raise an github issue request with a sample CSV
 
 Tested on Barclaycard Commercial statement CSV exports
 (Barclaycard lists entries in reverse chronological order so need to use --credit and --reverse-order)
@@ -58,14 +61,14 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3'
+__version__ = '0.4'
 
 
-class CrunchAccountingCsvConverter(CLI):
+class CrunchAccountingCsvStatementConverter(CLI):
 
     def __init__(self):
         # Python 2.x
-        super(CrunchAccountingCsvConverter, self).__init__()
+        super(CrunchAccountingCsvStatementConverter, self).__init__()
         # Python 3.x
         # super().__init__()
         self.verbose = 2
@@ -75,7 +78,7 @@ class CrunchAccountingCsvConverter(CLI):
         self.reverse_order = False
 
     def add_options(self):
-        super(CrunchAccountingCsvConverter, self).add_options()
+        super(CrunchAccountingCsvStatementConverter, self).add_options()
         self.add_opt('-c', '--credit-card', action='store_true',
                      help='Credit Card statements (inverts transactions against running balance)')
         self.add_opt('-r', '--reverse-order', action='store_true',
@@ -83,7 +86,7 @@ class CrunchAccountingCsvConverter(CLI):
         self.add_opt('-s', '--starting-balance', help='Starting Balance (used if no balance column is found')
 
     def process_options(self):
-        super(CrunchAccountingCsvConverter, self).process_options()
+        super(CrunchAccountingCsvStatementConverter, self).process_options()
         self.credit_card = self.get_opt('credit_card')
         self.reverse_order = self.get_opt('reverse_order')
         self.running_balance = self.get_opt('starting_balance')
@@ -115,10 +118,11 @@ class CrunchAccountingCsvConverter(CLI):
         csvwriter.writerow(['Date', 'Description', 'Amount', 'Balance'])
         for row in csvreader:
             count += 1
+            amount = self.amount(row[positions['amount']])
             if balance_position is not None:
                 balance = row[balance_position]
             elif self.running_balance is not None:
-                self.update_balance(row[positions['amount']])
+                self.running_balance += amount
                 balance = self.running_balance
             else:
                 log.error('no balance column found and no running balance given')
@@ -127,7 +131,7 @@ class CrunchAccountingCsvConverter(CLI):
                 [
                     row[positions['date']],
                     row[positions['desc']],
-                    self.amount(row[positions['amount']]),
+                    amount,
                     balance
                 ]
                 )
@@ -138,12 +142,6 @@ class CrunchAccountingCsvConverter(CLI):
         if self.credit_card:
             return -Decimal(amount)
         return amount
-
-    def update_balance(self, amount):
-        if self.credit_card:
-            self.running_balance -= Decimal(amount)
-        else:
-            self.running_balance += Decimal(amount)
 
     @staticmethod
     def reverse_contents(filename):
@@ -193,7 +191,7 @@ class CrunchAccountingCsvConverter(CLI):
         except csv.Error as _:
             log.warning('file %s: %s', filename, _)
             return None
-        csvreader = CrunchAccountingCsvConverter.validate_csvreader(csvreader, filename)
+        csvreader = CrunchAccountingCsvStatementConverter.validate_csvreader(csvreader, filename)
         filehandle.seek(0)
         return csvreader
 
@@ -232,4 +230,4 @@ class CrunchAccountingCsvConverter(CLI):
 
 
 if __name__ == '__main__':
-    CrunchAccountingCsvConverter().main()
+    CrunchAccountingCsvStatementConverter().main()
