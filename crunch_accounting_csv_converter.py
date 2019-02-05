@@ -17,7 +17,8 @@
 
 """
 
-Tool to convert Credit Card CSVs to Crunch Accounting standard format - extracts the important fields
+Tool to convert Credit Card CSVs with headers to Crunch Accounting standard format - extracts the important fields,
+calculates the running balance if necessary
 
 File arguments are read one by one and converted and output to a file of the same name with _crunch.csv at the end
 
@@ -29,6 +30,7 @@ Can be easily extended for other banks CSV formats, as it's just simple matching
 is a sample
 
 Tested on Barclaycard Commercial statement CSV exports
+(Barclaycard lists entries in reverse chronological order so need to use --credit and --reverse-order)
 
 """
 
@@ -41,6 +43,7 @@ import csv
 import os
 import re
 import sys
+import tempfile
 import traceback
 from decimal import Decimal
 srcdir = os.path.abspath(os.path.dirname(__file__))
@@ -55,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 class CrunchAccountingCsvConverter(CLI):
@@ -69,15 +72,19 @@ class CrunchAccountingCsvConverter(CLI):
         self.running_balance = None
         self.default_timeout = None
         self.credit_card = False
+        self.reverse_order = False
 
     def add_options(self):
         super(CrunchAccountingCsvConverter, self).add_options()
         self.add_opt('-c', '--credit-card', action='store_true',
                      help='Credit Card statements (inverts transactions against running balance)')
+        self.add_opt('-r', '--reverse-order', action='store_true',
+                     help='Statement entries are in reverse chronological order (eg. Barclaycard)')
 
     def process_options(self):
         super(CrunchAccountingCsvConverter, self).process_options()
         self.credit_card = self.get_opt('credit_card')
+        self.reverse_order = self.get_opt('reverse_order')
 
     def run(self):
         if not self.args:
@@ -89,12 +96,15 @@ class CrunchAccountingCsvConverter(CLI):
                 log.error("FAILED to convert filename '%s'", filename)
 
     def convert(self, filename, target_filename):
+        if self.reverse_order:
+            filename = self.reverse_contents(filename)
         csvreader = self.get_csvreader(filename)
         if not csvreader:
             return False
         count = 0
         (positions, balance_position) = self.detect_columns(csvreader)
         csvwriter = csv.writer(open(target_filename, 'w'))
+        csvwriter.writerow(['Date', 'Description', 'Amount', 'Balance'])
         for row in csvreader:
             count += 1
             if balance_position is not None:
@@ -109,18 +119,33 @@ class CrunchAccountingCsvConverter(CLI):
                 [
                     row[positions['date']],
                     row[positions['desc']],
-                    row[positions['amount']],
+                    self.amount(row[positions['amount']]),
                     balance
                 ]
                 )
         log.info('%s: %s CSV lines processed', os.path.basename(filename), count)
         return True
 
+    def amount(self, amount):
+        if self.credit_card:
+            return -Decimal(amount)
+        return amount
+
     def update_balance(self, amount):
         if self.credit_card:
             self.running_balance -= Decimal(amount)
         else:
             self.running_balance += Decimal(amount)
+
+    @staticmethod
+    def reverse_contents(filename):
+        lines = open(filename).readlines()
+        lines = [lines[0]] + list(reversed(lines[1:]))
+        (_, tmp_filename) = tempfile.mkstemp(text=True)
+        filehandle = open(tmp_filename, 'w')
+        for line in lines:
+            filehandle.write(line)
+        return tmp_filename
 
     def detect_columns(self, csvreader):
         headers = csvreader.next()
