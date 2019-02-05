@@ -22,9 +22,9 @@ calculates the running balance if necessary
 
 File arguments are read one by one and converted and output to a file of the same name with _crunch.csv at the end
 
-If there is no balance column, you will prompted to provide the initial balance from which to calculate the running
-balance column for Crunch, In that case if specifying multiple CSV statements as arguments, they must be given in
-chronological order in order for one statement's running balance to flow on to the next in the correct order
+If there is no balance column you must provide a --starting-balance from which to calculate the running balance column
+for Crunch, In that case if specifying multiple CSV statements as arguments, they must be given in chronological order
+in order for one statement's running balance to flow on to the next in the correct order
 
 Can be easily extended for other banks CSV formats, as it's just simple matching of the headers, all that is required
 is a sample
@@ -58,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.3'
 
 
 class CrunchAccountingCsvConverter(CLI):
@@ -80,11 +80,19 @@ class CrunchAccountingCsvConverter(CLI):
                      help='Credit Card statements (inverts transactions against running balance)')
         self.add_opt('-r', '--reverse-order', action='store_true',
                      help='Statement entries are in reverse chronological order (eg. Barclaycard)')
+        self.add_opt('-s', '--starting-balance', help='Starting Balance (used if no balance column is found')
 
     def process_options(self):
         super(CrunchAccountingCsvConverter, self).process_options()
         self.credit_card = self.get_opt('credit_card')
         self.reverse_order = self.get_opt('reverse_order')
+        self.running_balance = self.get_opt('starting_balance')
+        if self.running_balance is not None:
+            try:
+                self.running_balance = Decimal(self.running_balance)
+            except ValueError as _:
+                log.error('INVALID starting balance %s, must be in a decimal number: %s', self.running_balance, _)
+                sys.exit(1)
 
     def run(self):
         if not self.args:
@@ -164,14 +172,8 @@ class CrunchAccountingCsvConverter(CLI):
             if positions[pos] is None:
                 log.error('field %s not found', pos)
                 return False
-        if balance_position is None:
-            print('Running balance column not found\nPlease give starting balance to auto-calculate it: ', end='')
-            self.running_balance = sys.stdin.readline().strip()
-            try:
-                self.running_balance = Decimal(self.running_balance)
-            except ValueError as _:
-                log.error('INVALID starting balance %s, must be in a decimal number: %s', self.running_balance, _)
-                sys.exit(1)
+        if balance_position is None and self.running_balance is None:
+            self.usage('no balance column detected, please specify --starting-balance')
         return (positions, balance_position)
 
     @staticmethod
