@@ -135,7 +135,7 @@ class CrunchAccountingCsvStatementConverter(CLI):
                     balance
                 ]
                 )
-        log.info('%s: %s CSV lines processed', os.path.basename(filename), count)
+        log.info('%s CSV lines processed', count)
         return True
 
     def amount(self, amount):
