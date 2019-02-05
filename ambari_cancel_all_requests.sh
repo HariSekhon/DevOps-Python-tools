@@ -51,7 +51,7 @@ if [ $# -gt 5 ]; then
 fi
 
 echo "querying Ambari for request IDs"
-curl -u "$AMBARI_USER:$AMBARI_PASSWORD" "http://$AMBARI_HOST:$AMBARI_PORT/api/v1/clusters/$AMBARI_CLUSTER/requests" |
+curl -u "$AMBARI_USER:$AMBARI_PASSWORD" "$PROTOCOL://$AMBARI_HOST:$AMBARI_PORT/api/v1/clusters/$AMBARI_CLUSTER/requests" |
 grep id |
 awk '{print $3}' |
 while read id; do
