@@ -333,7 +333,7 @@ class FindActiveServer(CLI):
     def finish(self, host, port=None):
         print(host, end='')
         if port is not None and port != self.port:
-            print(':{0}'.format(port))
+            print(':{0}'.format(port), end='')
         print()
         sys.exit(0)
 
@@ -419,11 +419,8 @@ class FindActiveServer(CLI):
             log.info('%s - checking regex against content', url)
             # if this ends up not being processed properly and remains a string instead
             # of the expected compiled regex, then .search() will hang
-            # now a precompiled regex
-            #if not isStr(self.regex):
-            #    die('non-string supplied for regex!')
-            #if type(self.regex) != '_sre.SRE_Pattern':
-            #    code_error('non-precompiled regex found!')
+            if isStr(self.regex):
+                die('string found instead of expected compiled regex!')
             if self.regex.search(req.content):
                 log.info('%s - regex matched http output', url)
             else:

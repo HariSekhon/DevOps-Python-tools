@@ -57,7 +57,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.3'
 
 
 class HdfsFindReplicationFactor1(CLI):
@@ -110,7 +110,7 @@ class HdfsFindReplicationFactor1(CLI):
             try:
                 result_list = client.ls([path], recurse=True, include_toplevel=True, include_children=True)
                 for result in result_list:
-                    if self.verbose:
+                    if self.verbose and (dir_count + file_count) % 100 == 0:
                         print('.', file=sys.stderr, end='')
                     if result['block_replication'] == 0:
                         dir_count += 1
@@ -125,8 +125,15 @@ class HdfsFindReplicationFactor1(CLI):
                         if self.replication_factor:
                             log.info('setting replication factor to {} on {}'\
                                      .format(self.replication_factor, file_path))
-                            # returns a generator so cast to list to force evaluation
-                            list(client.setrep([file_path], self.replication_factor, recurse=False))
+                            # returns a generator so must evaluate in order to actually execute
+                            # otherwise you find there is no effect on the replication factor
+                            for _ in client.setrep([file_path], self.replication_factor, recurse=False):
+                                if 'result' not in _:
+                                    print('WARNING: result field not found in setrep result: {}'.format(_),
+                                          file=sys.stderr)
+                                    continue
+                                if not _['result']:
+                                    print('WARNING: failed to setrep: {}'.format(_))
             except (snakebite.errors.FileNotFoundException, snakebite.errors.RequestError) as _:
                 if self.verbose:
                     print('', file=sys.stderr)
