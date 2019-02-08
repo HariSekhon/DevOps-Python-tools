@@ -61,7 +61,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4'
+__version__ = '0.5'
 
 
 class CrunchAccountingCsvStatementConverter(CLI):
@@ -157,6 +157,9 @@ class CrunchAccountingCsvStatementConverter(CLI):
 
     def detect_columns(self, csvreader):
         headers = csvreader.next()
+        if headers[0][0] == '{':
+            log.error('JSON opening braces detected, not a CSV?')
+            return False
         positions = {'date': None, 'desc': None, 'amount': None}
         balance_position = None
         for (position, value) in enumerate(headers):
@@ -208,18 +211,14 @@ class CrunchAccountingCsvStatementConverter(CLI):
                 # list of fields with no separator information
                 log.debug("line: %s", field_list)
                 # make it fail if there is only a single field on any line
-                if len(field_list) < 2:
-                    log.error("less than 2 fields detected, aborting conversion of file '%s'", filename)
-                    return None
-                # it's letting JSON through :-/
-                if field_list[0] == '{':
-                    log.info('JSON opening braces detected, not a CSV?')
+                if len(field_list) < 3:
+                    log.error("less than 3 fields detected, aborting conversion of file '%s'", filename)
                     return None
                 # extra protection along the same lines as anti-json:
                 # the first char of field should be alphanumeric, not syntax
                 # however instead of isAlnum allow quotes for quoted CSVs to pass validation
                 if not isChars(field_list[0][0], 'A-Za-z0-9"'):
-                    log.info('non-alphanumeric / quote opening character detected in CSV')
+                    log.error('non-alphanumeric / quote opening character detected in CSV')
                     return None
                 count += 1
         except csv.Error  as _:
