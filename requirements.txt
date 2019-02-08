@@ -35,7 +35,7 @@ py>=1.4.31
 python-krbV>=1.0.90
 # needed by avro
 python-snappy>=0.5
-PyYAML>=3.11
+PyYAML>=3.13
 requests>=2.11.1
 sasl>=0.2.1
 sh>=1.12.14
