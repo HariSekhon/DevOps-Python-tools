@@ -126,8 +126,6 @@ python:
 	# LD_RUN_PATH=/usr/local/include pip install snappy
 	#
 	$(SUDO_PIP) pip install --upgrade -r requirements.txt
-	# prevents https://urllib3.readthedocs.io/en/latest/security.html#insecureplatformwarning
-	$(SUDO_PIP) pip install --upgrade ndg-httpsclient
 	# for ipython-notebook-pyspark.py
 	#$(SUDO_PIP) pip install jinja2
 	# HiveServer2
