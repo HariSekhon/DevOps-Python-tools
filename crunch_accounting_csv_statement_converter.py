@@ -33,7 +33,7 @@ Can easily be extended for other Banks CSV formats, as it's just simple matching
 For additional formats just raise an github issue request with a sample CSV
 
 Tested on Barclaycard Commercial statement CSV exports
-(Barclaycard lists entries in reverse chronological order so need to use --credit and --reverse-order)
+(Barclaycard lists entries in reverse chronological order so you'll need to use --reverse-order, as well as --credit-card)
 
 """
 
