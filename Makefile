@@ -108,9 +108,15 @@ python:
 		$(MAKE) parquet-tools; \
 	fi
 	
-	# json module built-in to Python >= 2.6, backport not available via pypi
-	#$(SUDO_PIP) pip install json
-	
+	# fixes bug in cffi version detection when installing requests-kerberos
+	$(SUDO_PIP) pip install --upgrade pip
+
+	# only install pip packages not installed via system packages
+	#$(SUDO_PIP) pip install --upgrade -r requirements.txt
+	for pip_module in `sed 's/#.*//; s/[>=].*//; s/-/_/g; /^[[:space:]]*$$/d' requirements.txt`; do \
+		python -c "import $$pip_module" || $(SUDO_PIP) pip install "$$pip_module" || exit 1; \
+	done
+
 	# for impyla
 	$(SUDO_PIP) pip install --upgrade setuptools || :
 	#
@@ -125,7 +131,8 @@ python:
 	# sudo su
 	# LD_RUN_PATH=/usr/local/include pip install snappy
 	#
-	$(SUDO_PIP) pip install --upgrade -r requirements.txt
+	#$(SUDO_PIP) pip install --upgrade -r requirements.txt
+
 	# for ipython-notebook-pyspark.py
 	#$(SUDO_PIP) pip install jinja2
 	# HiveServer2
@@ -160,6 +167,7 @@ parquet-tools:
 apk-packages:
 	$(SUDO) apk update
 	$(SUDO) apk add `sed 's/#.*//; /^[[:space:]]*$$/d' setup/apk-packages.txt setup/apk-packages-dev.txt`
+	for package in `sed 's/#.*//; /^[[:space:]]*$$/d' setup/apk-packages-pip.txt`; do $(SUDO) apk add "$$package" || : ; done
 	if [ -z "$(NOJAVA)" ]; then which java || $(SUDO) apk add openjdk8-jre-base; fi
 	# Spark Java Py4J gets java linking error without this
 	if [ -f /lib/libc.musl-x86_64.so.1 ]; then [ -e /lib/ld-linux-x86-64.so.2 ] || ln -sv /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2; fi
@@ -181,6 +189,7 @@ apk-packages-remove:
 apt-packages:
 	$(SUDO) apt-get update
 	$(SUDO) apt-get install -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/deb-packages.txt setup/deb-packages-dev.txt`
+	for package in `sed 's/#.*//; /^[[:space:]]*$$/d' setup/deb-packages-pip.txt`; do $(SUDO) apt-get install -y "$$package" || : ; done
 	if [ -z "$(NOJAVA)" ]; then which java || $(SUDO) apt-get install -y openjdk-8-jdk || $(SUDO) apt-get install -y openjdk-7-jdk; fi
 
 # for validate_multimedia.py
@@ -208,6 +217,7 @@ yum-packages:
 	rpm -q wget || $(SUDO) yum install -y wget
 	rpm -q epel-release || yum install -y epel-release || { wget -t 100 --retry-connrefused -O /tmp/epel.rpm "https://dl.fedoraproject.org/pub/epel/epel-release-latest-`grep -o '[[:digit:]]' /etc/*release | head -n1`.noarch.rpm" && $(SUDO) rpm -ivh /tmp/epel.rpm && rm -f /tmp/epel.rpm; }
 	for x in `sed 's/#.*//; /^[[:space:]]*$$/d' setup/rpm-packages.txt setup/rpm-packages-dev.txt`; do rpm -q $$x || $(SUDO) yum install -y $$x; done
+	$(SUDO) yum install -y `sed 's/#.*//; /^[[:space:]]*$$/d' setup/rpm-packages-pip.txt` || :
 	if [ -z "$(NOJAVA)" ]; then which java || $(SUDO) yum install -y java; fi
 
 # for validate_multimedia.py
