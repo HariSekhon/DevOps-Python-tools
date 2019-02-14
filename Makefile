@@ -114,7 +114,7 @@ python:
 	# only install pip packages not installed via system packages
 	#$(SUDO_PIP) pip install --upgrade -r requirements.txt
 	for pip_module in `sed 's/#.*//; s/[>=].*//; s/-/_/g; /^[[:space:]]*$$/d' requirements.txt`; do \
-		python -c "import $$pip_module" || $(SUDO_PIP) pip install "$$pip_module" || exit 1; \
+		python -c "import $$pip_module" || $(SUDO_PIP) pip install --ignore-installed urllib3 "$$pip_module" || exit 1; \
 	done
 
 	# for impyla
