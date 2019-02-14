@@ -1,0 +1,27 @@
+#
+#  Author: Hari Sekhon
+#  Date: 2013-02-03 10:25:36 +0000 (Sun, 03 Feb 2013)
+#
+#  https://github.com/harisekhon/devops-python-tools
+#
+#  License: see accompanying LICENSE file
+#
+#  https://www.linkedin.com/in/harisekhon
+#
+
+# ============================================================================ #
+#                          RPM PIP Package Requirements
+# ============================================================================ #
+
+GitPython
+python-flask
+python-humanize
+python-jinja2
+python-krbV
+python-linecache2
+python-markupsafe
+python-thrift
+python-xmltodict
+python2-bitarray
+python2-numpy
+python2-psutil
