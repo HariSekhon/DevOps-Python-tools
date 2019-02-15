@@ -325,19 +325,19 @@ push:
 # For quick testing only - for actual Dockerfile builds see https://hub.docker.com/r/harisekhon/tools
 .PHONY: docker-alpine
 docker-alpine:
-	docker run -ti -v $$PWD:/py alpine sh /py/bash-tools/exec-interactive.sh 'cd /py && apk add --no-cache make && make build test'
+	bash-tools/docker_mount_build_exec.sh alpine
 
 # For quick testing only - for actual Dockerfile builds see https://hub.docker.com/r/harisekhon/tools
 .PHONY: docker-debian
 docker-debian:
-	docker run -ti -v $$PWD:/tools debian /tools/bash-tools/exec-interactive.sh 'cd /tools && apt-get update && apt-get install -y make && make build test'
+	bash-tools/docker_mount_build_exec.sh debian
 
 # For quick testing only - for actual Dockerfile builds see https://hub.docker.com/r/harisekhon/tools
 .PHONY: docker-centos
 docker-centos:
-	docker run -ti -v $$PWD:/tools centos /tools/bash-tools/exec-interactive.sh 'cd /tools && yum install -y make && make build test'
+	bash-tools/docker_mount_build_exec.sh centos
 
 # For quick testing only - for actual Dockerfile builds see https://hub.docker.com/r/harisekhon/tools
 .PHONY: docker-ubuntu
 docker-ubuntu:
-	docker run -ti -v $$PWD:/tools ubuntu /tools/bash-tools/exec-interactive.sh 'cd /tools && apt-get update && apt-get install -y make && make build test'
+	bash-tools/docker_mount_build_exec.sh ubuntu
