@@ -113,7 +113,8 @@ python:
 
 	# only install pip packages not installed via system packages
 	#$(SUDO_PIP) pip install --upgrade -r requirements.txt
-	@bash-tools/python_pip_install_if_absent.sh requirements.txt
+	#@bash-tools/python_pip_install_if_absent.sh requirements.txt
+	$(SUDO_PIP) pip install -r requirements.txt
 
 	# for impyla
 	$(SUDO_PIP) pip install --upgrade setuptools || :
