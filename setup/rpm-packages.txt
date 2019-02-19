@@ -33,4 +33,4 @@ https-tools
 # needed to build python-snappy for avro module
 snappy-devel
 
-#which java || $(SUDO) yum install -y java
+java
