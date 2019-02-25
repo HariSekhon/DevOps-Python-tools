@@ -42,7 +42,7 @@ build:
 	@echo =============
 
 	$(MAKE) init
-	if [ -z "$(CPANM)" ]; then make; exit $?; fi
+	if [ -z "$(CPANM)" ]; then make; exit $$?; fi
 	$(MAKE) system-packages
 	if type apk 2&>/dev/null; then $(MAKE) apk-packages-extra; fi
 	if type apt-get 2&>/dev/null; then $(MAKE) apt-packages-extra; fi
