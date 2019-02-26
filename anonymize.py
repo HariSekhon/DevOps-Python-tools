@@ -90,8 +90,10 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.9.2'
+__version__ = '0.9.3'
 
+ip_regex = '(?!127.0.0.1)' + ip_regex
+subnet_mask_regex = '(?!127.0.0.1)' + subnet_mask_regex
 
 class Anonymize(CLI):
 
@@ -274,7 +276,7 @@ class Anonymize(CLI):
         # don't use this simpler one as we want to catch everything inside quotes eg. 'my secret'
         #password_quoted = r'\S+'
         password_quoted = r'(?:\'[^\']+\'|"[^"]+"|\S+)'
-        user_name = r'(?:user(?:-?name)?|uid)'
+        user_name = r'(?:user(?:[_-]?name)?|uid)'
         group_name = r'group(?:-?name)?'
         arg_sep = r'[=\s:]+'
         # openssl uses -passin switch
