@@ -32,7 +32,7 @@ override each one.
 Exits with return code 1 and NO_AVAILABLE_SERVER if none of the namenodes are active, --quiet mode will not print
 NO_AVAILABLE_SERVER.
 
-Tested on Oozie
+Tested on Oozie 4.2.0 on Hortonworks HDP 2.6.0
 
 """
 
