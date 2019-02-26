@@ -418,6 +418,12 @@ dest[107]="hdfs://<hostname>/<user>"
 src[108]="hdfs:///user/blah"
 dest[108]="hdfs:///user/<user>"
 
+src[109]="es.xpack.user=hari"
+dest[109]="es.xpack.user=<user>"
+
+src[110]="es.xpack.password=myp@ss!"
+dest[110]="es.xpack.password=<password>"
+
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
 #dest[103]="proxy <proxy_host> port <proxy_port>"
