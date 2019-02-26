@@ -16,3 +16,4 @@
 
 openssl
 wget
+yamllint
