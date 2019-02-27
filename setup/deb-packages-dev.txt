@@ -13,5 +13,5 @@
 #                          Deb Dev Package Requirements
 # ============================================================================ #
 
-unzip
-zip
+# needed to build python-snappy for avro module
+libsnappy-dev
