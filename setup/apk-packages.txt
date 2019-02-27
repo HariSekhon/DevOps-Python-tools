@@ -13,15 +13,10 @@
 #                          Alpine Package Requirements
 # ============================================================================ #
 
-bash
 # without this arguments to mktemp fail in json tests
 coreutils
-git
+
 grep
-make
-py2-pip
-python
-snappy-dev
 
 # needed for tests/test_spark* and ambari_cancel_all_requests.sh
 curl
