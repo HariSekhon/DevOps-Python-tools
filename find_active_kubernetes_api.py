@@ -16,7 +16,7 @@
 
 """
 
-Tool to return the the active Oozie server from an argument list of hosts
+Tool to return the the active Kubernetes API server from an argument list of hosts
 
 Can mix and match between a comma separated list of hosts (--host server1,server2 or contents of the $HOST
 environment variable if not specified) and general free-form space separated arguments, which is useful if piping
@@ -32,7 +32,7 @@ override each one.
 Exits with return code 1 and NO_AVAILABLE_SERVER if none of the namenodes are active, --quiet mode will not print
 NO_AVAILABLE_SERVER.
 
-Tested on Oozie 4.2.0 on Hortonworks HDP 2.6.0
+Tested on Kubernetes 1.13
 
 """
 
@@ -59,21 +59,22 @@ __author__ = 'Hari Sekhon'
 __version__ = '0.7.1'
 
 
-class FindActiveOozie(FindActiveServer):
+class FindActiveKubernetesAPI(FindActiveServer):
 
     def __init__(self):
         # Python 2.x
-        super(FindActiveOozie, self).__init__()
+        super(FindActiveKubernetesAPI, self).__init__()
         # Python 3.x
         # super().__init__()
-        self.default_port = 11000
+        self.default_port = 8001
         self.protocol = 'http'
-        self.url_path = '/oozie/v1/admin/status'
-        self.regex = r'{"systemMode":"NORMAL"}'
+        # or just /healthz
+        self.url_path = '/healthz/ping'
+        self.regex = '^ok$'
         self.default_num_threads = 2
 
     def add_options(self):
-        self.add_hostoption(name='Oozie', default_port=self.default_port)
+        self.add_hostoption(name='Kubernetes', default_port=self.default_port)
         self.add_ssl_opt()
         self.add_common_opts()
 
@@ -82,4 +83,4 @@ class FindActiveOozie(FindActiveServer):
 
 
 if __name__ == '__main__':
-    FindActiveOozie().main()
+    FindActiveKubernetesAPI().main()

@@ -90,8 +90,10 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.9.1'
+__version__ = '0.9.4'
 
+ip_regex = r'(?!127\.0\.0\.)' + ip_regex
+subnet_mask_regex = r'(?!127\.0\.0\.)' + subnet_mask_regex
 
 class Anonymize(CLI):
 
@@ -274,7 +276,7 @@ class Anonymize(CLI):
         # don't use this simpler one as we want to catch everything inside quotes eg. 'my secret'
         #password_quoted = r'\S+'
         password_quoted = r'(?:\'[^\']+\'|"[^"]+"|\S+)'
-        user_name = r'(?:user(?:-?name)?|uid)'
+        user_name = r'(?:user(?:[_-]?name)?|uid)'
         group_name = r'group(?:-?name)?'
         arg_sep = r'[=\s:]+'
         # openssl uses -passin switch
@@ -295,7 +297,7 @@ class Anonymize(CLI):
             'group2': r'({group_name}{sep}){user}'.format(group_name=group_name, sep=arg_sep, user=user_regex),
             'group3': r'for\s+group\s+{group}'.format(group=user_regex),
             'group4': r'(["\']{group_name}["\']\s*:\s*["\']?){group}'.format(group_name=group_name, group=user_regex),
-            'user': r'(-{user_name}{sep})\S+'.format(user_name=user_name, sep=arg_sep),
+            'user': r'([-\.]{user_name}{sep})\S+'.format(user_name=user_name, sep=arg_sep),
             'user2': r'/(home|user)/{user}'.format(user=user_regex),
             'user3': r'({user_name}{sep}){user}'.format(user_name=user_name, sep=arg_sep, user=user_regex),
             'user4': r'(?<![\w\\]){NT_DOMAIN}(?!\\n\d\d\d\d-\d\d-\d\d)\\{user}(?!\\)'\
@@ -305,7 +307,7 @@ class Anonymize(CLI):
             'user6': r'(?<!<user>/){user}@'.format(user=user_regex),
             'user7': r'(["\'](?:{user_name}|owner)["\']\s*:\s*["\']?){user}'\
                      .format(user_name=user_name, user=user_regex),
-            'password': r'(-?{pass_word_phrase}{sep}){pw}'\
+            'password': r'([-\.]?{pass_word_phrase}{sep}){pw}'\
                         .format(pass_word_phrase=pass_word_phrase,
                                 sep=arg_sep,
                                 pw=password_quoted),

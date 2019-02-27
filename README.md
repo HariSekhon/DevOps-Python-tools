@@ -130,6 +130,7 @@ Environment variables are supported for convenience and also to hide credentials
       - ```find_active_apache_drill.py``` - returns first available [Apache Drill](https://drill.apache.org/) node
       - ```find_active_cassandra.py``` - returns first available [Apache Cassandra](https://cassandra.apache.org/) node
       - ```find_active_impala*.py``` - returns first available [Impala](https://impala.apache.org/) node of either Impalad, Catalog or Statestore
+      - ```find_active_kubernetes_api.py``` - returns first available [Kubernetes](https://kubernetes.io/) API server
       - ```find_active_presto_coordinator.py``` - returns first available [Presto](https://prestodb.io/) Coordinator
       - ```find_active_oozie.py``` - returns first active [Oozie](http://oozie.apache.org/) server
       - ```find_active_solrcloud.py``` - returns first available [Solr](http://lucene.apache.org/solr/) / [SolrCloud](https://wiki.apache.org/solr/SolrCloud) node

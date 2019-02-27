@@ -2,7 +2,7 @@
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
-#  Date: 2015-11-05 23:29:15 +0000 (Thu, 05 Nov 2015)
+#  Date: 2019-02-26 14:40:53 +0000 (Tue, 26 Feb 2019)
 #
 #  https://github.com/harisekhon/devops-python-tools
 #
@@ -17,25 +17,19 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-. "$srcdir/utils.sh"
+cfg="$srcdir/../.yamllint"
 
-# imported by utils.sh above
-#. "$srcdir/../bash-tools/utils.sh"
-
-export PROJECT=pytools
-
-section "Running PyTools ALL"
-
-# runs against . by default
 cd "$srcdir/..";
-bash-tools/all.sh
 
-tests/test_yamllint.sh
+. ./tests/utils.sh
 
-# do help afterwards for Spark to be downloaded, and then help will find and use downloaded spark for SPARK_HOME
-exit 0
+section "Running Yaml lint"
 
-# pyspark not found
-tests/help.sh
+yamllint -c "$cfg" .
 
-bash-tools/run_tests.sh
+echo "======="
+echo "SUCCESS"
+echo "======="
+
+echo
+echo

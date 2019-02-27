@@ -1,19 +1,16 @@
-#  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
-#  Date: 2018-05-22 11:15:16 +0100 (Tue, 22 May 2018)
+#  Date: 2013-02-03 10:25:36 +0000 (Sun, 03 Feb 2013)
 #
 #  https://github.com/harisekhon/devops-python-tools
 #
-#  License: see accompanying Hari Sekhon LICENSE file
+#  License: see accompanying LICENSE file
 #
 #  https://www.linkedin.com/in/harisekhon
 #
 
 # ============================================================================ #
-#                    Mac OS X - Homebrew Package Requirements
+#                       RPM Optional Package Requirements
 # ============================================================================ #
 
-openssl
-wget
 yamllint
