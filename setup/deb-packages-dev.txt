@@ -13,10 +13,7 @@
 #                          Deb Dev Package Requirements
 # ============================================================================ #
 
-build-essential
-libkrb5-dev
 libsasl2-dev
-python-dev
 unzip
 wget
 zip
