@@ -23,7 +23,6 @@ python-humanize
 python-jinja2
 python-krbv
 python-ldif3
-python-linecache2
 python-numpy
 python-psutil
 python-sh
