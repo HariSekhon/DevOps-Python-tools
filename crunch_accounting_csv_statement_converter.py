@@ -61,7 +61,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5'
+__version__ = '0.6.0'
 
 
 class CrunchAccountingCsvStatementConverter(CLI):
@@ -107,6 +107,7 @@ class CrunchAccountingCsvStatementConverter(CLI):
                 log.info("converted '%s' => '%s'", filename, target_filename)
             else:
                 log.error("FAILED to convert filename '%s'", filename)
+        log.info('Final Balance: {}'.format(self.running_balance))
 
     def convert(self, filename, target_filename):
         if self.reverse_order:
