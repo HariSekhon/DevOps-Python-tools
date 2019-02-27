@@ -27,6 +27,7 @@ python-linecache2
 python-numpy
 python-psutil
 python-sh
+python-six
 python-snappy
 python-thrift
 python-xmltodict
