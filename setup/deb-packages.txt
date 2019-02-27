@@ -15,14 +15,11 @@
 
 # needed to fetch the library submodule at end of build
 git
-
 python
-python-pip
-python-setuptools
-python-six
-unzip
+
 wget
 zip
+unzip
 
 # needed for tests/test_spark* and ambari_cancel_all_requests.sh
 curl
@@ -36,9 +33,6 @@ apache2-utils
 
 # needed for serf test's 'uptime' command
 procps
-
-# needed to build python-snappy for avro module
-libsnappy-dev
 
 # installs 343MB of dependencies - install by hand if needed
 #ffmpeg
