@@ -17,10 +17,6 @@
 git
 python
 
-wget
-zip
-unzip
-
 # needed for tests/test_spark* and ambari_cancel_all_requests.sh
 curl
 
