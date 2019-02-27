@@ -13,7 +13,12 @@
 #                          Deb Dev Package Requirements
 # ============================================================================ #
 
-libsasl2-dev
+zip
 unzip
 wget
-zip
+
+libsasl2-dev
+
+# needed to build python-snappy for avro module
+libsnappy-dev
+
