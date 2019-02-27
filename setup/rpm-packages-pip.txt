@@ -18,7 +18,6 @@ python-flask
 python-humanize
 python-jinja2
 python-krbV
-python-linecache2
 python-markupsafe
 python-thrift
 python-xmltodict
