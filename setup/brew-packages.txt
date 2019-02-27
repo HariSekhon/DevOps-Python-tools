@@ -14,4 +14,5 @@
 #                    Mac OS X - Homebrew Package Requirements
 # ============================================================================ #
 
+snappy
 yamllint
