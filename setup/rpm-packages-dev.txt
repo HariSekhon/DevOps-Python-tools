@@ -13,12 +13,9 @@
 #                          RPM Dev Package Requirements
 # ============================================================================ #
 
-cyrus-sasl-devel
-gcc
 gcc-c++
-git
+
+cyrus-sasl-devel
 krb5-devel
-python-devel
 unzip
-wget
 zip
