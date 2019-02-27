@@ -13,13 +13,6 @@
 #                            Deb Package Requirements
 # ============================================================================ #
 
-# needed to fetch the library submodule at end of build
-git
-
-python
-python-pip
-python-setuptools
-python-six
 unzip
 wget
 zip
