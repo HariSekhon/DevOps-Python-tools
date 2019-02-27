@@ -12,15 +12,3 @@
 # ============================================================================ #
 #                        Alpine Dev Package Requirements
 # ============================================================================ #
-
-alpine-sdk
-gcc
-cyrus-sasl-dev
-krb5-dev
-libffi-dev
-linux-headers
-#openssl-dev
-libressl-dev
-python-dev
-wget
-zip
