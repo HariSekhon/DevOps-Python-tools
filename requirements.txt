@@ -16,7 +16,6 @@ humanize>=0.5.1
 Jinja2>=2.8
 #kazoo>=2.2.1
 ldif3>=3.2.2
-linecache2>=1.0.0
 MarkupSafe>=0.23
 #Markdown>=2.6.8
 numpy>=1.8.0rc1
