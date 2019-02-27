@@ -13,10 +13,6 @@
 #                          RPM Package Requirements
 # ============================================================================ #
 
-git
-python-pip
-python-setuptools
-
 # needed for tests/test_spark* and ambari_cancel_all_requests.sh
 curl
 
