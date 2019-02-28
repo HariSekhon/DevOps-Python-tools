@@ -14,9 +14,9 @@
 # ============================================================================ #
 
 python-avro
-python-bitarray
+#python-bitarray
 python-dicttoxml
-python-flask
+#python-flask
 python-git
 python-happybase
 python-humanize
