@@ -14,6 +14,8 @@
 #                    Mac OS X - Homebrew Package Requirements
 # ============================================================================ #
 
+# for anonymize_parallel.sh
 parallel
+
 snappy
 yamllint
