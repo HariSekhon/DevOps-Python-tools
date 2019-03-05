@@ -25,7 +25,6 @@ curl
 apache2-utils
 
 # for anonymize_parallel.sh
-split
 parallel
 
 #which java || $(SUDO) apk add openjdk8-jre-base
