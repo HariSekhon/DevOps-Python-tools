@@ -24,6 +24,9 @@ curl
 # for htpasswd for docker registry authenticated checks
 apache2-utils
 
+# for anonymize_parallel.sh
+parallel
+
 #which java || $(SUDO) apk add openjdk8-jre-base
 
 # Spark Java Py4J gets java linking error without this
