@@ -26,6 +26,9 @@ https-tools
 # libgsasl-devel saslwrapper-devel
 #cyrus-sasl-devel
 
+# for anonymize_parallel.sh
+parallel
+
 # needed to build python-snappy for avro module
 snappy-devel
 
