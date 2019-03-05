@@ -23,6 +23,9 @@ iputils-ping
 # for htpasswd for docker registry authenticated checks
 apache2-utils
 
+# for anonymize_parallel.sh
+parallel
+
 # needed for serf test's 'uptime' command
 procps
 
