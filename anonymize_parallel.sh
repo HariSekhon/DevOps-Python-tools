@@ -19,6 +19,9 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 . "$srcdir/bash-tools/utils.sh"
 
+# re-establish srcdir local to this script since util.sh include brings its own srcdir
+srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 usage(){
     if [ -n "$*" ]; then
         echo "$@"
@@ -47,11 +50,11 @@ parts="$(cpu_count)"
 
 for filename in $@; do
     echo "Removing any pre-existing parts:"
-    rm -v "$filename".*
-    bash-tools/split.sh "$filename"
+    rm -v "$filename".* 2>/dev/null || :
+    "$srcdir/bash-tools/split.sh" "$filename"
     echo "Anonymizing parts"
     for file_part in "$filename".*; do
-        echo "./anonymize.py -a $file_part > $file_part.anonymized"
+        echo "$srcdir/anonymize.py -a $file_part > $file_part.anonymized"
     done |
     parallel -j "$parts"
     cat "$filename".*.anonymized > "$filename".anonymized
