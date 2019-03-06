@@ -59,8 +59,8 @@ for filename in $@; do
     parallel -j "$parts"
     cat "$filename".*.anonymized > "$filename".anonymized
     echo "Removing parts:"
-    rm -v "$filename".*.anonymized
-    rm -v "$filename".[a-z0-9][a-z0-9] "$filename".[a-z0-9][a-z0-9][a-z0-9] 2>/dev/null
+    rm -v "$filename".*.anonymized || :
+    rm -v "$filename".[a-z0-9][a-z0-9] "$filename".[a-z0-9][a-z0-9][a-z0-9] 2>/dev/null || :
     echo "Anonymized file ready: $filename.anonymized"
 done
 echo "Done"
