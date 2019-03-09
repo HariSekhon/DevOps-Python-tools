@@ -29,34 +29,44 @@ usage(){
     fi
     cat <<EOF
 
-Splits a big file in to \$PARTS parts (defaults to the number of CPU processors) and then runs that parallel anonymize.py processes on the parts before concatenating back in to one big anonymized file
+Splits a big file in to \$PARALLISM parts (defaults to the number of CPU processors) and then runs that man parallel anonymize.py processes on the individual parts before concatenating back in to one big anonymized file
 
-This makes it much, much faster to anonymize large log files for passing to vendors
+This makes it much, much faster to anonymize large log files for passing to vendors while maintaining the order of evaluation which is important for more specific matching before less specific matching
 
 usage: ${0##*/} <files>
 
+-p --parallelism    Number of parts to split files in to and anonymize in paallel before reconstituting
+-h --help           Show usage and exit
 EOF
     exit 3
 }
 
-for x in $@; do
-    case $x in
-        -h|--help)  usage
-                    ;;
+parallelism="${PARALLELISM:-$(cpu_count)}"
+
+file_list=""
+
+while [ $# -gt 0 ]; do
+    case $1 in
+        -p|--parallel)  parallelism="$2"
+                        shift
+                        ;;
+         -h|--help|-*)  usage
+                        ;;
+                    *)  file_list="$file_list $1"
+                        ;;
     esac
+    shift
 done
 
-parts="$(cpu_count)"
-
-for filename in $@; do
+for filename in $file_list; do
     echo "Removing any pre-existing parts:"
     rm -v "$filename".* 2>/dev/null || :
-    "$srcdir/bash-tools/split.sh" "$filename"
+    "$srcdir/bash-tools/split.sh" --parts "$parallelism" "$filename"
     echo "Anonymizing parts"
     for file_part in "$filename".*; do
         echo "$srcdir/anonymize.py -a $file_part > $file_part.anonymized"
     done |
-    parallel -j "$parts"
+    parallel -j "$parallelism"
     cat "$filename".*.anonymized > "$filename".anonymized
     echo "Removing parts:"
     rm -v "$filename".*.anonymized || :
