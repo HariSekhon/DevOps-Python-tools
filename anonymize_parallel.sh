@@ -59,18 +59,26 @@ while [ $# -gt 0 ]; do
 done
 
 for filename in $file_list; do
+    echo
+    echo "Processing file '$filename':"
+    echo
     echo "Removing any pre-existing parts:"
     rm -v "$filename".* 2>/dev/null || :
+    echo
     "$srcdir/bash-tools/split.sh" --parts "$parallelism" "$filename"
     echo "Anonymizing parts"
     for file_part in "$filename".*; do
-        echo "$srcdir/anonymize.py -a $file_part > $file_part.anonymized"
+        cmd="$srcdir/anonymize.py -a $file_part > $file_part.anonymized"
+        echo "$cmd"
     done |
     parallel -j "$parallelism"
+    echo "Concatenating parts"
     cat "$filename".*.anonymized > "$filename".anonymized
+    echo
     echo "Removing parts:"
     rm -v "$filename".*.anonymized || :
     rm -v "$filename".[a-z0-9][a-z0-9] "$filename".[a-z0-9][a-z0-9][a-z0-9] 2>/dev/null || :
+    echo
     echo "Anonymized file ready: $filename.anonymized"
+    echo
 done
-echo "Done"
