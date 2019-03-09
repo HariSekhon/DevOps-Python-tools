@@ -150,7 +150,8 @@ jython:
 	if [ -x /usr/bin/yum ];     then yum install -y wget expect; fi
 	sh jython_install.sh
 
-compile:
+.PHONY: pycompile
+pycompile:
 	bash-tools/python_compile.sh
 
 .PHONY: test-lib
