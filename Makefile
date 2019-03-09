@@ -98,7 +98,7 @@ python:
 	# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
 	$(SUDO_PIP) pip install "ipython[notebook]" || :
 	@echo
-	bash-tools/python_compile.sh
+	$(MAKE) pycompile
 	@echo
 	@echo
 	$(MAKE) spark-deps
