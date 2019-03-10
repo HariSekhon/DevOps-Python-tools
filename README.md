@@ -71,7 +71,7 @@ Environment variables are supported for convenience and also to hide credentials
     - placeholder tokens indicate what was stripped out (eg. ```<fqdn>```, ```<password>```, ```<custom>```)
     - ```--ip-prefix``` leaves the last IP octect to aid in cluster debugging to still see differentiated nodes communicating with each other to compare configs and log communications
     - ```--hash-hostnames``` - hashes hostnames to look like Docker temporary container ID hostnames so that vendors support teams can differentiate hosts in clusters
-    - ```anonymize_parallel.sh``` - splits files in to multiple parts to run anonymize.py on each part in parallel before re-join. Preserves order of evaluation important for anonymization rules, as well as file ordering. On servers this parallelization can result in a 30x speed up
+    - ```anonymize_parallel.sh``` - splits files in to multiple parts and runs `anonymize.py` on each part in parallel before re-joining back in to a file of the same name with a `.anonymized` suffix. Preserves order of evaluation important for anonymization rules, as well as file ordering. On servers this parallelization can result in a 30x speed up
   - ```find_duplicate_files.py``` - finds duplicate files in one or more directory trees via multiple methods including file basename, size, MD5 comparison of same sized files, or bespoke regex capture of partial file basename
   - ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user to put in your shell's ```.profile``` (there is also a perl version in my [DevOps Perl Tools](https://github.com/harisekhon/perl-tools) repo)
 - Hadoop & NoSQL:
