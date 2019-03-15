@@ -29,7 +29,7 @@ usage(){
     fi
     cat <<EOF
 
-Splits a big file in to \$PARALLELISM parts (defaults to the number of CPU processors) and then runs that man parallel anonymize.py processes on the individual parts before concatenating back in to one big anonymized file
+Splits a big file in to \$PARALLELISM parts (defaults to the number of CPU processors) and then runs that many parallel anonymize.py processes on the individual parts before concatenating back in to one big anonymized file
 
 This makes it much, much faster to anonymize large log files for passing to vendors while maintaining the order of evaluation which is important for more specific matching before less specific matching
 
