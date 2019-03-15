@@ -24,10 +24,10 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 usage(){
     if [ -n "$*" ]; then
-        echo "$@"
-        echo
+        echo "$@" >&2
+        echo >&2
     fi
-    cat <<EOF
+    cat >&2 <<EOF
 
 Splits a big file in to \$PARALLELISM parts (defaults to the number of CPU processors) and then runs that many parallel anonymize.py processes on the individual parts before concatenating back in to one big anonymized file
 
