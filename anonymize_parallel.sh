@@ -35,7 +35,7 @@ This makes it much, much faster to anonymize large log files for passing to vend
 
 usage: ${0##*/} <files>
 
--p --parallelism    Number of parts to split files in to and anonymize in paallel before reconstituting
+-p --parallelism    Number of parts to split files in to and anonymize in parallel before reconstituting
 -h --help           Show usage and exit
 EOF
     exit 3
