@@ -24,18 +24,18 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 usage(){
     if [ -n "$*" ]; then
-        echo "$@"
-        echo
+        echo "$@" >&2
+        echo >&2
     fi
-    cat <<EOF
+    cat >&2 <<EOF
 
-Splits a big file in to \$PARALLISM parts (defaults to the number of CPU processors) and then runs that man parallel anonymize.py processes on the individual parts before concatenating back in to one big anonymized file
+Splits a big file in to \$PARALLELISM parts (defaults to the number of CPU processors) and then runs that many parallel anonymize.py processes on the individual parts before concatenating back in to one big anonymized file
 
 This makes it much, much faster to anonymize large log files for passing to vendors while maintaining the order of evaluation which is important for more specific matching before less specific matching
 
 usage: ${0##*/} <files>
 
--p --parallelism    Number of parts to split files in to and anonymize in paallel before reconstituting
+-p --parallelism    Number of parts to split files in to and anonymize in parallel before reconstituting
 -h --help           Show usage and exit
 EOF
     exit 3
