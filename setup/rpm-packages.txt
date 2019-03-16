@@ -29,7 +29,4 @@ https-tools
 # for anonymize_parallel.sh
 parallel
 
-# needed to build python-snappy for avro module
-snappy-devel
-
 java
