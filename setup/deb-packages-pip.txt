@@ -14,14 +14,13 @@
 # ============================================================================ #
 
 python-avro
-#python-bitarray
 python-dicttoxml
-#python-flask
 python-git
 python-happybase
 python-humanize
 python-jinja2
 python-krbv
+python-ldap
 python-ldif3
 python-numpy
 python-psutil
@@ -29,3 +28,5 @@ python-sh
 python-snappy
 python-thrift
 python-xmltodict
+#python-bitarray
+#python-flask
