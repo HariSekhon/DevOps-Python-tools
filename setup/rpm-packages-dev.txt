@@ -14,8 +14,9 @@
 # ============================================================================ #
 
 gcc-c++
-
 cyrus-sasl-devel
 krb5-devel
+openssl-devel
+snappy-devel
 unzip
 zip
