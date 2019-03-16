@@ -13,5 +13,6 @@
 #                        Alpine Dev Package Requirements
 # ============================================================================ #
 
+openldap-dev
 snappy-dev
 unzip
