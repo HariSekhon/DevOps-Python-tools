@@ -14,13 +14,14 @@
 # ============================================================================ #
 
 GitPython
-#python-flask
 python-humanize
 python-jinja2
 python-krbV
-#python-markupsafe
+python-ldap
 python-thrift
 python-xmltodict
-#python2-bitarray
 python2-numpy
 python2-psutil
+#python-flask
+#python-markupsafe
+#python2-bitarray
