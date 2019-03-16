@@ -13,6 +13,7 @@
 #                          Deb Dev Package Requirements
 # ============================================================================ #
 
+libldap2-dev
 # needed to build python-snappy for avro module
 libsnappy-dev
 unzip
