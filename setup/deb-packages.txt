@@ -40,3 +40,5 @@ procps
 #ipython-notebook || :
 
 #which java || $(SUDO) apt-get install -y openjdk-8-jdk || $(SUDO) apt-get install -y openjdk-7-jdk
+
+zip
