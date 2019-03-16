@@ -14,7 +14,8 @@
 # ============================================================================ #
 
 py-dicttoxml
-#py-flask
 py-psutil
+py-pyldap
 py2-jinja2
 py2-numpy
+#py-flask
