@@ -13,6 +13,8 @@
 #                          RPM Package Requirements
 # ============================================================================ #
 
+java
+
 # needed for tests/test_spark* and ambari_cancel_all_requests.sh
 curl
 
@@ -29,4 +31,5 @@ https-tools
 # for anonymize_parallel.sh
 parallel
 
-java
+unzip
+zip
