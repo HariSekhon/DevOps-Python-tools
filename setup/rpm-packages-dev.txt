@@ -19,5 +19,3 @@ krb5-devel
 openssl-devel
 # needed to build python-snappy for avro module
 snappy-devel
-unzip
-zip
