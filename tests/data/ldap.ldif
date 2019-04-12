@@ -1,0 +1,70 @@
+# extended LDIF
+#
+# LDAPv3
+# base <dc=example,dc=org> with scope subtree
+# filter: (objectclass=*)
+# requesting: ALL
+#
+
+# example.org
+dn: dc=example,dc=org
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: Example Inc.
+dc: example
+
+# admin, example.org
+dn: cn=admin,dc=example,dc=org
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: admin
+description: LDAP administrator
+userPassword:: e1NTSEF9TnpTTnRqbzZUUlgrM2c3Y3c4VHU3eVpCOXhaaDJtN00=
+
+# Users, example.org
+dn: ou=Users,dc=example,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: Users
+
+# Groups, example.org
+dn: ou=Groups,dc=example,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: Groups
+
+# Dept1, Groups, example.org
+dn: ou=Dept1,ou=Groups,dc=example,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: Dept1
+
+# DeptA, Dept1, Groups, example.org
+dn: ou=DeptA,ou=Dept1,ou=Groups,dc=example,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: DeptA
+
+# hari, Users, example.org
+dn: cn=hari,ou=Users,dc=example,dc=org
+cn: hari
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+sn: sekhon
+memberOf: cn=SuperAdmins,ou=DeptA,ou=Dept1,ou=Groups,dc=example,dc=org
+
+# SuperAdmins, DeptA, Dept1, Groups, example.org
+dn: cn=SuperAdmins,ou=DeptA,ou=Dept1,ou=Groups,dc=example,dc=org
+cn: SuperAdmins
+member: cn=hari,ou=Users,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 9
+# numEntries: 8
