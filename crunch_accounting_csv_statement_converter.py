@@ -61,7 +61,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.0'
+__version__ = '0.6.1'
 
 
 class CrunchAccountingCsvStatementConverter(CLI):
@@ -164,7 +164,8 @@ class CrunchAccountingCsvStatementConverter(CLI):
         positions = {'date': None, 'desc': None, 'amount': None}
         balance_position = None
         for (position, value) in enumerate(headers):
-            if 'Date' in value:
+            # want Transaction Date and not Posted Date
+            if 'Date' in value and not 'Posted' in value:
                 positions['date'] = position
             elif 'Merchant Name' in value:
                 positions['desc'] = position

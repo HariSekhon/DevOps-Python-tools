@@ -1,6 +1,6 @@
 Hari Sekhon - DevOps Python Tools
 =================================
-[![Build Status](https://travis-ci.org/HariSekhon/devops-python-tools.svg?branch=master)](https://travis-ci.org/HariSekhon/devops-python-tools)
+[![Build Status](https://travis-ci.org/HariSekhon/DevOps-Python-tools.svg?branch=master)](https://travis-ci.org/HariSekhon/DevOps-Python-tools)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f7af72140c3b408b9659207ced17544f)](https://www.codacy.com/app/harisekhon/devops-python-tools)
 [![GitHub stars](https://img.shields.io/github/stars/harisekhon/devops-python-tools.svg)](https://github.com/harisekhon/devops-python-tools/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/harisekhon/devops-python-tools.svg)](https://github.com/harisekhon/devops-python-tools/network)
