@@ -63,8 +63,8 @@ objectClass: groupOfNames
 objectClass: top
 
 # search result
-search: 2
-result: 0 Success
+#search: 2
+#result: 0 Success
 
 # numResponses: 9
 # numEntries: 8
