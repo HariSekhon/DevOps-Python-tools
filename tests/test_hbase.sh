@@ -245,19 +245,19 @@ EOF
     run_conn_refused ./hbase_table_row_key_distribution.py -T HexStringSplitTable
 
     # ============================================================================ #
-    run ./hbase_region_requests.py -T HexStringSplitTable $HBASE_HOST -c 1
-    run ./hbase_region_requests.py -T HexStringSplitTable $HBASE_HOST -c 1 --average
-    run ./hbase_region_requests.py -T HexStringSplitTable $HBASE_HOST -c 1 --average --skip-zeros
+    run ./hbase_region_requests.py -T HexStringSplitTable $HBASE_HOST -c 2
+    run ./hbase_region_requests.py -T HexStringSplitTable $HBASE_HOST -c 2 --average
+    run ./hbase_region_requests.py -T HexStringSplitTable $HBASE_HOST -c 2 --average --skip-zeros
 
-    run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST -c 1
-    run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST -c 1 --skip-zeros
-    run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST -c 1 --average
+    run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST -c 2
+    run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST -c 2 --skip-zeros
+    run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST -c 2 --average
 
     run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST --count 2 --interval 2
 
-    run ./hbase_region_requests.py -T HS_test_data localhost $HBASE_HOST -c 1
+    run ./hbase_region_requests.py -T HS_test_data localhost $HBASE_HOST -c 2
     run ./hbase_region_requests.py -T HS_test_data localhost $HBASE_HOST --count 2 -i 2
-    run ./hbase_region_requests.py -T HS_test_data localhost $HBASE_HOST -c 1 --average
+    run ./hbase_region_requests.py -T HS_test_data localhost $HBASE_HOST -c 2 --average
 
     # ============================================================================ #
     run ./hbase_regionserver_requests.py $HBASE_HOST -c 1
