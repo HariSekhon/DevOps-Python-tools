@@ -96,8 +96,7 @@ check_broken(){
 cat > "$broken_dir/broken_tabs.yaml" <<EOF
 ---
 name:   Hari Sekhon
-age:    21
-...
+    age:    21
 EOF
 
 check_broken "$broken_dir/broken_tabs.yaml"
