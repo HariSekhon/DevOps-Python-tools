@@ -50,7 +50,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.2'
+__version__ = '0.5.3'
 
 
 class HBaseRegionsRequests(CLI):
@@ -88,6 +88,7 @@ class HBaseRegionsRequests(CLI):
         self.add_opt('--reads', action='store_true', help='Show read requests (default shows read and write)')
         self.add_opt('--writes', action='store_true', help='Show write requests (default shows read and write')
         self.add_opt('--total', action='store_true', help='Show total requests (default shows read and write)')
+        self.add_opt('--skip-zeros', action='store_true', help="Don't output regions which have zero requests")
 
     def process_args(self):
         self.host_list = self.args
@@ -211,6 +212,7 @@ class HBaseRegionsRequests(CLI):
     def print_stats(self, host):
         stats = self.stats
         show = self.show
+        skip_zeros = self.get_opt('skip_zeros')
         tstamp = time.strftime('%F %T')
         if not stats:
             print("No table regions found for table '{}'. Did you specify the correct table name?".format(self.table))
@@ -221,6 +223,7 @@ class HBaseRegionsRequests(CLI):
                   .format(tstamp, host, self.interval, plural(self.interval)))
             self.first_iteration = 0
             return
+        count = 0
         for table in sorted(stats[host]):
             for region in sorted(stats[host][table]):
                 table_region = region
@@ -229,10 +232,16 @@ class HBaseRegionsRequests(CLI):
                 # maintain explicit order for humans
                 # rather than iterate keys of region which will some out in the wrong order
                 for metric in ('read', 'write', 'total'):
-                    if (not show) or metric in show:
-                        print('{:20s}\t{:20s}\t{:40s}\t{:10s}\t{:8.0f}'\
-                              .format(tstamp, host, table_region, metric, stats[host][table][region][metric]))
-        print()
+                    value = stats[host][table][region][metric]
+                    if value == 0 and skip_zeros:
+                        continue
+                    if show and metric not in show:
+                        continue
+                    print('{:20s}\t{:20s}\t{:40s}\t{:10s}\t{:8.0f}'\
+                          .format(tstamp, host, table_region, metric, value))
+                    count += 1
+        if count:
+            print()
 
     # some extra effort to make it look the same as HBase presents it as
     #def encode_char(self, char):
