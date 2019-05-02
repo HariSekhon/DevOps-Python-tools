@@ -247,8 +247,10 @@ EOF
     # ============================================================================ #
     run ./hbase_region_requests.py -T HexStringSplitTable $HBASE_HOST -c 1
     run ./hbase_region_requests.py -T HexStringSplitTable $HBASE_HOST -c 1 --average
+    run ./hbase_region_requests.py -T HexStringSplitTable $HBASE_HOST -c 1 --average --skip-zeros
 
     run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST -c 1
+    run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST -c 1 --skip-zeros
     run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST -c 1 --average
 
     run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST --count 2 --interval 2
