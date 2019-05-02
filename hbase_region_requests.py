@@ -233,7 +233,7 @@ class HBaseRegionsRequests(CLI):
                 # rather than iterate keys of region which will some out in the wrong order
                 for metric in ('read', 'write', 'total'):
                     value = stats[host][table][region][metric]
-                    if value == 0 and skip_zeros:
+                    if skip_zeros and int(value) == 0:
                         continue
                     if show and metric not in show:
                         continue
