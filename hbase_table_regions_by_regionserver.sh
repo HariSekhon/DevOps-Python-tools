@@ -40,7 +40,7 @@ usage: ${0##*/} [options] regionserver1 regionserver2 regionserver3 ...
 -p --port   RegionServer HTTP JMX port
 
 EOF
-    exit 1
+    exit 3
 }
 
 table=".*"
