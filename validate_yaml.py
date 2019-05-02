@@ -49,7 +49,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.9.0'
+__version__ = '0.9.1'
 
 
 class YamlValidatorTool(CLI):
@@ -99,7 +99,7 @@ class YamlValidatorTool(CLI):
             if not self.get_opt('print'):
                 if self.verbose > 2:
                     try:
-                        yaml.load(content)
+                        yaml.safe_load(content)
                     except yaml.YAMLError as _:
                         print(_)
                 die(self.invalid_yaml_msg)
