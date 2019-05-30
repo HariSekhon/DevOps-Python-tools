@@ -61,7 +61,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 
 
 class CrunchAccountingCsvStatementConverter(CLI):
@@ -144,7 +144,7 @@ class CrunchAccountingCsvStatementConverter(CLI):
     def amount(self, amount):
         if self.credit_card:
             return -Decimal(amount)
-        return amount
+        return Decimal(amount)
 
     @staticmethod
     def reverse_contents(filename):
