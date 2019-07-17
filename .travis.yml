@@ -26,6 +26,8 @@ python:
 #  - "pypy"
 #  - "pypy3"
 
+dist: trusty
+
 sudo: required
 
 env:
