@@ -33,7 +33,7 @@ If specifying a --repo be aware the API is case sensitive for repo names
 If repo starts with / and $TRAVIS_USER is set, will prepend $TRAVIS_USER for convenience, eg.
 
 export TRAVIS_USER=HariSekhon # put this in .bashrc
-travis_last_log.py /pytools   # shorter to type '/pytools' than 'HariSekhon/pytools'
+travis_last_log.py /DevOps-Python-tools   # shorter to type than full 'HariSekhon/DevOps-Python-tools'
 
 As a convenience you may supply either job id or repo as an argument without any switch and it'll infer it as a repo if
 if contains a slash but no url (eg. HariSekhon/nagios-plugins) otherwise it'll assume it's a job id, strip any leading
@@ -50,7 +50,7 @@ checking the last error when your CCMenu or BuildNotify applet shows the last co
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-#from __future__ import unicode_literals
+from __future__ import unicode_literals
 
 import json
 import logging
