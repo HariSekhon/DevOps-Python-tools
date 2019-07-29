@@ -74,7 +74,7 @@ Environment variables are supported for convenience and also to hide credentials
     - ```anonymize_parallel.sh``` - splits files in to multiple parts and runs `anonymize.py` on each part in parallel before re-joining back in to a file of the same name with a `.anonymized` suffix. Preserves order of evaluation important for anonymization rules, as well as maintaining file content order. On servers this parallelization can result in a 30x speed up for large log files
   - ```find_duplicate_files.py``` - finds duplicate files in one or more directory trees via multiple methods including file basename, size, MD5 comparison of same sized files, or bespoke regex capture of partial file basename
   - ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user to put in your shell's ```.profile``` (there is also a perl version in my [DevOps Perl Tools](https://github.com/harisekhon/perl-tools) repo)
-- Hadoop & NoSQL:
+- [Hadoop](http://hadoop.apache.org/) & NoSQL:
   - [Spark](https://spark.apache.org/) & Data Format Converters:
     - ```spark_avro_to_parquet.py``` - PySpark Avro => Parquet converter
     - ```spark_parquet_to_avro.py``` - PySpark Parquet => Avro converter
@@ -141,7 +141,7 @@ Environment variables are supported for convenience and also to hide credentials
   - ```docker_registry_show_tags.py``` / ```dockerhub_show_tags.py``` / ```quay_show_tags.py``` - shows tags for docker repos in a docker registry or on [DockerHub](https://hub.docker.com/u/harisekhon/) or [Quay.io](https://quay.io/) - Docker CLI doesn't support this yet but it's a very useful thing to be able to see live on the command line or use in shell scripts (use `-q`/`--quiet` to return only the tags for easy shell scripting). You can use this to pre-download all tags of a docker image before running tests across versions in a simple bash for loop, eg. ```docker_pull_all_tags.sh```
   - ```dockerhub_search.py``` - search DockerHub with a configurable number of returned results (official `docker search` is limited to only 25 results), using `--verbose` will also show you how many results were returned to the termainal and how many DockerHub has in total (use ```-q / --quiet``` to return only the image names for easy shell scripting). This can be used to download all of my DockerHub images in a simple bash for loop eg. ```docker_pull_all_images.sh``` and can be chained with ```dockerhub_show_tags.py``` to download all tagged versions for all docker images eg. ```docker_pull_all_images_all_tags.sh```
   - ```dockerfiles_check_git*.py``` - check Git tags & branches align with the containing Dockerfile's ```ARG *_VERSION```
-- Travis CI:
+- [Travis CI](https://travis-ci.org/):
     - ```travis_last_log.py``` - fetches [Travis CI](https://travis-ci.org/) latest running / completed / failed build log for given repo - useful for quickly getting the log of the last failed build when CCMenu or BuildNotify applets turn red
     - ```travis_debug_session.py``` - launches a [Travis CI](https://travis-ci.org/) interactive debug build session via Travis API, tracks session creation and drops user straight in to the SSH shell on the remote Travis build, very convenient one shot debug launcher for Travis CI
 - Data Validation (useful in CI):
