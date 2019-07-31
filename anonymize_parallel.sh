@@ -17,7 +17,7 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-. "$srcdir/bash-tools/utils.sh"
+. "$srcdir/bash-tools/lib/utils.sh"
 
 # re-establish srcdir local to this script since util.sh include brings its own srcdir
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
