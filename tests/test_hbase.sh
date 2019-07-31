@@ -21,7 +21,7 @@ srcdir2="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$srcdir2/.."
 
 . "$srcdir2/utils.sh"
-. "$srcdir2/../bash-tools/docker.sh"
+. "$srcdir2/../bash-tools/lib/docker.sh"
 
 srcdir="$srcdir2"
 

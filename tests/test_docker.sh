@@ -19,7 +19,7 @@ srcdir="$(cd "$(dirname "$0")" && pwd)"
 
 cd "$srcdir/.."
 
-. "bash-tools/docker.sh"
+. "bash-tools/lib/docker.sh"
 . "bash-tools/lib/utils.sh"
 
 section "Docker Image"

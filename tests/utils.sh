@@ -19,7 +19,7 @@ srcdir2="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 . "$srcdir2/excluded.sh"
 . "$srcdir2/../bash-tools/lib/utils.sh"
-. "$srcdir2/../bash-tools/docker.sh"
+. "$srcdir2/../bash-tools/lib/docker.sh"
 
 srcdir="$srcdir2"
 
