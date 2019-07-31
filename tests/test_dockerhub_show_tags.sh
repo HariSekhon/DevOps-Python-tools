@@ -21,7 +21,7 @@ cd "$srcdir/.."
 
 . "tests/utils.sh"
 
-. "bash-tools/utils.sh"
+. "bash-tools/lib/utils.sh"
 
 section "Testing DockerHub Show Tags"
 

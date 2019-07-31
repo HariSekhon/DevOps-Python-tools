@@ -20,7 +20,7 @@ srcdir="$(cd "$(dirname "$0")" && pwd)"
 
 cd "$srcdir/.."
 
-. bash-tools/utils.sh
+. bash-tools/lib/utils.sh
 
 set +e +o pipefail
 

@@ -21,7 +21,7 @@ cd "$srcdir2/.."
 
 . "tests/utils.sh"
 
-. "bash-tools/utils.sh"
+. "bash-tools/lib/utils.sh"
 
 srcdir="$srcdir2"
 

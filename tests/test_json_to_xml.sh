@@ -20,7 +20,7 @@ srcdir="$(cd "$(dirname "$0")" && pwd)"
 cd "$srcdir";
 
 . utils.sh
-. ../bash-tools/utils.sh
+. ../bash-tools/lib/utils.sh
 
 section "JSON => XML"
 
