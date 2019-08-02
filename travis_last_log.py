@@ -50,7 +50,8 @@ checking the last error when your CCMenu or BuildNotify applet shows the last co
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
+# this breaks regex on Python 2.7 with UnicodeDecodeError traceback from the Travis CI output
+#from __future__ import unicode_literals
 
 import json
 import logging
