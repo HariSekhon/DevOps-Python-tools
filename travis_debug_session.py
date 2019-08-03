@@ -26,7 +26,7 @@ been enabled for debugging yet (you may need to contact Travis at support@travis
 If specifying a --repo be aware the API is case sensitive for repo names
 
 As a convenience you may supply either job id or repo as an argument without any switch and it'll infer it as a repo if
-if contains a slash but no url (eg. HariSekhon/nagios-plugins) otherwise it'll assume it's a job id, strip any leading
+if contains a slash but no url (eg. HariSekhon/Nagios-Plugins) otherwise it'll assume it's a job id, strip any leading
 URL so you can simply paste the path to a failing build and it'll just work. The switch versions of --job-id and --repo
 take priority as they're more explicit
 
@@ -124,7 +124,7 @@ class TravisDebugSession(CLI):
         #    self.usage('--travis-token option or ' +
         #               '$TRAVIS_TOKEN environment variable required to authenticate to the API')
         if self.args:
-            # assume arg is a repo in form of HariSekhon/nagios-plugins but do not use url which we are more likely to
+            # assume arg is a repo in form of HariSekhon/Nagios-Plugins but do not use url which we are more likely to
             # have pasted a travis-ci url to a job, see a few lines further down
             if '/' in self.args[0]:
                 if not self.repo:
@@ -135,7 +135,7 @@ class TravisDebugSession(CLI):
                 self.job_id = self.args[0]
         if self.job_id:
             # convenience to be able to lazily paste a URL like the following and still have it extract the job_id
-            # https://travis-ci.org/HariSekhon/nagios-plugins/jobs/283840596#L1079
+            # https://travis-ci.org/HariSekhon/Nagios-Plugins/jobs/283840596#L1079
             self.job_id = self.job_id.split('/')[-1].split('#')[0]
             validate_chars(self.job_id, 'job id', '0-9')
         elif self.repo:
@@ -210,7 +210,7 @@ class TravisDebugSession(CLI):
                   + " Either the specified repo '{0}' doesn't exist".format(self.repo)
                   + " or no builds have happened yet?"
                   + " Also remember the repo is case sensitive, for example 'harisekhon/nagios-plugins' returns this"
-                  + " blank build set whereas 'HariSekhon/nagios-plugins' succeeds"
+                  + " blank build set whereas 'HariSekhon/Nagios-Plugins' succeeds"
                   + " in returning latest builds information"
                  )
         builds = json_data['builds']
