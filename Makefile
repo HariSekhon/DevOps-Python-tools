@@ -29,6 +29,8 @@
 
 # ===================
 
+REPO := HariSekhon/DevOps-Python-tools
+
 ifneq ("$(wildcard bash-tools/Makefile.in)", "")
 	include bash-tools/Makefile.in
 endif
@@ -170,6 +172,14 @@ basic-test: test-lib
 test2:
 	cd pylib && $(MAKE) test2
 	tests/all.sh
+
+.PHONY: travis
+travis:
+	travis_last_log.py $(REPO)
+
+.PHONY: travis-debug
+travis-debug:
+	travis_debug_session.py $(REPO)
 
 .PHONY: install
 install:
