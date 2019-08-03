@@ -64,7 +64,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.3'
+__version__ = '0.8.4'
 
 
 class TravisDebugSession(CLI):
@@ -139,7 +139,12 @@ class TravisDebugSession(CLI):
             self.job_id = self.job_id.split('/')[-1].split('#')[0]
             validate_chars(self.job_id, 'job id', '0-9')
         elif self.repo:
-            self.repo = re.sub(r'https://travis-ci\.org/', '', self.repo)
+            self.repo = re.sub(r'https?://travis-ci\.org/', '', self.repo)
+            travis_user = os.getenv('TRAVIS_USER')
+            if '/' not in self.repo:
+                self.repo = '/' + self.repo
+            if self.repo[0] == '/' and travis_user:
+                self.repo = travis_user + self.repo
             validate_chars(self.repo, 'repo', r'\/\w\.-')
         else:
             self.usage('--job-id / --repo not specified')
