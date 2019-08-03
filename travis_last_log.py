@@ -218,7 +218,7 @@ class TravisLastBuildLog(CLI):
                   + " Either the specified repo '{0}' doesn't exist".format(self.repo)
                   + " or no builds have happened yet?"
                   + " Also remember the repo is case sensitive, for example 'harisekhon/nagios-plugins' returns this"
-                  + " blank build set whereas 'HariSekhon/nagios-plugins' succeeds"
+                  + " blank build set whereas 'HariSekhon/Nagios-Plugins' succeeds"
                   + " in returning latest builds information"
                  )
         builds = json_data['builds']
