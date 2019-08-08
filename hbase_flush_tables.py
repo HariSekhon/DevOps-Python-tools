@@ -27,6 +27,8 @@ Written for flushing bulk imports skipping the WAL, for example OpenTSDB bulk im
 
 The Thrift API doesn't support this action so it uses the HBase shell locally which must be in the $PATH
 
+There is also a shell script version of this in the adjacent DevOps-Perl-Tools repo
+
 Tested on Hortonworks HDP 2.3 (HBase 1.1.2) and Apache HBase 1.0.3, 1.1.6, 1.2.1, 1.2.2, 1.3.1
 
 """
