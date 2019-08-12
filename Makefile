@@ -31,6 +31,8 @@
 
 REPO := HariSekhon/DevOps-Python-tools
 
+CODE_FILES := $(shell find . -type f -name '*.py' -o -type f -name '*.sh' | grep -v -e bash-tools -e /pylib/)
+
 ifneq ("$(wildcard bash-tools/Makefile.in)", "")
 	include bash-tools/Makefile.in
 endif
