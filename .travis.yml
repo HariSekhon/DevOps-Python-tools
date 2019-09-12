@@ -26,9 +26,10 @@ python:
 #  - "pypy"
 #  - "pypy3"
 
-os:
-  - linux
-  - osx
+# Mac Python 2.7 not available - see https://travis-ci.org/HariSekhon/pylib/jobs/584226228
+#os:
+#  - linux
+#  - osx
 
 dist: trusty
 
