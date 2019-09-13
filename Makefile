@@ -173,14 +173,6 @@ test2:
 	cd pylib && $(MAKE) test2
 	tests/all.sh
 
-.PHONY: travis
-travis:
-	travis_last_log.py $(REPO)
-
-.PHONY: travis-debug
-travis-debug:
-	travis_debug_session.py $(REPO)
-
 .PHONY: install
 install:
 	@echo "No installation needed, just add '$(PWD)' to your \$$PATH"
