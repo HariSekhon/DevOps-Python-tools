@@ -55,7 +55,7 @@ build:
 .PHONY: init
 init:
 	git submodule update --init --recursive
-	
+
 .PHONY: python
 python:
 	cd pylib && $(MAKE)
@@ -68,7 +68,7 @@ python:
 	else \
 		$(MAKE) parquet-tools; \
 	fi
-	
+
 	# only install pip packages not installed via system packages
 	#$(SUDO_PIP) pip install --upgrade -r requirements.txt
 	#$(SUDO_PIP) pip install -r requirements.txt
@@ -98,7 +98,7 @@ python:
 	#$(SUDO_PIP) pip install impyla
 	# must downgrade happybase library to work on Python 2.6
 	#if [ "$$(python -c 'import sys; sys.path.append("pylib"); import harisekhon; print(harisekhon.utils.getPythonVersion())')" = "2.6" ]; then $(SUDO_PIP) pip install --upgrade "happybase==0.9"; fi
-	
+
 	# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
 	$(SUDO_PIP) pip install "ipython[notebook]" || :
 	@echo
