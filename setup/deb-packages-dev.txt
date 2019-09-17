@@ -16,3 +16,6 @@
 libldap2-dev
 # needed to build python-snappy for avro module
 libsnappy-dev
+
+# needed to build python-krbV
+libsasl2-dev
