@@ -37,8 +37,6 @@ ifneq ("$(wildcard bash-tools/Makefile.in)", "")
 	include bash-tools/Makefile.in
 endif
 
-PARQUET_VERSION=1.5.0
-
 .PHONY: build
 build:
 	@echo =========================
@@ -111,10 +109,7 @@ python:
 
 .PHONY: parquet-tools
 parquet-tools:
-	if ! command -v parquet-cat && ! [ -d "parquet-tools-$(PARQUET_VERSION)" ]; then \
-		wget -t 100 --retry-connrefused -c -O "parquet-tools-$(PARQUET_VERSION)-bin.zip" "http://search.maven.org/remotecontent?filepath=com/twitter/parquet-tools/$(PARQUET_VERSION)/parquet-tools-$(PARQUET_VERSION)-bin.zip"; \
-		unzip "parquet-tools-$(PARQUET_VERSION)-bin.zip"; \
-	fi
+	@BIN='.' bash-tools/setup/install_parquet-tools.sh
 
 .PHONY: apk-packages-extra
 apk-packages-extra:
