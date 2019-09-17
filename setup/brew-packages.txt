@@ -20,3 +20,6 @@ parallel
 parquet-tools
 snappy
 yamllint
+
+# Mac already provides unzip - brew is keg only and doesn't link anyway to avoid clashes
+#unzip
