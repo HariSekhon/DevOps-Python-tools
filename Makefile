@@ -37,7 +37,7 @@ ifneq ("$(wildcard bash-tools/Makefile.in)", "")
 	include bash-tools/Makefile.in
 endif
 
-PARQUET_VERSION=1.5.0
+PARQUET_VERSION=1.6.0
 
 .PHONY: build
 build:
