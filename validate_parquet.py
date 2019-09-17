@@ -65,7 +65,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.9.0'
+__version__ = '0.9.1'
 
 
 class ParquetValidatorTool(CLI):
@@ -80,9 +80,10 @@ class ParquetValidatorTool(CLI):
         self.valid_parquet_msg = '<unknown> => Parquet OK'
         self.invalid_parquet_msg = '<unknown> => Parquet INVALID'
         self.exclude = None
-        for _ in glob.glob(os.path.join(os.path.dirname(__file__), 'parquet-tools-*')):
-            log.debug('adding %s to $PATH' % _)
-            os.environ['PATH'] += ':' + os.path.abspath(_)
+        for _ in reversed(glob.glob(os.path.join(os.path.dirname(__file__), 'parquet-tools-*'))):
+            if os.path.isdir(_):
+                log.debug('adding %s to $PATH' % _)
+                os.environ['PATH'] += ':' + os.path.abspath(_)
 
     def add_options(self):
         self.add_opt('-e', '--exclude', metavar='regex', default=os.getenv('EXCLUDE'),
