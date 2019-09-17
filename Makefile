@@ -111,7 +111,7 @@ python:
 
 .PHONY: parquet-tools
 parquet-tools:
-	if ! [ -d "parquet-tools-$(PARQUET_VERSION)" ]; then \
+	if ! command -v parquet-cat && ! [ -d "parquet-tools-$(PARQUET_VERSION)" ]; then \
 		wget -t 100 --retry-connrefused -c -O "parquet-tools-$(PARQUET_VERSION)-bin.zip" "http://search.maven.org/remotecontent?filepath=com/twitter/parquet-tools/$(PARQUET_VERSION)/parquet-tools-$(PARQUET_VERSION)-bin.zip"; \
 		unzip "parquet-tools-$(PARQUET_VERSION)-bin.zip"; \
 	fi
