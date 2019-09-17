@@ -17,5 +17,6 @@
 # for anonymize_parallel.sh
 parallel
 
+parquet-tools
 snappy
 yamllint
