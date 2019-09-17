@@ -37,13 +37,13 @@ ifneq ("$(wildcard bash-tools/Makefile.in)", "")
 	include bash-tools/Makefile.in
 endif
 
-PARQUET_VERSION=1.6.0
+PARQUET_VERSION=1.5.0
 
 .PHONY: build
 build:
-	@echo =============
+	@echo =========================
 	@echo DevOps Python Tools Build
-	@echo =============
+	@echo =========================
 
 	$(MAKE) init
 	if [ -z "$(CPANM)" ]; then make; exit $$?; fi
