@@ -1,3 +1,5 @@
+# vim: filetype=conf
+
 # This doesn't actually work on already committed files,  git update-index --assume-unchanged is set in Makefile instead
 anonymize_custom.conf
 
