@@ -275,7 +275,7 @@ Then add the Jython install bin directory to the $PATH or specify the full path 
 
 #### Configuration for Strict Domain / FQDN validation ####
 
-Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list is done via my [PyLib](https://github.com/harisekhon/pylib) library submodule - see there for details on configuring this to permit custom TLDs like ```.local``` or ```.intranet``` (both supported by default).
+Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list is done via my [PyLib](https://github.com/harisekhon/pylib) library submodule - see there for details on configuring this to permit custom TLDs like `.local`, `.intranet`, `.vm`, `.cloud` etc. (all already included in there because they're common across companies internal environments).
 
 #### Python SSL certificate verification problems
 
