@@ -8,6 +8,7 @@ spark-deps.zip
 *.pyc
 *.pyo
 *.jyc
+*.jyo
 *.avro
 *.parquet
 *.log
