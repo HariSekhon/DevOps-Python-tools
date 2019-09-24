@@ -171,7 +171,7 @@ test2:
 	tests/all.sh
 
 .PHONY: install
-install:
+install: build
 	@echo "No installation needed, just add '$(PWD)' to your \$$PATH"
 
 .PHONY: clean
