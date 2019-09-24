@@ -72,6 +72,11 @@ python:
 	#$(SUDO_PIP) pip install -r requirements.txt
 	@bash-tools/python_pip_install_if_absent.sh requirements.txt
 
+	# python-krbV dependency doesn't build on Mac any more and is unmaintained
+	# python_pip_install_if_absent.sh would import snakebite module and not trigger to build the enhanced snakebite with [kerberos] bit
+	#@bash-tools/python_pip_install.sh snakebite[kerberos] || :
+	@bash-tools/python_pip_install.sh snakebite[kerberos] || :
+
 	# for impyla
 	#$(SUDO_PIP) pip install --upgrade setuptools || :
 	#
