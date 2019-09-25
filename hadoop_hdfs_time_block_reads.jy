@@ -23,7 +23,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 __author__  = 'Hari Sekhon'
-__version__ = '0.9.0'
+__version__ = '0.9.1'
 
 import os
 
@@ -95,7 +95,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'pylib'))
 try:
     from harisekhon.utils import jython_only, die, printerr, ERRORS, \
                                  isJavaOOM, java_oom_fix_msg, log_jython_exception, get_jython_exception
-except ImportError, e:
+except ImportError as e:
     print('module import failed: %s' % e, file=sys.stderr)
     sys.exit(4)
 
@@ -105,14 +105,14 @@ jython_only()
 import jarray
 try:
     from java.nio import ByteBuffer
-except ImportError, e:
+except ImportError as e:
     die("Couldn't find java.nio class, not running inside Jython?")
 try:
     from org.apache.hadoop.conf import Configuration
     #from org.apache.hadoop.fs import FileSystem
     from org.apache.hadoop.fs import Path
     from org.apache.hadoop.hdfs import DistributedFileSystem
-except ImportError, e:
+except ImportError as e:
     die("Couldn't find Hadoop Java classes, try:  jython -J-cp `hadoop classpath` hadoop_hdfs_time_block_reads.jy <args>")
 
 def usage(*msg):
@@ -127,7 +127,7 @@ def main():
 
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:], "hamo", ["help", "usage", "all-blocks", "multiple-blocks", "one-block-per-DN"])
-    except getopt.GetoptError, e:
+    except getopt.GetoptError as e:
         usage("error: %s" % e)
     all_blocks       = False
     multiple_blocks  = False
@@ -153,10 +153,10 @@ def main():
     filelist = sorted(filelist)
     try:
         HDFSBlockReader(multiple_blocks, one_block_per_DN).fetchFilelistBlocksTimed(filelist)
-    except KeyboardInterrupt, e:
+    except KeyboardInterrupt as e:
         printerr("Caught Control-C...", 1)
         sys.exit(ERRORS["OK"])
-    except Exception, e:
+    except Exception as e:
         printerr("Error running HDFSBlockReader: %s" % e, 1)
         if isJavaOOM(e.message):
             printerr(java_oom_fix_msg())
@@ -206,7 +206,7 @@ class HDFSBlockReader:
         try:
             self.client = self.fs.getClient()
         except:
-            raise Exception, "Failed to create hdfs client: %s" % get_jython_exception()
+            raise Exception("Failed to create hdfs client: %s" % get_jython_exception())
         #in = client.DFSDataInputStream(self.fh)
 
 
@@ -214,7 +214,7 @@ class HDFSBlockReader:
         """ Return the path object for a given filename """
         try:
             path = Path(filename)
-        except Exception, e:
+        except Exception as e:
             return None
         if path:
             return path
@@ -238,7 +238,7 @@ class HDFSBlockReader:
                 printerr("Failed to get HDFS path object for file " + filename, 1)
                 continue
             if not self.fs.exists(path):
-                #raise IOError, "HDFS File not found: %s" % filename
+                #raise IOError("HDFS File not found: %s" % filename)
                 printerr("HDFS file/dir not found: %s" % filename, 1)
                 continue
             self.recurse_path(filename, path)
@@ -292,7 +292,7 @@ class HDFSBlockReader:
                 if not self.multiple_files:
                     print("Reading File %s\n" % filename)
                 self.fetchFileBlocksTimed(filename, path)
-            except Exception, e:
+            except Exception as e:
                 printerr(e, 1)
         elif self.fs.isDirectory(path):
             # even if there is only one file under the whole directory tree since it's now different to the specified arg we should print it
@@ -308,7 +308,7 @@ class HDFSBlockReader:
             except:
                 printerr(get_jython_exception().split("\n")[0], 1)
         else:
-            raise IOError, ">>> %s is not a file or directory" % filename
+            raise IOError(">>> %s is not a file or directory" % filename)
 
 
     def fetchFileBlocksTimed(self, filename, path):
@@ -323,16 +323,16 @@ class HDFSBlockReader:
         try:
             self.fh = self.client.open(filename)
         except:
-            raise IOError, "Failed to get client filehandle to HDFS file %s: %s" % (filename, get_jython_exception())
+            raise IOError("Failed to get client filehandle to HDFS file %s: %s" % (filename, get_jython_exception()))
         if self.fh == None:
-            raise IOError, "Failed to get client filehandle to HDFS file %s" % filename
+            raise IOError("Failed to get client filehandle to HDFS file %s" % filename)
 
         while True:
             self.block_num += 1
             try:
                 block_locations = self.fs.getFileBlockLocations(path, self.offset, self.length)
             except:
-                raise IOError, "Failed to get block locations for %sblock %d (offset %d, length %d): %s" % (self.fileoutput, self.block_num, self.offset, self.length, get_jython_exception())
+                raise IOError("Failed to get block locations for %sblock %d (offset %d, length %d): %s" % (self.fileoutput, self.block_num, self.offset, self.length, get_jython_exception()))
             if not block_locations:
                 return
             for block in block_locations:
@@ -344,11 +344,11 @@ class HDFSBlockReader:
                         return
                     self.offset       = self.block_offset + self.block_length
                 except:
-                    raise IOError, "Failed to get %sblock %d offset/length: %s" % (self.fileoutput, self.block_num, get_jython_exception())
+                    raise IOError("Failed to get %sblock %d offset/length: %s" % (self.fileoutput, self.block_num, get_jython_exception()))
                 try:
                     self.readBlockFromDNs()
-                except Exception, e:
-                    raise IOError, "Failed to read %sblock %d (offset %d, length %d) from datanodes: %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length, e)
+                except Exception as e:
+                    raise IOError("Failed to read %sblock %d (offset %d, length %d) from datanodes: %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length, e))
 
     def readBlockFromDNs(self):
         """ Read current block self.offset to self.length from all datanodes """
@@ -375,10 +375,10 @@ class HDFSBlockReader:
                 # self.dn must be populated by here or something is wrong
                 self.dn = self.fh.getCurrentDatanode()
                 if self.dn == None:
-                    raise IOError, "Failed to get current DataNode for %sblock %s offset %s length %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length)
+                    raise IOError("Failed to get current DataNode for %sblock %s offset %s length %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length))
                 self.host = self.dn.getHostName()
                 if not self.host:
-                    raise Exception, "Failed to get current DataNode host name for %sblock %s offset %s length %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length)
+                    raise Exception("Failed to get current DataNode host name for %sblock %s offset %s length %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length))
                 # I've come back to the first DN, done with this block
                 if self.host in self.block_read_DNs:
                     return
@@ -419,8 +419,8 @@ class HDFSBlockReader:
 #                else:
 #                    printerr("ERROR: Failed to read bytes from %sblock %d (offset %d, length %d) [datanode info not available]" % (self.fileoutput, self.block_num, self.block_offset, self.block_length))
 #                return
-        except Exception, e:
-            raise Exception, e
+        except Exception as e:
+            raise Exception(e)
         except:
             self.dn    = self.fh.getCurrentDatanode()
             if self.dn:
@@ -429,7 +429,7 @@ class HDFSBlockReader:
                 self.nodes_failed_reads.add(self.host)
                 print("Error: failed to read %sblock %d (offset %d, length %d) from rack %s datanode %s: %s" % (self.fileoutput, self.block_num, self.block_offset, self.block_length, self.rack, self.host, get_jython_exception()))
             else:
-                raise IOError, get_jython_exception()
+                raise IOError(get_jython_exception())
             return
         end_time   = time.time()
         time_taken = end_time - start_time

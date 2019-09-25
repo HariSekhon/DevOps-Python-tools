@@ -15,7 +15,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.9.1'
+__version__ = '0.9.2'
 
 # pylint: disable=wrong-import-position
 import os
@@ -146,7 +146,7 @@ class HDFSBlockCounter(object):
         try:
             self.client = self.filesystem.getClient()
         except:
-            raise Exception, "Failed to create hdfs client: %s" % get_jython_exception()
+            raise Exception("Failed to create hdfs client: %s" % get_jython_exception())
         #in = client.DFSDataInputStream(self.filehandle)
 
 
@@ -178,7 +178,7 @@ class HDFSBlockCounter(object):
                 printerr("Failed to get HDFS path object for file " + filename, 1)
                 continue
             if not self.filesystem.exists(path):
-                #raise IOError, "HDFS File not found: %s" % filename
+                #raise IOError("HDFS File not found: %s" % filename)
                 printerr("HDFS file/dir not found: %s" % filename, 1)
                 continue
             self.recurse_path(filename, path)
@@ -213,7 +213,7 @@ class HDFSBlockCounter(object):
             except:
                 printerr(get_jython_exception().split("\n")[0], 1)
         else:
-            raise IOError, ">>> %s is not a file or directory" % filename
+            raise IOError(">>> %s is not a file or directory" % filename)
 
 
     def print_file_block_counts(self, filename, path):
@@ -226,9 +226,9 @@ class HDFSBlockCounter(object):
         try:
             self.filehandle = self.client.open(filename)
         except:
-            raise IOError, "Failed to get client filehandle to HDFS file %s: %s" % (filename, get_jython_exception())
+            raise IOError("Failed to get client filehandle to HDFS file %s: %s" % (filename, get_jython_exception()))
         if self.filehandle is None:
-            raise IOError, "Failed to get client filehandle to HDFS file %s" % filename
+            raise IOError("Failed to get client filehandle to HDFS file %s" % filename)
 
         try:
             filestatus = self.filesystem.getFileStatus(path)

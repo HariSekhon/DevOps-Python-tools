@@ -15,7 +15,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 
 # pylint: disable=wrong-import-position
 import os
@@ -142,7 +142,7 @@ class HDFSChecksumReader(object):
                 printerr("Failed to get HDFS path object for file " + filename, 1)
                 continue
             if not self.filesystem.exists(path):
-                #raise IOError, "HDFS File not found: %s" % filename
+                #raise IOError("HDFS File not found: %s" % filename)
                 printerr("HDFS file/dir not found: %s" % filename, 1)
                 continue
             self.print_checksum_recurse(filename, path)
@@ -161,7 +161,7 @@ class HDFSChecksumReader(object):
             except:
                 printerr(get_jython_exception().split("\n")[0], 1)
         else:
-            raise IOError, ">>> %s is not a file or directory" % filename
+            raise IOError(">>> %s is not a file or directory" % filename)
 
     def print_checksum(self, filename, path):
         """ Prints the HDFS checksum for the given file + fs path object """
