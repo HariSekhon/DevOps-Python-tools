@@ -77,6 +77,9 @@ python:
 	#@bash-tools/python_pip_install.sh snakebite[kerberos] || :
 	@bash-tools/python_pip_install.sh snakebite[kerberos] || :
 
+	# Python >= 3.4 - try but accept failure in case we're not on the right version of Python
+	@if ! python -V | grep -q ^2; then bash-tools/python_pip_install.sh "avro-python3"; fi
+
 	# for impyla
 	#$(SUDO_PIP) pip install --upgrade setuptools || :
 	#
@@ -103,7 +106,7 @@ python:
 	#if [ "$$(python -c 'import sys; sys.path.append("pylib"); import harisekhon; print(harisekhon.utils.getPythonVersion())')" = "2.6" ]; then $(SUDO_PIP) pip install --upgrade "happybase==0.9"; fi
 
 	# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
-	$(SUDO_PIP) pip install "ipython[notebook]" || :
+	@bash-tools/python_pip_install.sh "ipython[notebook]" || :
 	@echo
 	$(MAKE) pycompile
 	@echo
