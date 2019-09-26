@@ -35,9 +35,13 @@ from __future__ import print_function
 import os
 import re
 import sys
-import avro
-from avro.datafile import DataFileReader
-from avro.io import DatumReader
+# pylint: disable=bare-except
+try:
+    from avro3.datafile import DataFileReader, DataFileException
+    from avro3.io import DatumReader
+except:
+    from avro.datafile import DataFileReader, DataFileException
+    from avro.io import DatumReader
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
@@ -51,7 +55,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.9.0'
+__version__ = '0.9.1'
 
 
 class AvroValidatorTool(CLI):
@@ -86,7 +90,7 @@ class AvroValidatorTool(CLI):
         try:
             DataFileReader(filehandle, DatumReader())
             print(self.valid_avro_msg)
-        except avro.datafile.DataFileException as _:
+        except DataFileException as _:
             if 'snappy' in str(_):
                 die("%s => ERROR: %s - Is the python-snappy module installed? ('pip install python-snappy')" \
                     % (filehandle.name, _))
