@@ -20,6 +20,8 @@ Simple tool to print the local path to one or more libraries given as arguments
 
 Useful for finding where things are installed on different operating systems like Mac vs Linux
 
+If no libraries are specified, finds the default library location as if the 'sys' argument was given
+
 Tested on Python 2.7 and Python 3.x on Mac and Linux
 
 """
@@ -33,7 +35,7 @@ import os
 import sys
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
@@ -77,7 +79,7 @@ def get_module_location(module):
 def main():
     exitcode = 0
     if len(sys.argv) < 2:
-        usage()
+        sys.argv.append('sys')
     for arg in sys.argv:
         if arg.startswith('-'):
             usage()
