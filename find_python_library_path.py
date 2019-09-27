@@ -31,6 +31,7 @@ from __future__ import division
 from __future__ import print_function
 #from __future__ import unicode_literals
 
+import getpass
 import os
 import sys
 
@@ -62,16 +63,19 @@ def get_module_location(module):
         if potential_attrib in attribs:
             value = getattr(imported_module, potential_attrib)
             if potential_attrib == 'exec_prefix':
-                if not 'Python.framework' in value:
+                if not 'Python.framework' in value and not 'site-packages' in value:
                     continue
             return value
     # to account for sys not having __file__ attribute
     if '__name__' in attribs and imported_module.__name__ == 'sys':
-        python_site_packages = 'python{}.{}/site-packages'\
-                               .format(sys.version_info.major, sys.version_info.minor)
+        user = getpass.getuser()
         for path in sys.path:
-            if path.endswith(python_site_packages):
-                value = path.rsplit('/site-packages')[0]
+            # don't return local /Users/$USER/Library/Python/2.7/lib/python/site-packages
+            # as that is not the source of sys
+            if user in path:
+                continue
+            if path.endswith('/site-packages'):
+                #value = path.rsplit('/site-packages')[0]
                 return value
     raise AttributeError('could not find any attribute to determine location out of: {}'\
                          .format(', '.join(potential_attribs)))
