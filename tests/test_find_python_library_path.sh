@@ -22,10 +22,22 @@ cd "$srcdir/..";
 # shellcheck disable=SC1091
 . ./tests/utils.sh
 
-run_grep '/os.py[co]?$' ./find_python_library_path.py os
-run_grep '/logging/__init__.py[co]?$' ./find_python_library_path.py logging
-ERRCODE=2 run_grep '' ./find_python_library_path.py nonexistentmodule
-run_grep 'python' ./find_python_library_path.py sys
-run_grep 'python' ./find_python_library_path.py
-run_usage ./find_python_library_path.py -
-run_usage ./find_python_library_path.py --help
+section "Python Find Library Path"
+
+start_time="$(start_timer "python_find_library_path")"
+
+run ./pythonpath.py
+
+run_grep '/os.py[co]?$' ./python_find_library_path.py os
+run_grep '/logging/__init__.py[co]?$' ./python_find_library_path.py logging
+ERRCODE=2 run_grep '' ./python_find_library_path.py nonexistentmodule
+run_grep 'python' ./python_find_library_path.py sys
+run_grep 'python' ./python_find_library_path.py
+run_usage ./python_find_library_path.py -
+run_usage ./python_find_library_path.py --help
+
+echo
+# shellcheck disable=SC2154
+echo "Total Tests run: $run_count"
+time_taken "$start_time" "SUCCESS! All tests for python_find_library_path.py completed in"
+echo
