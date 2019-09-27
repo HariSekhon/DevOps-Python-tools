@@ -16,7 +16,7 @@
 
 """
 
-Simply tool to print the local path to one or more libraries given as arguments
+Simple tool to print the local path to one or more libraries given as arguments
 
 Useful for finding where things are installed on different operating systems like Mac vs Linux
 
@@ -33,14 +33,16 @@ import os
 import sys
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 
 
 def usage():
-    print('usage: {} <library1> [<library2> <library3>...]'.format(os.path.basename(sys.argv[0])), file=sys.stderr)
+    print(__doc__.strip())
+    print('\n\nusage: {} <library1> [<library2> <library3>...]\n'\
+          .format(os.path.basename(sys.argv[0])), file=sys.stderr)
     sys.exit(3)
 
 def get_module_location(module):
@@ -74,6 +76,11 @@ def get_module_location(module):
 
 def main():
     exitcode = 0
+    if len(sys.argv) < 2:
+        usage()
+    for arg in sys.argv:
+        if arg.startswith('-'):
+            usage()
     for module in sys.argv[1:]:
         try:
             print(get_module_location(module))
