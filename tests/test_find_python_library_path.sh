@@ -26,5 +26,5 @@ run_grep '/os.py[co]?$' ./find_python_library_path.py os
 run_grep '/logging/__init__.py[co]?$' ./find_python_library_path.py logging
 ERRCODE=2 run_grep '' ./find_python_library_path.py nonexistentmodule
 run_grep 'python' ./find_python_library_path.py sys
-ERRCODE=3 run_grep '' ./find_python_library_path.py
+run_grep 'python' ./find_python_library_path.py
 run_usage ./find_python_library_path.py
