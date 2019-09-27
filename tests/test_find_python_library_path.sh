@@ -2,7 +2,7 @@
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
-#  Date: 2015-11-05 23:29:15 +0000 (Thu, 05 Nov 2015)
+#  Date: 2019-09-27
 #
 #  https://github.com/harisekhon/devops-python-tools
 #
