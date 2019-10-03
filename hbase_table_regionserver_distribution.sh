@@ -24,7 +24,6 @@
 
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
-srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 usage(){
     echo "usage: $0 <list of regionservers>"
@@ -37,9 +36,9 @@ if [ $# -lt 1 ]; then
     usage
 fi
 
-for server in $@; do
+for server in "$@"; do
     echo "$server:"
-    curl -s $server:$port/jmx |
+    curl -s "$server:$port/jmx" |
     grep 'Namespace_.*_metric_getCount"[[:space:]]*:[[:space:]]*' |
     sed 's/.*_table_//; s/_region_.*//' |
     sort |
