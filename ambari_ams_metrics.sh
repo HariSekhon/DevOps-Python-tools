@@ -98,13 +98,14 @@ if [ -z "$ams_host" ]; then
 elif [ -z "$ams_port" ]; then
     usage "--port not defined"
 fi
-if [ -n "$node_list" -a -z "$metric" ]; then
+if [ -n "$node_list" ] && [ -z "$metric" ]; then
     usage "--nodes option requires --metric. See --list-metrics for a list of available metrics"
 fi
 
 check_bin(){
     local bin="$1"
-    if ! which $bin &>/dev/null; then
+    # shellcheck disable=SC2230
+    if ! which "$bin" &>/dev/null; then
         echo "'$bin' command not found in \$PATH ($PATH)"
         exit 1
     fi
@@ -125,7 +126,7 @@ list_metrics(){
 list_hosts(){
     curl -s "$ams_host:$ams_port/ws/v1/timeline/metrics/hosts" |
     python -m json.tool |
-    egrep '^[[:space:]]*".+":[[:space:]]* \[[[:space:]]*$' |
+    grep -E '^[[:space:]]*".+":[[:space:]]* \[[[:space:]]*$' |
     sed 's/"//g;s/:.*//;s/[[:space:]]*//g' |
     grep -v fakehostname |
     sort ||
