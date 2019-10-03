@@ -16,7 +16,7 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
-srcdir="$(dirname $0)"
+srcdir="$(dirname "$0")"
 
 for docker_image in $("$srcdir/dockerhub_search.py" -q harisekhon | grep -v 'presto.*dev'); do
     echo "pulling all tags for docker image $docker_image:"
