@@ -16,7 +16,7 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
-srcdir="$(dirname $0)"
+srcdir="$(dirname "$0")"
 
 docker_image="${1:-}"
 
