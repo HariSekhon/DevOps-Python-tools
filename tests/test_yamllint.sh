@@ -21,6 +21,7 @@ cfg="$srcdir/../.yamllint"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "Running Yaml lint"
