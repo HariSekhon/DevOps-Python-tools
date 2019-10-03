@@ -18,7 +18,6 @@ set -euo pipefail
 
 regionservers=""
 port="${HBASE_REGIONSERVER_PORT:-16030}"
-metrics="metrics"
 
 usage(){
     if [ -n "$*" ]; then
@@ -66,7 +65,8 @@ fi
 
 check_bin(){
     local bin="$1"
-    if ! which $bin &>/dev/null; then
+    # shellcheck disable=SC2230
+    if ! which "$bin" &>/dev/null; then
         echo "'$bin' command not found in \$PATH ($PATH)"
         exit 1
     fi
@@ -79,6 +79,7 @@ if [ -z "${DEBUG:-}" ]; then
 fi
 for regionserver in $(tr ' ' '\n' <<< "$regionservers" | sort -u); do
     echo "$regionserver:"
+    # shellcheck disable=SC2086
     curl $curl_options "$regionserver:$port/jmx" |
     grep "_table_.*${table}.*_region_" |
     sed 's/.*_table_//; s/_region_/ /; s/_.*$//' |
