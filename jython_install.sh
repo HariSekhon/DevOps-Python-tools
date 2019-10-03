@@ -15,7 +15,6 @@
 
 set -eu
 [ -n "${DEBUG:-}" ] && set -x
-srcdir="$(cd "$(dirname "$0")" && pwd)"
 
 JYTHON_VERSION="${1:-2.7.0}"
 
@@ -23,7 +22,7 @@ JYTHON_INSTALL_DIR="${2:-/opt/jython-$JYTHON_VERSION}"
 
 # not set in busybox
 #[ $EUID -eq 0 ] && sudo="" || sudo=sudo
-[ $(whoami) = "root" ] && sudo="" || sudo=sudo
+[ "$(whoami)" = "root" ] && sudo="" || sudo=sudo
 
 # installer will tell us if dir isn't empty
 #if ! [ -e "$JYTHON_INSTALL_DIR" ]; then
