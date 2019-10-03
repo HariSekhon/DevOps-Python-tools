@@ -17,7 +17,7 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
 usage(){
-    [ -n "${@:-}" ] && echo "$@"
+    [ -n "${*:-}" ] && echo "$@"
     echo
     echo "Fast and dirty script to scan an HBase table to determine all columns (column family + qualifiers)
 
@@ -45,6 +45,7 @@ if [ -z "${table:-}" ]; then
     usage "ERROR: Table not defined, use --table switch"
 fi
 
+# shellcheck disable=SC2230
 if ! which hbase &>/dev/null; then
     usage "ERROR: hbase command not found in \$PATH ($PATH)"
 fi
