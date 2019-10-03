@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1090
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
@@ -28,11 +29,13 @@ export COMPOSE_PROJECT_NAME="pytools"
 if [ -n "${TRAVIS:-}" ]; then
     sudo=sudo
 else
+    # will be used in sourcing scripts
+    # shellcheck disable=SC2034
     sudo=""
 fi
 
 set +o pipefail
-spark_home="$(ls -d tests/spark-*-bin-hadoop* 2>/dev/null | head -n 1)"
+spark_home="$(find . -type d -path 'tests/spark-*-bin-hadoop*' 2>/dev/null | head -n 1)"
 set -o pipefail
 if [ -n "$spark_home" ]; then
     export SPARK_HOME="$spark_home"
@@ -56,7 +59,7 @@ sample_files(){
         "$data_dir/../../README.md" \
         ; do
         local excluded=0
-        for ext in $@; do
+        for ext in "$@"; do
             if [ "${filename##*.}" = "$ext" ]; then
                 excluded=1
                 break
@@ -69,9 +72,9 @@ sample_files(){
 }
 
 check_broken_sample_files(){
-    echo "Now checking non $@ files to detect successful failure:"
+    echo "Now checking non $* files to detect successful failure:"
     echo
-    for filename in $(sample_files $@); do
+    for filename in $(sample_files "$@"); do
         check_broken "$filename"
     done
 }
