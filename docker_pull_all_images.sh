@@ -16,7 +16,7 @@
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 
-srcdir="$(dirname $0)"
+srcdir="$(dirname "$0")"
 
 for docker_image in $("$srcdir/dockerhub_search.py" -q harisekhon); do
     echo "docker pull $docker_image"
