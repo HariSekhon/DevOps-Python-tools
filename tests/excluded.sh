@@ -31,7 +31,7 @@ isExcluded(){
     if is_inside_docker && [[ "$prog" =~ spark_* ]]; then
         return 0
     fi
-    if which git &>/dev/null; then
+    if type -P git &>/dev/null; then
         commit="$(git log "$prog" | head -n1 | grep 'commit')"
         if [ -z "$commit" ]; then
             return 0

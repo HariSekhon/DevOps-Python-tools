@@ -105,7 +105,7 @@ fi
 check_bin(){
     local bin="$1"
     # shellcheck disable=SC2230
-    if ! which "$bin" &>/dev/null; then
+    if ! type -P "$bin" &>/dev/null; then
         echo "'$bin' command not found in \$PATH ($PATH)"
         exit 1
     fi

@@ -40,7 +40,7 @@ for SPARK_VERSION in $SPARK_VERSIONS; do
         if ! [ -f "$tar" ]; then
             echo "fetching $tar"
             # some systems don't have wget
-            if which wget &>/dev/null; then
+            if type -P wget &>/dev/null; then
                 wget "http://d3kbcqa49mib13.cloudfront.net/$tar"
             else
                 curl -L "http://d3kbcqa49mib13.cloudfront.net/$tar" > "$tar"

@@ -25,7 +25,7 @@ cd "$srcdir/.."
 
 section "Testing Dockerfiles Check Git branches"
 
-if which git &>dev/null; then
+if type -P git &>dev/null; then
     if ! [ -d Dockerfiles ]; then
         git clone https://github.com/harisekhon/Dockerfiles
     else

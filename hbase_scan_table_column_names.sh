@@ -45,8 +45,7 @@ if [ -z "${table:-}" ]; then
     usage "ERROR: Table not defined, use --table switch"
 fi
 
-# shellcheck disable=SC2230
-if ! which hbase &>/dev/null; then
+if ! type -P hbase &>/dev/null; then
     usage "ERROR: hbase command not found in \$PATH ($PATH)"
 fi
 
