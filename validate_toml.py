@@ -60,6 +60,8 @@ class TomlValidatorTool(IniValidatorTool):
         # Python 3.x
         # super().__init__()
         self.re_suffix = re.compile(r'.*\.toml$', re.I)
+        self.valid_toml_msg = '<unknown> => TOML OK'
+        self.invalid_toml_msg = '<unknown> => TOML INVALID'
 
     def add_options(self):
         self.add_opt('-i', '--include', metavar='regex', default=os.getenv('INCLUDE'),
@@ -82,9 +84,12 @@ class TomlValidatorTool(IniValidatorTool):
 
     @staticmethod
     def check_toml(filename):
-        _ = toml.load(filename)
-        if _:
-            return True
+        try:
+            _ = toml.load(filename)
+            if _:
+                return True
+        except toml.decoder.TomlDecodeError:
+            return False
         return False
 
     def check_file(self, filename):
@@ -107,6 +112,7 @@ class TomlValidatorTool(IniValidatorTool):
                     print(self.valid_toml_msg)
                 else:
                     print(self.invalid_toml_msg)
+                    sys.exit(2)
             except IOError as _:
                 die("ERROR: %s" % _)
 
