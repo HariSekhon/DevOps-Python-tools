@@ -65,7 +65,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.12.2'
+__version__ = '0.12.3'
 
 
 class IniValidatorTool2(IniValidatorTool):
@@ -75,7 +75,7 @@ class IniValidatorTool2(IniValidatorTool):
         super(IniValidatorTool2, self).__init__()
         # Python 3.x
         # super().__init__()
-        self.re_ini_suffix = re.compile(r'.*\.ini$', re.I)
+        self.re_suffix = re.compile(r'.*\.ini$', re.I)
 
     def add_options(self):
         self.add_opt('-p', '--print', action='store_true',
