@@ -58,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.12.1'
+__version__ = '0.12.2'
 
 
 class IniValidatorTool(CLI):
@@ -69,7 +69,7 @@ class IniValidatorTool(CLI):
         # Python 3.x
         # super().__init__()
         self.filename = None
-        self.re_ini_suffix = re.compile(r'.*\.(?:ini|properties)$', re.I)
+        self.re_suffix = re.compile(r'.*\.(?:ini|properties)$', re.I)
         # In Windows ini key cannot contain equals sign = or semicolon ;
         #                                   key=val or [section]
         self.re_ini_section = re.compile(r'^\s*\[([\w=\:\.-]+)\]\s*$')
@@ -286,7 +286,7 @@ class IniValidatorTool(CLI):
             dirs[:] = [d for d in dirs if not self.is_excluded(os.path.join(root, d))]
             for filename in files:
                 file_path = os.path.join(root, filename)
-                if self.re_ini_suffix.match(file_path):
+                if self.re_suffix.match(file_path):
                     self.check_file(file_path)
 
     def check_file(self, filename):
