@@ -119,6 +119,8 @@ echo "checking for non-existent file"
 check_broken nonexistentfile 2
 echo
 
+rm -fv "$data_dir/test.yml"
+
 echo "======="
 echo "SUCCESS"
 echo "======="
