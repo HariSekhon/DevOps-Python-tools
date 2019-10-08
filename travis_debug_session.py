@@ -30,6 +30,10 @@ if contains a slash but no url (eg. HariSekhon/Nagios-Plugins) otherwise it'll a
 URL so you can simply paste the path to a failing build and it'll just work. The switch versions of --job-id and --repo
 take priority as they're more explicit
 
+Travis CI doc on debug builds:
+
+    https://docs.travis-ci.com/user/running-build-in-debug-mode/
+
 """
 
 from __future__ import absolute_import
