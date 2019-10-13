@@ -81,7 +81,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.3'
+__version__ = '0.5.4'
 
 
 class FindDuplicateFiles(CLI):
@@ -270,7 +270,7 @@ class FindDuplicateFiles(CLI):
         # os.walk returns nothing if path is a file, and must store file names, sizes, checksums and regex captures
         # even for standalone file args
         if os.path.isfile(path):
-            self.check_file(path)
+            self.is_file_dup(path)
         elif os.path.isdir(path):
             # returns generator
             # root is the dir, dirs and files are child basenames
