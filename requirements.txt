@@ -21,7 +21,7 @@ Jinja2==2.8
 ldif3==3.2.2
 #MarkupSafe==0.23
 #Markdown==2.6.8
-numpy==1.8.0
+numpy==1.17.2
 python-cson==1.0.9
 psutil==4.3.0
 # parquet support in pyarrow is weaker, gone back to using parquet-tools
