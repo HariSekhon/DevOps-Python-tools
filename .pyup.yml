@@ -1,0 +1,4 @@
+# https://pyup.io/docs/configuration/
+
+update: insecure
+assignees: HariSekhon
