@@ -1,48 +1,48 @@
-avro>=1.8.1
-# requires Python >= 3.4, build in Makefile instead
-#avro-python3>=1.9.0
-awscli>=1.16.241
-#bitarray>=0.8.1
-#cassandra-driver>=3.6.0
-dicttoxml>=1.7.4
+avro==1.8.1
+# requires Python == 3.4, build in Makefile instead
+#avro-python3==1.9.0
+awscli==1.16.241
+#bitarray==0.8.1
+#cassandra-driver==3.6.0
+dicttoxml==1.7.4
 # Elasticsearch library must match major version :(
 # for Elasticsearch 2.x
 #elasticsearch>=2.0.0,<3.0.0
 # for Elasticsearch 1.x
 #elasticsearch>=1.0.0,<2.0.0
 # fails on requiring newer version of setuptools
-#Flask>=0.10.1
-GitPython>=2.0.8
-happybase>=1.0.0
-humanize>=0.5.1
-#impyla>=0.12.0
-Jinja2>=2.8
-#kazoo>=2.2.1
-ldif3>=3.2.2
-#MarkupSafe>=0.23
-#Markdown>=2.6.8
-numpy>=1.8.0rc1
-python-cson>=1.0.9
-psutil>=4.3.0
+#Flask==0.10.1
+GitPython==2.0.8
+happybase==1.0.0
+humanize==0.5.1
+#impyla==0.12.0
+Jinja2==2.8
+#kazoo==2.2.1
+ldif3==3.2.2
+#MarkupSafe==0.23
+#Markdown==2.6.8
+numpy==1.8.0
+python-cson==1.0.9
+psutil==4.3.0
 # parquet support in pyarrow is weaker, gone back to using parquet-tools
 #pyarrow==0.6.0
-python-ldap>=3.2.0
+python-ldap==3.2.0
 # PyLint fails some checks in Travis that pass locally
-#pyhs2>=0.6.0
-#python-jenkins>=0.4.13
+#pyhs2==0.6.0
+#python-jenkins==0.4.13
 # pulled in automatically by snakebite[kerberos]
-#python-krbV>=1.0.90
+#python-krbV==1.0.90
 # needed by avro
-python-snappy>=0.5
-sasl>=0.2.1
-sh>=1.12.14
+python-snappy==0.5
+sasl==0.2.1
+sh==1.12.14
 # pulls in python-KrbV as a dependency which doesn't build on Mac any more
 # moved to Makefile as best effort
-#snakebite[kerberos]>=2.11.0
-snakebite>=2.11.0
-thrift-sasl>=0.2.1
-thrift>=0.9.3
-thriftpy>=0.3.9
-toml>=0.10.0
-xmltodict>=0.10.2
-yamllint>=1.15.0
+#snakebite[kerberos]==2.11.0
+snakebite==2.11.0
+thrift-sasl==0.2.1
+thrift==0.9.3
+thriftpy==0.3.9
+toml==0.10.0
+xmltodict==0.10.2
+yamllint==1.15.0
