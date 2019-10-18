@@ -58,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 
 class AmbariTriggerServiceChecks(CLI):
@@ -307,7 +307,7 @@ class AmbariTriggerServiceChecks(CLI):
     def parse_scheduled_request(content):
         try:
             _ = json.loads(content)
-            if _['RequestSchedule']['last_execution_status'] == 'COMPLETED':
+            if _['RequestSchedule']['status'] == 'COMPLETED':
                 log.info('COMPLETED')
                 return 'COMPLETED'
             for item in _['RequestSchedule']['batch']['batch_requests']:
