@@ -37,6 +37,14 @@ REPO := HariSekhon/DevOps-Python-tools
 
 CODE_FILES := $(shell find . -type f -name '*.py' -o -type f -name '*.sh' | grep -v -e bash-tools -e /pylib/)
 
+# placeholders to silence check_makefile.sh warnings - should be set in client Makefiles after sourcing
+ifndef PARQUET_VERSION
+	PARQUET_VERSION :=
+endif
+ifndef SKIP_PARQUET
+	SKIP_PARQUET :=
+endif
+
 .PHONY: build
 build:
 	@echo =========================
@@ -57,9 +65,9 @@ init:
 .PHONY: python
 python:
 	cd pylib && $(MAKE)
-	# don't pull parquet tools in to docker image by default, will bloat it
-	# can fetch separately by running 'make parquet-tools' if you really want to
-	if [ -f /.dockerenv -o -n "$(SKIP_PARQUET)" ]; then \
+	@# don't pull parquet tools in to docker image by default, will bloat it
+	@# can fetch separately by running 'make parquet-tools' if you really want to
+	@if [ -f /.dockerenv -o -n "$(SKIP_PARQUET)" ]; then \
 		echo; echo; \
 		echo "Skipping Parquet install..."; \
 		echo; echo; \
@@ -67,45 +75,44 @@ python:
 		$(MAKE) parquet-tools; \
 	fi
 
-	# only install pip packages not installed via system packages
-	#$(SUDO_PIP) pip install --upgrade -r requirements.txt
-	#$(SUDO_PIP) pip install -r requirements.txt
+	@# only install pip packages not installed via system packages
+	@#$(SUDO_PIP) pip install --upgrade -r requirements.txt
+	@#$(SUDO_PIP) pip install -r requirements.txt
 	@bash-tools/python_pip_install_if_absent.sh requirements.txt
 
-	# python-krbV dependency doesn't build on Mac any more and is unmaintained
-	# python_pip_install_if_absent.sh would import snakebite module and not trigger to build the enhanced snakebite with [kerberos] bit
-	#@bash-tools/python_pip_install.sh snakebite[kerberos] || :
+	@# python-krbV dependency doesn't build on Mac any more and is unmaintained
+	@# python_pip_install_if_absent.sh would import snakebite module and not trigger to build the enhanced snakebite with [kerberos] bit
 	@bash-tools/python_pip_install.sh snakebite[kerberos] || :
 
 	# Python >= 3.4 - try but accept failure in case we're not on the right version of Python
 	@if [ "$$(echo "$$(python -V 2>&1 | grep -Eo '[[:digit:]]+\.[[:digit:]]+') >= 3.4" | bc -l)" = 1 ]; then bash-tools/python_pip_install.sh "avro-python3"; fi
 
-	# for impyla
-	#$(SUDO_PIP) pip install --upgrade setuptools || :
-	#
-	# snappy may fail to install on Mac not finding snappy-c.h - workaround:
-	#
-	# brew install snappy
-	#
-	# find /usr/local -name snappy-c.h
-	#
-	# /usr/local/include/snappy-c.h
-	#
-	# sudo su
-	# LD_RUN_PATH=/usr/local/include pip install snappy
-	#
-	#$(SUDO_PIP) pip install --upgrade -r requirements.txt
+	@# for impyla
+	@#$(SUDO_PIP) pip install --upgrade setuptools || :
+	@#
+	@# snappy may fail to install on Mac not finding snappy-c.h - workaround:
+	@#
+	@# brew install snappy
+	@#
+	@# find /usr/local -name snappy-c.h
+	@#
+	@# /usr/local/include/snappy-c.h
+	@#
+	@# sudo su
+	@# LD_RUN_PATH=/usr/local/include pip install snappy
+	@#
+	@#$(SUDO_PIP) pip install --upgrade -r requirements.txt
 
-	# for ipython-notebook-pyspark.py
-	#$(SUDO_PIP) pip install jinja2
-	# HiveServer2
-	#$(SUDO_PIP) pip install pyhs2
-	# Impala
-	#$(SUDO_PIP) pip install impyla
-	# must downgrade happybase library to work on Python 2.6
-	#if [ "$$(python -c 'import sys; sys.path.append("pylib"); import harisekhon; print(harisekhon.utils.getPythonVersion())')" = "2.6" ]; then $(SUDO_PIP) pip install --upgrade "happybase==0.9"; fi
+	@# for ipython-notebook-pyspark.py
+	@#$(SUDO_PIP) pip install jinja2
+	@# HiveServer2
+	@#$(SUDO_PIP) pip install pyhs2
+	@# Impala
+	@#$(SUDO_PIP) pip install impyla
+	@# must downgrade happybase library to work on Python 2.6
+	@#if [ "$$(python -c 'import sys; sys.path.append("pylib"); import harisekhon; print(harisekhon.utils.getPythonVersion())')" = "2.6" ]; then $(SUDO_PIP) pip install --upgrade "happybase==0.9"; fi
 
-	# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
+	@# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
 	@bash-tools/python_pip_install.sh "ipython[notebook]" || :
 	@echo
 	$(MAKE) pycompile
