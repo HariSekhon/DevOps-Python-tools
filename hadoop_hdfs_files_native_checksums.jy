@@ -58,7 +58,7 @@ Hari Sekhon - https://github.com/harisekhon/devops-python-tools
 
 Jython program to fetch the HDFS native checksums for given files / all files under given directories.
 
-Quick way of checking for duplicate files but not checking content itself. This is at least ~100x more efficient in terms of data transfer than 'hadoop fs -cat | md5sum'.
+Quick way of checking for duplicate files but not checking content itself. This is ~90% more efficient in terms of data transfer than 'hadoop fs -cat | md5sum'.
 Caveat: files with differing block sizes will not match
 
 Will be implemented in hadoop-9209 jira for versions 3.0.0, 0.23.7, 2.1.0-beta using a new command line param: hadoop fs -checksum
