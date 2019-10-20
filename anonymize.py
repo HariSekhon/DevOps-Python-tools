@@ -353,7 +353,7 @@ class Anonymize(CLI):
             'http_auth': r'(https?:\/\/)[^:]+:[^\@]*\@',
             'http_auth2': r'(Proxy auth using \w+ with user )([\'"]).+([\'"])',
             'http_auth3': r'\bAuthorization:\s+Basic\s+[A-Za-z0-9]+',
-            'http_auth4': r'\b(token:\s+)[A-Za-z0-9]+',
+            'http_auth4': r'(\btoken:\s+)[A-Za-z0-9]+',
             'cisco': r'username .+ (?:password|secret) .*?$',
             'cisco2': r'password .*?$',
             'cisco3': r'\ssecret\s.*?$',
