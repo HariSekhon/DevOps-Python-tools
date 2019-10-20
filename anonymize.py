@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.9.4'
+__version__ = '0.9.5'
 
 ip_regex = r'(?!127\.0\.0\.)' + ip_regex
 subnet_mask_regex = r'(?!127\.0\.0\.)' + subnet_mask_regex
@@ -353,6 +353,7 @@ class Anonymize(CLI):
             'http_auth': r'(https?:\/\/)[^:]+:[^\@]*\@',
             'http_auth2': r'(Proxy auth using \w+ with user )([\'"]).+([\'"])',
             'http_auth3': r'\bAuthorization:\s+Basic\s+[A-Za-z0-9]+',
+            'http_auth4': r'\b(token:\s+)[A-Za-z0-9]+',
             'cisco': r'username .+ (?:password|secret) .*?$',
             'cisco2': r'password .*?$',
             'cisco3': r'\ssecret\s.*?$',
@@ -425,6 +426,7 @@ class Anonymize(CLI):
             'http_auth': r'$1<user>:<password>@',
             'http_auth2': r'\1\'<proxy_user>\2\3/',
             'http_auth3': r'Authorization: Basic <token>',
+            'http_auth4': r'\1<token>',
             'cisco': r'username <username> password <password>',
             'cisco2': r'password <cisco_password>',
             'cisco3': r'secret <secret>',
