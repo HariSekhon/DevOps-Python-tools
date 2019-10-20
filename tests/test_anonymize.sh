@@ -427,6 +427,9 @@ dest[110]="es.xpack.password=<password>"
 src[111]="127.0.0.1"
 dest[111]="127.0.0.1"
 
+src[112]="travis token:  Abc123"
+dest[112]="travis token:  <token>"
+
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
 #dest[103]="proxy <proxy_host> port <proxy_port>"
