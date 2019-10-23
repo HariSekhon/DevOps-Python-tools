@@ -174,7 +174,7 @@ test: test-lib
 
 .PHONY: basic-test
 basic-test: test-lib
-	bash-tools/all.sh
+	bash-tools/check_all.sh
 
 .PHONY: test2
 test2:
