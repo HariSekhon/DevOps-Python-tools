@@ -28,7 +28,7 @@ section "Running PyTools ALL"
 
 # runs against . by default
 cd "$srcdir/..";
-bash-tools/all.sh
+bash-tools/check_all.sh
 
 tests/test_yamllint.sh
 
