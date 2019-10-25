@@ -13,6 +13,8 @@
 #  https://www.linkedin.com/in/harisekhon
 #
 
+version: ~> 1.0
+
 # Mac Python 2.7 not available - see https://travis-ci.org/HariSekhon/pylib/jobs/584226228
 #os:
 #  - linux
