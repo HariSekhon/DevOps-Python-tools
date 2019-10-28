@@ -200,7 +200,7 @@ mv -vf pylib pytools/
 
 Proceed to install PyPI modules for whichever programs you want to use using your usual procedure - usually an internal mirror or proxy server to PyPI, or rpms / debs (some libraries are packaged by Linux distributions).
 
-All PyPI modules are listed in the ```requirements.txt``` file.
+All PyPI modules are listed in the `requirements.txt` and `pylib/requirements.txt` files.
 
 Internal Mirror example ([JFrog Artifactory](https://jfrog.com/artifactory/) or similar):
 
