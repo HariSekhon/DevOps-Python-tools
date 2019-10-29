@@ -205,8 +205,8 @@ spark-deps:
 	rm -vf spark-deps.zip
 	zip spark-deps.zip pylib
 
-.PHONY: dockerhub
-dockerhub:
+.PHONY: dockerhub-trigger
+dockerhub-trigger:
 	# PyTools
 	curl --header "Content:Type:application/json" --data '{"build":true}' -X POST https://cloud.docker.com/api/build/v1/source/d470810b-9a44-4abc-92cc-c903a6afd962/trigger/0e69c39f-ea1b-43c7-a97d-cef1252f1400/call/
 	# Alpine Github
