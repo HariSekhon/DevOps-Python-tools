@@ -344,3 +344,7 @@ Patches, improvements and even general feedback are welcome in the form of GitHu
 You might also be interested in the following really nice Jupyter notebook for HDFS space analysis created by another Hortonworks guy Jonas Straub:
 
 * https://github.com/mr-jstraub/HDFSQuota/blob/master/HDFSQuota.ipynb
+
+### Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/HariSekhon/DevOps-Python-tools.svg)](https://starchart.cc/HariSekhon/DevOps-Python-tools)
