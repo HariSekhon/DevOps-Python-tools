@@ -28,6 +28,8 @@ python-cson==1.0.9
 psutil==4.3.0
 # parquet support in pyarrow is weaker, gone back to using parquet-tools
 #pyarrow==0.6.0
+#PyHive==0.6.1
+#PyInstaller==3.3.1
 python-ldap==3.2.0
 #python-jenkins==0.4.13
 # pulled in automatically by snakebite[kerberos]
