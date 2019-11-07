@@ -33,6 +33,7 @@ for x in $(echo ./*.py 2>/dev/null); do
     if [ $status = 0 ]; then
         [[ "$x" =~ ambari_blueprints.py$ ]] && continue
         [[ "$x" =~ (hive|impala)_schemas_csv.py$ ]] && continue
+        [[ "$x" =~ pythonpath.py$ ]] && continue
     fi
     [ $status = 3 ] || { echo "status code for $x --help was $status not expected 3"; exit 1; }
 done
