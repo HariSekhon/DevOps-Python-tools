@@ -19,13 +19,15 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
-for x in $(echo *.py 2>/dev/null); do
+for x in $(echo ./*.py 2>/dev/null); do
     isExcluded "$x" && continue
+    [[ "$x" =~ (hive|impala)_schema_csv.py ]] && continue
     set +e
-    echo ./$x --help
-    ./$x --help # >/dev/null
+    echo "./$x --help"
+    "./$x" --help # >/dev/null
     status=$?
     set -e
     echo; hr
