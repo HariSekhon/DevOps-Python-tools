@@ -24,15 +24,15 @@ cd "$srcdir/..";
 
 for x in $(echo ./*.py 2>/dev/null); do
     isExcluded "$x" && continue
-    [[ "$x" =~ (hive|impala)_schema_csv.py ]] && continue
     set +e
-    echo "./$x --help"
-    "./$x" --help # >/dev/null
+    echo "$x --help"
+    "$x" --help # >/dev/null
     status=$?
     set -e
     echo; hr
     if [ $status = 0 ]; then
-        [[ $x =~ ambari_blueprints ]] && continue
+        [[ "$x" =~ ambari_blueprints.py$ ]] && continue
+        [[ "$x" =~ (hive|impala)_schemas_csv.py$ ]] && continue
     fi
     [ $status = 3 ] || { echo "status code for $x --help was $status not expected 3"; exit 1; }
 done
