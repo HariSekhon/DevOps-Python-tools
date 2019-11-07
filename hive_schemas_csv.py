@@ -18,7 +18,7 @@
 
 Connect to Impala or HiveServer2 and dump all the schemas, tables and columns out in CSV format to stdout
 
-Tested on Hive 1.1.0 (CDH 5.10) with Kerberos
+Tested on CDH 5.10, Hive 1.1.0 and Impala 2.7.0 with Kerberos
 
 Due to a thrift / impyla bug this needs exactly thrift==0.9.3, see
 
