@@ -15,7 +15,7 @@ dicttoxml==1.7.4
 GitPython==2.1.14
 happybase==1.0.0
 humanize==0.5.1
-#impyla==0.12.0
+#impyla==0.16.0
 Jinja2==2.10.1
 #kazoo==2.2.1
 ldif3==3.2.2
@@ -29,8 +29,6 @@ psutil==4.3.0
 # parquet support in pyarrow is weaker, gone back to using parquet-tools
 #pyarrow==0.6.0
 python-ldap==3.2.0
-# PyLint fails some checks in Travis that pass locally
-#pyhs2==0.6.0
 #python-jenkins==0.4.13
 # pulled in automatically by snakebite[kerberos]
 #python-krbV==1.0.90
