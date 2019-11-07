@@ -15,7 +15,7 @@ dicttoxml==1.7.4
 GitPython==2.1.14
 happybase==1.0.0
 humanize==0.5.1
-#impyla==0.16.0
+impyla==0.16.0
 Jinja2==2.10.1
 #kazoo==2.2.1
 ldif3==3.2.2
