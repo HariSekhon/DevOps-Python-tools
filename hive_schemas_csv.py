@@ -45,10 +45,17 @@ logging.basicConfig()
 log = logging.getLogger(os.path.basename(sys.argv[0]))
 
 host_envs = [
-    'HIVE_HOST',
     'HIVESERVER2_HOST',
+    'HIVE_HOST',
     'IMPALA_HOST',
     'HOST'
+]
+
+port_envs = [
+    'HIVESERVER2_PORT',
+    'HIVE_PORT',
+    'IMPALA_PORT',
+    'PORT'
 ]
 
 def getenvs(keys, default=None):
@@ -60,13 +67,15 @@ def getenvs(keys, default=None):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-H', '--host', default=getenvs(host_envs, socket.getfqdn()),
-                        help='HiveServer2 / Impala host')
-    parser.add_argument('-P', '--port', type=int, default=os.getenv('PORT', 10000),
-                        help='HiveServer2 port (default: 10000, set to 21050 for Impala)')
+    parser.add_argument('-H', '--host', default=getenvs(host_envs, socket.getfqdn()),\
+                        help='HiveServer2 / Impala host ' + \
+                             '(default: fqdn of local host, [$' + ', $'.join(host_envs) + ']')
+    parser.add_argument('-P', '--port', type=int, default=getenvs(port_envs, 10000),
+                        help='HiveServer2 / Impala port (default: 10000, set to 21050 for Impala, [$' + \
+                                                                                ', $'.join(port_envs) + ']')
     parser.add_argument('-k', '--kerberos', action='store_true', help='Use Kerberos (you must kinit first)')
     parser.add_argument('-n', '--krb5-service-name', default='hive',
-                        help='Service principal (default: hive, set to \'impala\' for Impala)')
+                        help='Service principal (default: \'hive\', set to \'impala\' for Impala)')
     parser.add_argument('-S', '--ssl', action='store_true', help='Use SSL')
     parser.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
     args = parser.parse_args()
