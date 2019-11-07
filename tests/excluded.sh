@@ -23,8 +23,8 @@ set -eu
 isExcluded(){
     local prog="$1"
     [[ "$prog" =~ ^\* ]] && return 0
+    [[ "$prog" =~ spark_.*.py ]] && return 0
     #[[ $prog =~ ipython-notebook ]] && return 0
-    #[[ $prog =~ ambari_blueprints.py ]] && return 0
     # this external git check is expensive, skip it when in CI as using fresh git checkouts
     is_CI && return 1
     # we no longer include spark inside pytools docker image due to bloat, so skip tests
