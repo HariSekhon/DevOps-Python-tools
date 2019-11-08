@@ -82,7 +82,7 @@ def parse_args():
                                                                   ', $'.join(port_envs) + ')')
     parser.add_argument('-k', '--kerberos', action='store_true', help='Use Kerberos (you must kinit first)')
     parser.add_argument('-n', '--krb5-service-name', default='hive',
-                        help='Service principal (default: \'hive\', or \'impala\' if called as impala_schema_csv.py)')
+                        help='Service principal (default: \'hive\', or \'impala\' if called as impala_schemas_csv.py)')
     parser.add_argument('-S', '--ssl', action='store_true', help='Use SSL')
     parser.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
     args = parser.parse_args()
