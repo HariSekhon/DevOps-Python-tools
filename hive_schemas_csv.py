@@ -16,7 +16,15 @@
 
 """
 
-Connect to Impala or HiveServer2 and dump all the schemas, tables and columns out in CSV format to stdout
+Connect to a HiveServer2 or Impala daemon and dump all the schemas, tables and columns out in CSV format to stdout
+
+In practice Hive is much more reliable for dumping masses of schema
+
+Impala appears faster initially but then slows down more than Hive and hits things query handle errors
+under sustained load of extracting large amounts of schema information
+
+There is also a risk that Impala's metadata may be out of date, so Hive is strongly preferred for this
+
 
 CSV format:
 
