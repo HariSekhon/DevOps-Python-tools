@@ -44,7 +44,7 @@ import sys
 from impala.dbapi import connect
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 logging.basicConfig()
 log = logging.getLogger(os.path.basename(sys.argv[0]))
@@ -75,16 +75,28 @@ def parse_args():
         description="Dumps all Hive / Impala schemas, tables, columns and types to CSV format on stdout")
     parser.add_argument('-H', '--host', default=getenvs(host_envs, socket.getfqdn()),\
                         help='HiveServer2 / Impala host ' + \
-                             '(default: fqdn of local host, [$' + ', $'.join(host_envs) + ']')
+                             '(default: fqdn of local host, $' + ', $'.join(host_envs) + ')')
     parser.add_argument('-P', '--port', type=int, default=getenvs(port_envs, 10000),
-                        help='HiveServer2 / Impala port (default: 10000, set to 21050 for Impala, [$' + \
-                                                                                ', $'.join(port_envs) + ']')
+                        help='HiveServer2 / Impala port (default: 10000 if called as hive, ' + \
+                                                                  '21050 if called as impala, $' + \
+                                                                  ', $'.join(port_envs) + ')')
     parser.add_argument('-k', '--kerberos', action='store_true', help='Use Kerberos (you must kinit first)')
     parser.add_argument('-n', '--krb5-service-name', default='hive',
-                        help='Service principal (default: \'hive\', set to \'impala\' for Impala)')
+                        help='Service principal (default: \'hive\', or \'impala\' if called as impala_schema_csv.py)')
     parser.add_argument('-S', '--ssl', action='store_true', help='Use SSL')
     parser.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
     args = parser.parse_args()
+
+    if args.verbose:
+        log.setLevel(logging.INFO)
+
+    if 'impala' in sys.argv[0]:
+        if args.krb5_service_name == 'hive':
+            log.info('called as impala, setting service principal to impala')
+            args.krb5_service_name = 'impala'
+        if args.port == 10000:
+            log.info('called as impala, setting port to 21050')
+            args.port = 21050
     return args
 
 def connect_db(args, database):
@@ -108,9 +120,6 @@ def main():
     args = parse_args()
 
     conn = connect_db(args, None)
-
-    if args.verbose:
-        log.setLevel(logging.INFO)
 
     print('database,table,column,type')
     log.info('querying databases')
