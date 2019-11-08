@@ -14,6 +14,7 @@
 # ============================================================================ #
 
 gcc-c++
+# needed to build python-krbV and cloudera/thrift_sasl
 cyrus-sasl-devel
 krb5-devel
 openssl-devel
