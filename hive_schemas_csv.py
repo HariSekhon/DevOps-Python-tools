@@ -71,7 +71,8 @@ def getenvs(keys, default=None):
     return default
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Dumps all Hive / Impala schemas, tables, columns and types to CSV format on stdout")
+    parser = argparse.ArgumentParser(
+        description="Dumps all Hive / Impala schemas, tables, columns and types to CSV format on stdout")
     parser.add_argument('-H', '--host', default=getenvs(host_envs, socket.getfqdn()),\
                         help='HiveServer2 / Impala host ' + \
                              '(default: fqdn of local host, [$' + ', $'.join(host_envs) + ']')
