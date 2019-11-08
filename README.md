@@ -103,6 +103,8 @@ Environment variables are supported for convenience and also to hide credentials
     - ```hadoop_hdfs_time_block_reads.jy``` - HDFS per-block read timing debugger with datanode and rack locations for a given file or directory tree. Reports the slowest Hadoop datanodes in descending order at the end. Helps find cluster data layer bottlenecks such as slow datanodes, faulty hardware or misconfigured top-of-rack switch ports.
     - ```hadoop_hdfs_files_native_checksums.jy``` - fetches native HDFS checksums for quicker file comparisons (about 100x faster than doing hdfs dfs -cat | md5sum)
     - ```hadoop_hdfs_files_stats.jy``` - fetches HDFS file stats. Useful to generate a list of all files in a directory tree showing block size, replication factor, underfilled blocks and small files
+  - [Hive](https://hive.apache.org/) / [Impala](https://impala.apache.org/):
+    - ```hive_schemas_csv.py``` / ```impala_schemas_csv.py``` - dumps all databases, tables, columns and types out in CSV format to standard output
   - [HBase](https://hbase.apache.org/):
     - ```hbase_generate_data.py``` - inserts random generated data in to a given [HBase](https://hbase.apache.org/) table, with optional skew support with configurable skew percentage. Useful for testing region splitting, balancing, CI tests etc. Outputs stats for number of rows written, time taken, rows per sec and volume per sec written.
     - ```hbase_show_table_region_ranges.py``` - dumps HBase table region ranges information, useful when pre-splitting tables
