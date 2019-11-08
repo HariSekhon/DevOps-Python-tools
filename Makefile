@@ -78,7 +78,7 @@ python:
 	@# only install pip packages not installed via system packages
 	@#$(SUDO_PIP) pip install --upgrade -r requirements.txt
 	@#$(SUDO_PIP) pip install -r requirements.txt
-	@bash-tools/python_pip_install_if_absent.sh requirements.txt
+	@PIP_OPTS="--ignore-installed" bash-tools/python_pip_install_if_absent.sh requirements.txt
 
 	@# python-krbV dependency doesn't build on Mac any more and is unmaintained
 	@# python_pip_install_if_absent.sh would import snakebite module and not trigger to build the enhanced snakebite with [kerberos] bit
