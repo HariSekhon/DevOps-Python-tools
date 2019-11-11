@@ -31,6 +31,11 @@ CSV format:
 database,table,column,type
 
 
+I recommend generating quoted csv because you may encounter Hive data types such as decimal(15,2)
+which would cause incorrect field splitting, you can disable by setting --quotechar='' to blank but
+if escaping is needed then you will be forced to specify an --escapechar otherwise the csv writer will
+raise a traceback to tell you to set one (eg. --escapechar='\\')
+
 Tested on CDH 5.10, Hive 1.1.0 and Impala 2.7.0 with Kerberos
 
 Due to a thrift / impyla bug this needs exactly thrift==0.9.3, see
@@ -45,6 +50,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import argparse
+import csv
 import logging
 import os
 import socket
@@ -52,7 +58,7 @@ import sys
 from impala.dbapi import connect
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1.1'
+__version__ = '0.2.0'
 
 logging.basicConfig()
 log = logging.getLogger(os.path.basename(sys.argv[0]))
@@ -92,6 +98,12 @@ def parse_args():
     parser.add_argument('-n', '--krb5-service-name', default='hive',
                         help='Service principal (default: \'hive\', or \'impala\' if called as impala_schemas_csv.py)')
     parser.add_argument('-S', '--ssl', action='store_true', help='Use SSL')
+    # must set type to str otherwise csv module gives this error on Python 2.7:
+    # TypeError: "delimiter" must be string, not unicode
+    parser.add_argument('-d', '--delimiter', default=',', type=str, help='Delimiter to use (default: ,)')
+    parser.add_argument('-Q', '--quotechar', default='"', type=str,
+                        help='Generate quoted CSV (recommended, default is double quote \'"\')')
+    parser.add_argument('-E', '--escapechar', help='Escape char if needed')
     parser.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
     args = parser.parse_args()
 
@@ -129,7 +141,17 @@ def main():
 
     conn = connect_db(args, None)
 
-    print('database,table,column,type')
+    quoting = csv.QUOTE_ALL
+    if args.quotechar == '':
+        quoting = csv.QUOTE_NONE
+    fieldnames = ['database', 'table', 'column', 'type']
+    csv_writer = csv.DictWriter(sys.stdout,
+                                delimiter=args.delimiter,
+                                quotechar=args.quotechar,
+                                escapechar=args.escapechar,
+                                quoting=quoting,
+                                fieldnames=fieldnames)
+    csv_writer.writeheader()
     log.info('querying databases')
     with conn.cursor() as db_cursor:
         db_cursor.execute('show databases')
@@ -155,11 +177,10 @@ def main():
                         for column_row in column_cursor:
                             column = column_row[0]
                             column_type = column_row[1]
-                            print('{database},{table},{column},{type}'\
-                                  .format(database=database,
-                                          table=table,
-                                          column=column,
-                                          type=column_type))
+                            csv_writer.writerow({'database': database,
+                                                 'table': table,
+                                                 'column': column,
+                                                 'type': column_type})
 
 
 if __name__ == '__main__':
