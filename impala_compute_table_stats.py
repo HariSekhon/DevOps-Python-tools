@@ -163,6 +163,7 @@ def compute_table_stats(conn, args, database, table, partition_regex):
         log.info("no partitions found for database '%s' table '%s', computing stats for whole table", database, table)
         with conn.cursor() as table_cursor:
             log.info("running compute stats on table '%s'", table)
+            # doesn't support parameterized query quoting from dbapi spec
             table_cursor.execute('COMPUTE STATS {db}.{table}'.format(db=database, table=table))
 
 
