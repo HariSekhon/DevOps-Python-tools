@@ -108,11 +108,15 @@ def connect_db(args, database):
 def main():
     args = parse_args()
 
-    conn = connect_db(args, None)
+    try:
+        database_regex = re.compile(args.database, re.I)
+        table_regex = re.compile(args.table, re.I)
+        partition_regex = re.compile(args.partition, re.I)
+    except re.error as _:
+        log.error('error in provided regex: %s', _)
+        sys.exit(3)
 
-    database_regex = re.compile(args.database, re.I)
-    table_regex = re.compile(args.table, re.I)
-    partition_regex = re.compile(args.partition, re.I)
+    conn = connect_db(args, None)
 
     log.info('querying databases')
     with conn.cursor() as db_cursor:
