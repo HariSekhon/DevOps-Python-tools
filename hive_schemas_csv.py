@@ -42,6 +42,15 @@ Due to a thrift / impyla bug this needs exactly thrift==0.9.3, see
 
 https://github.com/cloudera/impyla/issues/286
 
+If you get an error like this:
+
+ERROR:impala.hiveserver2:Failed to open transport (tries_left=1)
+...
+TTransportException: TSocket read 0 bytes
+
+then check your --kerberos and --ssl settings match the cluster's settings
+(Thrift and Kerberos have the worst error messages ever)
+
 """
 
 from __future__ import absolute_import
@@ -58,7 +67,7 @@ import sys
 from impala.dbapi import connect
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 logging.basicConfig()
 log = logging.getLogger(os.path.basename(sys.argv[0]))
@@ -104,11 +113,13 @@ def parse_args():
     parser.add_argument('-Q', '--quotechar', default='"', type=str,
                         help='Generate quoted CSV (recommended, default is double quote \'"\')')
     parser.add_argument('-E', '--escapechar', help='Escape char if needed')
-    parser.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
+    parser.add_argument('-v', '--verbose', action='count', help='Verbose mode')
     args = parser.parse_args()
 
     if args.verbose:
         log.setLevel(logging.INFO)
+    if args.verbose > 1 or os.getenv('DEBUG'):
+        log.setLevel(logging.DEBUG)
 
     if 'impala' in sys.argv[0]:
         if args.krb5_service_name == 'hive':
@@ -123,6 +134,10 @@ def connect_db(args, database):
     auth_mechanism = None
     if args.kerberos:
         auth_mechanism = 'GSSAPI'
+        log.debug('kerberos enabled')
+        log.debug('krb5 remote service principal name = %s', args.krb5_service_name)
+    if args.ssl is True:
+        log.debug('ssl enabled')
 
     log.info('connecting to %s:%s database %s', args.host, args.port, database)
     return connect(
@@ -139,7 +154,7 @@ def connect_db(args, database):
 def main():
     args = parse_args()
 
-    conn = connect_db(args, None)
+    conn = connect_db(args, 'default')
 
     quoting = csv.QUOTE_ALL
     if args.quotechar == '':
