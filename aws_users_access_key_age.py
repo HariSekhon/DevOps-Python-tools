@@ -62,11 +62,11 @@ class AWSUsersAccessKeysAge(CLI):
 
     def add_options(self):
         self.add_opt('--age', help='Return keys older than this N days')
-        self.add_opt('--only-active', action='store_true', help='Return only keys with Active status')
+        #self.add_opt('--only-active', action='store_true', help='Return only keys with Active status')
 
     def process_args(self):
         self.only_active_keys = self.get_opt('only_active')
-        self.age = self.get_opt('age')
+        #self.age = self.get_opt('age')
         if self.age:
             validate_float(self.age, 'age')
             self.age = float(self.age)
