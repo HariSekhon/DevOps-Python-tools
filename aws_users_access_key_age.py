@@ -24,8 +24,15 @@ Output format is:
 
 Status is usually Active
 
-See also aws_users_access_key_age.sh for a similar version in the adjacent DevOps Bash Tools repo
+See also:
+
+aws_users_access_key_age.sh - similar version in the adjacent DevOps Bash Tools repo (https://github.com/harisekhon/devops-bash-tools)
 This version adds date parsing for finding keys older than a given time for enforcing periodic key rotation policies
+
+Advanced Nagios Plugins (https://github.com/harisekhon/nagios-plugins)
+
+check_aws_access_keys_age.py
+check_aws_access_keys_disabled.py
 
 """
 
