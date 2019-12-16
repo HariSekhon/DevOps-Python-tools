@@ -51,42 +51,41 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 class AWSUsersAccessKeysAge(CLI):
 
     def __init__(self):
         super(AWSUsersAccessKeysAge, self).__init__()
         self.age = None
+        self.now = None
         self.only_active_keys = False
 
     def add_options(self):
-        #self.add_opt('--age', help='Return keys older than this N days')
+        self.add_opt('--age', help='Return keys older than N days')
         self.add_opt('--only-active', action='store_true', help='Return only keys with Active status')
 
     def process_args(self):
         self.only_active_keys = self.get_opt('only_active')
-        #self.age = self.get_opt('age')
+        self.age = self.get_opt('age')
         if self.age:
             validate_float(self.age, 'age')
             self.age = float(self.age)
+            self.age = self.age * 86400
 
     def run(self):
         iam = boto3.client('iam')
         user_paginator = iam.get_paginator('list_users')
-        now = datetime.datetime.utcnow()
-        age = 0
-        if self.age:
-            age = self.age * 86400
+        self.now = datetime.datetime.utcnow()
         for users_response in user_paginator.paginate():
             for user_item in users_response['Users']:
                 username = user_item['UserName']
                 key_paginator = iam.get_paginator('list_access_keys')
                 for keys_response in key_paginator.paginate(UserName=username):
-                    self.process_key(keys_response, username, now, age)
+                    self.process_key(keys_response, username)
         log.info('Completed')
 
-    def process_key(self, keys_response, username, now, age):
+    def process_key(self, keys_response, username):
         assert not keys_response['IsTruncated']
         for access_key_item in keys_response['AccessKeyMetadata']:
             assert username == access_key_item['UserName']
@@ -94,11 +93,14 @@ class AWSUsersAccessKeysAge(CLI):
             if self.only_active_keys and not status:
                 continue
             create_date = access_key_item['CreateDate']
-            #if age:
-                # already cast to datetime.datetime
+            if self.age:
+                # already cast to datetime.datetime with tzinfo
                 #create_datetime = datetime.datetime.strptime(create_date, '%Y-%m-%d %H:%M:%S%z')
-                #if (now - create_date).total_seconds() < age:
-                #    continue
+                # removing tzinfo for comparison to avoid below error
+                # - both are UTC and this doesn't make much difference anyway
+                # TypeError: can't subtract offset-naive and offset-aware datetimes
+                if (self.now - create_date.replace(tzinfo=None)).total_seconds() < self.age:
+                    continue
             print('{user:20}\t{status}\t{date}'.format(
                 user=username,
                 status=status,
