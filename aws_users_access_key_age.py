@@ -86,7 +86,7 @@ class AWSUsersAccessKeysAge(CLI):
         log.info('Completed')
 
     def process_key(self, keys_response, username):
-        assert not keys_response['IsTruncated']
+        #assert not keys_response['IsTruncated']
         for access_key_item in keys_response['AccessKeyMetadata']:
             assert username == access_key_item['UserName']
             status = access_key_item['Status']
