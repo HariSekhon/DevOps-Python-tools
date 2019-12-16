@@ -62,8 +62,8 @@ class AWSUsersAccessKeysAge(CLI):
         self.only_active_keys = False
 
     def add_options(self):
-        self.add_opt('--age', help='Return keys older than N days')
-        self.add_opt('--only-active', action='store_true', help='Return only keys with Active status')
+        self.add_opt('-a', '--age', help='Return keys older than N days')
+        self.add_opt('-o', '--only-active', action='store_true', help='Return only keys with Active status')
 
     def process_args(self):
         self.only_active_keys = self.get_opt('only_active')
