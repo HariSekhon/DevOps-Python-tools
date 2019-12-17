@@ -26,7 +26,9 @@ Status is usually Active
 
 See also:
 
-aws_users_access_key_age.sh - similar version in the adjacent DevOps Bash Tools repo (https://github.com/harisekhon/devops-bash-tools)
+aws_users_access_key_age.sh - similar version in the adjacent DevOps Bash Tools repo
+- https://github.com/harisekhon/devops-bash-tools
+
 This version adds date parsing for finding keys older than a given time for enforcing periodic key rotation policies
 
 Advanced Nagios Plugins (https://github.com/harisekhon/nagios-plugins)
@@ -67,6 +69,7 @@ class AWSUsersAccessKeysAge(CLI):
         self.age = None
         self.now = None
         self.only_active_keys = False
+        self.timeout_default = 300
 
     def add_options(self):
         self.add_opt('-a', '--age', help='Return keys older than N days')
