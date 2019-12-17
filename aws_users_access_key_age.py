@@ -24,17 +24,21 @@ Output format is:
 
 Status is usually Active
 
-See also:
+Uses Boto, read here for the list of ways to configure your AWS credentials:
 
-aws_users_access_key_age.sh - similar version in the adjacent DevOps Bash Tools repo
-- https://github.com/harisekhon/devops-bash-tools
+    https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html
+
+See also:
 
 This version adds date parsing for finding keys older than a given time for enforcing periodic key rotation policies
 
+    aws_users_access_key_age.sh - similar version in the adjacent DevOps Bash Tools repo
+                                - https://github.com/harisekhon/devops-bash-tools
+
 Advanced Nagios Plugins (https://github.com/harisekhon/nagios-plugins)
 
-check_aws_access_keys_age.py
-check_aws_access_keys_disabled.py
+    check_aws_access_keys_age.py
+    check_aws_access_keys_disabled.py
 
 """
 
