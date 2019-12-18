@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.9.5'
+__version__ = '0.9.6'
 
 ip_regex = r'(?!127\.0\.0\.)' + ip_regex
 subnet_mask_regex = r'(?!127\.0\.0\.)' + subnet_mask_regex
@@ -297,6 +297,8 @@ class Anonymize(CLI):
             'group2': r'({group_name}{sep}){user}'.format(group_name=group_name, sep=arg_sep, user=user_regex),
             'group3': r'for\s+group\s+{group}'.format(group=user_regex),
             'group4': r'(["\']{group_name}["\']\s*:\s*["\']?){group}'.format(group_name=group_name, group=user_regex),
+            'group5': r'(arn:aws:iam:[^:]*:)\d+(:group/){group}'.format(\
+                                                         group='({}/)*{}'.format(user_regex, user_regex)),
             'user': r'([-\.]{user_name}{sep})\S+'.format(user_name=user_name, sep=arg_sep),
             'user2': r'/(home|user)/{user}'.format(user=user_regex),
             'user3': r'({user_name}{sep}){user}'.format(user_name=user_name, sep=arg_sep, user=user_regex),
@@ -307,6 +309,8 @@ class Anonymize(CLI):
             'user6': r'(?<!<user>/){user}@'.format(user=user_regex),
             'user7': r'(["\'](?:{user_name}|owner)["\']\s*:\s*["\']?){user}'\
                      .format(user_name=user_name, user=user_regex),
+            #'user8': r'arn:aws:iam::\d{12}:user/{user}'.format(user=user_regex),
+            'user8': r'(arn:aws:iam:[^:]*:)\d+(:user/){user}'.format(user='({}/)*{}'.format(user_regex, user_regex)),
             'password': r'([-\.]?{pass_word_phrase}{sep}){pw}'\
                         .format(pass_word_phrase=pass_word_phrase,
                                 sep=arg_sep,
@@ -396,10 +400,12 @@ class Anonymize(CLI):
             'user5': 'for user <user>',
             'user6': '<user>@',
             'user7': r'\1<user>',
+            'user8': r'\1<account_id>\2<user>',
             'group': r'\1<group>',
             'group2': r'\1<group>',
             'group3': r'for group <group>',
             'group4': r'\1<group>',
+            'group5': r'\1<account_id>\2<group>',
             'password': r'\1<password>',
             'password2': r'\1<user>:<password>',
             'password3': r'\1<user>\2<password>',
@@ -792,16 +798,16 @@ class Anonymize(CLI):
                 line = self.anonymize_dynamic(_, line)
             if line is None:
                 if method:
-                    raise AssertionError('anonymize_{} returned None', _)
+                    raise AssertionError('anonymize_{} returned None'.format(_))
                 else:
-                    raise AssertionError('anonymize_dynamic({}, line)', _)
+                    raise AssertionError('anonymize_dynamic({}, line)'.format(_))
         line += line_ending
         return line
 
     def anonymize_dynamic(self, name, line):
         #log.debug('anonymize_dynamic(%s, %s)', name, line)
         if not isStr(line):
-            raise AssertionError('anonymize_dynamic: passed in non-string line: %s', line)
+            raise AssertionError('anonymize_dynamic: passed in non-string line: {}'.format(line))
         line = self.dynamic_replace(name, line)
         for i in range(2, 101):
             name2 = '{}{}'.format(name, i)
