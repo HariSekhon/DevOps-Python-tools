@@ -430,6 +430,18 @@ dest[111]="127.0.0.1"
 src[112]="travis token:  Abc123"
 dest[112]="travis token:  <token>"
 
+src[113]="arn:aws:iam::123456789012:user/hari"
+dest[113]="arn:aws:iam::<account_id>:user/<user>"
+
+src[114]="arn:aws:iam::123456789012:group/hari"
+dest[114]="arn:aws:iam::<account_id>:group/<group>"
+
+src[115]="arn:aws:iam::123456789012:user/Development/product_1234/*"
+dest[115]="arn:aws:iam::<account_id>:user/<user>/*"
+
+src[116]="arn:aws:iam::123456789012:group/Development/product_1234/*"
+dest[116]="arn:aws:iam::<account_id>:group/<group>/*"
+
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
 #dest[103]="proxy <proxy_host> port <proxy_port>"
