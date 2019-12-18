@@ -22,7 +22,7 @@ Output format is:
 
 <user>      <status>    <created_date>
 
-Status is usually Active
+Status is Active or Inactive
 
 Uses Boto, read here for the list of ways to configure your AWS credentials:
 
@@ -115,7 +115,7 @@ class AWSUsersAccessKeysAge(CLI):
                 # TypeError: can't subtract offset-naive and offset-aware datetimes
                 if (self.now - create_date.replace(tzinfo=None)).total_seconds() < self.age:
                     continue
-            print('{user:20}\t{status}\t{date}'.format(
+            print('{user:20}\t{status:8}\t{date}'.format(
                 user=username,
                 status=status,
                 date=create_date))
