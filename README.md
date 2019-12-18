@@ -65,6 +65,7 @@ Environment variables are supported for convenience and also to hide credentials
       - hostnames / domains / FQDNs
       - email addresses
       - IP + MAC addresses
+      - AWS ARNs
       - Kerberos principals
       - LDAP sensitive fields (eg. CN, DN, OU, UID, sAMAccountName, member, memberOf...)
       - Cisco & Juniper ScreenOS configurations passwords, shared keys and SNMP strings
