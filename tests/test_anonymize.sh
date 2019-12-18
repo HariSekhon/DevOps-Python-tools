@@ -437,10 +437,16 @@ src[114]="arn:aws:iam::123456789012:group/hari"
 dest[114]="arn:aws:iam::<account_id>:group/<group>"
 
 src[115]="arn:aws:iam::123456789012:user/Development/product_1234/*"
-dest[115]="arn:aws:iam::<account_id>:user/<user>/*"
+dest[115]="arn:aws:iam::<account_id>:user/<user>*"
 
 src[116]="arn:aws:iam::123456789012:group/Development/product_1234/*"
-dest[116]="arn:aws:iam::<account_id>:group/<group>/*"
+dest[116]="arn:aws:iam::<account_id>:group/<group>*"
+
+src[116]="arn:aws:iam::123456789012:group/Development/product_1234/*"
+dest[116]="arn:aws:iam::<account_id>:group/<group>*"
+
+src[117]="arn:aws:s3:::my_corporate_bucket/Development/*"
+dest[117]="arn:aws:s3:::<resource>*"
 
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
