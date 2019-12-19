@@ -104,9 +104,9 @@ class AWSUsersPasswordLastUsed(CLI):
         else:
             password_last_used = 'N/A'
             days = 'N/A'
-        print('{user:20s}\t{password_last_used}\t({days:>3} days)'.format(
+        print('{user:20s}\t{password_last_used:25s}\t({days:>3} days)'.format(
             user=user,
-            password_last_used=password_last_used,
+            password_last_used=str(password_last_used),  # without str() format string breaks with :25
             days=days))
 
 
