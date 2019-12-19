@@ -25,6 +25,8 @@ Directories if given are detected and recursed, processing all files in the dire
 Works like a standard unix filter program - if no files are passed as arguments or '-' is passed then reads from
 standard input.
 
+Written to convert old AWS CloudFormation json templates to yaml
+
 See also:
 
     https://www.commandlinefu.com/commands/view/12221/convert-json-to-yaml
