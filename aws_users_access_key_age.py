@@ -24,7 +24,7 @@ Output format is:
 
 Status is Active or Inactive
 
-Uses Boto, read here for the list of ways to configure your AWS credentials:
+Uses the Boto library, read here for the list of ways to configure your AWS credentials:
 
     https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html
 
