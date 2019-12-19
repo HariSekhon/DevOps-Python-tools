@@ -39,6 +39,9 @@ for x in ./cloudformation/centos7-12nodes-encrypted.json tests/data/embedded_dou
     echo
 done
 
-echo "recursing directory to convert all json to yaml > /dev/null"
-./json_to_yaml.py cloudformation/ >/dev/null
+echo "recursing directory to convert all json files under a directory tree to yaml"
+./json_to_yaml.py cloudformation/ > "$tmpfile"
+# TODO: fix validate_yaml.py to work on multi-yamls with --- and re-enable
+#echo "now validating generated yaml"
+#./validate_yaml.py "$tmpfile"
 echo "Success"
