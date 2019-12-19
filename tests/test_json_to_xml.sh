@@ -29,10 +29,10 @@ tmpfile="$(mktemp json_to_xml_test.XXXXX.xml)"
 
 trap "rm -f $tmpfile" $TRAP_SIGNALS
 
-echo "running json_to_xml.py":
+echo "running json_to_xml.py:"
 ../json_to_xml.py data/test.json | tee "$tmpfile"
 echo
 
-echo "now validating generated xml":
+echo "now validating generated xml:"
 ../validate_xml.py "$tmpfile"
 echo
