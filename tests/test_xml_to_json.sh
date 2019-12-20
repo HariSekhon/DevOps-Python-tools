@@ -26,12 +26,18 @@ section "XML => JSON"
 
 cd ..
 
-for x in simple.xml plant_catalog.xml; do
-    x="tests/data/$x"
-    #tmpfile="$(mktemp xml_to_json_test.XXXXX.xml)"
-    #trap "rm -f $tmpfile" $TRAP_SIGNALS
-    echo "running xml_to_json.py on $x":
-    ./xml_to_json.py "$x" | tee /dev/stderr | ./validate_json.py
-    echo
-    echo "========="
-done
+testdata="tests/data/simple.xml"
+
+echo "running xml_to_json.py on $testdata":
+./xml_to_json.py "$testdata" | tee /dev/stderr | ./validate_json.py
+echo
+
+echo "running xml_to_json.py on stdin < $testdata":
+./xml_to_json.py < "$testdata" | tee /dev/stderr | ./validate_json.py
+echo
+
+echo "running xml_to_json.py on tests/data/plant_catalog.xml":
+./xml_to_json.py "tests/data/plant_catalog.xml" | ./validate_json.py
+echo
+echo "XML to JSON tests succeeded!"
+echo
