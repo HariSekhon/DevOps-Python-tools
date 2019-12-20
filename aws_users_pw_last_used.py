@@ -86,10 +86,10 @@ class AWSUsersPasswordLastUsed(CLI):
         for users_response in user_paginator.paginate():
             for user_item in users_response['Users']:
                 log.debug(user_item)
-                self.process_password_age(user_item)
+                self.process_password_last_used(user_item)
         log.info('Completed')
 
-    def process_password_age(self, user_item):
+    def process_password_last_used(self, user_item):
         # already cast to datetime.datetime with tzinfo
         user = user_item['UserName']
         if 'PasswordLastUsed' in user_item:
