@@ -50,6 +50,7 @@ from __future__ import unicode_literals
 import datetime
 import os
 import sys
+from math import ceil
 import boto3
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
@@ -64,7 +65,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 class AWSUsersAccessKeysAge(CLI):
 
@@ -85,7 +86,6 @@ class AWSUsersAccessKeysAge(CLI):
         if self.age:
             validate_float(self.age, 'age')
             self.age = float(self.age)
-            self.age = self.age * 86400
 
     def run(self):
         iam = boto3.client('iam')
@@ -107,18 +107,21 @@ class AWSUsersAccessKeysAge(CLI):
             if self.only_active_keys and status != 'Active':
                 continue
             create_date = access_key_item['CreateDate']
+            # already cast to datetime.datetime with tzinfo
+            #create_datetime = datetime.datetime.strptime(create_date, '%Y-%m-%d %H:%M:%S%z')
+            # removing tzinfo for comparison to avoid below error
+            # - both areOA UTC and this doesn't make much difference anyway
+            # TypeError: can't subtract offset-naive and offset-aware datetimes
+            age_timedelta = self.now - create_date.replace(tzinfo=None)
+            age_days = int(ceil(age_timedelta.total_seconds() / 86400.0))
             if self.age:
-                # already cast to datetime.datetime with tzinfo
-                #create_datetime = datetime.datetime.strptime(create_date, '%Y-%m-%d %H:%M:%S%z')
-                # removing tzinfo for comparison to avoid below error
-                # - both are UTC and this doesn't make much difference anyway
-                # TypeError: can't subtract offset-naive and offset-aware datetimes
-                if (self.now - create_date.replace(tzinfo=None)).total_seconds() < self.age:
+                if age_days < self.age:
                     continue
-            print('{user:20}\t{status:8}\t{date}'.format(
+            print('{user:20}\t{status:8}\t{date}\t({days:>3} days)'.format(
                 user=username,
                 status=status,
-                date=create_date))
+                date=create_date,
+                days=age_days))
 
 
 if __name__ == '__main__':
