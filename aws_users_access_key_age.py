@@ -108,7 +108,7 @@ class AWSUsersAccessKeysAge(CLI):
                 continue
             create_date = access_key_item['CreateDate']
             # already cast to datetime.datetime with tzinfo
-            #create_datetime = datetime.datetime.strptime(create_date, '%Y-%m-%d %H:%M:%S%z')
+            #create_datetime = datetime.datetime.strptime(create_date, '%Y-%m-%dT%H:%M:%S%z')
             # removing tzinfo for comparison to avoid below error
             # - both areOA UTC and this doesn't make much difference anyway
             # TypeError: can't subtract offset-naive and offset-aware datetimes
