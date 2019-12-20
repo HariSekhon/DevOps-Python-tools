@@ -19,7 +19,10 @@ srcdir="$(cd "$(dirname "$0")" && pwd)"
 
 cd "$srcdir";
 
+# shellcheck disable=SC1091
 . utils.sh
+
+# shellcheck disable=SC1091
 . ../bash-tools/lib/utils.sh
 
 section "JSON => YAML"
@@ -29,7 +32,9 @@ cd ..
 tmpfile="$(mktemp json_to_yaml_test.XXXXX.yml)"
 #echo "tmpfile is $tmpfile"
 
-trap "rm -f $tmpfile" $TRAP_SIGNALS
+# want var splitting
+# shellcheck disable=SC2086
+trap 'rm -f "$tmpfile"' $TRAP_SIGNALS
 
 for x in ./cloudformation/centos7-12nodes-encrypted.json tests/data/embedded_double_quotes.json; do
     echo "running json_to_yaml.py $x"
