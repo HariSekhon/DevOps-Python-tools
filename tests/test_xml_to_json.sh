@@ -24,15 +24,14 @@ cd "$srcdir";
 
 section "XML => JSON"
 
+cd ..
+
 for x in simple.xml plant_catalog.xml; do
-    tmpfile="$(mktemp xml_to_json_test.XXXXX.xml)"
-    trap "rm -f $tmpfile" $TRAP_SIGNALS
+    x="tests/data/$x"
+    #tmpfile="$(mktemp xml_to_json_test.XXXXX.xml)"
+    #trap "rm -f $tmpfile" $TRAP_SIGNALS
     echo "running xml_to_json.py on $x":
-    ../xml_to_json.py "data/$x" > "$tmpfile"
+    ./xml_to_json.py "$x" | tee /dev/stderr | ./validate_json.py
     echo
-    echo "now validating generated json":
-    ../validate_json.py "$tmpfile"
-    echo
-    rm -f "$tmpfile"
     echo "========="
 done
