@@ -19,7 +19,10 @@ srcdir="$(cd "$(dirname "$0")" && pwd)"
 
 cd "$srcdir";
 
+# shellcheck disable=SC1091
 . utils.sh
+
+# shellcheck disable=SC1091
 . ../bash-tools/lib/utils.sh
 
 section "XML => JSON"
