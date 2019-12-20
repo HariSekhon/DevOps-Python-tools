@@ -24,15 +24,15 @@ cd "$srcdir";
 
 section "JSON => XML"
 
-tmpfile="$(mktemp json_to_xml_test.XXXXX.xml)"
+#tmpfile="$(mktemp json_to_xml_test.XXXXX.xml)"
 #echo "tmpfile is $tmpfile"
 
-trap "rm -f $tmpfile" $TRAP_SIGNALS
+#trap "rm -f $tmpfile" $TRAP_SIGNALS
 
 echo "running json_to_xml.py:"
-../json_to_xml.py data/test.json | tee "$tmpfile"
+../json_to_xml.py data/test.json | tee /dev/stderr | validate_xml.py
 echo
 
-echo "now validating generated xml:"
-../validate_xml.py "$tmpfile"
+echo "running json_to_xml.py from stdin:"
+../json_to_xml.py < data/test.json | tee /dev/stderr | validate_xml.py
 echo
