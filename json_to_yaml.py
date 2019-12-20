@@ -56,7 +56,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2.0'
 
 
 class JsonToYaml(CLI):
@@ -114,7 +114,7 @@ class JsonToYaml(CLI):
         if filepath == '-':
             filepath = '<STDIN>'
         if filepath == '<STDIN>':
-            self.json_to_yaml(sys.stdin.read())
+            print(self.json_to_yaml(sys.stdin.read()))
         else:
             with open(filepath) as _:
                 content = _.read()
