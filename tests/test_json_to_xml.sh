@@ -36,3 +36,6 @@ echo
 echo "running json_to_xml.py from stdin:"
 ../json_to_xml.py < data/test.json | tee /dev/stderr | validate_xml.py
 echo
+
+echo "JSON to XML tests succeeded!"
+echo
