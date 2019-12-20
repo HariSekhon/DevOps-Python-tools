@@ -58,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.11.0'
+__version__ = '0.11.1'
 
 
 class JsonValidatorTool(CLI):
@@ -297,8 +297,6 @@ class JsonValidatorTool(CLI):
         if filename == '-':
             filename = '<STDIN>'
         self.filename = filename
-        self.valid_json_msg = '{0} => JSON OK'.format(filename)
-        self.invalid_json_msg = '{0} => JSON INVALID'.format(filename)
         single_quotes = '(found single quotes not double quotes)'
         self.valid_json_msg_single_quotes = '{0} {1}'.format(self.valid_json_msg, single_quotes)
         self.invalid_json_msg_single_quotes = '{0} {1}'.format(self.invalid_json_msg, single_quotes)
