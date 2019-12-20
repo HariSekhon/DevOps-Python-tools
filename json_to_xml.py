@@ -52,7 +52,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2.0'
 
 
 class JsonToXml(CLI):
@@ -110,7 +110,7 @@ class JsonToXml(CLI):
         if filepath == '-':
             filepath = '<STDIN>'
         if filepath == '<STDIN>':
-            self.json_to_xml(sys.stdin.read())
+            print(self.json_to_xml(sys.stdin.read()))
         else:
             with open(filepath) as _:
                 content = _.read()
