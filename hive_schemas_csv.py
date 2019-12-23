@@ -67,24 +67,10 @@ import sys
 from impala.dbapi import connect
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.1'
+__version__ = '0.3.0'
 
 logging.basicConfig()
 log = logging.getLogger(os.path.basename(sys.argv[0]))
-
-host_envs = [
-    'HIVESERVER2_HOST',
-    'HIVE_HOST',
-    'IMPALA_HOST',
-    'HOST'
-]
-
-port_envs = [
-    'HIVESERVER2_PORT',
-    'HIVE_PORT',
-    'IMPALA_PORT',
-    'PORT'
-]
 
 def getenvs(keys, default=None):
     for key in keys:
@@ -94,17 +80,40 @@ def getenvs(keys, default=None):
     return default
 
 def parse_args():
+    default_port = 10000
+    default_service_name = 'hive'
+    host_envs = [
+        'HIVESERVER2_HOST',
+        'HIVE_HOST',
+        'HOST'
+    ]
+    port_envs = [
+        'HIVESERVER2_PORT',
+        'HIVE_PORT',
+        'PORT'
+    ]
+
+    if 'impala' in sys.argv[0]:
+        default_port = 21050
+        default_service_name = 'impala'
+        host_envs = [
+            'IMPALA_HOST',
+            'HOST'
+        ]
+        port_envs = [
+            'IMPALA_PORT',
+            'PORT'
+        ]
     parser = argparse.ArgumentParser(
         description="Dumps all Hive / Impala schemas, tables, columns and types to CSV format on stdout")
     parser.add_argument('-H', '--host', default=getenvs(host_envs, socket.getfqdn()),\
                         help='HiveServer2 / Impala host ' + \
                              '(default: fqdn of local host, $' + ', $'.join(host_envs) + ')')
-    parser.add_argument('-P', '--port', type=int, default=getenvs(port_envs, 10000),
-                        help='HiveServer2 / Impala port (default: 10000 if called as hive, ' + \
-                                                                  '21050 if called as impala, $' + \
+    parser.add_argument('-P', '--port', type=int, default=getenvs(port_envs, default_port),
+                        help='HiveServer2 / Impala port (default: {}, '.format(default_port) + \
                                                                   ', $'.join(port_envs) + ')')
     parser.add_argument('-k', '--kerberos', action='store_true', help='Use Kerberos (you must kinit first)')
-    parser.add_argument('-n', '--krb5-service-name', default='hive',
+    parser.add_argument('-n', '--krb5-service-name', default=default_service_name,
                         help='Service principal (default: \'hive\', or \'impala\' if called as impala_schemas_csv.py)')
     parser.add_argument('-S', '--ssl', action='store_true', help='Use SSL')
     # must set type to str otherwise csv module gives this error on Python 2.7:
@@ -121,13 +130,6 @@ def parse_args():
     if args.verbose > 1 or os.getenv('DEBUG'):
         log.setLevel(logging.DEBUG)
 
-    if 'impala' in sys.argv[0]:
-        if args.krb5_service_name == 'hive':
-            log.info('called as impala, setting service principal to impala')
-            args.krb5_service_name = 'impala'
-        if args.port == 10000:
-            log.info('called as impala, setting port to 21050')
-            args.port = 21050
     return args
 
 def connect_db(args, database):
