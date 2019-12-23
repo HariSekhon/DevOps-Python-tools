@@ -153,8 +153,14 @@ def main():
             with conn.cursor() as table_cursor:
                 # doesn't support parameterized query quoting from dbapi spec
                 #table_cursor.execute('use %(database)s', {'database': database})
-                table_cursor.execute('use {}'.format(database))
-                table_cursor.execute('show tables')
+                try:
+                    table_cursor.execute('use {}'.format(database))
+                    table_cursor.execute('show tables')
+                except impala.error.HiveServer2Error as _:
+                    log.error(_)
+                    if 'AuthorizationException' in str(_):
+                        continue
+                    raise
                 for table_row in table_cursor:
                     table = table_row[0]
                     if not table_regex.search(table):
@@ -168,17 +174,19 @@ def main():
                             query = args.query.format(table=table)
                     try:
                         log.info("running %s", query)
-                        # doesn't support parameterized query quoting from dbapi spec
-                        table_cursor.execute(query)
-                        for result in table_cursor:
-                            print('{db}.{table}\t{result}'.format(db=database, table=table, \
-                                                                  result='\t'.join([str(_) for _ in result])))
+                        with conn.cursor() as query_cursor:
+                            # doesn't support parameterized query quoting from dbapi spec
+                            query_cursor.execute(query)
+                            for result in query_cursor:
+                                print('{db}.{table}\t{result}'.format(db=database, table=table, \
+                                                                      result='\t'.join([str(_) for _ in result])))
                     except (impala.error.OperationalError, impala.error.HiveServer2Error) as _:
                         log.error(_)
-                    #except impala.error.ProgrammingError as _:
-                    #    # COMPUTE STATS returns no results
-                    #    if not 'Trying to fetch results on an operation with no results' in _:
-                    #        raise
+                    except impala.error.ProgrammingError as _:
+                        log.error(_)
+                        # COMPUTE STATS returns no results
+                        if 'Trying to fetch results on an operation with no results' not in str(_):
+                            raise
 
 
 if __name__ == '__main__':
