@@ -173,10 +173,14 @@ def main():
                         # doesn't support parameterized query quoting from dbapi spec
                         table_cursor.execute(query)
                         for result in table_cursor:
-                            row_count = result[0]
-                            print('{db}.{table}\t{row_count}'.format(db=database, table=table, row_count=row_count))
+                            print('{db}.{table}\t{result}'.format(db=database, table=table, \
+                                                                  result='\t'.join([str(_) for _ in result])))
                     except (impala.error.OperationalError, impala.error.HiveServer2Error) as _:
                         log.error(_)
+                    #except impala.error.ProgrammingError as _:
+                    #    # COMPUTE STATS returns no results
+                    #    if not 'Trying to fetch results on an operation with no results' in _:
+                    #        raise
 
 
 if __name__ == '__main__':
