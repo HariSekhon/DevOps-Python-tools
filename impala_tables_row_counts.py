@@ -27,7 +27,7 @@ https://github.com/cloudera/impyla/issues/286
 
 If you get an error like this:
 
-ERROR:impala.impalaserver2:Failed to open transport (tries_left=1)
+ERROR:impala.hiveserver2:Failed to open transport (tries_left=1)
 ...
 TTransportException: TSocket read 0 bytes
 
