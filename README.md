@@ -106,6 +106,8 @@ Environment variables are supported for convenience and also to hide credentials
     - ```hadoop_hdfs_files_stats.jy``` - fetches HDFS file stats. Useful to generate a list of all files in a directory tree showing block size, replication factor, underfilled blocks and small files
   - [Hive](https://hive.apache.org/) / [Impala](https://impala.apache.org/):
     - ```hive_schemas_csv.py``` / ```impala_schemas_csv.py``` - dumps all databases, tables, columns and types out in CSV format to standard output
+    - ```hive_foreach_table.py``` / ```impala_foreach_table.py``` - execute any query of statement for each matching table
+    - ```hive_tables_row_counts.py``` / ```impala_tables_row_counts.py``` - iterate all matching tables in all databases (by partition if available) and output TSV of table names and row counts
   - [HBase](https://hbase.apache.org/):
     - ```hbase_generate_data.py``` - inserts random generated data in to a given [HBase](https://hbase.apache.org/) table, with optional skew support with configurable skew percentage. Useful for testing region splitting, balancing, CI tests etc. Outputs stats for number of rows written, time taken, rows per sec and volume per sec written.
     - ```hbase_show_table_region_ranges.py``` - dumps HBase table region ranges information, useful when pre-splitting tables
