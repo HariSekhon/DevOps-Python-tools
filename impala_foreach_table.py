@@ -63,7 +63,7 @@ import impala
 from impala.dbapi import connect
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 logging.basicConfig()
 log = logging.getLogger(os.path.basename(sys.argv[0]))
@@ -151,9 +151,9 @@ def main():
             #db_conn = connect_db(args, database)
             #with db_conn.cursor() as table_cursor:
             with conn.cursor() as table_cursor:
-                # doesn't support parameterized query quoting from dbapi spec
-                #table_cursor.execute('use %(database)s', {'database': database})
                 try:
+                    # doesn't support parameterized query quoting from dbapi spec
+                    #table_cursor.execute('use %(database)s', {'database': database})
                     table_cursor.execute('use {}'.format(database))
                     table_cursor.execute('show tables')
                 except impala.error.HiveServer2Error as _:
