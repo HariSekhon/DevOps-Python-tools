@@ -28,7 +28,7 @@ hive_foreach_table.py --query 'ANALYZE TABLE {db}.{table} COMPUTE STATS'
 
 or just for today's partition:
 
-hive_foreach_table.py --query "ANALYZE TABLE {db}.{table} PARTITION(DATE=$(date '+%Y-%m-%d')) COMPUTE STATS"
+hive_foreach_table.py --query "ANALYZE TABLE {db}.{table} PARTITION(date=$(date '+%Y-%m-%d')) COMPUTE STATS"
 
 
 Tested on CDH 5.10, Hive 1.1.0 with Kerberos
