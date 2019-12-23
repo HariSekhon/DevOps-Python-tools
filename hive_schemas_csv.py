@@ -80,6 +80,7 @@ def getenvs(keys, default=None):
     return default
 
 def parse_args():
+    name = 'HiveServer2'
     default_port = 10000
     default_service_name = 'hive'
     host_envs = [
@@ -94,6 +95,7 @@ def parse_args():
     ]
 
     if 'impala' in sys.argv[0]:
+        name = 'Impala'
         default_port = 21050
         default_service_name = 'impala'
         host_envs = [
@@ -105,12 +107,12 @@ def parse_args():
             'PORT'
         ]
     parser = argparse.ArgumentParser(
-        description="Dumps all Hive / Impala schemas, tables, columns and types to CSV format on stdout")
+        description="Dumps all {} schemas, tables, columns and types to CSV format on stdout".format(name))
     parser.add_argument('-H', '--host', default=getenvs(host_envs, socket.getfqdn()),\
-                        help='HiveServer2 / Impala host ' + \
+                        help='{} host '.format(name) + \
                              '(default: fqdn of local host, $' + ', $'.join(host_envs) + ')')
     parser.add_argument('-P', '--port', type=int, default=getenvs(port_envs, default_port),
-                        help='HiveServer2 / Impala port (default: {}, '.format(default_port) + \
+                        help='{} port (default: {}, '.format(name, default_port) + \
                                                                   ', $'.join(port_envs) + ')')
     parser.add_argument('-k', '--kerberos', action='store_true', help='Use Kerberos (you must kinit first)')
     parser.add_argument('-n', '--krb5-service-name', default=default_service_name,
