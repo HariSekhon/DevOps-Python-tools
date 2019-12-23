@@ -196,4 +196,7 @@ def get_row_counts(conn, args, database, table, partition_regex):
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Control-C", file=sys.stderr)
