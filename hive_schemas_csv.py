@@ -114,7 +114,7 @@ def parse_args():
                                                                   ', $'.join(port_envs) + ')')
     parser.add_argument('-k', '--kerberos', action='store_true', help='Use Kerberos (you must kinit first)')
     parser.add_argument('-n', '--krb5-service-name', default=default_service_name,
-                        help='Service principal (default: \'hive\', or \'impala\' if called as impala_schemas_csv.py)')
+                        help='Service principal (default: {})'.format(default_service_name))
     parser.add_argument('-S', '--ssl', action='store_true', help='Use SSL')
     # must set type to str otherwise csv module gives this error on Python 2.7:
     # TypeError: "delimiter" must be string, not unicode
