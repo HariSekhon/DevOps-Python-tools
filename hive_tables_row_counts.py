@@ -16,10 +16,10 @@
 
 """
 
-Connect to a HiveServer2 and get rows counts for all tables in all databases,
+Connect to a HiveServer2 / Impala node and get rows counts for all tables in all databases,
 or only those matching given db / table / partition value regexes
 
-Tested on CDH 5.10, Hive 1.1.0 with Kerberos
+Tested on CDH 5.10, Hive 1.1.0 and Impala 2.7.0 with Kerberos
 
 Due to a thrift / impyla bug this needs exactly thrift==0.9.3, see
 
@@ -56,18 +56,6 @@ __version__ = '0.2.0'
 logging.basicConfig()
 log = logging.getLogger(os.path.basename(sys.argv[0]))
 
-host_envs = [
-    'HIVESERVER2_HOST',
-    'HIVE_HOST',
-    'HOST'
-]
-
-port_envs = [
-    'HIVESERVER2_PORT',
-    'HIVE_PORT',
-    'PORT'
-]
-
 def getenvs(keys, default=None):
     for key in keys:
         value = os.getenv(key)
@@ -76,19 +64,47 @@ def getenvs(keys, default=None):
     return default
 
 def parse_args():
+    name = 'HiveServer2'
+    default_port = 10000
+    default_service_name = 'hive'
+    host_envs = [
+        'HIVESERVER2_HOST',
+        'HIVE_HOST',
+        'HOST'
+    ]
+    port_envs = [
+        'HIVESERVER2_PORT',
+        'HIVE_PORT',
+        'PORT'
+    ]
+
+    if 'impala' in sys.argv[0]:
+        name = 'Impala'
+        default_port = 21050
+        default_service_name = 'impala'
+        host_envs = [
+            'IMPALA_HOST',
+            'HOST'
+        ]
+        port_envs = [
+            'IMPALA_PORT',
+            'PORT'
+        ]
     parser = argparse.ArgumentParser(
-        description="Gets row counts for all Hive tables/partitions matching database / table / partition regexes")
+        description="Gets row counts for all {} tables / partitions matching database / table / partition regexes"\
+                    .format(name))
     parser.add_argument('-H', '--host', default=getenvs(host_envs, socket.getfqdn()),\
-                        help='HiveServer2 host ' + \
+                        help='{} host '.format(name) + \
                              '(default: fqdn of local host, $' + ', $'.join(host_envs) + ')')
-    parser.add_argument('-P', '--port', type=int, default=getenvs(port_envs, 10000),
-                        help='HiveServer2 port (default: 10000, ' + ', $'.join(port_envs) + ')')
+    parser.add_argument('-P', '--port', type=int, default=getenvs(port_envs, default_port),
+                        help='{} port (default: {}, '.format(name, default_port) + \
+                                                                  ', $'.join(port_envs) + ')')
     parser.add_argument('-d', '--database', default='.*', help='Database regex (default: .*)')
     parser.add_argument('-t', '--table', default='.*', help='Table regex (default: .*)')
     parser.add_argument('-p', '--partition', default='.*', help='Partition regex (default: .*)')
     parser.add_argument('-k', '--kerberos', action='store_true', help='Use Kerberos (you must kinit first)')
-    parser.add_argument('-n', '--krb5-service-name', default='hive',
-                        help='Service principal (default: \'hive\')')
+    parser.add_argument('-n', '--krb5-service-name', default=default_service_name,
+                        help='Service principal (default: {})'.format(default_service_name))
     parser.add_argument('-S', '--ssl', action='store_true', help='Use SSL')
     parser.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
     args = parser.parse_args()
@@ -190,7 +206,10 @@ def get_row_counts(conn, args, database, table, partition_regex):
                     print('{db}.{table}.{key}={value}\t{row_count}'.format(\
                             db=database, table=table, key=partition_key, value=partition_value, row_count=row_count))
         except impala.error.OperationalError as _:
-            if 'is not a partitioned table' not in str(_):
+            # Hive exception msg: is not a partitioned table
+            # Impala exception msg: Table is not partitioned
+            if 'is not a partitioned table' not in str(_) and \
+               'Table is not partitioned' not in str(_):
                 raise
             log.info("no partitions found for database '%s' table '%s', getting row counts for whole table",
                      database, table)
