@@ -51,7 +51,7 @@ import impala
 from impala.dbapi import connect
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 logging.basicConfig()
 log = logging.getLogger(os.path.basename(sys.argv[0]))
@@ -205,9 +205,9 @@ def get_row_counts(conn, args, database, table, partition_regex):
                     row_count = result[0]
                     print('{db}.{table}.{key}={value}\t{row_count}'.format(\
                             db=database, table=table, key=partition_key, value=partition_value, row_count=row_count))
-        except impala.error.OperationalError as _:
-            # Hive exception msg: is not a partitioned table
-            # Impala exception msg: Table is not partitioned
+        except (impala.error.OperationalError, impala.error.HiveServer2Error) as _:
+            # Hive impala.error.HiveServer2Error: is not a partitioned table
+            # Impala impala.error.HiveServer2Error: Table is not partitioned
             if 'is not a partitioned table' not in str(_) and \
                'Table is not partitioned' not in str(_):
                 raise
