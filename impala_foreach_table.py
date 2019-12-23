@@ -28,7 +28,7 @@ impala_foreach_table.py --query 'COMPUTE STATS {table}'
 
 or just for today's partition:
 
-impala_foreach_table.py --query "COMPUTE INCREMENTAL STATS {db}.{table} PARTITION(DATE=$(date '+%Y-%m-%d'))"
+impala_foreach_table.py --query "COMPUTE INCREMENTAL STATS {db}.{table} PARTITION(date=$(date '+%Y-%m-%d'))"
 
 
 Tested on CDH 5.10, Impala 2.7.0 with Kerberos
