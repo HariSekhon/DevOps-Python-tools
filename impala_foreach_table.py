@@ -16,7 +16,7 @@
 
 """
 
-Tool to connect to a Impala and execute a query for all tables in all databases,
+Tool to connect to an Impala node and execute a query for all tables in all databases,
 or only those matching given db / table regexes
 
 Useful for getting row counts of all tables or analyzing tables:
