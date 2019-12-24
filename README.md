@@ -76,6 +76,10 @@ Environment variables are supported for convenience and also to hide credentials
     - ```anonymize_parallel.sh``` - splits files in to multiple parts and runs `anonymize.py` on each part in parallel before re-joining back in to a file of the same name with a `.anonymized` suffix. Preserves order of evaluation important for anonymization rules, as well as maintaining file content order. On servers this parallelization can result in a 30x speed up for large log files
   - ```find_duplicate_files.py``` - finds duplicate files in one or more directory trees via multiple methods including file basename, size, MD5 comparison of same sized files, or bespoke regex capture of partial file basename
   - ```welcome.py``` - cool spinning welcome message greeting your username and showing last login time and user to put in your shell's ```.profile``` (there is also a perl version in my [DevOps Perl Tools](https://github.com/harisekhon/perl-tools) repo)
+- [AWS](https://aws.amazon.com/):
+  - ```aws_users_access_key_age.py``` - lists all users access keys, status, date of creation and age in days. Optionally filters for active keys and older than N days
+  - ```aws_users_last_used.py``` - lists all users and their days since last use across both passwords and access keys. Optionally filters for users not used in the last N days to find old accounts to remove
+  - ```aws_users_pw_last_used.py``` - lists all users and dates since their passwords were last used. Optionally filters for users with passwords not used in the last N days
 - [Hadoop](http://hadoop.apache.org/) & NoSQL:
   - [Spark](https://spark.apache.org/) & Data Format Converters:
     - ```spark_avro_to_parquet.py``` - PySpark Avro => Parquet converter
