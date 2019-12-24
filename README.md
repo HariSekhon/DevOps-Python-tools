@@ -10,15 +10,15 @@ Hari Sekhon - DevOps Python Tools
 [![MicroBadger](https://images.microbadger.com/badges/image/harisekhon/pytools.svg)](http://microbadger.com/#/images/harisekhon/pytools)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20OS%20X-blue.svg)](https://github.com/harisekhon/devops-python-tools#hari-sekhon-pytools)
 
-### Hadoop, Spark / PySpark, HBase, Pig, Ambari, IPython and Linux Tools ###
+### AWS, Docker, Spark / PySpark, Hadoop, HBase, Hive, Impala, Pig, Ambari, IPython and Linux Tools ###
 
-A few of the Big Data, NoSQL & Linux tools I've written over the years. All programs have `--help` to list the available options.
+A few of the Cloud, Big Data, NoSQL & Linux tools I've written over the years. All programs have `--help` to list the available options.
 
 For many more tools see the [DevOps Perl Tools](https://github.com/harisekhon/perl-tools) and [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) repos which contains many Hadoop, NoSQL, Web and infrastructure tools and Nagios plugins.
 
 Hari Sekhon
 
-Big Data Contractor, United Kingdom
+Cloud Big Data Contractor, United Kingdom
 
 https://www.linkedin.com/in/harisekhon
 
