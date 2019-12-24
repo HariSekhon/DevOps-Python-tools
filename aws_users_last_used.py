@@ -77,6 +77,7 @@ class AWSUsersLastUsed(CLI):
         # super().__init__()
         self.age = None
         self.now = None
+        self.timeout_default = 300
         self.msg = 'AWSUsersLastUsed msg not defined'
 
     def add_options(self):
