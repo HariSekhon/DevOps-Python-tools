@@ -18,7 +18,7 @@ For many more tools see the [DevOps Perl Tools](https://github.com/harisekhon/pe
 
 Hari Sekhon
 
-Cloud Big Data Contractor, United Kingdom
+Cloud & Big Data Contractor, United Kingdom
 
 https://www.linkedin.com/in/harisekhon
 
