@@ -437,16 +437,31 @@ src[114]="arn:aws:iam::123456789012:group/hari"
 dest[114]="arn:aws:iam::<account_id>:group/<group>"
 
 src[115]="arn:aws:iam::123456789012:user/Development/product_1234/*"
-dest[115]="arn:aws:iam::<account_id>:user/<user>*"
+dest[115]="arn:aws:iam::<account_id>:user/<user>/*"
 
 src[116]="arn:aws:iam::123456789012:group/Development/product_1234/*"
 dest[116]="arn:aws:iam::<account_id>:group/<group>*"
 
 src[116]="arn:aws:iam::123456789012:group/Development/product_1234/*"
-dest[116]="arn:aws:iam::<account_id>:group/<group>*"
+dest[116]="arn:aws:iam::<account_id>:group/<group>/*"
 
 src[117]="arn:aws:s3:::my_corporate_bucket/Development/*"
 dest[117]="arn:aws:s3:::<resource>*"
+
+src[118]="AKIAIOSFODNN7EXAMPLE"
+dest[118]="<access_key>"
+
+src[119]="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+dest[119]="<secret_key>"
+
+src[120]="AQoEXAMPLEH4aoAH0gNCAPyJxz4BlCFFxWNE1OPTgk5TthT+FvwqnKwRcOIfrRh3c/LTo6UDdyJwOOvEVPvLXCrrrUtdnniCEXAMPLE/IvU1dYUg2RVAJBanLiHb4IgRmpRV3zrkuWJOgQs8IZZaIv2BXIa2R4OlgkBN9bkUDNCJiBeb/AXlzBBko7b15fjrBs2+cTQtpZ3CYWFXG8C5zqx37wnOE49mRl/+OtkIKGO7fAE"
+dest[120]="<sts_token>"
+
+src[121]="ASIAIOSFODNN7EXAMPLE"
+dest[121]="<sts_access_key>"
+
+src[122]="AQoDYXdzEPT//////////wEXAMPLEtc764bNrC9SAPBSM22wDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMicRXmxfpSPfIeoIYRqTflfKD8YUuwthAx7mSEI/qkPpKPi/kMcGdQrmGdeehM4IC1NtBmUpp2wUE8phUZampKsburEDy0KPkyQDYwT7WZ0wq5VSXDvp75YU9HFvlRd8Tx6q6fE8YQcHNVXAkiY9q6d+xo0rKwT38xVqr7ZD0u0iPPkUL64lIZbqBAz+scqKmlzm8FDrypNC9Yjc8fPOLn9FX9KSYvKTr4rvx3iSIlTJabIQwj2ICCR/oLxBA=="
+dest[122]="<sts_token>"
 
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
