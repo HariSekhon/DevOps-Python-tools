@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.9.7'
+__version__ = '0.10.0'
 
 ip_regex = r'(?!127\.0\.0\.)' + ip_regex
 subnet_mask_regex = r'(?!127\.0\.0\.)' + subnet_mask_regex
@@ -114,7 +114,6 @@ class Anonymize(CLI):
         self.hash_salt = None
         # order of iteration of application matters because we must do more specific matches before less specific ones
         self.anonymizations = OrderedDict([
-            ('aws', False),
             ('ip_prefix', False),
             ('ip', False),
             ('subnet_mask', False),
@@ -130,11 +129,12 @@ class Anonymize(CLI):
             ('screenos', False),
             ('junos', False),
             ('network', False),
+            ('windows', False),
+            ('aws', False),  # access key, secret key, sts tokens etc are very generic so do them later
             ('fqdn', False),
             ('domain', False),
             ('hostname', False),
             #('proxy', False),
-            ('windows', False),
             ('custom', False),
         ])
         self.exceptions = {
@@ -287,10 +287,15 @@ class Anonymize(CLI):
             # arn:partition:service:region:account-id:resource-type/resource-id
             # arn:partition:service:region:account-id:resource-type:resource-id
             # eg. arn:aws:iam::123456789012:group/Development/product_1234/*
-            'aws': r'\b(arn:[^:]+:[^:]+:[^:]*:)\d+(:([^:/]+)[:/])[\w/-]+',
+            'aws': r'\b(arn:[^:]+:[^:]+:[^:]*:)\d+(:([^:/]+)[:/])[\w/.-]+',
             # arn:aws:s3:::my_corporate_bucket/Development/*
             #'aws2': r'\b(arn:aws:s3:::)[^/]+',
-            'aws2': r'\b(arn:[^:]+:[^:]+:[^:]*:)\d*:[\w/-]+',
+            'aws2': r'\b(arn:[^:]+:[^:]+:[^:]*:)\d*:[\w/.-]+',
+            # https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html
+            'aws3': r'\bAKIA[A-Za-z0-9]{16}\b',  # access key
+            'aws4': r'\b[A-Za-z0-9][A-Za-z0-9/+=-]{38}[A-Za-z0-9]\b',  # secret key
+            'aws5': r'\b[A-Za-z0-9][A-Za-z0-9/+=-]{238,}',  # STS token - no \b at end as it'll stop before '==' suffix
+            'aws6': r'\bASIA[A-Za-z0-9]{16}\b',  # sts temporary access key
             # don't change hostname or fqdn regex without updating hash_hostnames() option parse
             # since that replaces these replacements and needs to match the grouping captures and surrounding format
             'hostname2': r'({aws_host_ip})(?!-\d)'.format(aws_host_ip=aws_host_ip_regex),
@@ -398,6 +403,10 @@ class Anonymize(CLI):
             # arn:partition:service:region:account-id:resource-type:resource-id
             'aws': r'\1<account_id>\2<\3>',
             'aws2': r'\1:<resource>',
+            'aws3': r'<access_key>',
+            'aws4': r'<secret_key>',
+            'aws5': r'<sts_token>',
+            'aws6': r'<sts_access_key>',
             'hostname': r'<hostname>:\2',
             #'hostname2': '<aws_hostname>',
             'hostname2': r'<ip-x-x-x-x>',
@@ -476,7 +485,7 @@ class Anonymize(CLI):
         self.add_opt('-a', '--all', action='store_true',
                      help='Apply all anonymizations (careful this includes --host which can be overzealous and ' + \
                           'match too many things, in which case try more targeted anonymizations below)')
-        self.add_opt('-w', '--aws', action='store_true', help='Apply AWS ARN anonymizations'),
+        self.add_opt('-w', '--aws', action='store_true', help='Apply AWS ARN anonymizations')
         self.add_opt('-C', '--custom', action='store_true',
                      help='Apply custom phrase anonymization (add your Name, Company Name etc to the list of ' + \
                           'blacklisted words/phrases one per line in anonymize_custom.conf). Matching is case ' + \
