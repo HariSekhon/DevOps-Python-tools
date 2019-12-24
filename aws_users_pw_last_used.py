@@ -16,7 +16,7 @@
 
 """
 
-Lists all AWS IAM users keys along with the dates and days since their passwords were last used, optionally filtering
+Lists all AWS IAM users dates since their passwords were last used, optionally filtering
 for users whose passwords haven't been used in > N days
 
 Output format is:
