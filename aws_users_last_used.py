@@ -23,6 +23,8 @@ Optionally filters to only users > N days old to find old user accounts
 Generates an IAM credential report, then parses it to determine the time since each user's password
 and access keys were last used
 
+Requires iam:GenerateCredentialReport on resource: *
+
 Output:
 
 <user>  <days_since_used>   <password_last_used_date>  <access_key_1_last_used_date> <access_key_2_last_used_date>
