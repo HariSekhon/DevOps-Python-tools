@@ -49,7 +49,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.9.2'
+__version__ = '0.9.3'
 
 
 class YamlValidatorTool(CLI):
@@ -86,7 +86,7 @@ class YamlValidatorTool(CLI):
         return False
 
     def check_yaml(self, content):
-        if isYaml(content):
+        if isYaml(content, safe_load_all=True):
             if self.get_opt('print'):
                 print(content, end='')
             else:
@@ -99,7 +99,6 @@ class YamlValidatorTool(CLI):
             if not self.get_opt('print'):
                 if self.verbose > 2:
                     try:
-                        # TODO: doesn't validate network-policy.yaml in templates containing multiple yaml docs
                         yaml.safe_load_all(content)
                     except yaml.YAMLError as _:
                         print(_)
