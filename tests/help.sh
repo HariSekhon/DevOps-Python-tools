@@ -22,7 +22,8 @@ cd "$srcdir/..";
 # shellcheck disable=SC1091
 . ./tests/utils.sh
 
-for x in $(echo ./*.py 2>/dev/null); do
+# shellcheck disable=SC2068
+for x in ${@:-$(echo ./*.py 2>/dev/null)}; do
     isExcluded "$x" && continue
     set +e
     echo "$x --help"
@@ -33,7 +34,14 @@ for x in $(echo ./*.py 2>/dev/null); do
     if [ $status = 0 ]; then
         [[ "$x" =~ ambari_blueprints.py$ ]] && continue
         [[ "$x" =~ (hive|impala)_schemas_csv.py$ ]] && continue
+        [[ "$x" =~ (hive|impala)_foreach_table.py$ ]] && continue
+        [[ "$x" =~ (hive|impala)_tables_row_counts.py$ ]] && continue
         [[ "$x" =~ pythonpath.py$ ]] && continue
+    elif [ $status = 1 ]; then
+        if [[ "$x" =~ hdfs_find_replication_factor_1.py$ ]] &&
+           ! python -c 'import krbV'; then  # best effort, not available on Mac any more
+            continue
+        fi
     fi
     [ $status = 3 ] || { echo "status code for $x --help was $status not expected 3"; exit 1; }
 done
