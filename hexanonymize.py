@@ -84,13 +84,13 @@ class HexAnonymize(CLI):
                     integer += 1
                     if integer > 9:
                         integer = 0
-                elif char.lower() in hex_alphas or (not only_hex_alphas and char.isalpha()):
+                elif (not only_hex_alphas and char.isalpha()) or char.lower() in hex_alphas:
                     if preserve_case and char.isupper():
                         char = letter.upper()
                     else:
                         char = letter
                     letter = chr(ord(char) + 1)
-                    if letter not in hex_alphas:
+                    if letter.lower() not in hex_alphas:
                         letter = 'a'
                 print(char, end='')
 
