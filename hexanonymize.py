@@ -63,13 +63,13 @@ class HexAnonymize(CLI):
     def add_options(self):
         super(HexAnonymize, self).add_options()
         self.add_opt('-c', '--case', action='store_true', help='Preserve case')
-        self.add_opt('-o', '--only-hex', action='store_true',
+        self.add_opt('-o', '--hex-only', action='store_true',
                      help='Only replace hex alpha chars (A-F, a-f), otherwise replaces all alphanumerics for safety')
 
     def process_options(self):
         super(HexAnonymize, self).process_options()
         self.preserve_case = self.get_opt('case')
-        self.only_hex_alphas = self.get_opt('only_hex')
+        self.only_hex_alphas = self.get_opt('hex_only')
 
     def hexanonymize(self, filehandle):
         preserve_case = self.preserve_case
