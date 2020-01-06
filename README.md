@@ -268,7 +268,7 @@ Run like so:
 jython -J-cp $(hadoop classpath) hdfs_time_block_reads.jy --help
 ```
 
-The ```-J-cp $(hadoop classpath) ``` part dynamically inserts the current Hadoop java classpath required to use the Hadoop APIs.
+The ```-J-cp $(hadoop classpath)``` part dynamically inserts the current Hadoop java classpath required to use the Hadoop APIs.
 
 See below for procedure to install Jython if you don't already have it.
 
