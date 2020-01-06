@@ -105,9 +105,10 @@ Environment variables are supported for convenience and also to hide credentials
     - ```ambari_cancel_all_requests.sh``` - cancel all ongoing operations using the Ambari API
     - ```ambari_trigger_service_checks.py``` - trigger service checks using the Ambari API
   - [Hadoop](http://hadoop.apache.org/) HDFS:
-    - ```hadoop_hdfs_time_block_reads.jy``` - HDFS per-block read timing debugger with datanode and rack locations for a given file or directory tree. Reports the slowest Hadoop datanodes in descending order at the end. Helps find cluster data layer bottlenecks such as slow datanodes, faulty hardware or misconfigured top-of-rack switch ports.
-    - ```hadoop_hdfs_files_native_checksums.jy``` - fetches native HDFS checksums for quicker file comparisons (about 100x faster than doing hdfs dfs -cat | md5sum)
-    - ```hadoop_hdfs_files_stats.jy``` - fetches HDFS file stats. Useful to generate a list of all files in a directory tree showing block size, replication factor, underfilled blocks and small files
+    - ```hdfs_find_replication_factor_1.py``` - finds HDFS files with replication factor 1, optionally resetting them to replication factor 3 to avoid missing block alerts during datanode maintenance windows
+    - ```hdfs_time_block_reads.jy``` - HDFS per-block read timing debugger with datanode and rack locations for a given file or directory tree. Reports the slowest Hadoop datanodes in descending order at the end. Helps find cluster data layer bottlenecks such as slow datanodes, faulty hardware or misconfigured top-of-rack switch ports.
+    - ```hdfs_files_native_checksums.jy``` - fetches native HDFS checksums for quicker file comparisons (about 100x faster than doing hdfs dfs -cat | md5sum)
+    - ```hdfs_files_stats.jy``` - fetches HDFS file stats. Useful to generate a list of all files in a directory tree showing block size, replication factor, underfilled blocks and small files
   - [Hive](https://hive.apache.org/) / [Impala](https://impala.apache.org/):
     - ```hive_schemas_csv.py``` / ```impala_schemas_csv.py``` - dumps all databases, tables, columns and types out in CSV format to standard output
     - ```hive_foreach_table.py``` / ```impala_foreach_table.py``` - execute any query or statement for every Hive / Impala table, optionally filtering to only select databases/tables via regex
@@ -257,14 +258,14 @@ make
 The 3 Hadoop utility programs listed below require Jython (as well as Hadoop to be installed and correctly configured)
 
 ```
-hadoop_hdfs_time_block_reads.jy
-hadoop_hdfs_files_native_checksums.jy
-hadoop_hdfs_files_stats.jy
+hdfs_time_block_reads.jy
+hdfs_files_native_checksums.jy
+hdfs_files_stats.jy
 ```
 
 Run like so:
 ```
-jython -J-cp $(hadoop classpath) hadoop_hdfs_time_block_reads.jy --help
+jython -J-cp $(hadoop classpath) hdfs_time_block_reads.jy --help
 ```
 
 The ```-J-cp $(hadoop classpath) ``` part dynamically inserts the current Hadoop java classpath required to use the Hadoop APIs.
@@ -286,7 +287,7 @@ Jython is a simple download and unpack and can be fetched from http://www.jython
 Then add the Jython install bin directory to the $PATH or specify the full path to the `jython` binary, eg:
 
 ```
-/opt/jython-2.7.0/bin/jython hadoop_hdfs_time_block_reads.jy ...
+/opt/jython-2.7.0/bin/jython hdfs_time_block_reads.jy ...
 ```
 
 
