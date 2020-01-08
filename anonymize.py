@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.10.0'
+__version__ = '0.10.1'
 
 ip_regex = r'(?!127\.0\.0\.)' + ip_regex
 subnet_mask_regex = r'(?!127\.0\.0\.)' + subnet_mask_regex
@@ -296,6 +296,8 @@ class Anonymize(CLI):
             'aws4': r'\b[A-Za-z0-9][A-Za-z0-9/+=-]{38}[A-Za-z0-9]\b',  # secret key
             'aws5': r'\b[A-Za-z0-9][A-Za-z0-9/+=-]{238,}',  # STS token - no \b at end as it'll stop before '==' suffix
             'aws6': r'\bASIA[A-Za-z0-9]{16}\b',  # sts temporary access key
+            'aws7': r'\bsg-[a-z0-9]{8}(?!\w)', # security group id
+            'aws8': r'(\bs3a?)://[^/]+/', # s3 bucket name
             # don't change hostname or fqdn regex without updating hash_hostnames() option parse
             # since that replaces these replacements and needs to match the grouping captures and surrounding format
             'hostname2': r'({aws_host_ip})(?!-\d)'.format(aws_host_ip=aws_host_ip_regex),
@@ -407,6 +409,8 @@ class Anonymize(CLI):
             'aws4': r'<secret_key>',
             'aws5': r'<sts_token>',
             'aws6': r'<sts_access_key>',
+            'aws7': r'<security_group>',
+            'aws8': r'\1://<bucket>/',
             'hostname': r'<hostname>:\2',
             #'hostname2': '<aws_hostname>',
             'hostname2': r'<ip-x-x-x-x>',
