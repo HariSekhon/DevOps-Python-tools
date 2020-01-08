@@ -440,7 +440,7 @@ src[115]="arn:aws:iam::123456789012:user/Development/product_1234/*"
 dest[115]="arn:aws:iam::<account_id>:user/<user>/*"
 
 src[116]="arn:aws:iam::123456789012:group/Development/product_1234/*"
-dest[116]="arn:aws:iam::<account_id>:group/<group>*"
+dest[116]="arn:aws:iam::<account_id>:group/<group>/*"
 
 src[117]="arn:aws:iam::123456789012:group/Development/product_1234/*"
 dest[117]="arn:aws:iam::<account_id>:group/<group>/*"
@@ -462,6 +462,9 @@ dest[122]="<sts_access_key>"
 
 src[123]="AQoDYXdzEPT//////////wEXAMPLEtc764bNrC9SAPBSM22wDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMicRXmxfpSPfIeoIYRqTflfKD8YUuwthAx7mSEI/qkPpKPi/kMcGdQrmGdeehM4IC1NtBmUpp2wUE8phUZampKsburEDy0KPkyQDYwT7WZ0wq5VSXDvp75YU9HFvlRd8Tx6q6fE8YQcHNVXAkiY9q6d+xo0rKwT38xVqr7ZD0u0iPPkUL64lIZbqBAz+scqKmlzm8FDrypNC9Yjc8fPOLn9FX9KSYvKTr4rvx3iSIlTJabIQwj2ICCR/oLxBA=="
 dest[123]="<sts_token>"
+
+src[124]="sg-5f63c627"
+dest[124]="<security_group>"
 
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
