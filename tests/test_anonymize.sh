@@ -466,6 +466,9 @@ dest[123]="<sts_token>"
 src[124]="sg-5f63c627"
 dest[124]="<security_group>"
 
+src[125]="s3://myBucket/file.txt"
+dest[125]="s3://<bucket>/file.txt"
+
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
 #dest[103]="proxy <proxy_host> port <proxy_port>"
