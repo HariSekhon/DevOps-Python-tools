@@ -303,6 +303,7 @@ class Anonymize(CLI):
             'aws8': r'(\bs3a?)://[^/]+/', # s3 bucket name
             'aws9': r'({switch_prefix}key(:?-?name)?{arg_sep})[\w-]+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
             'aws10': r'({switch_prefix}cluster(?:-?id)?{arg_sep})[\w-]+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
+            'aws11': r'(?<!<)\bsubnet-[A-Za-z0-9]{8}',
             'db': r'({switch_prefix}(?:db|database)-?name{arg_sep})\S+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
             'db2': r'({switch_prefix}(?:db|database)-?instance(-?identifier)?{arg_sep})\S+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
             'db3': r'({switch_prefix}schema-?name{arg_sep})\S+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
@@ -421,6 +422,7 @@ class Anonymize(CLI):
             'aws8': r'\1://<bucket>/',
             'aws9': r'\1<key>',
             'aws10': r'\1<cluster>',
+            'aws11': r'<subnet-xxxxxxxx>',
             'db': r'\1<database>',
             'db2': r'\1<database_instance>',
             'db3': r'\1<schema>',
