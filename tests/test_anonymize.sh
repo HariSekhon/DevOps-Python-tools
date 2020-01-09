@@ -463,11 +463,25 @@ dest[122]="<sts_access_key>"
 src[123]="AQoDYXdzEPT//////////wEXAMPLEtc764bNrC9SAPBSM22wDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMicRXmxfpSPfIeoIYRqTflfKD8YUuwthAx7mSEI/qkPpKPi/kMcGdQrmGdeehM4IC1NtBmUpp2wUE8phUZampKsburEDy0KPkyQDYwT7WZ0wq5VSXDvp75YU9HFvlRd8Tx6q6fE8YQcHNVXAkiY9q6d+xo0rKwT38xVqr7ZD0u0iPPkUL64lIZbqBAz+scqKmlzm8FDrypNC9Yjc8fPOLn9FX9KSYvKTr4rvx3iSIlTJabIQwj2ICCR/oLxBA=="
 dest[123]="<sts_token>"
 
+# security groups
 src[124]="sg-5f63c627"
-dest[124]="<security_group>"
+dest[124]="<sg-xxxxxxxx>"
 
 src[125]="s3://myBucket/file.txt"
 dest[125]="s3://<bucket>/file.txt"
+
+# RDS
+src[126]="--db-name myDB"
+dest[126]="--db-name <database>"
+
+src[127]="--db-instance-identifier myDBinstance"
+dest[127]="--db-instance-identifier <database_instance>"
+
+src[128]="--master-user-password blah"
+dest[128]="--master-user-password <password>"
+
+src[129]="--master-username first.last"
+dest[129]="--master-username <username>"
 
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
