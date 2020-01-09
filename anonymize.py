@@ -301,6 +301,7 @@ class Anonymize(CLI):
             'aws8': r'(\bs3a?)://[^/]+/', # s3 bucket name
             'db': r'(-{1,2}(?:db|database)?-?name' + r'{arg_sep})\S+'.format(arg_sep=arg_sep),
             'db2': r'(-{1,2}(?:db|database)-?instance(-?identifier)?' + r'{arg_sep})\S+'.format(arg_sep=arg_sep),
+            'db3': r'(-{1,2}schema-?name' + r'{arg_sep})\S+'.format(arg_sep=arg_sep),
             # don't change hostname or fqdn regex without updating hash_hostnames() option parse
             # since that replaces these replacements and needs to match the grouping captures and surrounding format
             'hostname2': r'({aws_host_ip})(?!-\d)'.format(aws_host_ip=aws_host_ip_regex),
@@ -416,6 +417,7 @@ class Anonymize(CLI):
             'aws8': r'\1://<bucket>/',
             'db': r'\1<database>',
             'db2': r'\1<database_instance>',
+            'db3': r'\1<schema>',
             'hostname': r'<hostname>:\2',
             #'hostname2': '<aws_hostname>',
             'hostname2': r'<ip-x-x-x-x>',
