@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.10.1'
+__version__ = '0.10.2'
 
 ip_regex = r'(?!127\.0\.0\.)' + ip_regex
 subnet_mask_regex = r'(?!127\.0\.0\.)' + subnet_mask_regex
@@ -118,6 +118,7 @@ class Anonymize(CLI):
             ('ip', False),
             ('subnet_mask', False),
             ('mac', False),
+            ('db', False),
             ('kerberos', False),
             ('email', False),
             ('password', False),
@@ -296,8 +297,10 @@ class Anonymize(CLI):
             'aws4': r'\b[A-Za-z0-9][A-Za-z0-9/+=-]{38}[A-Za-z0-9]\b',  # secret key
             'aws5': r'\b[A-Za-z0-9][A-Za-z0-9/+=-]{238,}',  # STS token - no \b at end as it'll stop before '==' suffix
             'aws6': r'\bASIA[A-Za-z0-9]{16}\b',  # sts temporary access key
-            'aws7': r'\bsg-[a-z0-9]{8}(?!\w)', # security group id
+            'aws7': r'\bsg-[A-Za-z0-9]{8}(?<!<sg-xxxxxxxx)(?!\w)', # security group id
             'aws8': r'(\bs3a?)://[^/]+/', # s3 bucket name
+            'db': r'(-{1,2}(?:db|database)?-?name' + r'{arg_sep})\S+'.format(arg_sep=arg_sep),
+            'db2': r'(-{1,2}(?:db|database)-?instance(-?identifier)?' + r'{arg_sep})\S+'.format(arg_sep=arg_sep),
             # don't change hostname or fqdn regex without updating hash_hostnames() option parse
             # since that replaces these replacements and needs to match the grouping captures and surrounding format
             'hostname2': r'({aws_host_ip})(?!-\d)'.format(aws_host_ip=aws_host_ip_regex),
@@ -327,7 +330,7 @@ class Anonymize(CLI):
                      .format(user_name=user_name, user=user_regex),
             #'user8': r'arn:aws:iam::\d{12}:user/{user}'.format(user=user_regex),
             'user8': r'(arn:aws:iam:[^:]*:)\d+(:user/){user}'.format(user='({}/)*{}'.format(user_regex, user_regex)),
-            'password': r'([-\.]?{pass_word_phrase}{sep}){pw}'\
+            'password': r'([\.-]?{pass_word_phrase}{sep}){pw}'\
                         .format(pass_word_phrase=pass_word_phrase,
                                 sep=arg_sep,
                                 pw=password_quoted),
@@ -375,7 +378,7 @@ class Anonymize(CLI):
             'http_auth3': r'\bAuthorization:\s+Basic\s+[A-Za-z0-9]+',
             'http_auth4': r'(\btoken:\s+)[A-Za-z0-9]+',
             'cisco': r'username .+ (?:password|secret) .*?$',
-            'cisco2': r'password .*?$',
+            'cisco2': r'password (?!<(?:cisco_)?password>).*?$',
             'cisco3': r'\ssecret\s.*?$',
             'cisco4': r'\smd5\s+.*?$',
             'cisco5': r'\scommunity\s+.*$',
@@ -409,8 +412,10 @@ class Anonymize(CLI):
             'aws4': r'<secret_key>',
             'aws5': r'<sts_token>',
             'aws6': r'<sts_access_key>',
-            'aws7': r'<security_group>',
+            'aws7': r'<sg-xxxxxxxx>',
             'aws8': r'\1://<bucket>/',
+            'db': r'\1<database>',
+            'db2': r'\1<database_instance>',
             'hostname': r'<hostname>:\2',
             #'hostname2': '<aws_hostname>',
             'hostname2': r'<ip-x-x-x-x>',
@@ -489,7 +494,10 @@ class Anonymize(CLI):
         self.add_opt('-a', '--all', action='store_true',
                      help='Apply all anonymizations (careful this includes --host which can be overzealous and ' + \
                           'match too many things, in which case try more targeted anonymizations below)')
-        self.add_opt('-w', '--aws', action='store_true', help='Apply AWS ARN anonymizations')
+        self.add_opt('-w', '--aws', action='store_true',
+                     help='Apply AWS anonymizations (access/secret keys, STS tokens, ARNs, buckets, security groups)')
+        self.add_opt('-b', '--db', '--database', action='store_true',
+                     help='Apply database anonymizations (db name, instance name)')
         self.add_opt('-C', '--custom', action='store_true',
                      help='Apply custom phrase anonymization (add your Name, Company Name etc to the list of ' + \
                           'blacklisted words/phrases one per line in anonymize_custom.conf). Matching is case ' + \
@@ -600,7 +608,10 @@ class Anonymize(CLI):
             for _ in self.anonymizations:
                 if _ in ('subnet_mask', 'mac', 'group'):
                     continue
-                self.anonymizations[_] = self.get_opt(_)
+                elif _ == 'database':
+                    self.anonymizations['db'] = True
+                else:
+                    self.anonymizations[_] = self.get_opt(_)
                 log.debug('anonymization enabled %s = %s', _, bool(self.anonymizations[_]))
         self._process_options_host()
         self._process_options_network()
