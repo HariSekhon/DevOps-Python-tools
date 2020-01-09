@@ -483,6 +483,9 @@ dest[128]="--master-user-password <password>"
 src[129]="--master-username first.last"
 dest[129]="--master-username <username>"
 
+src[130]="--schema-name mySchema"
+dest[130]="--schema-name <schema>"
+
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
 #dest[103]="proxy <proxy_host> port <proxy_port>"
