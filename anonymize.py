@@ -283,6 +283,8 @@ class Anonymize(CLI):
         arg_sep = r'[=\s:]+'
         # openssl uses -passin switch
         pass_word_phrase = r'(?:pass(?:word|phrase|in)?|userPassword)'
+        # allowing --blah- prefix variants
+        switch_prefix = r'(?<!\w)--?(?:[A-Za-z0-9-]+-)*'
         self.regex = {
             # arn:partition:service:region:account-id:resource-id
             # arn:partition:service:region:account-id:resource-type/resource-id
@@ -299,10 +301,11 @@ class Anonymize(CLI):
             'aws6': r'\bASIA[A-Za-z0-9]{16}\b',  # sts temporary access key
             'aws7': r'\bsg-[A-Za-z0-9]{8}(?<!<sg-xxxxxxxx)(?!\w)', # security group id
             'aws8': r'(\bs3a?)://[^/]+/', # s3 bucket name
-            'aws9': r'(--?key(:?-?name)?{arg_sep})[\w-]+'.format(arg_sep=arg_sep),
-            'db': r'(\s(?:-[A-Za-z0-9-])*--?(?:db|database)-?name{arg_sep})\S+'.format(arg_sep=arg_sep),
-            'db2': r'(\s(?:-[A-Za-z0-9-])*--?(?:db|database)-?instance(-?identifier)?{arg_sep})\S+'.format(arg_sep=arg_sep),
-            'db3': r'(\s(?:-[A-Za-z0-9-])*--?schema-?name{arg_sep})\S+'.format(arg_sep=arg_sep),
+            'aws9': r'({switch_prefix}key(:?-?name)?{arg_sep})[\w-]+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
+            'aws10': r'({switch_prefix}cluster(?:-?id)?{arg_sep})[\w-]+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
+            'db': r'({switch_prefix}(?:db|database)-?name{arg_sep})\S+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
+            'db2': r'({switch_prefix}(?:db|database)-?instance(-?identifier)?{arg_sep})\S+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
+            'db3': r'({switch_prefix}schema-?name{arg_sep})\S+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
             # don't change hostname or fqdn regex without updating hash_hostnames() option parse
             # since that replaces these replacements and needs to match the grouping captures and surrounding format
             'hostname2': r'({aws_host_ip})(?!-\d)'.format(aws_host_ip=aws_host_ip_regex),
@@ -417,6 +420,7 @@ class Anonymize(CLI):
             'aws7': r'<sg-xxxxxxxx>',
             'aws8': r'\1://<bucket>/',
             'aws9': r'\1<key>',
+            'aws10': r'\1<cluster>',
             'db': r'\1<database>',
             'db2': r'\1<database_instance>',
             'db3': r'\1<schema>',
