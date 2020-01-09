@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.10.2'
+__version__ = '0.10.3'
 
 ip_regex = r'(?!127\.0\.0\.)' + ip_regex
 subnet_mask_regex = r'(?!127\.0\.0\.)' + subnet_mask_regex
@@ -299,9 +299,10 @@ class Anonymize(CLI):
             'aws6': r'\bASIA[A-Za-z0-9]{16}\b',  # sts temporary access key
             'aws7': r'\bsg-[A-Za-z0-9]{8}(?<!<sg-xxxxxxxx)(?!\w)', # security group id
             'aws8': r'(\bs3a?)://[^/]+/', # s3 bucket name
-            'db': r'(-{1,2}(?:db|database)?-?name' + r'{arg_sep})\S+'.format(arg_sep=arg_sep),
-            'db2': r'(-{1,2}(?:db|database)-?instance(-?identifier)?' + r'{arg_sep})\S+'.format(arg_sep=arg_sep),
-            'db3': r'(-{1,2}schema-?name' + r'{arg_sep})\S+'.format(arg_sep=arg_sep),
+            'aws9': r'(--?key(:?-?name)?{arg_sep})[\w-]+'.format(arg_sep=arg_sep),
+            'db': r'(--?(?:db|database)-?name{arg_sep})\S+'.format(arg_sep=arg_sep),
+            'db2': r'(--?(?:db|database)-?instance(-?identifier)?{arg_sep})\S+'.format(arg_sep=arg_sep),
+            'db3': r'(--?schema-?name{arg_sep})\S+'.format(arg_sep=arg_sep),
             # don't change hostname or fqdn regex without updating hash_hostnames() option parse
             # since that replaces these replacements and needs to match the grouping captures and surrounding format
             'hostname2': r'({aws_host_ip})(?!-\d)'.format(aws_host_ip=aws_host_ip_regex),
@@ -415,6 +416,7 @@ class Anonymize(CLI):
             'aws6': r'<sts_access_key>',
             'aws7': r'<sg-xxxxxxxx>',
             'aws8': r'\1://<bucket>/',
+            'aws9': r'\1<key>',
             'db': r'\1<database>',
             'db2': r'\1<database_instance>',
             'db3': r'\1<schema>',
