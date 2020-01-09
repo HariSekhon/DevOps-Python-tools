@@ -486,6 +486,9 @@ dest[129]="--master-username <username>"
 src[130]="--schema-name mySchema"
 dest[130]="--schema-name <schema>"
 
+src[131]="=arn:aws:acm:us-east-1:123456:certificate/abc-123"
+dest[131]="=arn:aws:acm:us-east-1:<account_id>:certificate/<certificate>"
+
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
 #dest[103]="proxy <proxy_host> port <proxy_port>"
