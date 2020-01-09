@@ -497,6 +497,9 @@ dest[133]="-private-key <key>"
 src[134]="aws elasticache create-cache-cluster --cache-cluster-id myCluster"
 dest[134]="aws elasticache create-cache-cluster --cache-cluster-id <cluster>"
 
+src[135]="subnet-abc12345"
+dest[135]="<subnet-xxxxxxxx>"
+
 
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
