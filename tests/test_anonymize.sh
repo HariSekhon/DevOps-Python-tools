@@ -470,12 +470,11 @@ dest[124]="<sg-xxxxxxxx>"
 src[125]="s3://myBucket/file.txt"
 dest[125]="s3://<bucket>/file.txt"
 
-# RDS
-src[126]="--db-name myDB"
-dest[126]="--db-name <database>"
+src[126]="aws rds create-db-instance --db-name myDB"
+dest[126]="aws rds create-db-instance --db-name <database>"
 
-src[127]="--db-instance-identifier myDBinstance"
-dest[127]="--db-instance-identifier <database_instance>"
+src[127]="aws rds modify-db-instance --db-instance-identifier myDBinstance"
+dest[127]="aws rds modify-db-instance --db-instance-identifier <database_instance>"
 
 src[128]="--master-user-password blah"
 dest[128]="--master-user-password <password>"
@@ -492,8 +491,12 @@ dest[131]="=arn:aws:acm:us-east-1:<account_id>:certificate/<certificate>"
 src[132]="--key-name my-key"
 dest[132]="--key-name <key>"
 
-src[133]="private-key my-key"
-dest[133]="private-key <key>"
+src[133]="-private-key my-key"
+dest[133]="-private-key <key>"
+
+src[134]="aws elasticache create-cache-cluster --cache-cluster-id myCluster"
+dest[134]="aws elasticache create-cache-cluster --cache-cluster-id <cluster>"
+
 
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
