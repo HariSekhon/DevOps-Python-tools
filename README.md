@@ -61,7 +61,7 @@ Environment variables are supported for convenience and also to hide credentials
 
 - Linux:
   - ```anonymize.py``` - anonymizes your configs / logs from files or stdin (for pasting to Apache Jira tickets or mailing lists)
-    - anonymizes:
+    - anonymizations include these and more:
       - hostnames / domains / FQDNs
       - email addresses
       - IP + MAC addresses
