@@ -120,6 +120,8 @@ class Anonymize(CLI):
             ('mac', False),
             ('db', False),
             ('generic', False),
+            # kerberos must be applied before email
+            # - if email is applied first, 'user/host@realm' becomes 'user/<email_regex>', exposing user
             ('kerberos', False),
             ('email', False),
             ('password', False),
@@ -304,13 +306,30 @@ class Anonymize(CLI):
             'aws7': r'\bsg-[A-Za-z0-9]{8}(?<!<sg-xxxxxxxx)(?!\w)', # security group id
             'aws8': r'(\bs3a?)://[^/]+/', # s3 bucket name
             'aws9': r'(?<!<)\bsubnet-[A-Za-z0-9]{8}\b',
-            'db': r'({switch_prefix}(?:db|database)-?name{arg_sep})\S+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
-            'db2': r'({switch_prefix}(?:db|database)-?instance{id_or_name}?{arg_sep})\S+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix, id_or_name=id_or_name),
-            'db3': r'({switch_prefix}schema{id_or_name}?{arg_sep})\S+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix, id_or_name=id_or_name),
+            'db': r'({switch_prefix}(?:db|database)-?name{arg_sep})\S+'\
+                   .format(arg_sep=arg_sep,
+                           switch_prefix=switch_prefix),
+            'db2': r'({switch_prefix}(?:db|database)-?instance{id_or_name}?{arg_sep})\S+'\
+                   .format(arg_sep=arg_sep,
+                           id_or_name=id_or_name,
+                           switch_prefix=switch_prefix),
+            'db3': r'({switch_prefix}schema{id_or_name}?{arg_sep})\S+'\
+                   .format(arg_sep=arg_sep,
+                           id_or_name=id_or_name,
+                           switch_prefix=switch_prefix),
             'generic': r'(\bfileb?)://{filename_regex}'.format(filename_regex=filename_regex),
-            'generic2': r'({switch_prefix}key{id_or_name}?{arg_sep})[\w-]+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix, id_or_name=id_or_name),
-            'generic3': r'({switch_prefix}cluster{id_or_name}?{arg_sep})[\w-]+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix, id_or_name=id_or_name),
-            'generic4': r'({switch_prefix}function{id_or_name}?{arg_sep})[\w-]+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix, id_or_name=id_or_name),
+            'generic2': r'({switch_prefix}key{id_or_name}?{arg_sep})[\w-]+'\
+                   .format(arg_sep=arg_sep,
+                           id_or_name=id_or_name,
+                           switch_prefix=switch_prefix),
+            'generic3': r'({switch_prefix}cluster{id_or_name}?{arg_sep})[\w-]+'\
+                   .format(arg_sep=arg_sep,
+                           id_or_name=id_or_name,
+                           switch_prefix=switch_prefix),
+            'generic4': r'({switch_prefix}function{id_or_name}?{arg_sep})[\w-]+'\
+                   .format(arg_sep=arg_sep,
+                           id_or_name=id_or_name,
+                           switch_prefix=switch_prefix),
             # don't change hostname or fqdn regex without updating hash_hostnames() option parse
             # since that replaces these replacements and needs to match the grouping captures and surrounding format
             'hostname2': r'({aws_host_ip})(?!-\d)'.format(aws_host_ip=aws_host_ip_regex),
@@ -544,7 +563,7 @@ class Anonymize(CLI):
                           'debugging, these are salted and truncated to be indistinguishable from temporal docker ' + \
                           'container IDs, but someone with enough computing power and time could theoretically ' + \
                           'calculate the source hostnames so don\'t put these on the public internet, it is more ' + \
-                          'for private vendor tickets)')
+                          'for private vendor tickets')
         self.add_opt('-d', '--domain', action='store_true',
                      help='Apply domain format anonymization')
         self.add_opt('-F', '--fqdn', action='store_true',
@@ -563,16 +582,11 @@ class Anonymize(CLI):
                           r'http://username:password\@ => ' + \
                           r'http://<user>:<password>\@. Also works with https://')
         self.add_opt('-K', '--kerberos', action='store_true',
-                     help=r'Kerberos 5 principals in the form <primary>@<realm> or <primary>/<instance>@<realm> ' + \
+                     help=r'Apply Kerberos anonymizations eg. <primary>@<realm>, <primary>/<instance>@<realm> ' + \
                           '(where <realm> must match a valid domain name - otherwise use --custom and populate ' + \
-                          r'anonymize_custom.conf). These kerberos principals are anonymizebed to ' + \
-                          '<kerberos_principal>. There is a special exemption for Hadoop Kerberos principals such ' + \
-                          'as NN/_HOST@<realm> which preserves the literal \'_HOST\' instance since that\'s ' + \
-                          'useful to know for debugging, the principal and realm will still be anonymizebed in ' + \
-                          'those cases (if wanting to retain NN/_HOST then use --domain instead of --kerberos). ' + \
-                          'This is applied before --email in order to not prevent the email replacement leaving ' + \
-                          r'this as user/host\@realm to user/<email_regex>, which would have exposed \'user\'' + \
-                          '. Auto enables --email, --domain and --fqdn')
+                          r'anonymize_custom.conf). Hadoop principals preserve the generic _HOST placeholder eg. ' + \
+                          '<user>/_HOST@<realm> (if wanting to retain full prefix eg. NN/_HOST then use ' + \
+                          '--domain instead of --kerberos). --kerberos auto-enables --email, --domain and --fqdn')
         self.add_opt('-L', '--ldap', action='store_true',
                      help='Apply LDAP anonymization ' + \
                           '(~100 attribs eg. CN, DN, OU, UID, sAMAccountName, member, memberOf...)')
@@ -583,7 +597,7 @@ class Anonymize(CLI):
         #                  'should probably also apply --ip and --host if using this. Auto enables --http-auth')
         self.add_opt('-N', '--network', action='store_true',
                      help='Apply all network anonymization, whether Cisco, ScreenOS, JunOS for secrets, auth, ' + \
-                          'usernames, passwords, md5s, PSKs, AS, SNMP etc.')
+                          'usernames, passwords, md5s, PSKs, AS, SNMP community strings etc.')
         self.add_opt('-c', '--cisco', action='store_true',
                      help='Apply Cisco IOS/IOS-XR/NX-OS configuration format anonymization')
         self.add_opt('-s', '--screenos', action='store_true',
