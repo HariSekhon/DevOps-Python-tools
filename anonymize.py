@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.10.4'
+__version__ = '0.10.5'
 
 ip_regex = r'(?!127\.0\.0\.)' + ip_regex
 subnet_mask_regex = r'(?!127\.0\.0\.)' + subnet_mask_regex
@@ -119,6 +119,7 @@ class Anonymize(CLI):
             ('subnet_mask', False),
             ('mac', False),
             ('db', False),
+            ('generic', False),
             ('kerberos', False),
             ('email', False),
             ('password', False),
@@ -285,6 +286,7 @@ class Anonymize(CLI):
         pass_word_phrase = r'(?:pass(?:word|phrase|in)?|userPassword)'
         # allowing --blah- prefix variants
         switch_prefix = r'(?<!\w)--?(?:[A-Za-z0-9-]+-)*'
+        id_or_name = r'(?:-?(?:id|name|identifier))'
         self.regex = {
             # arn:partition:service:region:account-id:resource-id
             # arn:partition:service:region:account-id:resource-type/resource-id
@@ -301,12 +303,14 @@ class Anonymize(CLI):
             'aws6': r'\bASIA[A-Za-z0-9]{16}\b',  # sts temporary access key
             'aws7': r'\bsg-[A-Za-z0-9]{8}(?<!<sg-xxxxxxxx)(?!\w)', # security group id
             'aws8': r'(\bs3a?)://[^/]+/', # s3 bucket name
-            'aws9': r'({switch_prefix}key(:?-?name)?{arg_sep})[\w-]+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
-            'aws10': r'({switch_prefix}cluster(?:-?id)?{arg_sep})[\w-]+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
-            'aws11': r'(?<!<)\bsubnet-[A-Za-z0-9]{8}\b',
+            'aws9': r'(?<!<)\bsubnet-[A-Za-z0-9]{8}\b',
             'db': r'({switch_prefix}(?:db|database)-?name{arg_sep})\S+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
-            'db2': r'({switch_prefix}(?:db|database)-?instance(-?identifier)?{arg_sep})\S+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
-            'db3': r'({switch_prefix}schema-?name{arg_sep})\S+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix),
+            'db2': r'({switch_prefix}(?:db|database)-?instance{id_or_name}?{arg_sep})\S+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix, id_or_name=id_or_name),
+            'db3': r'({switch_prefix}schema{id_or_name}?{arg_sep})\S+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix, id_or_name=id_or_name),
+            'generic': r'(\bfileb?)://{filename_regex}'.format(filename_regex=filename_regex),
+            'generic2': r'({switch_prefix}key{id_or_name}?{arg_sep})[\w-]+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix, id_or_name=id_or_name),
+            'generic3': r'({switch_prefix}cluster{id_or_name}?{arg_sep})[\w-]+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix, id_or_name=id_or_name),
+            'generic4': r'({switch_prefix}function{id_or_name}?{arg_sep})[\w-]+'.format(arg_sep=arg_sep, switch_prefix=switch_prefix, id_or_name=id_or_name),
             # don't change hostname or fqdn regex without updating hash_hostnames() option parse
             # since that replaces these replacements and needs to match the grouping captures and surrounding format
             'hostname2': r'({aws_host_ip})(?!-\d)'.format(aws_host_ip=aws_host_ip_regex),
@@ -420,12 +424,14 @@ class Anonymize(CLI):
             'aws6': r'<sts_access_key>',
             'aws7': r'<sg-xxxxxxxx>',
             'aws8': r'\1://<bucket>/',
-            'aws9': r'\1<key>',
-            'aws10': r'\1<cluster>',
-            'aws11': r'<subnet-xxxxxxxx>',
+            'aws9': r'<subnet-xxxxxxxx>',
             'db': r'\1<database>',
             'db2': r'\1<database_instance>',
             'db3': r'\1<schema>',
+            'generic': r'\1://<file>',
+            'generic2': r'\1<key>',
+            'generic3': r'\1<cluster>',
+            'generic4': r'\1<function>',
             'hostname': r'<hostname>:\2',
             #'hostname2': '<aws_hostname>',
             'hostname2': r'<ip-x-x-x-x>',
@@ -508,6 +514,8 @@ class Anonymize(CLI):
                      help='Apply AWS anonymizations (access/secret keys, STS tokens, ARNs, buckets, security groups)')
         self.add_opt('-b', '--db', '--database', action='store_true',
                      help='Apply database anonymizations (db name, instance name)')
+        self.add_opt('-g', '--generic', action='store_true',
+                     help='Apply generic anonymizations (file://, key, cluster name / id etc)')
         self.add_opt('-C', '--custom', action='store_true',
                      help='Apply custom phrase anonymization (add your Name, Company Name etc to the list of ' + \
                           'blacklisted words/phrases one per line in anonymize_custom.conf). Matching is case ' + \
