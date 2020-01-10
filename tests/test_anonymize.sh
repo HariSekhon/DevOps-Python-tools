@@ -500,6 +500,9 @@ dest[134]="aws elasticache create-cache-cluster --cache-cluster-id <cluster>"
 src[135]="subnet-abc12345"
 dest[135]="<subnet-xxxxxxxx>"
 
+src[136]="arn:aws:acm:us-east-1:123456:function:myFunction123:7"
+dest[136]="arn:aws:acm:us-east-1:<account_id>:function:<function>:7"
+
 
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
