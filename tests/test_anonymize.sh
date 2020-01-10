@@ -503,6 +503,9 @@ dest[135]="<subnet-xxxxxxxx>"
 src[136]="arn:aws:acm:us-east-1:123456:function:myFunction123:7"
 dest[136]="arn:aws:acm:us-east-1:<account_id>:function:<function>:7"
 
+src[137]="aws lambda update-function-code --function-name hari-test --zip-file fileb://myfunction.zip"
+dest[137]="aws lambda update-function-code --function-name <function> --zip-file fileb://<file>"
+
 
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
