@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.10.5'
+__version__ = '0.10.6'
 
 ip_regex = r'(?!127\.0\.0\.)' + ip_regex
 subnet_mask_regex = r'(?!127\.0\.0\.)' + subnet_mask_regex
@@ -318,15 +318,19 @@ class Anonymize(CLI):
                            id_or_name=id_or_name,
                            switch_prefix=switch_prefix),
             'generic': r'(\bfileb?)://{filename_regex}'.format(filename_regex=filename_regex),
-            'generic2': r'({switch_prefix}key{id_or_name}?{arg_sep})[\w-]+'\
+            'generic2': r'({switch_prefix}key{id_or_name}?{arg_sep})\S+'\
                    .format(arg_sep=arg_sep,
                            id_or_name=id_or_name,
                            switch_prefix=switch_prefix),
-            'generic3': r'({switch_prefix}cluster{id_or_name}?{arg_sep})[\w-]+'\
+            'generic3': r'({switch_prefix}cluster{id_or_name}?{arg_sep})\S+'\
                    .format(arg_sep=arg_sep,
                            id_or_name=id_or_name,
                            switch_prefix=switch_prefix),
-            'generic4': r'({switch_prefix}function{id_or_name}?{arg_sep})[\w-]+'\
+            'generic4': r'({switch_prefix}function{id_or_name}?{arg_sep})\S+'\
+                   .format(arg_sep=arg_sep,
+                           id_or_name=id_or_name,
+                           switch_prefix=switch_prefix),
+            'generic5': r'({switch_prefix}load-?balancer{id_or_name}?{arg_sep})\S+'\
                    .format(arg_sep=arg_sep,
                            id_or_name=id_or_name,
                            switch_prefix=switch_prefix),
@@ -451,6 +455,7 @@ class Anonymize(CLI):
             'generic2': r'\1<key>',
             'generic3': r'\1<cluster>',
             'generic4': r'\1<function>',
+            'generic5': r'\1<load_balancer_name>',
             'hostname': r'<hostname>:\2',
             #'hostname2': '<aws_hostname>',
             'hostname2': r'<ip-x-x-x-x>',
