@@ -114,7 +114,6 @@ class AWSUnusedAccessKeys(CLI):
         headers = csvreader.next()
         log.debug('headers: %s', headers)
         assert headers[0] == 'user'
-        assert headers[4] == 'password_last_used'
         assert headers[10] == 'access_key_1_last_used_date'
         assert headers[15] == 'access_key_2_last_used_date'
         self.now = datetime.utcnow()
