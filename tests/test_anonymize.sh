@@ -506,6 +506,9 @@ dest[136]="arn:aws:acm:us-east-1:<account_id>:function:<function>:7"
 src[137]="aws lambda update-function-code --function-name hari-test --zip-file fileb://myfunction.zip"
 dest[137]="aws lambda update-function-code --function-name <function> --zip-file fileb://<file>"
 
+src[138]=' aws elb create-load-balancer --load-balancer-name "$lb_name" ...'
+dest[138]=' aws elb create-load-balancer --load-balancer-name <load_balancer_name> ...'
+
 
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
