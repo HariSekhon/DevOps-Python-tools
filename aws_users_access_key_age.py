@@ -24,6 +24,8 @@ Output format is:
 
 Status is Active or Inactive
 
+Validated compared to xls report download from Trusted Advisor -> Security -> IAM Access Key Rotation
+
 Uses the Boto library, read here for the list of ways to configure your AWS credentials:
 
     https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html
