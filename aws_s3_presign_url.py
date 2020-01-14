@@ -35,10 +35,11 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import argparse
+import sys
 import boto3
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 def main():
     parser = argparse.ArgumentParser(
@@ -64,4 +65,4 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        print('Control-C...')
+        print('Control-C...', file=sys.stderr)
