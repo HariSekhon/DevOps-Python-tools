@@ -51,7 +51,7 @@ import impala
 from impala.dbapi import connect
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 logging.basicConfig()
 log = logging.getLogger(os.path.basename(sys.argv[0]))
@@ -106,6 +106,10 @@ def parse_args():
     parser.add_argument('-n', '--krb5-service-name', default=default_service_name,
                         help='Service principal (default: {})'.format(default_service_name))
     parser.add_argument('-S', '--ssl', action='store_true', help='Use SSL')
+    # ignore tables that fail with errors like:
+    # impala.error.HiveServer2Error: AnalysisException: Unsupported type 'void' in column '<column>' of table '<table>'
+    # CAUSED BY: TableLoadingException: Unsupported type 'void' in column '<column>' of table '<table>'
+    parser.add_argument('-e', '--ignore-errors', action='store_true', help='Ignore errors and continue')
     parser.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
     args = parser.parse_args()
 
@@ -176,8 +180,11 @@ def main():
                         continue
                     try:
                         get_row_counts(conn, args, database, table, partition_regex)
-                    except impala.error.OperationalError as _:
-                        log.error(_)
+                    except Exception as _:
+                        if args.ignore_errors:
+                            log.error("database '%s' table '%s':  %s", database, table, _)
+                            continue
+                        raise
 
 def get_row_counts(conn, args, database, table, partition_regex):
     log.info("getting partitions for database '%s' table '%s'", database, table)
