@@ -18,6 +18,10 @@
 
 Generate and print an S3 pre-signed URL
 
+Can do the same with the following AWS CLI command:
+
+aws s3 presign s3://<bucket>/<key> [--expires-in <secs>]
+
 Will generate a pre-signed URL even when the bucket and object key don't exist!
 
 (you will get a runtime error when requesting the link that the bucket or object doesn't exist)
@@ -49,6 +53,7 @@ def main():
     parser.add_argument('expiration', nargs='?', default=3600, help='Expiration of URL in seconds')
     args = parser.parse_args()
 
+    # more useful if doing this programmatically as we can do this on the command line via AWS CLI
     conn = boto3.client('s3')
     url = conn.generate_presigned_url(
         'get_object',
