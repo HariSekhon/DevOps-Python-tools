@@ -215,7 +215,7 @@ def main():
 
 def execute(conn, database, table, query):
     try:
-        log.info("running %s", query)
+        log.info(" %s.%s - running %s", database, table, query)
         with conn.cursor() as query_cursor:
             # doesn't support parameterized query quoting from dbapi spec
             query_cursor.execute(query)
