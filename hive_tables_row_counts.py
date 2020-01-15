@@ -106,9 +106,16 @@ def parse_args():
     parser.add_argument('-n', '--krb5-service-name', default=default_service_name,
                         help='Service principal (default: {})'.format(default_service_name))
     parser.add_argument('-S', '--ssl', action='store_true', help='Use SSL')
-    # ignore tables that fail with errors like:
-    # impala.error.HiveServer2Error: AnalysisException: Unsupported type 'void' in column '<column>' of table '<table>'
-    # CAUSED BY: TableLoadingException: Unsupported type 'void' in column '<column>' of table '<table>'
+#
+# ignore tables that fail with errors like this for Hive (on CDH so MR, no tez):
+#
+# impala.error.OperationalError: Error while processing statement: FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.mr.MapRedTask  # pylint: disable=line-too-long
+#
+# or this for Impala:
+#
+# impala.error.HiveServer2Error: AnalysisException: Unsupported type 'void' in column '<column>' of table '<table>'
+# CAUSED BY: TableLoadingException: Unsupported type 'void' in column '<column>' of table '<table>'
+#
     parser.add_argument('-e', '--ignore-errors', action='store_true', help='Ignore errors and continue')
     parser.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
     args = parser.parse_args()
