@@ -509,6 +509,9 @@ dest[137]="aws lambda update-function-code --function-name <function> --zip-file
 src[138]=' aws elb create-load-balancer --load-balancer-name "$lb_name" ...'
 dest[138]=' aws elb create-load-balancer --load-balancer-name <load_balancer_name> ...'
 
+src[139]=' in column "blah" of table "blah2"'
+dest[139]=' in column "<column>" of table "<table>"'
+
 
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
