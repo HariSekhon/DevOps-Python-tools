@@ -107,11 +107,13 @@ def parse_args():
                         help='Service principal (default: {})'.format(default_service_name))
     parser.add_argument('-S', '--ssl', action='store_true', help='Use SSL')
 #
-# ignore tables that fail with errors like this for Hive (on CDH so MR, no tez):
+# ignore tables that fail with errors like:
+#
+# Hive (CDH has MR, no tez):
 #
 # impala.error.OperationalError: Error while processing statement: FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.mr.MapRedTask  # pylint: disable=line-too-long
 #
-# or this for Impala:
+# Impala:
 #
 # impala.error.HiveServer2Error: AnalysisException: Unsupported type 'void' in column '<column>' of table '<table>'
 # CAUSED BY: TableLoadingException: Unsupported type 'void' in column '<column>' of table '<table>'
