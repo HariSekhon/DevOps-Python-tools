@@ -68,7 +68,7 @@ import impala
 from impala.dbapi import connect
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 logging.basicConfig()
 log = logging.getLogger(os.path.basename(sys.argv[0]))
@@ -122,6 +122,17 @@ def parse_args():
     parser.add_argument('-n', '--krb5-service-name', default=default_service_name,
                         help='Service principal (default: {})'.format(default_service_name))
     parser.add_argument('-S', '--ssl', action='store_true', help='Use SSL')
+#
+# ignore tables that fail with errors like this for Hive (on CDH so MR, no tez):
+#
+# impala.error.OperationalError: Error while processing statement: FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.mr.MapRedTask  # pylint: disable=line-too-long
+#
+# or this for Impala:
+#
+# impala.error.HiveServer2Error: AnalysisException: Unsupported type 'void' in column '<column>' of table '<table>'
+# CAUSED BY: TableLoadingException: Unsupported type 'void' in column '<column>' of table '<table>'
+#
+    parser.add_argument('-e', '--ignore-errors', action='store_true', help='Ignore errors and continue')
     parser.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
     args = parser.parse_args()
 
@@ -195,20 +206,29 @@ def main():
                         if _ == 'db':
                             query = args.query.format(table=table)
                     try:
-                        log.info("running %s", query)
-                        with conn.cursor() as query_cursor:
-                            # doesn't support parameterized query quoting from dbapi spec
-                            query_cursor.execute(query)
-                            for result in query_cursor:
-                                print('{db}.{table}\t{result}'.format(db=database, table=table, \
-                                                                      result='\t'.join([str(_) for _ in result])))
-                    except (impala.error.OperationalError, impala.error.HiveServer2Error) as _:
-                        log.error(_)
-                    except impala.error.ProgrammingError as _:
-                        log.error(_)
-                        # COMPUTE STATS returns no results
-                        if 'Trying to fetch results on an operation with no results' not in str(_):
-                            raise
+                        execute(conn, database, table, query)
+                    except Exception as _:
+                        if args.ignore_errors:
+                            log.error("database '%s' table '%s':  %s", database, table, _)
+                            continue
+                        raise
+
+def execute(conn, database, table, query):
+    try:
+        log.info("running %s", query)
+        with conn.cursor() as query_cursor:
+            # doesn't support parameterized query quoting from dbapi spec
+            query_cursor.execute(query)
+            for result in query_cursor:
+                print('{db}.{table}\t{result}'.format(db=database, table=table, \
+                                                      result='\t'.join([str(_) for _ in result])))
+    #except (impala.error.OperationalError, impala.error.HiveServer2Error) as _:
+    #    log.error(_)
+    except impala.error.ProgrammingError as _:
+        log.error(_)
+        # COMPUTE STATS returns no results
+        if 'Trying to fetch results on an operation with no results' not in str(_):
+            raise
 
 
 if __name__ == '__main__':
