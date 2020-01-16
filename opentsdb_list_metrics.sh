@@ -72,7 +72,7 @@ done
 
 check_bin(){
     local bin="$1"
-    if ! type -P $bin &>/dev/null; then
+    if ! type -P "$bin" &>/dev/null; then
         echo "'$bin' command not found in \$PATH ($PATH)"
         exit 1
     fi
@@ -83,6 +83,8 @@ check_bin jq
 if [ -z "${DEBUG:-}" ]; then
     curl_options="$curl_options -s"
 fi
+# split opts
+# shellcheck disable=SC2086
 curl $curl_options "$tsd_url/api/suggest?type=$metrics&q=&max=2000000000" |
 jq '.[]' |
 sed 's/"//g' |
