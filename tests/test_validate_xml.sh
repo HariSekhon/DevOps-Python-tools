@@ -19,6 +19,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "Testing validate_xml.py"
@@ -26,8 +27,8 @@ section "Testing validate_xml.py"
 export TIMEOUT=3
 
 if [ $# -gt 0 ]; then
-    echo "validate_xml.py $@"
-    ./validate_xml.py $@
+    echo "validate_xml.py $*"
+    ./validate_xml.py "$@"
     echo
 fi
 
@@ -60,6 +61,7 @@ echo
 echo "testing stdin"
 ./validate_xml.py - < "$data_dir/simple.xml"
 ./validate_xml.py < "$data_dir/simple.xml"
+# shellcheck disable=SC2094
 ./validate_xml.py "$data_dir/simple.xml" - < "$data_dir/simple.xml"
 echo
 
@@ -77,7 +79,7 @@ check_broken(){
     ./validate_xml.py -t 1 $options "$filename"
     exitcode=$?
     set -e
-    if [ $exitcode = $expected_exitcode ]; then
+    if [ "$exitcode" = "$expected_exitcode" ]; then
         echo "successfully detected broken xml in '$filename', returned exit code $exitcode"
         echo
     #elif [ $exitcode != 0 ]; then
