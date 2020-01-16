@@ -19,6 +19,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "Testing validate_yaml.py"
@@ -29,8 +30,8 @@ if is_inside_docker; then
 fi
 
 if [ $# -gt 0 ]; then
-    echo "validate_yaml.py $@"
-    ./validate_yaml.py $@
+    echo "validate_yaml.py $*"
+    ./validate_yaml.py "$@"
     echo
 fi
 
@@ -65,6 +66,7 @@ echo "testing stdin"
 ./validate_yaml.py - < "$data_dir/test.yaml"
 ./validate_yaml.py < "$data_dir/test.yaml"
 echo "testing stdin mixed with filename"
+# shellcheck disable=SC2094
 ./validate_yaml.py "$data_dir/test.yaml" - < "$data_dir/test.yaml"
 echo
 
@@ -82,7 +84,7 @@ check_broken(){
     ./validate_yaml.py -t 1 $options "$filename"
     exitcode=$?
     set -e
-    if [ $exitcode = $expected_exitcode ]; then
+    if [ "$exitcode" = "$expected_exitcode" ]; then
         echo "successfully detected broken yaml in '$filename', returned exit code $exitcode"
         echo
     #elif [ $exitcode != 0 ]; then
