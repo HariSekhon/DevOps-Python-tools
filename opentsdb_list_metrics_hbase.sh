@@ -73,7 +73,7 @@ done
 
 check_bin(){
     local bin="$1"
-    if ! type -P $bin &>/dev/null; then
+    if ! type -P "$bin" &>/dev/null; then
         echo "'$bin' command not found in \$PATH ($PATH)"
         exit 1
     fi
@@ -106,6 +106,7 @@ for line in sys.stdin:
 #    ts = metrics[metric]
     print("{}\t{}\t{}".format(ts, time.strftime("%F %T", time.localtime(int(ts)/1000)), metric))
 EOF
+    # shellcheck disable=SC2064
     trap "rm '$tmp_python_script'" EXIT
 
     hbase shell <<< "scan 'tsdb-uid', { COLUMNS => 'name:$metrics', VERSIONS => 1 }" 2>/dev/null |
