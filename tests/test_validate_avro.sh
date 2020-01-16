@@ -19,6 +19,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "Testing validate_avro.py"
@@ -26,8 +27,8 @@ section "Testing validate_avro.py"
 export TIMEOUT=3
 
 if [ $# -gt 0 ]; then
-    echo "validate_avro.py $@"
-    ./validate_avro.py $@
+    echo "validate_avro.py $*"
+    ./validate_avro.py "$@"
     echo
 fi
 
@@ -82,6 +83,7 @@ echo "testing stdin"
 ./validate_avro.py - < "$data_dir/test.avro"
 ./validate_avro.py < "$data_dir/test.avro"
 echo "testing stdin mixed with filename"
+# shellcheck disable=SC2094
 ./validate_avro.py "$data_dir/test.avro" - < "$data_dir/test.avro"
 echo
 
@@ -93,10 +95,10 @@ check_broken(){
     ./validate_avro.py -t 1 $options "$filename"
     exitcode=$?
     set -e
-    if [ $exitcode = $expected_exitcode ]; then
+    if [ "$exitcode" = "$expected_exitcode" ]; then
         echo "successfully detected broken avro in '$filename', returned exit code $exitcode"
         echo
-    #elif [ $exitcode != 0 ]; then
+    #elif [ "$exitcode" != 0 ]; then
     #    echo "returned unexpected non-zero exit code $exitcode for broken avro in '$filename'"
     #    exit 1
     else
