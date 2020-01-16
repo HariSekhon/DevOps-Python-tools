@@ -19,6 +19,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "Testing validate_parquet.py"
@@ -32,8 +33,8 @@ fi
 #export TIMEOUT=10
 
 if [ $# -gt 0 ]; then
-    echo "validate_parquet.py $@"
-    ./validate_parquet.py $@
+    echo "validate_parquet.py $*"
+    ./validate_parquet.py "$@"
     echo
 fi
 
@@ -84,6 +85,7 @@ echo "testing stdin"
 ./validate_parquet.py - < "$data_dir/test.parquet"
 ./validate_parquet.py < "$data_dir/test.parquet"
 echo "testing stdin mixed with filename"
+# shellcheck disable=SC2094
 ./validate_parquet.py "$data_dir/test.parquet" - < "$data_dir/test.parquet"
 echo
 
@@ -95,7 +97,7 @@ check_broken(){
     ./validate_parquet.py -t 5 $options "$filename"
     exitcode=$?
     set -e
-    if [ $exitcode = $expected_exitcode ]; then
+    if [ "$exitcode" = "$expected_exitcode" ]; then
         echo "successfully detected broken parquet in '$filename', returned exit code $exitcode"
         echo
     #elif [ $exitcode != 0 ]; then
