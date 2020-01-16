@@ -19,6 +19,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "Testing validate_multimedia.py"
@@ -38,8 +39,8 @@ if ! type -P ffmpeg &>/dev/null; then
 fi
 
 if [ $# -gt 0 ]; then
-    echo "validate_multimedia.py $@"
-    ./validate_multimedia.py $@
+    echo "validate_multimedia.py $*"
+    ./validate_multimedia.py "$@"
     echo
 fi
 
@@ -87,7 +88,7 @@ check_broken(){
     ./validate_multimedia.py -t 1 $options "$filename"
     exitcode=$?
     set -e
-    if [ $exitcode = $expected_exitcode ]; then
+    if [ "$exitcode" = "$expected_exitcode" ]; then
         echo "successfully detected broken media in '$filename', returned exit code $exitcode"
         echo
     #elif [ $exitcode != 0 ]; then
