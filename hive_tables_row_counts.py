@@ -118,7 +118,7 @@ def parse_args():
 # impala.error.HiveServer2Error: AnalysisException: Unsupported type 'void' in column '<column>' of table '<table>'
 # CAUSED BY: TableLoadingException: Unsupported type 'void' in column '<column>' of table '<table>'
 #
-    parser.add_argument('-e', '--ignore-errors', action='store_true', help='Ignore errors and continue')
+    parser.add_argument('-e', '--ignore-errors', action='store_true', help='Ignore individual table errors and continue')
     parser.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
     args = parser.parse_args()
 
@@ -190,6 +190,8 @@ def main():
                     try:
                         get_row_counts(conn, args, database, table, partition_regex)
                     except Exception as _:
+                        # invalid query handle and similar errors happen at higher level
+                        # as they are not query specific, will not be caught here so still error out
                         if args.ignore_errors:
                             log.error("database '%s' table '%s':  %s", database, table, _)
                             continue
