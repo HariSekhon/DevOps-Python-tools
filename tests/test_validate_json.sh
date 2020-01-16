@@ -19,6 +19,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "Testing validate_json.py"
@@ -26,8 +27,8 @@ section "Testing validate_json.py"
 export TIMEOUT=${TIMEOUT:-3}
 
 if [ $# -gt 0 ]; then
-    echo "validate_json.py $@"
-    ./validate_json.py $@
+    echo "validate_json.py $*"
+    ./validate_json.py "$@"
     echo
 fi
 
@@ -68,6 +69,7 @@ echo "testing stdin"
 ./validate_json.py - < "$data_dir/test.json"
 ./validate_json.py < "$data_dir/test.json"
 echo "testing stdin and file mix"
+# shellcheck disable=SC2094
 ./validate_json.py "$data_dir/test.json" - < "$data_dir/test.json"
 echo "testing stdin with multirecord"
 ./validate_json.py -m - < "$data_dir/multirecord.json"
@@ -89,7 +91,7 @@ check_broken(){
     ./validate_json.py $options "$filename"
     exitcode=$?
     set -e
-    if [ $exitcode = $expected_exitcode ]; then
+    if [ "$exitcode" = "$expected_exitcode" ]; then
         echo "successfully detected broken json in '$filename', returned exit code $exitcode"
         echo
     #elif [ $exitcode != 0 ]; then
@@ -210,17 +212,21 @@ echo "checking --permit-single-quotes mode infers multirecord single quoted json
 echo
 
 echo "checking --permit-single-quotes mode works with multirecord single quoted json with mixed quoting (should result in a WARNING message)"
-./validate_json.py -s "$data_dir/multirecord_single_double_mixed_quotes.notjson" -m 2>&1 |
-    grep -q WARNING &&
-        echo "Found warning message" ||
-            { echo "failed to raise a WARNING message for mixed quoting"; exit 1; }
+if ./validate_json.py -s "$data_dir/multirecord_single_double_mixed_quotes.notjson" -m 2>&1 | grep -q WARNING; then
+    echo "Found warning message"
+else
+    echo "failed to raise a WARNING message for mixed quoting"
+    exit 1
+fi
 echo
 
 echo "checking --permit-single-quotes mode infers multirecord single quoted json with mixed quoting (should result in a WARNING message)"
-./validate_json.py -s "$data_dir/multirecord_single_double_mixed_quotes.notjson" 2>&1 |
-    grep -q WARNING &&
-        echo "Found warning message" ||
-            { echo "failed to raise a WARNING message for mixed quoting"; exit 1; }
+if ./validate_json.py -s "$data_dir/multirecord_single_double_mixed_quotes.notjson" 2>&1 | grep -q WARNING; then
+    echo "Found warning message"
+else
+    echo "failed to raise a WARNING message while inferring mixed quoting"
+    exit 1
+fi
 echo
 
 # ============================================================================ #
@@ -309,7 +315,7 @@ echo "checking blank content is invalid for multirecord via stdin"
 check_broken - 2 -m < "$broken_dir/blank.json"
 
 echo "checking blank content is invalid for multirecord via stdin piped from /dev/null"
-cat /dev/null | check_broken - 2 -m
+check_broken - 2 -m < /dev/null
 echo
 
 check_broken_sample_files json
