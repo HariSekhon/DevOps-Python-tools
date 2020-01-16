@@ -19,6 +19,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "Testing validate_csv.py"
@@ -26,8 +27,8 @@ section "Testing validate_csv.py"
 export TIMEOUT=3
 
 if [ $# -gt 0 ]; then
-    echo "validate_csv.py $@"
-    ./validate_csv.py $@
+    echo "validate_csv.py $*"
+    ./validate_csv.py "$@"
     echo
 fi
 
@@ -70,6 +71,7 @@ echo "testing stdin"
 ./validate_csv.py - < "$data_dir/test.csv"
 ./validate_csv.py < "$data_dir/test.csv"
 echo "testing stdin mixed with filename"
+# shellcheck disable=SC2094
 ./validate_csv.py "$data_dir/test.csv" - < "$data_dir/test.csv"
 echo
 
@@ -88,7 +90,7 @@ check_broken(){
     ./validate_csv.py -t 1 $options "$filename"
     exitcode=$?
     set -e
-    if [ $exitcode = $expected_exitcode ]; then
+    if [ "$exitcode" = "$expected_exitcode" ]; then
         echo "successfully detected broken csv in '$filename', returned exit code $exitcode"
         echo
     #elif [ $exitcode != 0 ]; then
@@ -123,7 +125,7 @@ echo "checking blank content is invalid via stdin"
 check_broken - 2 < "$broken_dir/blank.csv"
 
 echo "checking blank content is invalid via stdin piped from /dev/null"
-cat /dev/null | check_broken - 2
+check_broken - 2 < /dev/null
 echo
 
 rm -fr "$broken_dir"
