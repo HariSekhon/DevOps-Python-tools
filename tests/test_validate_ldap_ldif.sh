@@ -19,13 +19,14 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "Testing validate_ldap_ldif.py"
 
 if [ $# -gt 0 ]; then
-    echo "validate_ldap_ldif.py $@"
-    ./validate_ldap_ldif.py $@
+    echo "validate_ldap_ldif.py $*"
+    ./validate_ldap_ldif.py "$@"
     echo
 fi
 
@@ -60,6 +61,7 @@ echo
 echo "testing stdin"
 ./validate_ldap_ldif.py - < "$data_dir/add_ou.ldif"
 ./validate_ldap_ldif.py < "$data_dir/add_ou.ldif"
+# shellcheck disable=SC2094
 ./validate_ldap_ldif.py "$data_dir/add_ou.ldif" - < "$data_dir/add_ou.ldif"
 echo
 
@@ -87,7 +89,7 @@ check_broken(){
     ./validate_ldap_ldif.py $options "$filename"
     exitcode=$?
     set -e
-    if [ $exitcode = $expected_exitcode ]; then
+    if [ "$exitcode" = "$expected_exitcode" ]; then
         echo "successfully detected broken ldif in '$filename', returned exit code $exitcode"
         echo
     #elif [ $exitcode != 0 ]; then
