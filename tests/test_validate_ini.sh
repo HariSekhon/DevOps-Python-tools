@@ -19,6 +19,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "Testing validate_ini.py"
@@ -26,8 +27,8 @@ section "Testing validate_ini.py"
 export TIMEOUT=3
 
 if [ $# -gt 0 ]; then
-    echo "validate_ini.py $@"
-    ./validate_ini.py $@
+    echo "validate_ini.py $*"
+    ./validate_ini.py "$@"
     echo
 fi
 
@@ -49,7 +50,8 @@ run_fail2(){
     run_fail "${@/validate_ini/validate_ini2}"  # ignore_run_unqualified
 }
 
-if [ -f /etc/sssd/sssd.conf -a -r /etc/sssd/sssd.conf ]; then
+if [ -f /etc/sssd/sssd.conf ] &&
+   [ -r /etc/sssd/sssd.conf ]; then
     run ./validate_ini.py /etc/sssd/sssd.conf
 fi
 
@@ -86,6 +88,7 @@ echo "testing stdin"
 run2 ./validate_ini.py - < "$data_dir/test.ini"
 run2 ./validate_ini.py < "$data_dir/test.ini"
 echo "testing stdin mixed with filename"
+# shellcheck disable=SC2094
 run2 ./validate_ini.py "$data_dir/test.ini" - < "$data_dir/test.ini"
 echo
 
@@ -115,7 +118,7 @@ check_broken(){
     ./validate_ini.py $options "$filename"
     exitcode=$?
     set -e
-    if [ $exitcode = $expected_exitcode ]; then
+    if [ "$exitcode" = "$expected_exitcode" ]; then
         echo "successfully detected broken ini in '$filename', returned exit code $exitcode"
         echo
     #elif [ $exitcode != 0 ]; then
@@ -268,10 +271,10 @@ echo
 
 hr2
 echo "checking blank content is invalid via stdin piped from /dev/null"
-cat /dev/null | check_broken - 2
-cat /dev/null | run_fail 2 ./validate_ini.py
+check_broken - 2 < /dev/null
+run_fail 2 ./validate_ini.py < /dev/null
 echo "validate_ini2.py blank content is valid:"
-cat /dev/null | run ./validate_ini2.py
+run ./validate_ini2.py < /dev/null
 echo
 
 hr2
