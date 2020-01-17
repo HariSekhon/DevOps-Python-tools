@@ -18,7 +18,7 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-test_nums="${@:-}"
+test_nums="${*:-}"
 parallel=""
 if [ "$test_nums" = "p" ]; then
     parallel="1"
@@ -27,6 +27,7 @@ fi
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "Anonymize"
@@ -45,7 +46,7 @@ if [ -z "$test_nums" ]; then
     echo
     echo "checking file args:"
     run++
-    if [ `$anonymize -ae README.md | wc -l` -gt 100 ]; then
+    if [ "$($anonymize -ae README.md | wc -l)" -gt 100 ]; then
         echo "SUCCEEDED - anonymized README.md > 100 lines"
     else
         echo "FAILED - suspicious README.md file arg result came to <= 100 lines"
@@ -506,6 +507,7 @@ dest[136]="arn:aws:acm:us-east-1:<account_id>:function:<function>:7"
 src[137]="aws lambda update-function-code --function-name hari-test --zip-file fileb://myfunction.zip"
 dest[137]="aws lambda update-function-code --function-name <function> --zip-file fileb://<file>"
 
+# shellcheck disable=SC2016
 src[138]=' aws elb create-load-balancer --load-balancer-name "$lb_name" ...'
 dest[138]=' aws elb create-load-balancer --load-balancer-name <load_balancer_name> ...'
 
@@ -523,12 +525,16 @@ dest[139]=' in column "<column>" of table "<table>"'
 args="-aPe"
 test_anonymize(){
     run++
-    src="$1"
-    dest="$2"
+    # shellcheck disable=SC2178
+    local src="$1"
+    # shellcheck disable=SC2178
+    local dest="$2"
     #[ -z "${src[$i]:-}" ] && { echo "skipping test $i..."; continue; }
     # didn't work for \e escape codes for ANSI stripping test
     #result="$(echo -e "$src" | $anonymize $args)"
+    # shellcheck disable=SC2128
     result="$($anonymize $args <<< "$src")"
+    # shellcheck disable=SC2128
     if grep -xFq -- "$dest" <<< "$result"; then
         echo -n "SUCCEEDED anonymization test $i"
         if [ -n "${SHOW_OUTPUT:-}" ]; then
@@ -560,7 +566,7 @@ fi
 # this gives the number of elements and prevents testing the last element(s) if commenting something out in the middle
 #for (( i = 0 ; i < ${#src[@]} ; i++ )); do
 run_tests(){
-    test_numbers="${@:-${!src[@]}}"
+    test_numbers="${*:-${!src[*]}}"
     for i in $test_numbers; do
         [ -n "${src[$i]:-}" ]  || { echo "code error: src[$i] not defined";  exit 1; }
         [ -n "${dest[$i]:-}" ] || { echo "code error: dest[$i] not defined"; exit 1; }
@@ -614,6 +620,8 @@ if [ -n "$parallel" ]; then
 fi
 
 echo
+# run_count assigned in utils lib
+# shellcheck disable=SC2154
 echo "Total Tests run: $run_count"
 time_taken "$start_time" "SUCCESS! All tests for $anonymize completed in"
 echo
