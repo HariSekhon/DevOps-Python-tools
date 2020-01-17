@@ -19,20 +19,21 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
-for x in $(echo *.py *.jy 2>/dev/null); do
-    isExcluded "$x" && continue
+while read -r prog; do
+    isExcluded "$prog" && continue
     if type -P flake8 &> /dev/null; then
-        echo "flake8 $x"
-        flake8 --max-line-length=120 --statistics $x
+        echo "flake8 $prog"
+        flake8 --max-line-length=120 --statistics "$prog"
         echo; hr; echo
     fi
     for y in pyflakes pychecker; do
-        if type -P $y &>/dev/null; then
-            echo "$y $x"
-            $y $x
+        if type -P "$y" &>/dev/null; then
+            echo "$y $prog"
+            "$y" "$prog"
             echo; hr; echo
         fi
    done
-done
+done < <(find . -type f -name '*.py' -o -type f -name '*.jy')
