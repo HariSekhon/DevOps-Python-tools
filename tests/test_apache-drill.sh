@@ -20,11 +20,12 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/.."
 
+# shellcheck disable=SC1090
 . "$srcdir/utils.sh"
 
 section "A p a c h e   D r i l l"
 
-export APACHE_DRILL_VERSIONS="${@:-${APACHE_DRILL_VERSIONS:-0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 1.10 1.11 1.12 1.13 1.14 1.15 latest}}"
+export APACHE_DRILL_VERSIONS="${*:-${APACHE_DRILL_VERSIONS:-0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 1.10 1.11 1.12 1.13 1.14 1.15 latest}}"
 
 APACHE_DRILL_HOST="${DOCKER_HOST:-${APACHE_DRILL_HOST:-${HOST:-localhost}}}"
 APACHE_DRILL_HOST="${APACHE_DRILL_HOST##*/}"
@@ -45,6 +46,7 @@ test_apache_drill(){
     echo "getting Apache Drill dynamic port mappings:"
     docker_compose_port "Apache Drill"
     hr
+    # shellcheck disable=SC2153
     when_ports_available "$APACHE_DRILL_HOST" "$APACHE_DRILL_PORT"
     hr
     when_url_content "http://$APACHE_DRILL_HOST:$APACHE_DRILL_PORT/status" "Running"
@@ -60,15 +62,19 @@ test_apache_drill(){
     hr
     APACHE_DRILL_PORT="$APACHE_DRILL_PORT_DEFAULT" ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_apache_drill.py $non_drill_node1 $non_drill_node2
 
+    # shellcheck disable=SC2097,SC2098
     APACHE_DRILL_PORT="$APACHE_DRILL_PORT_DEFAULT" run_grep "^$APACHE_DRILL_HOST:$APACHE_DRILL_PORT$" ./find_active_apache_drill.py $non_drill_node1 "$APACHE_DRILL_HOST:$APACHE_DRILL_PORT"
 
     # Drill 1.7+ only
-    if [ "$version" = "latest" ] || [[ "$version" > 1.6 ]]; then
+    if [ "$version" = "latest" ] || [ "$(bc <<< "$version > 1.6")" = 1 ]; then
         APACHE_DRILL_PORT="$APACHE_DRILL_PORT_DEFAULT" ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_apache_drill2.py $non_drill_node1 $non_drill_node2
 
+        # shellcheck disable=SC2097,SC2098
         APACHE_DRILL_PORT="$APACHE_DRILL_PORT_DEFAULT" run_grep "^$APACHE_DRILL_HOST:$APACHE_DRILL_PORT$" ./find_active_apache_drill2.py $non_drill_node1 "$APACHE_DRILL_HOST:$APACHE_DRILL_PORT"
     fi
 
+    # run_count defined in util lib
+    # shellcheck disable=SC2154
     echo "Completed $run_count Apache Drill tests"
     hr
     [ -n "${KEEPDOCKER:-}" ] ||
