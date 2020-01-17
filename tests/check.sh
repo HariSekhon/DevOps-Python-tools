@@ -21,12 +21,12 @@ check(){
     msg=$2
     echo
     hr2
-    echo $msg
+    echo "$msg"
     hr2
     echo
-    echo cmd:  $cmd
+    echo "cmd:  $cmd"
     echo
-    if eval $cmd; then
+    if eval "$cmd"; then
         echo
         echo "SUCCESS"
     else
