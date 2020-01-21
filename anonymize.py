@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.10.7'
+__version__ = '0.10.8'
 
 ip_regex = r'(?!127\.0\.0\.)' + ip_regex
 subnet_mask_regex = r'(?!127\.0\.0\.)' + subnet_mask_regex
@@ -300,8 +300,8 @@ class Anonymize(CLI):
             'aws2': r'\b(arn:[^:]+:[^:]+:[^:]*:)\d*:[\w/.-]+',
             # https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html
             'aws3': r'\bAKIA[A-Za-z0-9]{16}\b',  # access key
-            'aws4': r'\b[A-Za-z0-9][A-Za-z0-9/+=-]{38}[A-Za-z0-9]\b',  # secret key
-            'aws5': r'\b[A-Za-z0-9][A-Za-z0-9/+=-]{238,}',  # STS token - no \b at end as it'll stop before '==' suffix
+            'aws4': r'\b[A-Za-z0-9][A-Za-z0-9/+=-]{238,}',  # STS token - no \b at end as it'll stop before '==' suffix
+            'aws5': r'\b[A-Za-z0-9][A-Za-z0-9/+=-]{38}[A-Za-z0-9]\b',  # secret key
             'aws6': r'\bASIA[A-Za-z0-9]{16}\b',  # sts temporary access key
             'aws7': r'\bsg-[A-Za-z0-9]{8}(?<!<sg-xxxxxxxx)(?!\w)', # security group id
             'aws8': r'(\bs3a?)://[^/]+/', # s3 bucket name
@@ -443,8 +443,8 @@ class Anonymize(CLI):
             'aws': r'\1<account_id>\2<\3>',
             'aws2': r'\1:<resource>',
             'aws3': r'<access_key>',
-            'aws4': r'<secret_key>',
-            'aws5': r'<sts_token>',
+            'aws4': r'<sts_token>',
+            'aws5': r'<secret_key>',
             'aws6': r'<sts_access_key>',
             'aws7': r'<sg-xxxxxxxx>',
             'aws8': r'\1://<bucket>/',
