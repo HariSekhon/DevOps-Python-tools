@@ -19,11 +19,12 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "E l a s t i c s e a r c h"
 
-export ELASTICSEARCH_VERSIONS="${@:-${ELASTICSEARCH_VERSIONS:-latest 1.3 1.4 1.5 1.6 1.7 2.0 2.1 2.2 2.3 2.4 5.0 5.1 5.2 5.3 5.4 5.5 5.6 6.0.1 6.1.1}}"
+export ELASTICSEARCH_VERSIONS="${*:-${ELASTICSEARCH_VERSIONS:-latest 1.3 1.4 1.5 1.6 1.7 2.0 2.1 2.2 2.3 2.4 5.0 5.1 5.2 5.3 5.4 5.5 5.6 6.0.1 6.1.1}}"
 
 ELASTICSEARCH_HOST="${DOCKER_HOST:-${ELASTICSEARCH_HOST:-${HOST:-localhost}}}"
 ELASTICSEARCH_HOST="${ELASTICSEARCH_HOST##*/}"
@@ -43,7 +44,7 @@ test_elasticsearch(){
     local version="$1"
     section2 "Setting up Elasticsearch $version test container"
     if [ "$version" != "latest" ] && [ "${version:0:1}" -ge 6 ]; then
-        local export COMPOSE_FILE="$srcdir/docker/$DOCKER_SERVICE-elastic.co-docker-compose.yml"
+        export COMPOSE_FILE="$srcdir/docker/$DOCKER_SERVICE-elastic.co-docker-compose.yml"
     fi
     docker_compose_pull
     VERSION="$version" docker-compose up -d
@@ -63,6 +64,7 @@ test_elasticsearch(){
     ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT_DEFAULT" \
     ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_elasticsearch.py $non_es_node1 $non_es_node2
 
+    # shellcheck disable=SC2097,SC2098
     ELASTICSEARCH_PORT="$ELASTICSEARCH_PORT_DEFAULT" \
     run_grep "^$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT$" ./find_active_elasticsearch.py $non_es_node1 $non_es_node2 "$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT"
 
