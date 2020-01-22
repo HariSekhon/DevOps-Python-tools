@@ -79,8 +79,9 @@ echo "Now trying non-yaml files to detect successful failure:"
 check_broken(){
     local filename="$1"
     local expected_exitcode="${2:-2}"
-    local options="${@:3}"
+    local options="${*:3}"
     set +e
+    # shellcheck disable=SC2086
     ./validate_yaml.py -t 1 $options "$filename"
     exitcode=$?
     set -e
