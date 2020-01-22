@@ -25,6 +25,7 @@ echo "
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 until [ $# -lt 1 ]; do
@@ -34,7 +35,7 @@ until [ $# -lt 1 ]; do
 done
 
 data_dir="tests/data"
-broken_dir="$data_dir/broken_json_data"
+#broken_dir="$data_dir/broken_json_data"
 
 testfile="$data_dir/plant_catalog.xml"
 
@@ -42,7 +43,7 @@ check(){
     cmd="$1"
     expected="$2"
     msg="$3"
-    output="$(eval $cmd)"
+    output="$(eval "$cmd")"
     result="$(cksum <<< "$output")"
     echo -n "checking headtail $msg  =>  "
     if [ "$result" = "$expected" ]; then
@@ -52,7 +53,7 @@ check(){
         echo
         echo "full output: "
         echo
-        eval $cmd
+        eval "$cmd"
         echo
         echo "cksum: $result"
         exit 1
