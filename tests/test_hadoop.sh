@@ -19,12 +19,13 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 cd "$srcdir/.."
 
+# shellcheck disable=SC1090
 . "$srcdir/utils.sh"
 
 section "H a d o o p"
 
 # find_active_hadoop_namenode.py doesn't work on Hadoop 2.2 as the JMX bean isn't present
-export HADOOP_VERSIONS="${@:-${HADOOP_VERSIONS:-latest 2.3 2.4 2.5 2.6 2.7 2.8}}"
+export HADOOP_VERSIONS="${*:-${HADOOP_VERSIONS:-latest 2.3 2.4 2.5 2.6 2.7 2.8}}"
 
 HADOOP_HOST="${DOCKER_HOST:-${HADOOP_HOST:-${HOST:-localhost}}}"
 HADOOP_HOST="${HADOOP_HOST##*/}"
@@ -61,6 +62,7 @@ test_hadoop(){
     docker_compose_port HADOOP_YARN_NODE_MANAGER_PORT "Yarn NM"
     export HADOOP_PORTS="$HADOOP_NAMENODE_PORT $HADOOP_DATANODE_PORT $HADOOP_YARN_RESOURCE_MANAGER_PORT $HADOOP_YARN_NODE_MANAGER_PORT"
     hr
+    # shellcheck disable=SC2086
     when_ports_available "$HADOOP_HOST" $HADOOP_PORTS
     hr
     # don't use the worker nodes so not testing for their availability
@@ -125,10 +127,12 @@ EOFCOMMENTED
     # therefore reset the HADOOP PORTS to point to something that should get connection refused like port 1 and so that the failure hosts still fail and return only the expected correct host
     HADOOP_NAMENODE_PORT=1 ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_hadoop_namenode.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_DATANODE_PORT"
 
+    # shellcheck disable=SC2097,SC2098
     HADOOP_NAMENODE_PORT=1 run_grep "^$HADOOP_HOST:$HADOOP_NAMENODE_PORT$" ./find_active_hadoop_namenode.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_DATANODE_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_NAMENODE_PORT"
 
     HADOOP_YARN_RESOURCE_MANAGER_PORT=1 ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT"
 
+    # shellcheck disable=SC2097,SC2098
     HADOOP_YARN_RESOURCE_MANAGER_PORT=1 run_grep "^$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT$" ./find_active_hadoop_yarn_resource_manager.py 127.0.0.2 "$HADOOP_HOST:$HADOOP_YARN_NODE_MANAGER_PORT" 127.0.0.3 "$HADOOP_HOST:$HADOOP_YARN_RESOURCE_MANAGER_PORT"
     [ -z "${KEEPDOCKER:-}" ] ||
     docker-compose down
