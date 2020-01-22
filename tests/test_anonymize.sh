@@ -514,6 +514,11 @@ dest[138]=' aws elb create-load-balancer --load-balancer-name <load_balancer_nam
 src[139]=' in column "blah" of table "blah2"'
 dest[139]=' in column "<column>" of table "<table>"'
 
+src[140]='ssh -i myKey -N -L 8888:ec2-1-2-3-4.eu-west-1.compute.amazonaws.com:8888 hadoop@ec2-1-2-3-4.eu-west-1.compute.amazonaws.com'
+# email anonymization applies before fqdn anonymization
+#dest[140]='ssh -i myKey -N -L 8888:<fqdn>:8888 <user>@<fqdn>'
+dest[140]='ssh -i myKey -N -L 8888:<fqdn>:8888 <user>@<domain>'
+
 
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
