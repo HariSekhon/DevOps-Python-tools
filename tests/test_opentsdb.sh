@@ -16,14 +16,12 @@
 
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
+srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-srcdir2="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$srcdir/.."
 
-cd "$srcdir2/.."
-
-. "$srcdir2/utils.sh"
-
-srcdir="$srcdir2"
+# shellcheck disable=SC1090
+. "$srcdir/utils.sh"
 
 echo "
 # ============================================================================ #
@@ -41,7 +39,7 @@ export ZOOKEEPER_PORT=2181
 export OPENTSDB_PORTS="$ZOOKEEPER_PORT $HBASE_STARGATE_PORT 8085 $HBASE_THRIFT_PORT 9095 3000 16000 16010 16201 16301"
 export OPENTSDB_TEST_PORTS="$ZOOKEEPER_PORT $HBASE_THRIFT_PORT 3000"
 
-export OPENTSDB_VERSIONS="${@:-latest}"
+export OPENTSDB_VERSIONS="${*:-latest}"
 
 #export DOCKER_IMAGE="opower/opentsdb"
 #export DOCKER_IMAGE="petergrace/opentsdb-docker"
@@ -68,11 +66,13 @@ generate_test_data(){
     #chars="$(echo {A..Z} {a..z} {0..9})"
     chars=$(echo {A..Z} | tr -d ' ')
     ts="$(date '+%s')"
+    # shellcheck disable=SC2034
     for x in {1..100}; do
+        # shellcheck disable=SC2034
         for y in {1..1000}; do
             metric="metric${chars:$((RANDOM % ${#chars})):1}"
             for z in {1..5}; do
-                echo "ship${RANDOM:0:3} $(($ts + $RANDOM)) $RANDOM id=$metric crew=$z"
+                echo "ship${RANDOM:0:3} $((ts + RANDOM)) $RANDOM id=$metric crew=$z"
             done
         done
     done > "$DATA_FILE"
@@ -111,6 +111,7 @@ made up error line
 EOF
     hr
     echo "testing from data file and STDIN at the same time:"
+    # shellcheck disable=SC2094
     ./opentsdb_import_metric_distribution.py --key-prefix-length 7 "$DATA_FILE" - < "$DATA_FILE"
     hr
 
@@ -119,7 +120,7 @@ EOF
 }
 
 for version in $OPENTSDB_VERSIONS; do
-    test_opentsdb $version
+    test_opentsdb "$version"
 done
 if [ -z "${NODELETE:-}" ]; then
     echo -n "removing test data: "
