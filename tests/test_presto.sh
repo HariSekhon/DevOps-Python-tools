@@ -19,12 +19,13 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "P r e s t o   S Q L"
 
 export PRESTO_TERADATA_VERSIONS="latest 0.152 0.157 0.167 0.179"
-export PRESTO_VERSIONS="${@:-${PRESTO_VERSIONS:-$PRESTO_TERADATA_VERSIONS}}"
+export PRESTO_VERSIONS="${*:-${PRESTO_VERSIONS:-$PRESTO_TERADATA_VERSIONS}}"
 
 PRESTO_HOST="${DOCKER_HOST:-${PRESTO_HOST:-${HOST:-localhost}}}"
 PRESTO_HOST="${PRESTO_HOST##*/}"
@@ -64,8 +65,8 @@ test_presto2(){
     when_url_content "http://$PRESTO_HOST:$PRESTO_PORT/v1/service/presto/general" nodeId
     hr
     expected_version="$version"
-    if [ "$version" = "latest" -o \
-         "$version" = "NODOCKER" ]; then
+    if [ "$version" = "latest" ] ||
+       [ "$version" = "NODOCKER" ]; then
         if [ "$teradata_distribution" = 1 ]; then
             echo "latest version, fetching latest version from DockerHub master branch"
             expected_version="$(dockerhub_latest_version presto)"
@@ -82,6 +83,7 @@ test_presto2(){
     hr
     PRESTO_PORT="$PRESTO_PORT_DEFAULT" ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_presto_coordinator.py $non_presto_node1 $non_presto_node2
 
+    # shellcheck disable=SC2097,SC2098
     PRESTO_PORT="$PRESTO_PORT_DEFAULT" run_grep "^$PRESTO_HOST:$PRESTO_PORT$" ./find_active_presto_coordinator.py $non_presto_node1 "$PRESTO_HOST:$PRESTO_PORT"
 
     echo "Completed $run_count Presto tests"
@@ -117,11 +119,12 @@ test_presto(){
             fi
         done
     fi
-    if [ "$teradata_distribution" = "1" -a $facebook_only -eq 0 ]; then
+    if [ "$teradata_distribution" = "1" ] &&
+       [ $facebook_only -eq 0 ]; then
         echo "Testing Teradata's Presto distribution version:  '$version'"
         COMPOSE_FILE="$srcdir/docker/presto-docker-compose.yml" test_presto2 "$version"
         # must call this manually here as we're sneaking in an extra batch of tests that run_test_versions is generally not aware of
-        let total_run_count+=$run_count
+        ((total_run_count+=run_count))
         # reset this so it can be used in test_presto to detect now testing Facebook
         teradata_distribution=0
     fi
