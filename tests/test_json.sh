@@ -36,9 +36,10 @@ done
 
 # ignore multi-line json data file for spark testing
 for jsonFile in $(find "${1:-.}" -iname '*.json' |
-                  grep -v '/spark-.*-bin-hadoop.*/' |
-                  grep -v 'multirecord.json' |
-                  grep -v -e 'broken' -e 'error'); do
+                  grep -v -e '/spark-.*-bin-hadoop.*/' \
+                          -e 'multirecord.json' \
+                          -e 'broken' \
+                          -e 'error'); do
     echo "testing json file: $jsonFile"
     python -mjson.tool < "$jsonFile" > /dev/null
 done
