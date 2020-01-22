@@ -19,8 +19,10 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/.."
 
+# shellcheck disable=SC1091
 . "tests/utils.sh"
 
+# shellcheck disable=SC1091
 . "bash-tools/lib/utils.sh"
 
 section "Testing DockerHub Show Tags"
@@ -39,6 +41,8 @@ echo
 echo
 echo "All DockerHub Show Tags tests completed successfully"
 echo
+# $run_count defined in lib
+# shellcheck disable=SC2154
 echo "Total Tests run: $run_count"
 time_taken "$start_time" "DockerHub Show Tags tests completed in"
 echo
