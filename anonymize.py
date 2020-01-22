@@ -306,6 +306,8 @@ class Anonymize(CLI):
             'aws7': r'\bsg-[A-Za-z0-9]{8}(?<!<sg-xxxxxxxx)(?!\w)', # security group id
             'aws8': r'(\bs3a?)://[^/]+/', # s3 bucket name
             'aws9': r'(?<!<)\bsubnet-[A-Za-z0-9]{8}\b',
+            # would get double replaced to ec2-x-x-x-x.<region>.<fqdn> anyway by later fqdn anonymization
+            #'aws10': r'ec2-\d+-\d+-\d+-\d+\.{region}(\.compute\.amazonaws\.com)'.format(region='[A-Za-z0-9-]+'),
             'db': r'({switch_prefix}(?:db|database)-?name{arg_sep})\S+'\
                    .format(arg_sep=arg_sep,
                            switch_prefix=switch_prefix),
@@ -449,6 +451,7 @@ class Anonymize(CLI):
             'aws7': r'<sg-xxxxxxxx>',
             'aws8': r'\1://<bucket>/',
             'aws9': r'<subnet-xxxxxxxx>',
+            #'aws10': r'ec2-x-x-x-x.<region>\1',
             'db': r'\1<database>',
             'db2': r'\1<database_instance>',
             'db3': r'\1<schema>',
