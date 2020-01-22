@@ -84,8 +84,9 @@ echo
 check_broken(){
     local filename="$1"
     local expected_exitcode="${2:-2}"
-    local options="${@:3}"
+    local options="${*:3}"
     set +e
+    # shellcheck disable=SC2086
     ./validate_ldap_ldif.py $options "$filename"
     exitcode=$?
     set -e
