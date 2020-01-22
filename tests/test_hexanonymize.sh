@@ -15,6 +15,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "HexAnonymize"
@@ -34,7 +35,9 @@ run++
 check_output "xyz123456rst789012abc" hexanonymize.py -o <<< "xyz987654rst654321caD"
 
 echo
+# $run_count defined in lib
+# shellcheck disable=SC2154
 echo "Total Tests run: $run_count"
-time_taken "$start_time" "All version tests for $name completed in"
+time_taken "$start_time" "All version tests for hexanonymize.py completed in"
 echo
 untrap
