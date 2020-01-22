@@ -22,6 +22,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/.."
 
+# shellcheck disable=SC1091
 . "bash-tools/lib/utils.sh"
 
 section "Testing center.py"
@@ -127,6 +128,8 @@ echo "testing spacing with stdin:"
 run_output "$expected" ./center.py -s <<< "                     <this is a  test> "
 
 echo
+# $run_count defined in lib
+# shellcheck disable=SC2154
 echo "Completed $run_count tests"
 echo
 echo "All tests for center.py completed successfully"
