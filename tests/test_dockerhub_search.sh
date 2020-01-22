@@ -19,8 +19,10 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/.."
 
+# shellcheck disable=SC1091
 . "tests/utils.sh"
 
+# shellcheck disable=SC1091
 . "bash-tools/lib/utils.sh"
 
 section "Testing DockerHub Show Tags"
@@ -33,6 +35,7 @@ check './dockerhub_search.py harisekhon -n 30' "DockerHub Search for harisekhon 
 check './dockerhub_search.py hadoop-dev | grep harisekhon/hadoop-dev' "DockerHub Search for harisekhon/hadoop-dev"
 # causes IOError: [Errno 32] Broken pipe
 #unset PYTHONUNBUFFERED
+# shellcheck disable=SC2016
 check '[ $(./dockerhub_search.py -q harisekhon | head -n 40 | tee /dev/stderr | grep "^harisekhon/[A-Za-z0-9_-]*$" | wc -l) = 40 ]' "DockerHub Search quiet mode for shell scripting"
 
 echo
