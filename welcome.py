@@ -45,7 +45,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '2.0.1'
+__version__ = '2.0.2'
 
 
 class Welcome(CLI):
@@ -56,6 +56,7 @@ class Welcome(CLI):
         # Python 3.x
         # super().__init__()
         self.quick = False
+        self.timeout_default = 20
 
     @staticmethod
     def case_user(user):
