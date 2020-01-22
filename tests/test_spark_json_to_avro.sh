@@ -19,6 +19,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir"
 
+# shellcheck disable=SC1091
 . ./utils.sh
 
 section "Spark JSON => Avro"
@@ -30,9 +31,9 @@ if is_inside_docker; then
 fi
 
 # don't support Spark <= 1.3 due to difference in databricks avro dependency
-export SPARK_VERSIONS="${@:-1.4.0 1.5.1 1.6.2}"
+export SPARK_VERSIONS="${*:-1.4.0 1.5.1 1.6.2}"
 # requires upgrade to spark-avro 3.0.0
-#export SPARK_VERSIONS="${@:-2.0.0}"
+#export SPARK_VERSIONS="${*:-2.0.0}"
 
 for SPARK_VERSION in $SPARK_VERSIONS; do
     dir="spark-$SPARK_VERSION-bin-hadoop2.6"
@@ -57,9 +58,12 @@ for SPARK_VERSION in $SPARK_VERSIONS; do
     # resolved, was due to Spark 1.4+ requiring pyspark-shell for PYSPARK_SUBMIT_ARGS
 
     rm -fr "test-$dir.avro"
-    ../spark_json_to_avro.py -j data/multirecord.json -a "test-$dir.avro" &&
-        echo "SUCCEEDED with header with Spark $SPARK_VERSION" ||
-        { echo "FAILED with header with Spark $SPARK_VERSION"; exit 1; }
+    if ../spark_json_to_avro.py -j data/multirecord.json -a "test-$dir.avro"; then
+        echo "SUCCEEDED with header with Spark $SPARK_VERSION"
+    else
+        echo "FAILED with header with Spark $SPARK_VERSION"
+        exit 1
+    fi
 
     #../spark_json_to_avro.py -j data/multirecord.json -a "test-$dir.avro" -s Year:String,Make,Model,Dimension.0.Length:float &&
     #    echo "SUCCEEDED with header with Spark $SPARK_VERSION" ||
