@@ -15,6 +15,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "Strip ANSI Escape Codes"
@@ -23,11 +24,11 @@ name="strip_ansi_escape_codes.py"
 
 start_time=$(date +%s)
 
-if is_mac; then
-    cat_opts="-e"
-else
-    cat_opts="-A"
-fi
+#if is_mac; then
+#    cat_opts="-e"
+#else
+#    cat_opts="-A"
+#fi
 run++
 if echo "some highlighted content" |
     grep --color=yes highlighted |
@@ -42,6 +43,7 @@ fi
 hr
 
 tmp=$(mktemp /tmp/strip_ansi_escape_codes.XXXXX)
+# shellcheck disable=SC2064,SC2086
 trap "rm $tmp" $TRAP_SIGNALS
 
 echo
@@ -62,6 +64,8 @@ tee /dev/stderr |
 fi
 
 echo
+# $run_count defined in lib
+# shellcheck disable=SC2154
 echo "Total Tests run: $run_count"
 time_taken "$start_time" "All version tests for $name completed in"
 echo
