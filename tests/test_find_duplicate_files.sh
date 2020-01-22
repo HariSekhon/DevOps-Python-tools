@@ -20,6 +20,7 @@ srcdir="$(cd "$(dirname "$0")" && pwd)"
 
 cd "$srcdir/.."
 
+# shellcheck disable=SC1091
 . "bash-tools/lib/utils.sh"
 
 section "find_duplicate_files.py"
@@ -29,6 +30,7 @@ start_time="$(start_timer "find_duplicate_files.py test")"
 testdir1="$(cd tests/data/ && mktemp -d -t tmp_find_duplicate_files.XXXXXX)"
 testdir2="$(cd tests/data/ && mktemp -d -t tmp_find_duplicate_files2.XXXXXX)"
 
+# shellcheck disable=SC2064,SC2086
 trap "rm -fr '$testdir1' '$testdir2'" $TRAP_SIGNALS
 
 echo test > "$testdir1/test1.txt"
@@ -135,6 +137,8 @@ rm -fr "$testdir1" "$testdir2"
 
 echo
 echo
+# $run_count defined in lib
+# shellcheck disable=SC2154
 echo "Tests run: $run_count"
 time_taken "$start_time" "find_duplicate_files.py tests completed in"
 echo
