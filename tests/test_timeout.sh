@@ -17,4 +17,7 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-"$srcdir/../timeout.py" -t 2 sleep 10 || :
+# shellcheck disable=SC1090
+. "$srcdir/../bash-tools/lib/utils.sh"
+
+run_fail 3 "$srcdir/../timeout.py" -t 2 sleep 10
