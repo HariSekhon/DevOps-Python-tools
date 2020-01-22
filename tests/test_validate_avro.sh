@@ -90,7 +90,7 @@ echo
 check_broken(){
     local filename="$1"
     local expected_exitcode="${2:-2}"
-    local options="${@:3}"
+    local options="${*:3}"
     set +e
     ./validate_avro.py -t 1 $options "$filename"
     exitcode=$?
