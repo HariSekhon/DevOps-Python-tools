@@ -115,6 +115,7 @@ check_broken(){
     local expected_exitcode="${2:-2}"
     local options="${*:3}"
     set +e
+    # shellcheck disable=SC2086
     ./validate_ini.py $options "$filename"
     exitcode=$?
     set -e
