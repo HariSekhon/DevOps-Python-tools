@@ -19,6 +19,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir"
 
+# shellcheck disable=SC1091
 . ./utils.sh
 
 section "Spark CSV => Parquet"
@@ -29,7 +30,7 @@ if is_inside_docker; then
     exit 0
 fi
 
-export SPARK_VERSIONS="${@:-1.3.1 1.4.0 1.5.1 1.6.2 2.0.0}"
+export SPARK_VERSIONS="${*:-1.3.1 1.4.0 1.5.1 1.6.2 2.0.0}"
 
 for SPARK_VERSION in $SPARK_VERSIONS; do
     dir="spark-$SPARK_VERSION-bin-hadoop2.6"
@@ -54,24 +55,36 @@ for SPARK_VERSION in $SPARK_VERSIONS; do
     # resolved, was due to Spark 1.4+ requiring pyspark-shell for PYSPARK_SUBMIT_ARGS
 
     rm -fr "test-header-$dir.parquet"
-    ../spark_csv_to_parquet.py -c data/header.csv --has-header -p "test-header-$dir.parquet" &&
-        echo "SUCCEEDED with header with Spark $SPARK_VERSION" ||
-        { echo "FAILED with header with Spark $SPARK_VERSION"; exit 1; }
+    if ../spark_csv_to_parquet.py -c data/header.csv --has-header -p "test-header-$dir.parquet"; then
+        echo "SUCCEEDED with header with Spark $SPARK_VERSION"
+    else
+        echo "FAILED with header with Spark $SPARK_VERSION"
+        exit 1
+    fi
 
     rm -fr "test-header-schemaoverride-$dir.parquet"
-    ../spark_csv_to_parquet.py -c data/header.csv -p "test-header-schemaoverride-$dir.parquet" --has-header -s Year:String,Make,Model,Length:float &&
-        echo "SUCCEEDED with header and schema override with Spark $SPARK_VERSION" ||
-        { echo "FAILED with header and schema override with Spark $SPARK_VERSION"; exit 1; }
+    if ../spark_csv_to_parquet.py -c data/header.csv -p "test-header-schemaoverride-$dir.parquet" --has-header -s Year:String,Make,Model,Length:float; then
+        echo "SUCCEEDED with header and schema override with Spark $SPARK_VERSION"
+    else
+        echo "FAILED with header and schema override with Spark $SPARK_VERSION"
+        exit 1
+    fi
 
     rm -fr "test-noheader-$dir.parquet"
-    ../spark_csv_to_parquet.py -c data/test.csv -s Year:String,Make,Model,Length -p "test-noheader-$dir.parquet" &&
-        echo "SUCCEEDED with no header with Spark $SPARK_VERSION" ||
-        { echo "FAILED with no header with Spark $SPARK_VERSION"; exit 1; }
+    if ../spark_csv_to_parquet.py -c data/test.csv -s Year:String,Make,Model,Length -p "test-noheader-$dir.parquet"; then
+        echo "SUCCEEDED with no header with Spark $SPARK_VERSION"
+    else
+        echo "FAILED with no header with Spark $SPARK_VERSION"
+        exit 1
+    fi
 
     rm -fr "test-noheader-types-$dir.parquet"
-    ../spark_csv_to_parquet.py -c data/test.csv -s Year:String,Make,Model,Length:float -p "test-noheader-types-$dir.parquet" &&
-        echo "SUCCEEDED with no header and float type with Spark $SPARK_VERSION" ||
-        { echo "FAILED with no header and float type with Spark $SPARK_VERSION"; exit 1; }
+    if ../spark_csv_to_parquet.py -c data/test.csv -s Year:String,Make,Model,Length:float -p "test-noheader-types-$dir.parquet"; then
+        echo "SUCCEEDED with no header and float type with Spark $SPARK_VERSION"
+    else
+        echo "FAILED with no header and float type with Spark $SPARK_VERSION"
+        exit 1
+    fi
 
 #    if [ "$(cksum < "test-header-$dir.parquet/part-r-00001.parquet")" = "$(cksum < "test-noheader-$dir.parquet/part-r-00001.parquet")" ]; then
 #        echo "SUCCESSFULLY compared noheader with explicit schema and mixed implicit/explicit string types to headered csv parquet output"
