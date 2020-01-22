@@ -19,8 +19,10 @@ srcdir2="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir2/.."
 
+# shellcheck disable=SC1091
 . "tests/utils.sh"
 
+# shellcheck disable=SC1091
 . "bash-tools/lib/utils.sh"
 
 srcdir="$srcdir2"
@@ -75,12 +77,13 @@ private_key="registry.key"
 certificate="registry.crt"
 htpasswd="registry.htpasswd"
 csr="registry.csr"
-if ! [ -f "$private_key" -a -f "$certificate" ]; then
+if ! [ -f "$private_key" ] &&
+     [ -f "$certificate" ]; then
     echo "Generating sample SSL certificates:"
     echo
     openssl genrsa -out "$private_key" 2048
     echo
-    yes "" | openssl req -new -key "$private_key" -out "$csr" || :
+    yes "." | openssl req -new -key "$private_key" -out "$csr" || :
     echo
     openssl x509 -req -days 3650 -in "$csr" -signkey "$private_key" -out "$certificate"
     echo
@@ -108,6 +111,7 @@ echo "getting dynamic Docker Registry port mapping:"
 docker_compose_port "Docker Registry"
 hr
 
+# shellcheck disable=SC2153
 if [ -z "$DOCKER_REGISTRY_PORT" ]; then
     echo "DOCKER_REGISTRY_PORT not found from running container, did container fail to start up properly?"
     exit 1
