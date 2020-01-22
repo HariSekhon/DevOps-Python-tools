@@ -15,17 +15,16 @@
 
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
-srcdir2="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-cd "$srcdir2/.."
+cd "$srcdir/.."
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
-
-srcdir="$srcdir2"
 
 section "S o l r C l o u d"
 
-export SOLRCLOUD_VERSIONS="${@:-${SOLRCLOUD_VERSIONS:-latest 4.10 5.5 6.0 6.1 6.2 6.3 6.4 6.5 6.6}}"
+export SOLRCLOUD_VERSIONS="${*:-${SOLRCLOUD_VERSIONS:-latest 4.10 5.5 6.0 6.1 6.2 6.3 6.4 6.5 6.6}}"
 
 SOLR_HOST="${DOCKER_HOST:-${SOLR_HOST:-${HOST:-localhost}}}"
 SOLR_HOST="${SOLR_HOST##*/}"
@@ -46,11 +45,9 @@ trap_debug_env solr zookeeper
 test_solrcloud(){
     local version="$1"
     # SolrCloud 4.x needs some different args / locations
-    if [ ${version:0:1} = 4 ]; then
-        four=true
+    if [ "${version:0:1}" = 4 ]; then
         export SOLR_COLLECTION="collection1"
     else
-        four=""
         export SOLR_COLLECTION="gettingstarted"
     fi
     section2 "Setting up SolrCloud $version docker test container"
@@ -63,7 +60,8 @@ test_solrcloud(){
     hr
     when_url_content "http://$SOLR_HOST:$SOLR_PORT/solr/" "Solr Admin"
     hr
-    local DOCKER_CONTAINER="$(docker-compose ps | sed -n '3s/ .*//p')"
+    local DOCKER_CONTAINER
+    DOCKER_CONTAINER="$(docker-compose ps | sed -n '3s/ .*//p')"
     echo "container is $DOCKER_CONTAINER"
     if [ -n "${NOTESTS:-}" ]; then
         exit 0
@@ -73,6 +71,7 @@ test_solrcloud(){
     hr
     SOLR_PORT="$SOLR_PORT_DEFAULT" ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_solrcloud.py $non_solr_node1 $non_solr_node2
 
+    # shellcheck disable=SC2097,SC2098
     SOLR_PORT="$SOLR_PORT_DEFAULT" run_grep "^$SOLR_HOST:$SOLR_PORT$" ./find_active_solrcloud.py $non_solr_node1 $non_solr_node2 "$SOLR_HOST:$SOLR_PORT"
 
     docker-compose down
