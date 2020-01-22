@@ -19,6 +19,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir"
 
+# shellcheck disable=SC1091
 . ./utils.sh
 
 section "Spark JSON => Parquet"
@@ -29,7 +30,7 @@ if is_inside_docker; then
     exit 0
 fi
 
-export SPARK_VERSIONS="${@:-1.3.1 1.4.0 1.5.1 1.6.2 2.0.0}"
+export SPARK_VERSIONS="${*:-1.3.1 1.4.0 1.5.1 1.6.2 2.0.0}"
 
 for SPARK_VERSION in $SPARK_VERSIONS; do
     dir="spark-$SPARK_VERSION-bin-hadoop2.6"
@@ -50,8 +51,11 @@ for SPARK_VERSION in $SPARK_VERSIONS; do
     echo
     export SPARK_HOME="$dir"
     rm -fr "test-$dir.parquet"
-    ../spark_json_to_parquet.py -j data/multirecord.json -p "test-$dir.parquet" &&
-        echo "SUCCEEDED with Spark $SPARK_VERSION" ||
-        { echo "FAILED test with Spark $SPARK_VERSION"; exit 1; }
+    if ../spark_json_to_parquet.py -j data/multirecord.json -p "test-$dir.parquet"; then
+        echo "SUCCEEDED with Spark $SPARK_VERSION"
+    else
+        echo "FAILED test with Spark $SPARK_VERSION"
+        exit 1
+    fi
 done
 echo "SUCCESS"
