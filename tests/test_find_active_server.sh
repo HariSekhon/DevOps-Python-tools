@@ -20,6 +20,7 @@ srcdir="$(cd "$(dirname "$0")" && pwd)"
 
 cd "$srcdir/.."
 
+# shellcheck disable=SC1091
 . bash-tools/lib/utils.sh
 
 set +e +o pipefail
@@ -174,19 +175,19 @@ count_socket_attempts=0
 found_google_socket=0
 found_duckduckgo_socket=0
 run++
-for x in {1..10}; do
+for _ in {1..10}; do
     echo -n .
-    let count_socket_attempts+=1
+    ((count_socket_attempts+=1))
     output="$(./find_active_server.py -n1 --random --port 80 $WEBSITE1 $WEBSITE2)"
     if [ "$output" = "$WEBSITE2" ]; then
         found_google_socket=1
     elif [ "$output" = "$WEBSITE1" ]; then
         found_duckduckgo_socket=1
     fi
-    [ $found_google_socket -eq 1 -a $found_duckduckgo_socket -eq 1 ] && break
+    [ $found_google_socket -eq 1 ] && [ $found_duckduckgo_socket -eq 1 ] && break
 done
 echo
-if [ $found_google_socket -eq 1 -a $found_duckduckgo_socket -eq 1 ]; then
+if [ $found_google_socket -eq 1 ] && [ $found_duckduckgo_socket -eq 1 ]; then
     echo "Found both $WEBSITE1 and $WEBSITE2 in results from $count_socket_attempts --random runs"
 else
     die "Failed to return both $WEBSITE1 and $WEBSITE2 in results from $count_socket_attempts --random runs"
@@ -210,25 +211,27 @@ count_http_attempts=0
 found_google_http=0
 found_duckduckgo_http=0
 run++
-for x in {1..10}; do
+for _ in {1..10}; do
     echo -n .
-    let count_http_attempts+=1
+    ((count_http_attempts+=1))
     output="$(./find_active_server.py -n1 --http --random $WEBSITE1 $WEBSITE2)"
     if [ "$output" = "$WEBSITE2" ]; then
         found_google_http=1
     elif [ "$output" = "$WEBSITE1" ]; then
         found_duckduckgo_http=1
     fi
-    [ $found_google_http -eq 1 -a $found_duckduckgo_http -eq 1 ] && break
+    [ $found_google_http -eq 1 ] && [ $found_duckduckgo_http -eq 1 ] && break
 done
 echo
-if [ $found_google_http -eq 1 -a $found_duckduckgo_http -eq 1 ]; then
+if [ $found_google_http -eq 1 ] && [ $found_duckduckgo_http -eq 1 ]; then
     echo "Found both $WEBSITE1 and $WEBSITE2 in results from $count_http_attempts --random runs"
 else
     die "Failed to return both $WEBSITE1 and $WEBSITE2 in results from $count_http_attempts --random runs"
 fi
 hr
 echo
+# $run_count defined in lib
+# shellcheck disable=SC2154
 echo "Tests run: $run_count"
 time_taken "$start_time" "find_active_server.py tests completed in"
 echo
