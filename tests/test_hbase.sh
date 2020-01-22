@@ -16,14 +16,15 @@
 
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
-srcdir2="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-cd "$srcdir2/.."
+cd "$srcdir/.."
 
-. "$srcdir2/utils.sh"
-. "$srcdir2/../bash-tools/lib/docker.sh"
+# shellcheck disable=SC1090
+. "$srcdir/utils.sh"
 
-srcdir="$srcdir2"
+# shellcheck disable=SC1090
+. "$srcdir/../bash-tools/lib/docker.sh"
 
 section "H B a s e"
 
@@ -39,7 +40,7 @@ export HBASE_THRIFT_PORT_DEFAULT=9090
 export HBASE_THRIFT_UI_PORT_DEFAULT=9095
 export ZOOKEEPER_PORT_DEFAULT=2181
 
-export HBASE_VERSIONS="${@:-latest 0.96 0.98 1.0 1.1 1.2 1.3}"
+export HBASE_VERSIONS="${*:-latest 0.96 0.98 1.0 1.1 1.2 1.3}"
 
 check_docker_available
 
@@ -59,9 +60,10 @@ test_hbase(){
     fi
     VERSION="$version" docker-compose up -d
     hr
-    if [ "$version" = "0.96" -o "$version" = "0.98" ]; then
-        local export HBASE_MASTER_PORT_DEFAULT=60010
-        local export HBASE_REGIONSERVER_PORT_DEFAULT=60301
+    if [ "$version" = "0.96" ] ||
+       [ "$version" = "0.98" ]; then
+        export HBASE_MASTER_PORT_DEFAULT=60010
+        export HBASE_REGIONSERVER_PORT_DEFAULT=60301
     fi
     echo "getting HBase dynamic port mappings:"
     docker_compose_port "HBase Master"
@@ -73,6 +75,7 @@ test_hbase(){
     #docker_compose_port ZOOKEEPER_PORT "HBase ZooKeeper"
     export HBASE_PORTS="$HBASE_MASTER_PORT $HBASE_REGIONSERVER_PORT $HBASE_STARGATE_PORT $HBASE_STARGATE_UI_PORT $HBASE_THRIFT_PORT $HBASE_THRIFT_UI_PORT"
     hr
+    # shellcheck disable=SC2086
     when_ports_available "$HBASE_HOST" $HBASE_PORTS
     hr
     if [ "${version:0:3}" = "0.9" ]; then
@@ -118,10 +121,12 @@ EOF
         return
     fi
     # will otherwise pick up HBASE_HOST and use default port and return the real HBase Master
+    # shellcheck disable=SC2097,SC2098
     HBASE_HOST='' HOST='' HBASE_MASTER_PORT="$HBASE_MASTER_PORT_DEFAULT" \
         ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_hbase_master.py 127.0.0.2 127.0.0.3 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT"
 
     # if HBASE_PORT / --port is set to same as suffix then only outputs host not host:port
+    # shellcheck disable=SC2097,SC2098
     HBASE_HOST='' HOST='' HBASE_MASTER_PORT="$HBASE_MASTER_PORT_DEFAULT" \
         run_grep "^$HBASE_HOST:$HBASE_MASTER_PORT$" ./find_active_hbase_master.py 127.0.0.2 "$HBASE_HOST:$HBASE_REGIONSERVER_PORT" 127.0.0.3 "$HBASE_HOST:$HBASE_MASTER_PORT"
 
@@ -245,53 +250,53 @@ EOF
     run_conn_refused ./hbase_table_row_key_distribution.py -T HexStringSplitTable
 
     # ============================================================================ #
-    run ./hbase_region_requests.py -T HexStringSplitTable $HBASE_HOST -c 2
-    run ./hbase_region_requests.py -T HexStringSplitTable $HBASE_HOST -c 2 --average
-    run ./hbase_region_requests.py -T HexStringSplitTable $HBASE_HOST -c 2 --average --skip-zeros
+    run ./hbase_region_requests.py -T HexStringSplitTable "$HBASE_HOST" -c 2
+    run ./hbase_region_requests.py -T HexStringSplitTable "$HBASE_HOST" -c 2 --average
+    run ./hbase_region_requests.py -T HexStringSplitTable "$HBASE_HOST" -c 2 --average --skip-zeros
 
-    run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST -c 2
-    run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST -c 2 --skip-zeros
-    run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST -c 2 --average
+    run ./hbase_region_requests.py -T HS_test_data "$HBASE_HOST" -c 2
+    run ./hbase_region_requests.py -T HS_test_data "$HBASE_HOST" -c 2 --skip-zeros
+    run ./hbase_region_requests.py -T HS_test_data "$HBASE_HOST" -c 2 --average
 
-    run ./hbase_region_requests.py -T HS_test_data $HBASE_HOST --count 2 --interval 2
+    run ./hbase_region_requests.py -T HS_test_data "$HBASE_HOST" --count 2 --interval 2
 
-    run ./hbase_region_requests.py -T HS_test_data localhost $HBASE_HOST -c 2
-    run ./hbase_region_requests.py -T HS_test_data localhost $HBASE_HOST --count 2 -i 2
-    run ./hbase_region_requests.py -T HS_test_data localhost $HBASE_HOST -c 2 --average
-
-    # ============================================================================ #
-    run ./hbase_regionserver_requests.py $HBASE_HOST -c 1
-    run ./hbase_regionserver_requests.py $HBASE_HOST -c 1 --average
-
-    run ./hbase_regionserver_requests.py $HBASE_HOST -c 1 -T read,write,total
-    run ./hbase_regionserver_requests.py $HBASE_HOST -c 1 --type read,write,total --average
-
-    run ./hbase_regionserver_requests.py $HBASE_HOST --count 2 --interval 2
-
-    run ./hbase_regionserver_requests.py localhost $HBASE_HOST -c 1
-    run ./hbase_regionserver_requests.py localhost $HBASE_HOST --count 2 -i 2
-    run ./hbase_regionserver_requests.py localhost $HBASE_HOST -c 1 --average
+    run ./hbase_region_requests.py -T HS_test_data localhost "$HBASE_HOST" -c 2
+    run ./hbase_region_requests.py -T HS_test_data localhost "$HBASE_HOST" --count 2 -i 2
+    run ./hbase_region_requests.py -T HS_test_data localhost "$HBASE_HOST" -c 2 --average
 
     # ============================================================================ #
-    run ./hbase_regions_by_size.py $HBASE_HOST
-    run ./hbase_regions_by_size.py $HBASE_HOST --smallest
-    run ./hbase_regions_by_size.py $HBASE_HOST --human
-    run ./hbase_regions_by_size.py $HBASE_HOST --human -s
-    run ./hbase_regions_by_size.py $HBASE_HOST --human --top 10
-    run ./hbase_regions_by_size.py $HBASE_HOST --human --top 10 --smallest
+    run ./hbase_regionserver_requests.py "$HBASE_HOST" -c 1
+    run ./hbase_regionserver_requests.py "$HBASE_HOST" -c 1 --average
 
-    run ./hbase_regions_by_memstore_size.py $HBASE_HOST
-    run ./hbase_regions_by_memstore_size.py $HBASE_HOST --smallest
-    run ./hbase_regions_by_memstore_size.py $HBASE_HOST --human
-    run ./hbase_regions_by_memstore_size.py $HBASE_HOST --human -s
-    run ./hbase_regions_by_memstore_size.py $HBASE_HOST --human --top 10
-    run ./hbase_regions_by_memstore_size.py $HBASE_HOST --human --top 10 --smallest
+    run ./hbase_regionserver_requests.py "$HBASE_HOST" -c 1 -T read,write,total
+    run ./hbase_regionserver_requests.py "$HBASE_HOST" -c 1 --type read,write,total --average
+
+    run ./hbase_regionserver_requests.py "$HBASE_HOST" --count 2 --interval 2
+
+    run ./hbase_regionserver_requests.py localhost "$HBASE_HOST" -c 1
+    run ./hbase_regionserver_requests.py localhost "$HBASE_HOST" --count 2 -i 2
+    run ./hbase_regionserver_requests.py localhost "$HBASE_HOST" -c 1 --average
 
     # ============================================================================ #
-    run ./hbase_regions_least_used.py $HBASE_HOST -r 20000
-    run ./hbase_regions_least_used.py $HBASE_HOST -r 0
-    run ./hbase_regions_least_used.py $HBASE_HOST --human --requests 20000
-    run ./hbase_regions_least_used.py $HBASE_HOST --human --requests 20000 --top 10
+    run ./hbase_regions_by_size.py "$HBASE_HOST"
+    run ./hbase_regions_by_size.py "$HBASE_HOST" --smallest
+    run ./hbase_regions_by_size.py "$HBASE_HOST" --human
+    run ./hbase_regions_by_size.py "$HBASE_HOST" --human -s
+    run ./hbase_regions_by_size.py "$HBASE_HOST" --human --top 10
+    run ./hbase_regions_by_size.py "$HBASE_HOST" --human --top 10 --smallest
+
+    run ./hbase_regions_by_memstore_size.py "$HBASE_HOST"
+    run ./hbase_regions_by_memstore_size.py "$HBASE_HOST" --smallest
+    run ./hbase_regions_by_memstore_size.py "$HBASE_HOST" --human
+    run ./hbase_regions_by_memstore_size.py "$HBASE_HOST" --human -s
+    run ./hbase_regions_by_memstore_size.py "$HBASE_HOST" --human --top 10
+    run ./hbase_regions_by_memstore_size.py "$HBASE_HOST" --human --top 10 --smallest
+
+    # ============================================================================ #
+    run ./hbase_regions_least_used.py "$HBASE_HOST" -r 20000
+    run ./hbase_regions_least_used.py "$HBASE_HOST" -r 0
+    run ./hbase_regions_least_used.py "$HBASE_HOST" --human --requests 20000
+    run ./hbase_regions_least_used.py "$HBASE_HOST" --human --requests 20000 --top 10
 
     [ -z "${KEEPDOCKER:-}" ] ||
     docker-compose down
