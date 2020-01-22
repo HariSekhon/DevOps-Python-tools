@@ -19,6 +19,7 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
+# shellcheck disable=SC1091
 . ./tests/utils.sh
 
 section "Testing json_docs_to_bulk_multiline.py"
@@ -85,6 +86,7 @@ echo "testing stdin"
 ./json_docs_to_bulk_multiline.py - < "$data_dir/test.json" > "$stdout"
 ./json_docs_to_bulk_multiline.py < "$data_dir/test.json" > "$stdout"
 echo "testing stdin and file mix"
+# shellcheck disable=SC2094
 ./json_docs_to_bulk_multiline.py "$data_dir/test.json" - < "$data_dir/test.json" > "$stdout"
 
 # ==================================================
@@ -102,10 +104,11 @@ check_broken(){
     filename="$1"
     expected_exitcode="${2:-2}"
     set +e
-    ./json_docs_to_bulk_multiline.py "$filename" ${@:3} 2> "$stderr" > "$stdout"
+    # shellcheck disable=SC2086
+    ./json_docs_to_bulk_multiline.py "$filename" ${*:3} 2> "$stderr" > "$stdout"
     exitcode=$?
     set -e
-    if [ $exitcode = $expected_exitcode ]; then
+    if [ $exitcode = "$expected_exitcode" ]; then
         echo "successfully detected broken json in '$filename', returned exit code $exitcode"
         echo
     #elif [ $exitcode != 0 ]; then
