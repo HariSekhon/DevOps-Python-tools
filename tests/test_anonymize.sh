@@ -40,40 +40,6 @@ start_time="$(start_timer "$anonymize")"
 #                                  Custom Tests
 # ============================================================================ #
 
-if [ -z "$test_nums" ]; then
-    echo
-    echo "Running Custom Tests:"
-    echo
-    echo "checking file args:"
-    run++
-    if [ "$($anonymize -ae README.md | wc -l)" -gt 100 ]; then
-        echo "SUCCEEDED - anonymized README.md > 100 lines"
-    else
-        echo "FAILED - suspicious README.md file arg result came to <= 100 lines"
-        exit 1
-    fi
-    hr
-
-    run_grep "<user>@<domain>" $anonymize --email <<< "hari@domain.com"
-    run_grep "<user>@<domain>" $anonymize -E <<< "hari@domain.com"
-
-    run_grep "<ip_x.x.x>.1" $anonymize -a --ip-prefix <<< "4.3.2.1"
-    run_grep "<ip_x.x.x>.1/<cidr_mask>" $anonymize --ip-prefix <<< "4.3.2.1/24"
-    run_grep "<ip_x.x.x>.1" $anonymize --ip-prefix <<< "4.3.2.1"
-    run_grep "<ip-x-x-x>.4" $anonymize --ip-prefix <<< "ip-1-2-3-4"
-    run_grep "ip-1-2-3-4-5" $anonymize --ip-prefix <<< "ip-1-2-3-4-5"
-    run_grep "dip-1-2-3-4" $anonymize --ip-prefix <<< "dip-1-2-3-4"
-    run_grep "5.4.3.2.1" $anonymize --ip-prefix <<< "5.4.3.2.1"
-    run_grep "log4j-1.2.3.4.jar" $anonymize --ip-prefix <<< "log4j-1.2.3.4.jar"
-    run_grep "/usr/hdp/2.6.2.0-123" $anonymize --ip-prefix <<< "/usr/hdp/2.6.2.0-123"
-
-    run_grep "^http://[a-f0-9]{12}:80/path$" $anonymize --hash-hostnames <<< "http://test.domain.com:80/path"
-    run_grep '^\\\\[a-f0-9]{12}\\mydir$' $anonymize --hash-hostnames <<< '\\test.domain.com\mydir'
-    run_grep '-host [a-f0-9]{12}' $anonymize --hash-hostnames <<< '-host blah'
-fi
-
-# ============================================================================ #
-
 src[0]="2015-11-19 09:59:59,893 - Execution of 'mysql -u root --password=somep@ssword! -h myHost.internal  -s -e \"select version();\"' returned 1. ERROR 2003 (HY000): Can't connect to MySQL server on 'host.domain.com' (111)"
 dest[0]="2015-11-19 09:59:59,893 - Execution of 'mysql -u root --password=<password> -h <fqdn>  -s -e \"select version();\"' returned 1. ERROR 2003 (HY000): Can't connect to MySQL server on '<fqdn>' (111)"
 
@@ -578,22 +544,20 @@ run_tests(){
     for i in $test_numbers; do
         [ -n "${src[$i]:-}" ]  || { echo "code error: src[$i] not defined";  exit 1; }
         [ -n "${dest[$i]:-}" ] || { echo "code error: dest[$i] not defined"; exit 1; }
-        if [ -n "$parallel" ]; then
-            test_anonymize "${src[$i]}" "${dest[$i]}" &
-        else
-            test_anonymize "${src[$i]}" "${dest[$i]}"
-        fi
+        #test_anonymize "${src[$i]}" "${dest[$i]}"
+        run++
     done
+    "$srcdir/test_anonymize.py"
 }
 
-echo
-echo "Running Standard Tests with --all --skip-exceptions"
-echo
+#echo
+#echo "Running Standard Tests with --all --skip-exceptions"
+#echo
 run_tests  # ignore_run_unqualified
 
-echo
-echo "Running Tests preseving text without --network enabled:"
-echo
+#echo
+#echo "Running Tests preseving text without --network enabled:"
+#echo
 # check normal don't strip these
 src[901]="reading password from foo"
 dest[901]="reading password from foo"
@@ -602,11 +566,11 @@ src[902]="some description = blah, module = foo"
 dest[902]="some description = blah, module = foo"
 
 args="-HKEiu"
-run_tests 901 902  # ignore_run_unqualified
+#run_tests 901 902  # ignore_run_unqualified
 
-echo
-echo "Running Network Specific Tests:"
-echo
+#echo
+#echo "Running Network Specific Tests:"
+#echo
 # now check --network / --cisco / --juniper do strip these
 src[903]="reading password from bar"
 dest[903]="reading password <cisco_password>"
@@ -615,16 +579,50 @@ src[904]="some description = blah, module=bar"
 dest[904]="some description <cisco_description>"
 
 args="--network"
-run_tests 903 904  # ignore_run_unqualified
+#run_tests 903 904  # ignore_run_unqualified
 
-if [ -n "$parallel" ]; then
-    # can't trust exit code for parallel yet, only for quick local testing
-    exit 1
-#    for i in ${!src[@]}; do
-#        let j=$i+1
-#        wait %$j
-#        [ $? -eq 0 ] || { echo "FAILED"; exit $?; }
-#    done
+#if [ -n "$parallel" ]; then
+#    # can't trust exit code for parallel yet, only for quick local testing
+#    exit 1
+##    for i in ${!src[@]}; do
+##        let j=$i+1
+##        wait %$j
+##        [ $? -eq 0 ] || { echo "FAILED"; exit $?; }
+##    done
+#fi
+
+# ============================================================================ #
+
+if [ -z "$test_nums" ]; then
+    echo
+    echo "Running Custom Tests:"
+    echo
+    echo "checking file args:"
+    run++
+    if [ "$($anonymize -ae README.md | wc -l)" -gt 100 ]; then
+        echo "SUCCEEDED - anonymized README.md > 100 lines"
+    else
+        echo "FAILED - suspicious README.md file arg result came to <= 100 lines"
+        exit 1
+    fi
+    hr
+
+    run_grep "<user>@<domain>" $anonymize --email <<< "hari@domain.com"
+    run_grep "<user>@<domain>" $anonymize -E <<< "hari@domain.com"
+
+    run_grep "<ip_x.x.x>.1" $anonymize -a --ip-prefix <<< "4.3.2.1"
+    run_grep "<ip_x.x.x>.1/<cidr_mask>" $anonymize --ip-prefix <<< "4.3.2.1/24"
+    run_grep "<ip_x.x.x>.1" $anonymize --ip-prefix <<< "4.3.2.1"
+    run_grep "<ip-x-x-x>.4" $anonymize --ip-prefix <<< "ip-1-2-3-4"
+    run_grep "ip-1-2-3-4-5" $anonymize --ip-prefix <<< "ip-1-2-3-4-5"
+    run_grep "dip-1-2-3-4" $anonymize --ip-prefix <<< "dip-1-2-3-4"
+    run_grep "5.4.3.2.1" $anonymize --ip-prefix <<< "5.4.3.2.1"
+    run_grep "log4j-1.2.3.4.jar" $anonymize --ip-prefix <<< "log4j-1.2.3.4.jar"
+    run_grep "/usr/hdp/2.6.2.0-123" $anonymize --ip-prefix <<< "/usr/hdp/2.6.2.0-123"
+
+    run_grep "^http://[a-f0-9]{12}:80/path$" $anonymize --hash-hostnames <<< "http://test.domain.com:80/path"
+    run_grep '^\\\\[a-f0-9]{12}\\mydir$' $anonymize --hash-hostnames <<< '\\test.domain.com\mydir'
+    run_grep '-host [a-f0-9]{12}' $anonymize --hash-hostnames <<< '-host blah'
 fi
 
 echo
