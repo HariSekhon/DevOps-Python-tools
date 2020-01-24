@@ -399,9 +399,9 @@ src[102]="-Dhost.domain.com=blah"
 dest[102]="-Dhost.domain.com=blah"
 
 # check escape codes get stripped if present (eg. if piping from grep --color-yes)
-#src[88]="some^[[01;31m^[[Khost^[[m^[[Kname:443"
-#src[88]="some\e[01;31m\e[Khost\e[m\e[K:443"
-src[103]="$(echo somehost:443 | grep --color=yes host)"
+# breaks test_anonymize.py which doesn't eval this, so put it explicitly
+#src[103]="$(echo somehost:443 | grep --color=yes host)"
+src[103]="some[01;31m[Khost[m[K:443"
 dest[103]="<hostname>:443"
 
 src[104]='..., "user": "blah", "group": "blah2", "host": "blah3", ...'
