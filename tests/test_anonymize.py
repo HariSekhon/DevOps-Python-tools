@@ -30,8 +30,8 @@ def normalize_text(text):
 def run():
     #test_input = StringIO.StringIO()
     #test_input.write('\n'.join(src))
-    global src
-    global dest
+    global src  # pylint: disable=global-statement
+    global dest # pylint: disable=global-statement
     src = {int(k) : v for k, v in src.items()}
     dest = {int(k) : v for k, v in dest.items()}
     src_keys = [key for key in sorted(src)]  # pylint: disable=redefined-outer-name
