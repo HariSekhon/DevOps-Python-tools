@@ -16,10 +16,10 @@
 
 """
 
-Connect to a HiveServer2 / Impala node and get rows counts for all tables in all databases,
+Connect to HiveServer2 and get rows counts for all tables in all databases,
 or only those matching given db / table / partition value regexes
 
-Tested on CDH 5.10, Hive 1.1.0 and Impala 2.7.0 with Kerberos
+Tested on Hive 1.1.0 CDH 5.10 with Kerberos
 
 Due to a thrift / impyla bug this needs exactly thrift==0.9.3, see
 
@@ -41,71 +41,46 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import argparse
-import logging
 import os
 import re
-import socket
 import sys
 import impala
-from impala.dbapi import connect
+srcdir = os.path.abspath(os.path.dirname(__file__))
+pylib = os.path.join(srcdir, 'pylib')
+lib = os.path.join(srcdir, 'lib')
+sys.path.append(pylib)
+sys.path.append(lib)
+try:
+    # pylint: disable=wrong-import-position
+    from harisekhon.utils import log, validate_regex
+    from hive_impala_cli import HiveImpalaCLI
+except ImportError as _:
+    print('module import failed: %s' % _, file=sys.stderr)
+    print("Did you remember to build the project by running 'make'?", file=sys.stderr)
+    print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
+    sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 
-logging.basicConfig()
-log = logging.getLogger(os.path.basename(sys.argv[0]))
 
-def getenvs(keys, default=None):
-    for key in keys:
-        value = os.getenv(key)
-        if value:
-            return value
-    return default
+class HiveTablesRowCounts(HiveImpalaCLI):
 
-def parse_args():
-    name = 'HiveServer2'
-    default_port = 10000
-    default_service_name = 'hive'
-    host_envs = [
-        'HIVESERVER2_HOST',
-        'HIVE_HOST',
-        'HOST'
-    ]
-    port_envs = [
-        'HIVESERVER2_PORT',
-        'HIVE_PORT',
-        'PORT'
-    ]
+    def __init__(self):
+        # Python 2.x
+        super(HiveTablesRowCounts, self).__init__()
+        # Python 3.x
+        # super().__init__()
+        self.database = None
+        self.table = None
+        self.partition = None
+        self.ignore_errors = False
 
-    if 'impala' in sys.argv[0]:
-        name = 'Impala'
-        default_port = 21050
-        default_service_name = 'impala'
-        host_envs = [
-            'IMPALA_HOST',
-            'HOST'
-        ]
-        port_envs = [
-            'IMPALA_PORT',
-            'PORT'
-        ]
-    parser = argparse.ArgumentParser(
-        description="Gets row counts for all {} tables / partitions matching database / table / partition regexes"\
-                    .format(name))
-    parser.add_argument('-H', '--host', default=getenvs(host_envs, socket.getfqdn()),\
-                        help='{} host '.format(name) + \
-                             '(default: fqdn of local host, $' + ', $'.join(host_envs) + ')')
-    parser.add_argument('-P', '--port', type=int, default=getenvs(port_envs, default_port),
-                        help='{} port (default: {}, '.format(name, default_port) + \
-                                                                  ', $'.join(port_envs) + ')')
-    parser.add_argument('-d', '--database', default='.*', help='Database regex (default: .*)')
-    parser.add_argument('-t', '--table', default='.*', help='Table regex (default: .*)')
-    parser.add_argument('-p', '--partition', default='.*', help='Partition regex (default: .*)')
-    parser.add_argument('-k', '--kerberos', action='store_true', help='Use Kerberos (you must kinit first)')
-    parser.add_argument('-n', '--krb5-service-name', default=default_service_name,
-                        help='Service principal (default: {})'.format(default_service_name))
-    parser.add_argument('-S', '--ssl', action='store_true', help='Use SSL')
+    def add_options(self):
+        super(HiveTablesRowCounts, self).add_options()
+        self.add_opt('-d', '--database', default='.*', help='Database regex (default: .*)')
+        self.add_opt('-t', '--table', default='.*', help='Table regex (default: .*)')
+        self.add_opt('-p', '--partition', default='.*', help='Partition regex (default: .*)')
 #
 # ignore tables that fail with errors like:
 #
@@ -118,130 +93,105 @@ def parse_args():
 # impala.error.HiveServer2Error: AnalysisException: Unsupported type 'void' in column '<column>' of table '<table>'
 # CAUSED BY: TableLoadingException: Unsupported type 'void' in column '<column>' of table '<table>'
 #
-    parser.add_argument('-e', '--ignore-errors', action='store_true', help='Ignore individual table errors and continue')
-    parser.add_argument('-v', '--verbose', action='store_true', help='Verbose mode')
-    args = parser.parse_args()
+        self.add_opt('-e', '--ignore-errors', action='store_true', help='Ignore individual table errors and continue')
 
-    if args.verbose:
-        log.setLevel(logging.INFO)
-    if args.verbose > 1 or os.getenv('DEBUG'):
-        log.setLevel(logging.DEBUG)
+    def process_options(self):
+        super(HiveTablesRowCounts, self).process_options()
+        self.database = self.get_opt('database')
+        self.table = self.get_opt('table')
+        self.partition = self.get_opt('partition')
+        self.ignore_errors = self.get_opt('ignore_errors')
+        validate_regex(self.database, 'database')
+        validate_regex(self.table, 'table')
+        validate_regex(self.partition, 'partition')
 
-    return args
-
-def connect_db(args, database):
-    auth_mechanism = None
-    if args.kerberos:
-        auth_mechanism = 'GSSAPI'
-
-    log.info('connecting to %s:%s database %s', args.host, args.port, database)
-    return connect(
-        host=args.host,
-        port=args.port,
-        auth_mechanism=auth_mechanism,
-        use_ssl=args.ssl,
-        #user=user,
-        #password=password,
-        database=database,
-        kerberos_service_name=args.krb5_service_name
-        )
-
-def main():
-    args = parse_args()
-
-    try:
-        database_regex = re.compile(args.database, re.I)
-        table_regex = re.compile(args.table, re.I)
-        partition_regex = re.compile(args.partition, re.I)
-    except re.error as _:
-        log.error('error in provided regex: %s', _)
-        sys.exit(3)
-
-    conn = connect_db(args, 'default')
-
-    log.info('querying databases')
-    with conn.cursor() as db_cursor:
-        db_cursor.execute('show databases')
-        for db_row in db_cursor:
-            database = db_row[0]
-            if not database_regex.search(database):
-                log.debug("skipping database '%s', does not match regex '%s'", database, args.database)
-                continue
-            log.info('querying tables for database %s', database)
-            #db_conn = connect_db(args, database)
-            #with db_conn.cursor() as table_cursor:
-            with conn.cursor() as table_cursor:
-                try:
-                    # doesn't support parameterized query quoting from dbapi spec
-                    #table_cursor.execute('use %(database)s', {'database': database})
-                    table_cursor.execute('use {}'.format(database))
-                    table_cursor.execute('show tables')
-                except impala.error.HiveServer2Error as _:
-                    log.error(_)
-                    if 'AuthorizationException' in str(_):
-                        continue
-                    raise
-                for table_row in table_cursor:
-                    table = table_row[0]
-                    if not table_regex.search(table):
-                        log.debug("skipping database '%s' table '%s', does not match regex '%s'", \
-                                  database, table, args.table)
-                        continue
+    def run(self):
+        database_regex = re.compile(self.database, re.I)
+        table_regex = re.compile(self.table, re.I)
+        partition_regex = re.compile(self.partition, re.I)
+        conn = self.connect('default')
+        log.info('querying databases')
+        with conn.cursor() as db_cursor:
+            db_cursor.execute('show databases')
+            for db_row in db_cursor:
+                database = db_row[0]
+                if not database_regex.search(database):
+                    log.debug("skipping database '%s', does not match regex '%s'", database, self.database)
+                    continue
+                log.info('querying tables for database %s', database)
+                with conn.cursor() as table_cursor:
                     try:
-                        get_row_counts(conn, args, database, table, partition_regex)
-                    except Exception as _:
-                        # invalid query handle and similar errors happen at higher level
-                        # as they are not query specific, will not be caught here so still error out
-                        if args.ignore_errors:
-                            log.error("database '%s' table '%s':  %s", database, table, _)
+                        # doesn't support parameterized query quoting from dbapi spec
+                        #table_cursor.execute('use %(database)s', {'database': database})
+                        table_cursor.execute('use {}'.format(database))
+                        table_cursor.execute('show tables')
+                    except impala.error.HiveServer2Error as _:
+                        log.error(_)
+                        if 'AuthorizationException' in str(_):
                             continue
                         raise
+                    for table_row in table_cursor:
+                        table = table_row[0]
+                        if not table_regex.search(table):
+                            log.debug("skipping database '%s' table '%s', does not match regex '%s'", \
+                                      database, table, self.table)
+                            continue
+                        try:
+                            self.get_row_counts(conn, database, table, partition_regex)
+                        except Exception as _:
+                            # invalid query handle and similar errors happen at higher level
+                            # as they are not query specific, will not be caught here so still error out
+                            if self.ignore_errors:
+                                log.error("database '%s' table '%s':  %s", database, table, _)
+                                continue
+                            raise
 
-def get_row_counts(conn, args, database, table, partition_regex):
-    log.info("getting partitions for database '%s' table '%s'", database, table)
-    with conn.cursor() as partition_cursor:
-        # doesn't support parameterized query quoting from dbapi spec
-        partition_cursor.execute('use {db}'.format(db=database))
-        try:
-            partition_cursor.execute('show partitions {table}'.format(table=table))
-            for partitions_row in partition_cursor:
-                partition_key = partitions_row[0]
-                partition_value = partitions_row[1]
-                if not partition_regex.match(partition_value):
-                    log.debug("skipping database '%s' table '%s' partition key '%s' value '%s', " +
-                              "value does not match regex '%s'",
-                              database,
-                              table,
-                              partition_key,
-                              partition_value,
-                              args.partition)
-                    continue
-                # doesn't support parameterized query quoting from dbapi spec
-                partition_cursor.execute('SELECT COUNT(*) FROM {db}.{table} WHERE {key}={value}'\
-                                      .format(db=database, table=table, key=partition_key, value=partition_value))
-                for result in partition_cursor:
-                    row_count = result[0]
-                    print('{db}.{table}.{key}={value}\t{row_count}'.format(\
-                            db=database, table=table, key=partition_key, value=partition_value, row_count=row_count))
-        except (impala.error.OperationalError, impala.error.HiveServer2Error) as _:
-            # Hive impala.error.HiveServer2Error: is not a partitioned table
-            # Impala impala.error.HiveServer2Error: Table is not partitioned
-            if 'is not a partitioned table' not in str(_) and \
-               'Table is not partitioned' not in str(_):
-                raise
-            log.info("no partitions found for database '%s' table '%s', getting row counts for whole table",
-                     database, table)
-            with conn.cursor() as table_cursor:
-                log.info("running SELECT COUNT(*) FROM %s.%s", database, table)
-                # doesn't support parameterized query quoting from dbapi spec
-                table_cursor.execute('SELECT COUNT(*) FROM {db}.{table}'.format(db=database, table=table))
-                for result in table_cursor:
-                    row_count = result[0]
-                    print('{db}.{table}\t{row_count}'.format(db=database, table=table, row_count=row_count))
+    def get_row_counts(self, conn, database, table, partition_regex):
+        log.info("getting partitions for database '%s' table '%s'", database, table)
+        with conn.cursor() as partition_cursor:
+            # doesn't support parameterized query quoting from dbapi spec
+            partition_cursor.execute('use {db}'.format(db=database))
+            try:
+                partition_cursor.execute('show partitions {table}'.format(table=table))
+                for partitions_row in partition_cursor:
+                    partition_key = partitions_row[0]
+                    partition_value = partitions_row[1]
+                    if not partition_regex.match(partition_value):
+                        log.debug("skipping database '%s' table '%s' partition key '%s' value '%s', " +
+                                  "value does not match regex '%s'",
+                                  database,
+                                  table,
+                                  partition_key,
+                                  partition_value,
+                                  self.partition)
+                        continue
+                    # doesn't support parameterized query quoting from dbapi spec
+                    partition_cursor.execute('SELECT COUNT(*) FROM {db}.{table} WHERE {key}={value}'\
+                                          .format(db=database, table=table, key=partition_key, value=partition_value))
+                    for result in partition_cursor:
+                        row_count = result[0]
+                        print('{db}.{table}.{key}={value}\t{row_count}'.format(\
+                                db=database,
+                                table=table,
+                                key=partition_key,
+                                value=partition_value,
+                                row_count=row_count))
+            except (impala.error.OperationalError, impala.error.HiveServer2Error) as _:
+                # Hive impala.error.HiveServer2Error: is not a partitioned table
+                # Impala impala.error.HiveServer2Error: Table is not partitioned
+                if 'is not a partitioned table' not in str(_) and \
+                   'Table is not partitioned' not in str(_):
+                    raise
+                log.info("no partitions found for database '%s' table '%s', getting row counts for whole table",
+                         database, table)
+                with conn.cursor() as table_cursor:
+                    log.info("running SELECT COUNT(*) FROM %s.%s", database, table)
+                    # doesn't support parameterized query quoting from dbapi spec
+                    table_cursor.execute('SELECT COUNT(*) FROM {db}.{table}'.format(db=database, table=table))
+                    for result in table_cursor:
+                        row_count = result[0]
+                        print('{db}.{table}\t{row_count}'.format(db=database, table=table, row_count=row_count))
 
 
 if __name__ == '__main__':
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("Control-C", file=sys.stderr)
+    HiveTablesRowCounts().main()
