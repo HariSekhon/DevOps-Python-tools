@@ -610,15 +610,33 @@ if [ -z "$test_nums" ]; then
     run_grep "<user>@<domain>" $anonymize --email <<< "hari@domain.com"
     run_grep "<user>@<domain>" $anonymize -E <<< "hari@domain.com"
 
-    run_grep "<ip_x.x.x>.1" $anonymize -a --ip-prefix <<< "4.3.2.1"
-    run_grep "<ip_x.x.x>.1/<cidr_mask>" $anonymize --ip-prefix <<< "4.3.2.1/24"
-    run_grep "<ip_x.x.x>.1" $anonymize --ip-prefix <<< "4.3.2.1"
-    run_grep "<ip-x-x-x>.4" $anonymize --ip-prefix <<< "ip-1-2-3-4"
-    run_grep "ip-1-2-3-4-5" $anonymize --ip-prefix <<< "ip-1-2-3-4-5"
-    run_grep "dip-1-2-3-4" $anonymize --ip-prefix <<< "dip-1-2-3-4"
-    run_grep "5.4.3.2.1" $anonymize --ip-prefix <<< "5.4.3.2.1"
-    run_grep "log4j-1.2.3.4.jar" $anonymize --ip-prefix <<< "log4j-1.2.3.4.jar"
-    run_grep "/usr/hdp/2.6.2.0-123" $anonymize --ip-prefix <<< "/usr/hdp/2.6.2.0-123"
+    src[800]="4.3.2.1"
+    dest[800]="<ip_x.x.x>.1"
+
+    src[801]="4.3.2.1/24"
+    dest[801]="<ip_x.x.x>.1/<cidr_mask>"
+
+    src[802]="4.3.2.1"
+    dest[802]="<ip_x.x.x>.1"
+
+    src[803]="ip-1-2-3-4"
+    dest[803]="<ip-x-x-x>.4"
+
+    src[804]="ip-1-2-3-4-5"
+    dest[804]="ip-1-2-3-4-5"
+
+    src[805]="dip-1-2-3-4"
+    dest[805]="dip-1-2-3-4"
+
+    src[806]="5.4.3.2.1"
+    dest[806]="5.4.3.2.1"
+
+    src[807]="log4j-1.2.3.4.jar"
+    dest[807]="log4j-1.2.3.4.jar"
+
+    src[808]="/usr/hdp/2.6.2.0-123"
+    dest[808]="/usr/hdp/2.6.2.0-123"
+    args="-a --ip-prefix"
 
     run_grep "^http://[a-f0-9]{12}:80/path$" $anonymize --hash-hostnames <<< "http://test.domain.com:80/path"
     run_grep '^\\\\[a-f0-9]{12}\\mydir$' $anonymize --hash-hostnames <<< '\\test.domain.com\mydir'
