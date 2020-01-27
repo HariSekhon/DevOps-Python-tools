@@ -138,7 +138,7 @@ class HiveSchemasCSV(HiveImpalaCLI):
                     table_cursor.execute('show tables')
                     for table_row in table_cursor:
                         table = table_row[0]
-                        log.info('describing table %s', table)
+                        log.info('describing table %s.%s', database, table)
                         with conn.cursor() as column_cursor:
                             # doesn't support parameterized query quoting from dbapi spec
                             #column_cursor.execute('use %(database)s', {'database': database})
