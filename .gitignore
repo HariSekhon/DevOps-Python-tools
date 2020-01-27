@@ -48,7 +48,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+#lib/  # breaks local lib/ change tracking
 lib64/
 parts/
 sdist/
