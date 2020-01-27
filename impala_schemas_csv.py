@@ -18,7 +18,7 @@
 
 Connect to an Impala daemon and dump all the schemas, tables and columns out in CSV format to stdout
 
-In practice Hive is much more reliable for dumping masses of schema
+In practice Hive is much more reliable than Impala for dumping masses of schema
 
 Impala appears faster initially but then slows down more than Hive and hits things query handle errors
 under sustained load of extracting large amounts of schema information
@@ -61,7 +61,7 @@ from __future__ import print_function
 from hive_schemas_csv import HiveSchemasCSV
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 
 
 class ImpalaSchemasCSV(HiveSchemasCSV):
@@ -71,9 +71,11 @@ class ImpalaSchemasCSV(HiveSchemasCSV):
         super(ImpalaSchemasCSV, self).__init__()
         # Python 3.x
         # super().__init__()
+
+        # these are auto-set checking sys.argv[0] in HiveImpalaCLI class
         self.name = 'Impala'
-        self.default_port = 21050
-        self.default_service_name = 'impala'
+        #self.default_port = 21050
+        #self.default_service_name = 'impala'
 
 
 if __name__ == '__main__':
