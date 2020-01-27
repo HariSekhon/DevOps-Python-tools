@@ -19,11 +19,11 @@ set -euo pipefail
 srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 test_nums="${*:-}"
-parallel=""
-if [ "$test_nums" = "p" ]; then
-    parallel="1"
-    test_nums=""
-fi
+#parallel=""
+#if [ "$test_nums" = "p" ]; then
+#    parallel="1"
+#    test_nums=""
+#fi
 
 cd "$srcdir/..";
 
@@ -553,7 +553,7 @@ run_tests(){
 #echo
 #echo "Running Standard Tests with --all --skip-exceptions"
 #echo
-run_tests  # ignore_run_unqualified
+run_tests "$@" # ignore_run_unqualified
 
 #echo
 #echo "Running Tests preseving text without --network enabled:"
