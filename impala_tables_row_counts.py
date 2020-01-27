@@ -19,6 +19,8 @@
 Connect to an Impala daemon and get rows counts for all tables in all databases,
 or only those matching given db / table / partition value regexes
 
+Useful for reconciliations between clusters after migrations
+
 Tested on Impala 2.7.0 on CDH 5.10 with Kerberos
 
 Due to a thrift / impyla bug this needs exactly thrift==0.9.3, see
