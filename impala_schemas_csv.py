@@ -18,7 +18,7 @@
 
 Connect to an Impala daemon and dump all the schemas, tables and columns out in CSV format to stdout
 
-In practice Hive is much more reliable than Impala for dumping masses of schema
+In practice Hive is much more reliable than Impala for dumping masses of schema (see adjacent hive_schemas_csv.py)
 
 Impala appears faster initially but then slows down more than Hive and hits things query handle errors
 under sustained load of extracting large amounts of schema information
@@ -36,7 +36,7 @@ which would cause incorrect field splitting, you can disable by setting --quotec
 if escaping is needed then you will be forced to specify an --escapechar otherwise the csv writer will
 raise a traceback to tell you to set one (eg. --escapechar='\\')
 
-Tested on CDH 5.10, Hive 1.1.0 and Impala 2.7.0 with Kerberos
+Tested on Impala 2.7.0 on CDH 5.10 with Kerberos
 
 Due to a thrift / impyla bug this needs exactly thrift==0.9.3, see
 
