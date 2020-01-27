@@ -99,12 +99,6 @@ class HiveSchemasCSV(CLI):
         self.quotechar = None
         self.escapechar = None
 
-        if 'impala' in sys.argv[0]:
-            self.name = 'Impala'
-            self.default_port = 21050
-            self.default_service_name = 'impala'
-            self.env_prefixes = ['IMPALA']
-
     def add_options(self):
         super(HiveSchemasCSV, self).add_options()
         self.add_hostoption()
