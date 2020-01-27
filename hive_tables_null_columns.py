@@ -19,8 +19,8 @@
 Connect to HiveServer2 and find tables with columns containing only NULLs
 for all tables in all databases, or only those matching given db / table regexes
 
-Describes each table to construct a large query based on all detected columns,
-then queries the columns for NULLs and prints the tables columns containing only NULLs
+Describes each table, constructs a complex query to check each column individually for containing only NULLs,
+and prints out each tables' count of total columns containing only NULLs as well as the list of offending columns
 
 Useful for catching problems with data quality or broken ETL processes
 
