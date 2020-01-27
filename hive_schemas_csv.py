@@ -16,9 +16,9 @@
 
 """
 
-Connect to a HiveServer2 or Impala daemon and dump all the schemas, tables and columns out in CSV format to stdout
+Connect to HiveServer2 and dump all the schemas, tables and columns out in CSV format to stdout
 
-In practice Hive is much more reliable for dumping masses of schema
+In practice Hive is much more reliable than Impala for dumping masses of schema
 
 Impala appears faster initially but then slows down more than Hive and hits things query handle errors
 under sustained load of extracting large amounts of schema information
@@ -60,15 +60,16 @@ from __future__ import print_function
 
 import csv
 import os
-import socket
 import sys
-from impala.dbapi import connect
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
-sys.path.append(libdir)
+srcdir = os.path.abspath(os.path.dirname(__file__))
+pylib = os.path.join(srcdir, 'pylib')
+lib = os.path.join(srcdir, 'lib')
+sys.path.append(pylib)
+sys.path.append(lib)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log, validate_host, validate_port
-    from harisekhon import CLI
+    from harisekhon.utils import log
+    from hive_impala_cli import HiveImpalaCLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
     print("Did you remember to build the project by running 'make'?", file=sys.stderr)
@@ -76,36 +77,22 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 
 
-class HiveSchemasCSV(CLI):
+class HiveSchemasCSV(HiveImpalaCLI):
 
     def __init__(self):
         # Python 2.x
         super(HiveSchemasCSV, self).__init__()
         # Python 3.x
         # super().__init__()
-        self.name = ['HiveServer2', 'Hive']
-        self.host = None
-        self.port = None
-        self.default_host = socket.getfqdn()
-        self.default_port = 10000
-        self.default_service_name = 'hive'
-        self.kerberos = False
-        self.krb5_service_name = self.default_service_name
-        self.ssl = False
         self.delimiter = None
         self.quotechar = None
         self.escapechar = None
 
     def add_options(self):
         super(HiveSchemasCSV, self).add_options()
-        self.add_hostoption()
-        self.add_opt('-k', '--kerberos', action='store_true', help='Use Kerberos (you must kinit first)')
-        self.add_opt('-n', '--krb5-service-name', default=self.default_service_name,
-                     help='Service principal (default: {})'.format(self.default_service_name))
-        self.add_opt('-S', '--ssl', action='store_true', help='Use SSL')
         # must set type to str otherwise csv module gives this error on Python 2.7:
         # TypeError: "delimiter" must be string, not unicode
         # type=str worked with argparse but when integrated with CLI then 'from __future__ import unicode_literals'
@@ -117,38 +104,9 @@ class HiveSchemasCSV(CLI):
 
     def process_options(self):
         super(HiveSchemasCSV, self).process_options()
-        self.host = self.get_opt('host')
-        self.port = self.get_opt('port')
-        validate_host(self.host)
-        validate_port(self.port)
-        self.port = int(self.port)
-        self.kerberos = self.get_opt('kerberos')
-        self.krb5_service_name = self.get_opt('krb5_service_name')
-        self.ssl = self.get_opt('ssl')
         self.delimiter = self.get_opt('delimiter')
         self.quotechar = self.get_opt('quotechar')
         self.escapechar = self.get_opt('escapechar')
-
-    def connect(self, database):
-        auth_mechanism = None
-        if self.kerberos:
-            auth_mechanism = 'GSSAPI'
-            log.debug('kerberos enabled')
-            log.debug('krb5 remote service principal name = %s', self.krb5_service_name)
-        if self.ssl:
-            log.debug('ssl enabled')
-
-        log.info('connecting to %s:%s database %s', self.host, self.port, database)
-        return connect(
-            host=self.host,
-            port=self.port,
-            auth_mechanism=auth_mechanism,
-            use_ssl=self.ssl,
-            #user=user,
-            #password=password,
-            database=database,
-            kerberos_service_name=self.krb5_service_name
-            )
 
     def run(self):
 
