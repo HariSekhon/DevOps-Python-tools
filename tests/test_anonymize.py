@@ -20,7 +20,7 @@ dest = {}
 
 src_regex = re.compile(r'^\s*src\[(\d+)\]=["\'](.+)["\']\s*$')
 dest_regex = re.compile(r'^\s*dest\[(\d+)\]=["\'](.+)["\']\s*$')
-args_regex = re.compile(r'^args=["\'](.+)["\']\s*$')
+args_regex = re.compile(r'^\s*args=["\'](.+)["\']\s*$')
 
 def normalize_text(text):
     text = text.replace(r'\"', '"')
@@ -38,7 +38,8 @@ def run():
     test_input = '\n'.join([src[key] for key in src_keys])
 
     print('running anonymize tests using: {} {}'.format(anonymize, args))
-    process = subprocess.Popen([anonymize, args], stdin=PIPE, stdout=PIPE)
+    cmd = [anonymize] + [_ for _ in args.split()]
+    process = subprocess.Popen(cmd, stdin=PIPE, stdout=PIPE)
     (stdout, _) = process.communicate(input=test_input)
     index = 0
     for line in stdout.split('\n'):   # pylint: disable=redefined-outer-name
