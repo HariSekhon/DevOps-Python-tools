@@ -114,8 +114,8 @@ Environment variables are supported for convenience and also to hide credentials
   - [Hive](https://hive.apache.org/) / [Impala](https://impala.apache.org/):
     - ```hive_schemas_csv.py``` / ```impala_schemas_csv.py``` - dumps all databases, tables, columns and types out in CSV format to standard output
     - ```hive_foreach_table.py``` / ```impala_foreach_table.py``` - execute any query or statement for every Hive / Impala table, optionally filtering to only select databases/tables via regex
-    - ```hive_tables_row_counts.py``` / ```impala_tables_row_counts.py``` - iterate all matching tables in all databases (by partition if available) and output TSV of table names and row counts
-    - ```hive_tables_null_columns.py``` / ```impala_tables_null_columns.py``` - iterate all matching tables in all databases and outputs tables columns containing only NULLs (useful for catching data quality or ETL problems)
+    - ```hive_tables_row_counts.py``` / ```impala_tables_row_counts.py``` - iterates all matching tables in all databases (by partition if available) and outputs TSV of table names and row counts
+    - ```hive_tables_null_columns.py``` / ```impala_tables_null_columns.py``` - iterates all matching tables in all databases and outputs tables columns containing only NULLs (useful for catching data quality or ETL problems)
   - [HBase](https://hbase.apache.org/):
     - ```hbase_generate_data.py``` - inserts random generated data in to a given [HBase](https://hbase.apache.org/) table, with optional skew support with configurable skew percentage. Useful for testing region splitting, balancing, CI tests etc. Outputs stats for number of rows written, time taken, rows per sec and volume per sec written.
     - ```hbase_show_table_region_ranges.py``` - dumps HBase table region ranges information, useful when pre-splitting tables
