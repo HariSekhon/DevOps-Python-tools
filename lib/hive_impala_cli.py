@@ -55,6 +55,7 @@ class HiveImpalaCLI(CLI):
         self.kerberos = False
         self.krb5_service_name = self.default_service_name
         self.ssl = False
+        self.verbose_default = 1
         #self.timeout_default = 86400
         self.timeout_default = None
         if 'impala' in sys.argv[0]:
