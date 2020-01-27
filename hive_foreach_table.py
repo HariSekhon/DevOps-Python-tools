@@ -73,7 +73,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 
 
 class HiveForEachTable(HiveImpalaCLI):
@@ -83,6 +83,8 @@ class HiveForEachTable(HiveImpalaCLI):
         super(HiveForEachTable, self).__init__()
         # Python 3.x
         # super().__init__()
+
+        # self.query can be pre-defined in which case subclassed programs won't expose --query option
         self.query = None
         self.database = None
         self.table = None
@@ -91,8 +93,10 @@ class HiveForEachTable(HiveImpalaCLI):
 
     def add_options(self):
         super(HiveForEachTable, self).add_options()
-        self.add_opt('-q', '--query', help='Query or statement to execute for each table' + \
-                     ' (replaces {db} and {table} in the query string with each table and its database)')
+        # allow subclassing to pre-define query and not expose option in that case
+        if self.query is None:
+            self.add_opt('-q', '--query', help='Query or statement to execute for each table' + \
+                         ' (replaces {db} and {table} in the query string with each table and its database)')
         self.add_opt('-d', '--database', default='.*', help='Database regex (default: .*)')
         self.add_opt('-t', '--table', default='.*', help='Table regex (default: .*)')
         #self.add_opt('-p', '--partition', default='.*', help='Partition regex (default: .*)')
@@ -112,7 +116,8 @@ class HiveForEachTable(HiveImpalaCLI):
 
     def process_options(self):
         super(HiveForEachTable, self).process_options()
-        self.query = self.get_opt('query')
+        if self.query is None:
+            self.query = self.get_opt('query')
         if not self.query:
             self.usage('query not defined')
         self.database = self.get_opt('database')
