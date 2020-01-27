@@ -56,154 +56,151 @@ then check your --kerberos and --ssl settings match the cluster's settings
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
+#from __future__ import unicode_literals
 
-import argparse
 import csv
-import logging
 import os
 import socket
 import sys
 from impala.dbapi import connect
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
+sys.path.append(libdir)
+try:
+    # pylint: disable=wrong-import-position
+    from harisekhon.utils import log, validate_host, validate_port
+    from harisekhon import CLI
+except ImportError as _:
+    print('module import failed: %s' % _, file=sys.stderr)
+    print("Did you remember to build the project by running 'make'?", file=sys.stderr)
+    print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
+    sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
-logging.basicConfig()
-log = logging.getLogger(os.path.basename(sys.argv[0]))
 
-def getenvs(keys, default=None):
-    for key in keys:
-        value = os.getenv(key)
-        if value:
-            return value
-    return default
+class HiveSchemasCSV(CLI):
 
-def parse_args():
-    name = 'HiveServer2'
-    default_port = 10000
-    default_service_name = 'hive'
-    host_envs = [
-        'HIVESERVER2_HOST',
-        'HIVE_HOST',
-        'HOST'
-    ]
-    port_envs = [
-        'HIVESERVER2_PORT',
-        'HIVE_PORT',
-        'PORT'
-    ]
+    def __init__(self):
+        # Python 2.x
+        super(HiveSchemasCSV, self).__init__()
+        # Python 3.x
+        # super().__init__()
+        self.name = ['HiveServer2', 'Hive']
+        self.host = None
+        self.port = None
+        self.default_host = socket.getfqdn()
+        self.default_port = 10000
+        self.default_service_name = 'hive'
+        self.kerberos = False
+        self.krb5_service_name = self.default_service_name
+        self.ssl = False
+        self.delimiter = None
+        self.quotechar = None
+        self.escapechar = None
 
-    if 'impala' in sys.argv[0]:
-        name = 'Impala'
-        default_port = 21050
-        default_service_name = 'impala'
-        host_envs = [
-            'IMPALA_HOST',
-            'HOST'
-        ]
-        port_envs = [
-            'IMPALA_PORT',
-            'PORT'
-        ]
-    parser = argparse.ArgumentParser(
-        description="Dumps all {} schemas, tables, columns and types to CSV format on stdout".format(name))
-    parser.add_argument('-H', '--host', default=getenvs(host_envs, socket.getfqdn()),\
-                        help='{} host '.format(name) + \
-                             '(default: fqdn of local host, $' + ', $'.join(host_envs) + ')')
-    parser.add_argument('-P', '--port', type=int, default=getenvs(port_envs, default_port),
-                        help='{} port (default: {}, '.format(name, default_port) + \
-                                                                  ', $'.join(port_envs) + ')')
-    parser.add_argument('-k', '--kerberos', action='store_true', help='Use Kerberos (you must kinit first)')
-    parser.add_argument('-n', '--krb5-service-name', default=default_service_name,
-                        help='Service principal (default: {})'.format(default_service_name))
-    parser.add_argument('-S', '--ssl', action='store_true', help='Use SSL')
-    # must set type to str otherwise csv module gives this error on Python 2.7:
-    # TypeError: "delimiter" must be string, not unicode
-    parser.add_argument('-d', '--delimiter', default=',', type=str, help='Delimiter to use (default: ,)')
-    parser.add_argument('-Q', '--quotechar', default='"', type=str,
-                        help='Generate quoted CSV (recommended, default is double quote \'"\')')
-    parser.add_argument('-E', '--escapechar', help='Escape char if needed')
-    parser.add_argument('-v', '--verbose', action='count', help='Verbose mode')
-    args = parser.parse_args()
+        if 'impala' in sys.argv[0]:
+            self.name = 'Impala'
+            self.default_port = 21050
+            self.default_service_name = 'impala'
+            self.env_prefixes = ['IMPALA']
 
-    if args.verbose:
-        log.setLevel(logging.INFO)
-    if args.verbose > 1 or os.getenv('DEBUG'):
-        log.setLevel(logging.DEBUG)
+    def add_options(self):
+        super(HiveSchemasCSV, self).add_options()
+        self.add_hostoption()
+        self.add_opt('-k', '--kerberos', action='store_true', help='Use Kerberos (you must kinit first)')
+        self.add_opt('-n', '--krb5-service-name', default=self.default_service_name,
+                     help='Service principal (default: {})'.format(self.default_service_name))
+        self.add_opt('-S', '--ssl', action='store_true', help='Use SSL')
+        # must set type to str otherwise csv module gives this error on Python 2.7:
+        # TypeError: "delimiter" must be string, not unicode
+        # type=str worked with argparse but when integrated with CLI then 'from __future__ import unicode_literals'
+        # breaks this - might break in Python 3 if the impyla module doesn't fix behaviour
+        self.add_opt('-d', '--delimiter', default=',', type=str, help='Delimiter to use (default: ,)')
+        self.add_opt('-Q', '--quotechar', default='"', type=str,
+                     help='Generate quoted CSV (recommended, default is double quote \'"\')')
+        self.add_opt('-E', '--escapechar', help='Escape char if needed')
 
-    return args
+    def process_options(self):
+        super(HiveSchemasCSV, self).process_options()
+        self.host = self.get_opt('host')
+        self.port = self.get_opt('port')
+        validate_host(self.host)
+        validate_port(self.port)
+        self.port = int(self.port)
+        self.kerberos = self.get_opt('kerberos')
+        self.krb5_service_name = self.get_opt('krb5_service_name')
+        self.ssl = self.get_opt('ssl')
+        self.delimiter = self.get_opt('delimiter')
+        self.quotechar = self.get_opt('quotechar')
+        self.escapechar = self.get_opt('escapechar')
 
-def connect_db(args, database):
-    auth_mechanism = None
-    if args.kerberos:
-        auth_mechanism = 'GSSAPI'
-        log.debug('kerberos enabled')
-        log.debug('krb5 remote service principal name = %s', args.krb5_service_name)
-    if args.ssl is True:
-        log.debug('ssl enabled')
+    def connect(self, database):
+        auth_mechanism = None
+        if self.kerberos:
+            auth_mechanism = 'GSSAPI'
+            log.debug('kerberos enabled')
+            log.debug('krb5 remote service principal name = %s', self.krb5_service_name)
+        if self.ssl:
+            log.debug('ssl enabled')
 
-    log.info('connecting to %s:%s database %s', args.host, args.port, database)
-    return connect(
-        host=args.host,
-        port=args.port,
-        auth_mechanism=auth_mechanism,
-        use_ssl=args.ssl,
-        #user=user,
-        #password=password,
-        database=database,
-        kerberos_service_name=args.krb5_service_name
-        )
+        log.info('connecting to %s:%s database %s', self.host, self.port, database)
+        return connect(
+            host=self.host,
+            port=self.port,
+            auth_mechanism=auth_mechanism,
+            use_ssl=self.ssl,
+            #user=user,
+            #password=password,
+            database=database,
+            kerberos_service_name=self.krb5_service_name
+            )
 
-def main():
-    args = parse_args()
+    def run(self):
 
-    conn = connect_db(args, 'default')
+        conn = self.connect('default')
 
-    quoting = csv.QUOTE_ALL
-    if args.quotechar == '':
-        quoting = csv.QUOTE_NONE
-    fieldnames = ['database', 'table', 'column', 'type']
-    csv_writer = csv.DictWriter(sys.stdout,
-                                delimiter=args.delimiter,
-                                quotechar=args.quotechar,
-                                escapechar=args.escapechar,
-                                quoting=quoting,
-                                fieldnames=fieldnames)
-    csv_writer.writeheader()
-    log.info('querying databases')
-    with conn.cursor() as db_cursor:
-        db_cursor.execute('show databases')
-        for db_row in db_cursor:
-            database = db_row[0]
-            log.info('querying tables for database %s', database)
-            #db_conn = connect_db(args, database)
-            #with db_conn.cursor() as table_cursor:
-            with conn.cursor() as table_cursor:
-                # doesn't support parameterized query quoting from dbapi spec
-                #table_cursor.execute('use %(database)s', {'database': database})
-                table_cursor.execute('use {}'.format(database))
-                table_cursor.execute('show tables')
-                for table_row in table_cursor:
-                    table = table_row[0]
-                    log.info('describing table %s', table)
-                    with conn.cursor() as column_cursor:
-                        # doesn't support parameterized query quoting from dbapi spec
-                        #column_cursor.execute('use %(database)s', {'database': database})
-                        #column_cursor.execute('describe %(table)s', {'table': table})
-                        column_cursor.execute('use {}'.format(database))
-                        column_cursor.execute('describe {}'.format(table))
-                        for column_row in column_cursor:
-                            column = column_row[0]
-                            column_type = column_row[1]
-                            csv_writer.writerow({'database': database,
-                                                 'table': table,
-                                                 'column': column,
-                                                 'type': column_type})
+        quoting = csv.QUOTE_ALL
+        if self.quotechar == '':
+            quoting = csv.QUOTE_NONE
+        fieldnames = ['database', 'table', 'column', 'type']
+        csv_writer = csv.DictWriter(sys.stdout,
+                                    delimiter=self.delimiter,
+                                    quotechar=self.quotechar,
+                                    escapechar=self.escapechar,
+                                    quoting=quoting,
+                                    fieldnames=fieldnames)
+        csv_writer.writeheader()
+        log.info('querying databases')
+        with conn.cursor() as db_cursor:
+            db_cursor.execute('show databases')
+            for db_row in db_cursor:
+                database = db_row[0]
+                log.info('querying tables for database %s', database)
+                #db_conn = connect_db(args, database)
+                #with db_conn.cursor() as table_cursor:
+                with conn.cursor() as table_cursor:
+                    # doesn't support parameterized query quoting from dbapi spec
+                    #table_cursor.execute('use %(database)s', {'database': database})
+                    table_cursor.execute('use {}'.format(database))
+                    table_cursor.execute('show tables')
+                    for table_row in table_cursor:
+                        table = table_row[0]
+                        log.info('describing table %s', table)
+                        with conn.cursor() as column_cursor:
+                            # doesn't support parameterized query quoting from dbapi spec
+                            #column_cursor.execute('use %(database)s', {'database': database})
+                            #column_cursor.execute('describe %(table)s', {'table': table})
+                            column_cursor.execute('use {}'.format(database))
+                            column_cursor.execute('describe {}'.format(table))
+                            for column_row in column_cursor:
+                                column = column_row[0]
+                                column_type = column_row[1]
+                                csv_writer.writerow({'database': database,
+                                                     'table': table,
+                                                     'column': column,
+                                                     'type': column_type})
 
 
 if __name__ == '__main__':
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("Control-C", file=sys.stderr)
+    HiveSchemasCSV().main()
