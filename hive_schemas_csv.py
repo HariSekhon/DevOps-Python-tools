@@ -159,7 +159,7 @@ class HiveSchemasCSV(HiveImpalaCLI):
         log.info('databases: %s, tables: %s, columns: %s', database_count, self.table_count, self.column_count)
 
     def process_database(self, database):
-        log.info('querying tables for database %s', database)
+        log.info("querying tables for database '%s'", database)
         tables = []
         with self.conn.cursor() as table_cursor:
             # doesn't support parameterized query quoting from dbapi spec
