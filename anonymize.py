@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.10.9'
+__version__ = '0.10.10'
 
 ip_regex = r'(?!127\.0\.0\.)' + ip_regex
 subnet_mask_regex = r'(?!127\.0\.0\.)' + subnet_mask_regex
@@ -319,7 +319,7 @@ class Anonymize(CLI):
                    .format(arg_sep=arg_sep,
                            id_or_name=id_or_name,
                            switch_prefix=switch_prefix),
-            'db4': r'(\s(?:in|of)\s+(column|table|database|schema)\s+[\'"])[^\'"]+',
+            'db4': r'(\s(?:in|of|for)\s+(column|table|database|schema)[\s:]+[\'"])[^\'"]+',
             'db5': r'/+user/+hive/+warehouse/+([A-Za-z0-9_-]+/+)*[A-Za-z0-9_-]+.db/+[A-Za-z0-9_-]+',
             'generic': r'(\bfileb?)://{filename_regex}'.format(filename_regex=filename_regex),
             'generic2': r'({switch_prefix}key{id_or_name}?{arg_sep})\S+'\
