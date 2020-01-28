@@ -488,6 +488,9 @@ dest[140]='ssh -i myKey -N -L 8888:<fqdn>:8888 <user>@<domain>'
 src[141]="Failed to open HDFS file hdfs://nameservice1/user/hive/warehouse/area_2/my_database_2.db/my_table_2/part-r-00030-6a789012-3bc4-56d7-e890-123fa456b7c8.snappy.parquet\nError(2): No such file or directory"
 dest[141]="Failed to open HDFS file hdfs://<hostname>/user/<user>/warehouse/<database>.db/<table>/part-r-00030-6a789012-3bc4-56d7-e890-123fa456b7c8.snappy.parquet\nError(2): No such file or directory"
 
+src[142]="ERROR: AnalysisException: Failed to load metadata for table: 'myCustomerTable2'"
+dest[142]="ERROR: AnalysisException: Failed to load metadata for table: '<table>'"
+
 
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
