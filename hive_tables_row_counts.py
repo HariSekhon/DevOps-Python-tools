@@ -63,7 +63,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.0'
+__version__ = '0.6.1'
 
 
 class HiveTablesRowCounts(HiveImpalaCLI):
@@ -116,45 +116,54 @@ class HiveTablesRowCounts(HiveImpalaCLI):
         # collecting in local list because long time iteration results in
         # impala.error.HiveServer2Error: Invalid query handle
         databases = []
+        database_count = 0
         with conn.cursor() as db_cursor:
             db_cursor.execute('show databases')
             for db_row in db_cursor:
                 database = db_row[0]
+                database_count += 1
                 if not database_regex.search(database):
                     log.debug("skipping database '%s', does not match regex '%s'", database, self.database)
                     continue
                 databases.append(database)
+        log.info('%s/%s databases selected', len(databases), database_count)
         for database in databases:
-            tables = []
-            log.info('querying tables for database %s', database)
-            with conn.cursor() as table_cursor:
-                try:
-                    # doesn't support parameterized query quoting from dbapi spec
-                    #table_cursor.execute('use %(database)s', {'database': database})
-                    table_cursor.execute('use `{}`'.format(database))
-                    table_cursor.execute('show tables')
-                except impala.error.HiveServer2Error as _:
-                    log.error(_)
-                    if 'AuthorizationException' in str(_):
-                        continue
-                    raise
-                for table_row in table_cursor:
-                    table = table_row[0]
-                    if not table_regex.search(table):
-                        log.debug("skipping database '%s' table '%s', does not match regex '%s'", \
-                                  database, table, self.table)
-                        continue
-                    tables.append(table)
-            for table in tables:
-                try:
-                    self.get_row_counts(conn, database, table, partition_regex)
-                except Exception as _:
-                    # invalid query handle and similar errors happen at higher level
-                    # as they are not query specific, will not be caught here so still error out
-                    if self.ignore_errors:
-                        log.error("database '%s' table '%s':  %s", database, table, _)
-                        continue
-                    raise
+            self.process_database(conn, database, table_regex, partition_regex)
+
+    def process_database(self, conn, database, table_regex, partition_regex):
+        tables = []
+        table_count = 0
+        log.info('querying tables for database %s', database)
+        with conn.cursor() as table_cursor:
+            try:
+                # doesn't support parameterized query quoting from dbapi spec
+                #table_cursor.execute('use %(database)s', {'database': database})
+                table_cursor.execute('use `{}`'.format(database))
+                table_cursor.execute('show tables')
+            except impala.error.HiveServer2Error as _:
+                log.error(_)
+                if 'AuthorizationException' in str(_):
+                    return
+                raise
+            for table_row in table_cursor:
+                table = table_row[0]
+                table_count += 1
+                if not table_regex.search(table):
+                    log.debug("skipping database '%s' table '%s', does not match regex '%s'", \
+                              database, table, self.table)
+                    continue
+                tables.append(table)
+        log.info("%s/%s tables selected for database '%s'", len(tables), table_count, database)
+        for table in tables:
+            try:
+                self.get_row_counts(conn, database, table, partition_regex)
+            except Exception as _:
+                # invalid query handle and similar errors happen at higher level
+                # as they are not query specific, will not be caught here so still error out
+                if self.ignore_errors:
+                    log.error("database '%s' table '%s':  %s", database, table, _)
+                    continue
+                raise
 
     def get_row_counts(self, conn, database, table, partition_regex):
         log.info("getting partitions for database '%s' table '%s'", database, table)
