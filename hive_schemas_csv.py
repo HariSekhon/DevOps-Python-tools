@@ -181,7 +181,7 @@ class HiveSchemasCSV(HiveImpalaCLI):
                 raise
 
     def process_table(self, database, table):
-        log.info('describing table %s.%s', database, table)
+        log.info("describing table '%s.%s'", database, table)
         with self.conn.cursor() as column_cursor:
             # doesn't support parameterized query quoting from dbapi spec
             #column_cursor.execute('use %(database)s', {'database': database})
