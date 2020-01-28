@@ -61,6 +61,7 @@ from __future__ import print_function
 import csv
 import os
 import sys
+import impala
 srcdir = os.path.abspath(os.path.dirname(__file__))
 pylib = os.path.join(srcdir, 'pylib')
 lib = os.path.join(srcdir, 'lib')
@@ -90,6 +91,11 @@ class HiveSchemasCSV(HiveImpalaCLI):
         self.delimiter = None
         self.quotechar = None
         self.escapechar = None
+        self.table_count = 0
+        self.column_count = 0
+        self.ignore_errors = False
+        self.csv_writer = None
+        self.conn = None
 
     def add_options(self):
         super(HiveSchemasCSV, self).add_options()
@@ -101,57 +107,94 @@ class HiveSchemasCSV(HiveImpalaCLI):
         self.add_opt('-Q', '--quotechar', default='"', type=str,
                      help='Generate quoted CSV (recommended, default is double quote \'"\')')
         self.add_opt('-E', '--escapechar', help='Escape char if needed')
+#
+# ignore tables that fail with errors like:
+#
+# Hive (CDH has MR, no tez):
+#
+# impala.error.OperationalError: Error while processing statement: FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.mr.MapRedTask  # pylint: disable=line-too-long
+#
+# Impala:
+#
+# impala.error.HiveServer2Error: AnalysisException: Unsupported type 'void' in column '<column>' of table '<table>'
+# CAUSED BY: TableLoadingException: Unsupported type 'void' in column '<column>' of table '<table>'
+#
+        self.add_opt('-e', '--ignore-errors', action='store_true',
+                     help='Ignore individual table schema listing errors (Impala often has table metadata errors)')
 
     def process_options(self):
         super(HiveSchemasCSV, self).process_options()
         self.delimiter = self.get_opt('delimiter')
         self.quotechar = self.get_opt('quotechar')
         self.escapechar = self.get_opt('escapechar')
+        self.ignore_errors = self.get_opt('ignore_errors')
 
     def run(self):
 
-        conn = self.connect('default')
+        self.conn = self.connect('default')
 
         quoting = csv.QUOTE_ALL
         if self.quotechar == '':
             quoting = csv.QUOTE_NONE
         fieldnames = ['database', 'table', 'column', 'type']
-        csv_writer = csv.DictWriter(sys.stdout,
-                                    delimiter=self.delimiter,
-                                    quotechar=self.quotechar,
-                                    escapechar=self.escapechar,
-                                    quoting=quoting,
-                                    fieldnames=fieldnames)
-        csv_writer.writeheader()
+        self.csv_writer = csv.DictWriter(sys.stdout,
+                                         delimiter=self.delimiter,
+                                         quotechar=self.quotechar,
+                                         escapechar=self.escapechar,
+                                         quoting=quoting,
+                                         fieldnames=fieldnames)
+        self.csv_writer.writeheader()
         log.info('querying databases')
-        with conn.cursor() as db_cursor:
+        databases = []
+        database_count = 0
+        with self.conn.cursor() as db_cursor:
             db_cursor.execute('show databases')
             for db_row in db_cursor:
                 database = db_row[0]
-                log.info('querying tables for database %s', database)
-                #db_conn = connect_db(args, database)
-                #with db_conn.cursor() as table_cursor:
-                with conn.cursor() as table_cursor:
-                    # doesn't support parameterized query quoting from dbapi spec
-                    #table_cursor.execute('use %(database)s', {'database': database})
-                    table_cursor.execute('use `{}`'.format(database))
-                    table_cursor.execute('show tables')
-                    for table_row in table_cursor:
-                        table = table_row[0]
-                        log.info('describing table %s.%s', database, table)
-                        with conn.cursor() as column_cursor:
-                            # doesn't support parameterized query quoting from dbapi spec
-                            #column_cursor.execute('use %(database)s', {'database': database})
-                            #column_cursor.execute('describe %(table)s', {'table': table})
-                            column_cursor.execute('use `{}`'.format(database))
-                            column_cursor.execute('describe `{}`'.format(table))
-                            for column_row in column_cursor:
-                                column = column_row[0]
-                                column_type = column_row[1]
-                                csv_writer.writerow({'database': database,
-                                                     'table': table,
-                                                     'column': column,
-                                                     'type': column_type})
+                database_count += 1
+                databases.append(database)
+        log.info('found %s databases', database_count)
+        for database in databases:
+            self.process_database(database)
+        log.info('databases: %s, tables: %s, columns: %s', database_count, self.table_count, self.column_count)
+
+    def process_database(self, database):
+        log.info('querying tables for database %s', database)
+        tables = []
+        with self.conn.cursor() as table_cursor:
+            # doesn't support parameterized query quoting from dbapi spec
+            #table_cursor.execute('use %(database)s', {'database': database})
+            table_cursor.execute('use `{}`'.format(database))
+            table_cursor.execute('show tables')
+            for table_row in table_cursor:
+                table = table_row[0]
+                self.table_count += 1
+                tables.append(table)
+        for table in tables:
+            try:
+                self.process_table(database, table)
+            except impala.error.HiveServer2Error as _:
+                if self.ignore_errors:
+                    log.error("database '%s' table '%s':  %s", database, table, _)
+                    continue
+                raise
+
+    def process_table(self, database, table):
+        log.info('describing table %s.%s', database, table)
+        with self.conn.cursor() as column_cursor:
+            # doesn't support parameterized query quoting from dbapi spec
+            #column_cursor.execute('use %(database)s', {'database': database})
+            #column_cursor.execute('describe %(table)s', {'table': table})
+            column_cursor.execute('use `{}`'.format(database))
+            column_cursor.execute('describe `{}`'.format(table))
+            for column_row in column_cursor:
+                column = column_row[0]
+                column_type = column_row[1]
+                self.column_count += 1
+                self.csv_writer.writerow({'database': database,
+                                          'table': table,
+                                          'column': column,
+                                          'type': column_type})
 
 
 if __name__ == '__main__':
