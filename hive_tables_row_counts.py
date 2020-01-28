@@ -135,7 +135,7 @@ class HiveTablesRowCounts(HiveImpalaCLI):
     def process_database(self, conn, database, table_regex, partition_regex):
         tables = []
         table_count = 0
-        log.info('querying tables for database %s', database)
+        log.info("querying tables for database '%s'", database)
         with conn.cursor() as table_cursor:
             try:
                 # doesn't support parameterized query quoting from dbapi spec
