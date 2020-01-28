@@ -188,14 +188,17 @@ class HiveSchemasCSV(HiveImpalaCLI):
             #column_cursor.execute('describe %(table)s', {'table': table})
             column_cursor.execute('use `{}`'.format(database))
             column_cursor.execute('describe `{}`'.format(table))
+            column_count = 0
             for column_row in column_cursor:
                 column = column_row[0]
                 column_type = column_row[1]
-                self.column_count += 1
+                column_count += 1
                 self.csv_writer.writerow({'database': database,
                                           'table': table,
                                           'column': column,
                                           'type': column_type})
+        log.info("found %s columns in table '%s.%s'", column_count, database, table)
+        self.column_count += column_count
 
 
 if __name__ == '__main__':
