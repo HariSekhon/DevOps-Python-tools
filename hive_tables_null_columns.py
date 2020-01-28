@@ -128,7 +128,7 @@ class HiveTablesNullColumns(HiveForEachTable):
                                  )
                          )
                 else:
-                    print('OK: {db}.{table} as {num}/{total} columns with only nulls'\
+                    print('OK: {db}.{table} has {num}/{total} columns with only nulls'\
                           .format(db=database, table=table, num=num_cols, total=total_cols))
 
 
