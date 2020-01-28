@@ -113,7 +113,9 @@ Environment variables are supported for convenience and also to hide credentials
     - ```hdfs_files_stats.jy``` - fetches HDFS file stats. Useful to generate a list of all files in a directory tree showing block size, replication factor, underfilled blocks and small files
   - [Hive](https://hive.apache.org/) / [Impala](https://impala.apache.org/):
     - ```hive_schemas_csv.py``` / ```impala_schemas_csv.py``` - dumps all databases, tables, columns and types out in CSV format to standard output
+
     The following programs can all optionally filter by database / table name regex:
+
     - ```hive_foreach_table.py``` / ```impala_foreach_table.py``` - execute any query or statement against every Hive / Impala table
     - ```hive_tables_row_counts.py``` / ```impala_tables_row_counts.py``` - outputs tables row counts. Useful for reconciliation between cluster migrations
     - ```hive_tables_row_counts_any_nulls.py``` / ```impala_tables_row_counts_any_nulls.py``` - outputs tables row counts where any field is NULL. Useful for reconciliation between cluster migrations or catching data quality problems or subtle ETL bugs
