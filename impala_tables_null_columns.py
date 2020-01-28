@@ -22,7 +22,9 @@ for all tables in all databases, or only those matching given db / table regexes
 Describes each table, constructs a complex query to check each column individually for containing only NULLs,
 and prints out each tables' count of total columns containing only NULLs as well as the list of offending columns
 
-Useful for catching problems with data quality or broken ETL processes
+Useful for catching problems with data quality or subtle ETL bugs
+
+Rewrite of a Perl version from 2013 from my DevOps Perl Tools repo
 
 Tested on Impala 2.7.0 on CDH 5.10 with Kerberos
 
