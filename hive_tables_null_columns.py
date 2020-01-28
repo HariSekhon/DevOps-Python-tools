@@ -24,7 +24,7 @@ and prints out each tables' count of total columns containing only NULLs as well
 
 Useful for catching problems with data quality or subtle ETL bugs
 
-Rewrite of a Perl version from 2013 from my DevOps Perl Tools repo
+Rewrite of a Perl version from 2014 from my DevOps Perl Tools repo
 
 Tested on Hive 1.1.0 on CDH 5.10 with Kerberos
 
