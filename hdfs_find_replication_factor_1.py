@@ -123,8 +123,7 @@ class HdfsFindReplicationFactor1(CLI):
                             print('', file=sys.stderr)
                         print(file_path)
                         if self.replication_factor:
-                            log.info('setting replication factor to {} on {}'\
-                                     .format(self.replication_factor, file_path))
+                            log.info('setting replication factor to %s on %s', self.replication_factor, file_path)
                             # returns a generator so must evaluate in order to actually execute
                             # otherwise you find there is no effect on the replication factor
                             for _ in client.setrep([file_path], self.replication_factor, recurse=False):
