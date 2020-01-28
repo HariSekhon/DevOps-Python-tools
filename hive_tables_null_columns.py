@@ -65,7 +65,7 @@ except ImportError as _:
 
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 
 class HiveTablesNullColumns(HiveForEachTable):
 
@@ -96,12 +96,12 @@ class HiveTablesNullColumns(HiveForEachTable):
                 #column_type = column_row[1]
                 columns.append(column)
         sum_part = ', '.join(
-            ['IF(SUM(IF({col} IS NULL, 1, 0)) = COUNT(*), 1, 0) as {col}'.format(col=column) \
+            ['IF(SUM(IF(`{col}` IS NULL, 1, 0)) = COUNT(*), 1, 0) as `{col}`'.format(col=column) \
             for column in columns]
         )
-        query = "SELECT {sum_part} FROM {db}.{table} WHERE "\
+        query = "SELECT {sum_part} FROM `{db}`.`{table}` WHERE `"\
                 .format(sum_part=sum_part, db=database, table=table) + \
-                " IS NULL OR ".join(columns) + " IS NULL"
+                "` IS NULL OR `".join(columns) + "` IS NULL"
         self.check_table_for_nulls(conn, database, table, columns, query)
 
     @staticmethod
