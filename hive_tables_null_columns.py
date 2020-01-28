@@ -89,8 +89,8 @@ class HiveTablesNullColumns(HiveForEachTable):
             # doesn't support parameterized query quoting from dbapi spec
             #column_cursor.execute('use %(database)s', {'database': database})
             #column_cursor.execute('describe %(table)s', {'table': table})
-            column_cursor.execute('use {}'.format(database))
-            column_cursor.execute('describe {}'.format(table))
+            column_cursor.execute('use `{}`'.format(database))
+            column_cursor.execute('describe `{}`'.format(table))
             for column_row in column_cursor:
                 column = column_row[0]
                 #column_type = column_row[1]

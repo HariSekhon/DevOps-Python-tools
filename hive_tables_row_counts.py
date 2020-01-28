@@ -125,7 +125,7 @@ class HiveTablesRowCounts(HiveImpalaCLI):
                     try:
                         # doesn't support parameterized query quoting from dbapi spec
                         #table_cursor.execute('use %(database)s', {'database': database})
-                        table_cursor.execute('use {}'.format(database))
+                        table_cursor.execute('use `{}`'.format(database))
                         table_cursor.execute('show tables')
                     except impala.error.HiveServer2Error as _:
                         log.error(_)
@@ -152,9 +152,9 @@ class HiveTablesRowCounts(HiveImpalaCLI):
         log.info("getting partitions for database '%s' table '%s'", database, table)
         with conn.cursor() as partition_cursor:
             # doesn't support parameterized query quoting from dbapi spec
-            partition_cursor.execute('use {db}'.format(db=database))
+            partition_cursor.execute('use `{db}`'.format(db=database))
             try:
-                partition_cursor.execute('show partitions {table}'.format(table=table))
+                partition_cursor.execute('show partitions `{table}`'.format(table=table))
                 for partitions_row in partition_cursor:
                     partition_key = partitions_row[0]
                     partition_value = partitions_row[1]
@@ -168,7 +168,7 @@ class HiveTablesRowCounts(HiveImpalaCLI):
                                   self.partition)
                         continue
                     # doesn't support parameterized query quoting from dbapi spec
-                    partition_cursor.execute('SELECT COUNT(*) FROM {db}.{table} WHERE {key}={value}'\
+                    partition_cursor.execute('SELECT COUNT(*) FROM `{db}`.`{table}` WHERE `{key}`={value}'\
                                           .format(db=database, table=table, key=partition_key, value=partition_value))
                     for result in partition_cursor:
                         row_count = result[0]
@@ -187,9 +187,9 @@ class HiveTablesRowCounts(HiveImpalaCLI):
                 log.info("no partitions found for database '%s' table '%s', getting row counts for whole table",
                          database, table)
                 with conn.cursor() as table_cursor:
-                    log.info("running SELECT COUNT(*) FROM %s.%s", database, table)
+                    log.info("running SELECT COUNT(*) FROM `%s`.`%s`", database, table)
                     # doesn't support parameterized query quoting from dbapi spec
-                    table_cursor.execute('SELECT COUNT(*) FROM {db}.{table}'.format(db=database, table=table))
+                    table_cursor.execute('SELECT COUNT(*) FROM `{db}`.`{table}`'.format(db=database, table=table))
                     for result in table_cursor:
                         row_count = result[0]
                         print('{db}.{table}\t{row_count}'.format(db=database, table=table, row_count=row_count))

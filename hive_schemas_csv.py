@@ -77,7 +77,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 
 
 class HiveSchemasCSV(HiveImpalaCLI):
@@ -134,7 +134,7 @@ class HiveSchemasCSV(HiveImpalaCLI):
                 with conn.cursor() as table_cursor:
                     # doesn't support parameterized query quoting from dbapi spec
                     #table_cursor.execute('use %(database)s', {'database': database})
-                    table_cursor.execute('use {}'.format(database))
+                    table_cursor.execute('use `{}`'.format(database))
                     table_cursor.execute('show tables')
                     for table_row in table_cursor:
                         table = table_row[0]
@@ -143,8 +143,8 @@ class HiveSchemasCSV(HiveImpalaCLI):
                             # doesn't support parameterized query quoting from dbapi spec
                             #column_cursor.execute('use %(database)s', {'database': database})
                             #column_cursor.execute('describe %(table)s', {'table': table})
-                            column_cursor.execute('use {}'.format(database))
-                            column_cursor.execute('describe {}'.format(table))
+                            column_cursor.execute('use `{}`'.format(database))
+                            column_cursor.execute('describe `{}`'.format(table))
                             for column_row in column_cursor:
                                 column = column_row[0]
                                 column_type = column_row[1]

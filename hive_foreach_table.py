@@ -73,7 +73,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.1'
+__version__ = '0.4.2'
 
 
 class HiveForEachTable(HiveImpalaCLI):
@@ -146,7 +146,7 @@ class HiveForEachTable(HiveImpalaCLI):
                     try:
                         # doesn't support parameterized query quoting from dbapi spec
                         #table_cursor.execute('use %(database)s', {'database': database})
-                        table_cursor.execute('use {}'.format(database))
+                        table_cursor.execute('use `{}`'.format(database))
                         table_cursor.execute('show tables')
                     except impala.error.HiveServer2Error as _:
                         log.error(_)
