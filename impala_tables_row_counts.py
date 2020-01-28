@@ -21,7 +21,7 @@ or only those matching given db / table / partition value regexes
 
 Useful for reconciliations between clusters after migrations
 
-Tested on Impala 2.7.0 on CDH 5.10 with Kerberos
+Tested on Impala 2.7.0, 2.12.0 on CDH 5.10, 5.16 with Kerberos and SSL
 
 Due to a thrift / impyla bug this needs exactly thrift==0.9.3, see
 

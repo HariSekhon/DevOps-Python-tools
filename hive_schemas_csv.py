@@ -36,7 +36,7 @@ which would cause incorrect field splitting, you can disable by setting --quotec
 if escaping is needed then you will be forced to specify an --escapechar otherwise the csv writer will
 raise a traceback to tell you to set one (eg. --escapechar='\\')
 
-Tested on Hive 1.1.0 on CDH 5.10 with Kerberos
+Tested on Hive 1.1.0 on CDH 5.10, 5.16 with Kerberos and SSL
 
 Due to a thrift / impyla bug this needs exactly thrift==0.9.3, see
 

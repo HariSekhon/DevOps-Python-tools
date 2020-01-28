@@ -23,7 +23,7 @@ TSV Output format:
 <database>  <table>
 
 
-Tested on Hive 1.1.0 on CDH 5.10 with Kerberos
+Tested on Hive 1.1.0 on CDH 5.10, 5.16 with Kerberos and SSL
 
 Due to a thrift / impyla bug this needs exactly thrift==0.9.3, see
 
