@@ -164,7 +164,7 @@ class HiveForEachTable(HiveImpalaCLI):
                 table_cursor.execute('use `{}`'.format(database))
                 table_cursor.execute('show tables')
             except impala.error.HiveServer2Error as _:
-                log.error('error querying tables for database %s: %s', database, _)
+                log.error("error querying tables for database '%s': %s", database, _)
                 if 'AuthorizationException' in str(_):
                     return
                 raise
