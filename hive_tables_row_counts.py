@@ -77,6 +77,7 @@ class HiveTablesRowCounts(HiveImpalaCLI):
         self.table = None
         self.partition = None
         self.ignore_errors = False
+        self.table_count = 0
 
     def add_options(self):
         super(HiveTablesRowCounts, self).add_options()
@@ -129,6 +130,7 @@ class HiveTablesRowCounts(HiveImpalaCLI):
         log.info('%s/%s databases selected', len(databases), database_count)
         for database in databases:
             self.process_database(conn, database, table_regex, partition_regex)
+        log.info('processed %s databases, %s tables', database_count, self.table_count)
 
     def process_database(self, conn, database, table_regex, partition_regex):
         tables = []
@@ -157,6 +159,7 @@ class HiveTablesRowCounts(HiveImpalaCLI):
         for table in tables:
             try:
                 self.get_row_counts(conn, database, table, partition_regex)
+                self.table_count += 1
             except Exception as _:
                 # invalid query handle and similar errors happen at higher level
                 # as they are not query specific, will not be caught here so still error out
