@@ -80,7 +80,7 @@ class HiveTablesRowsWithNulls(HiveForEachTable):
     # discard last param query and construct our own based on the table DDL of cols
     def execute(self, conn, database, table, query):
         columns = []
-        log.info('describing table %s.%s', database, table)
+        log.info("describing table '%s.%s'", database, table)
         with conn.cursor() as column_cursor:
             # doesn't support parameterized query quoting from dbapi spec
             #column_cursor.execute('use %(database)s', {'database': database})
