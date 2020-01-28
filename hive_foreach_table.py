@@ -73,7 +73,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 
 
 class HiveForEachTable(HiveImpalaCLI):
@@ -137,53 +137,62 @@ class HiveForEachTable(HiveImpalaCLI):
         # collecting in local list because long time iteration results in
         # impala.error.HiveServer2Error: Invalid query handle
         databases = []
+        database_count = 0
         with conn.cursor() as db_cursor:
             db_cursor.execute('show databases')
             for db_row in db_cursor:
                 database = db_row[0]
+                database_count += 1
                 if not database_regex.search(database):
                     log.debug("skipping database '%s', does not match regex '%s'", database, self.database)
                     continue
                 databases.append(database)
+        log.info('%s/%s databases selected', len(databases), database_count)
         for database in databases:
-            tables = []
-            log.info('querying tables for database %s', database)
-            with conn.cursor() as table_cursor:
-                try:
-                    # doesn't support parameterized query quoting from dbapi spec
-                    #table_cursor.execute('use %(database)s', {'database': database})
-                    table_cursor.execute('use `{}`'.format(database))
-                    table_cursor.execute('show tables')
-                except impala.error.HiveServer2Error as _:
-                    log.error(_)
-                    if 'AuthorizationException' in str(_):
-                        continue
-                    raise
-                for table_row in table_cursor:
-                    table = table_row[0]
-                    if not table_regex.search(table):
-                        log.debug("skipping database '%s' table '%s', does not match regex '%s'", \
-                                  database, table, self.table)
-                        continue
-                    tables.append(table)
-            for table in tables:
-                try:
-                    query = self.query.format(db=database, table=table)
-                except KeyError as _:
-                    if _ == 'db':
-                        query = self.query.format(table=table)
-                try:
-                    self.execute(conn, database, table, query)
-                except Exception as _:
-                    if self.ignore_errors:
-                        log.error("database '%s' table '%s':  %s", database, table, _)
-                        continue
-                    raise
+            self.process_database(conn, database, table_regex)
+
+    def process_database(self, conn, database, table_regex):
+        tables = []
+        table_count = 0
+        log.info("querying tables for database '%s'", database)
+        with conn.cursor() as table_cursor:
+            try:
+                # doesn't support parameterized query quoting from dbapi spec
+                #table_cursor.execute('use %(database)s', {'database': database})
+                table_cursor.execute('use `{}`'.format(database))
+                table_cursor.execute('show tables')
+            except impala.error.HiveServer2Error as _:
+                log.error('error querying tables for database %s: %s', database, _)
+                if 'AuthorizationException' in str(_):
+                    return
+                raise
+            for table_row in table_cursor:
+                table = table_row[0]
+                table_count += 1
+                if not table_regex.search(table):
+                    log.debug("skipping database '%s' table '%s', does not match regex '%s'", \
+                              database, table, self.table)
+                    continue
+                tables.append(table)
+        log.info("%s/%s tables selected for database '%s'", len(tables), table_count, database)
+        for table in tables:
+            try:
+                query = self.query.format(db=database, table=table)
+            except KeyError as _:
+                if _ == 'db':
+                    query = self.query.format(table=table)
+            try:
+                self.execute(conn, database, table, query)
+            except Exception as _:
+                if self.ignore_errors:
+                    log.error("database '%s' table '%s':  %s", database, table, _)
+                    continue
+                raise
 
     @staticmethod
     def execute(conn, database, table, query):
         try:
-            log.info(" %s.%s - running %s", database, table, query)
+            log.info(' %s.%s - running %s', database, table, query)
             with conn.cursor() as query_cursor:
                 # doesn't support parameterized query quoting from dbapi spec
                 query_cursor.execute(query)
