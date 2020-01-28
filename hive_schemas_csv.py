@@ -170,6 +170,7 @@ class HiveSchemasCSV(HiveImpalaCLI):
                 table = table_row[0]
                 self.table_count += 1
                 tables.append(table)
+        log.info("found %s tables in database '%s'", len(tables), database)
         for table in tables:
             try:
                 self.process_table(database, table)
