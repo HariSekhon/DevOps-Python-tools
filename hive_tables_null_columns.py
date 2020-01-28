@@ -74,7 +74,7 @@ class HiveTablesNullColumns(HiveForEachTable):
         super(HiveTablesNullColumns, self).__init__()
         # Python 3.x
         # super().__init__()
-        self.query = 'placeholder'  # constructed later dynamically per table
+        self.query = 'placeholder'  # constructed later dynamically per table, here to suppress --query CLI option
         self.database = None
         self.table = None
         #self.partition = None
