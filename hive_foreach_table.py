@@ -90,6 +90,7 @@ class HiveForEachTable(HiveImpalaCLI):
         self.table = None
         self.partition = None
         self.ignore_errors = False
+        self.table_count = 0
 
     def add_options(self):
         super(HiveForEachTable, self).add_options()
@@ -150,6 +151,7 @@ class HiveForEachTable(HiveImpalaCLI):
         log.info('%s/%s databases selected', len(databases), database_count)
         for database in databases:
             self.process_database(conn, database, table_regex)
+        log.info('processed %s databases, %s tables', database_count, self.table_count)
 
     def process_database(self, conn, database, table_regex):
         tables = []
@@ -183,6 +185,7 @@ class HiveForEachTable(HiveImpalaCLI):
                     query = self.query.format(table=table)
             try:
                 self.execute(conn, database, table, query)
+                self.table_count += 1
             except Exception as _:
                 if self.ignore_errors:
                     log.error("database '%s' table '%s':  %s", database, table, _)
