@@ -73,7 +73,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 
 
 class HiveForEachTable(HiveImpalaCLI):
@@ -150,13 +150,14 @@ class HiveForEachTable(HiveImpalaCLI):
                 databases.append(database)
         log.info('%s/%s databases selected', len(databases), database_count)
         for database in databases:
-            self.process_database(conn, database, table_regex)
+            self.process_database(database, table_regex)
         log.info('processed %s databases, %s tables', database_count, self.table_count)
 
-    def process_database(self, conn, database, table_regex):
+    def process_database(self, database, table_regex):
         tables = []
         table_count = 0
         log.info("querying tables for database '%s'", database)
+        conn = self.connect(database)
         with conn.cursor() as table_cursor:
             try:
                 # doesn't support parameterized query quoting from dbapi spec
@@ -179,10 +180,13 @@ class HiveForEachTable(HiveImpalaCLI):
         log.info("%s/%s tables selected for database '%s'", len(tables), table_count, database)
         for table in tables:
             try:
-                query = self.query.format(db=database, table=table)
+                query = self.query.format(db='`{}`'.format(database),
+                                          table='`{}`'.format(table))
             except KeyError as _:
                 if _ == 'db':
-                    query = self.query.format(table=table)
+                    query = self.query.format(table='`{}`'.format(table))
+                else:
+                    raise
             try:
                 self.execute(conn, database, table, query)
                 self.table_count += 1
