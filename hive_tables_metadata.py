@@ -84,7 +84,8 @@ class HiveTablesMetadata(HiveForEachTable):
         super(HiveTablesMetadata, self).process_options()
         # Python 3.x
         # super().__init__()
-        field = self.get_opt('field')
+        if self.field is None:
+            field = self.get_opt('field')
         if not field:
             self.usage('--field not specified')
         validate_regex(field, 'field')
