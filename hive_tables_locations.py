@@ -48,8 +48,7 @@ pylib = os.path.join(srcdir, 'pylib')
 sys.path.append(pylib)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log
-    from hive_foreach_table import HiveForEachTable
+    from hive_tables_metadata import HiveTablesMetadata
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
     print("Did you remember to build the project by running 'make'?", file=sys.stderr)
@@ -60,30 +59,14 @@ __author__ = 'Hari Sekhon'
 __version__ = '0.5.0'
 
 
-class HiveTablesLocations(HiveForEachTable):
+class HiveTablesLocations(HiveTablesMetadata):
 
     def __init__(self):
         # Python 2.x
         super(HiveTablesLocations, self).__init__()
         # Python 3.x
         # super().__init__()
-        self.query = 'describe formatted {table}'
-
-    # discard last param query and construct our own based on the table DDL of cols
-    def execute(self, conn, database, table, query):
-        log.info("describing table '%s.%s'", database, table)
-        location = 'UNKNOWN'
-        with conn.cursor() as table_cursor:
-            # doesn't support parameterized query quoting from dbapi spec
-            #table_cursor.execute('use %(database)s', {'database': database})
-            #table_cursor.execute('describe %(table)s', {'table': table})
-            table_cursor.execute('use `{}`'.format(database))
-            table_cursor.execute(query.format(table=table))
-            for row in table_cursor:
-                if 'Location' in row[0]:
-                    location = row[1]
-                    break
-        print('{db}.{table}\t{location}'.format(db=database, table=table, location=location))
+        self.field = 'Location'
 
 
 if __name__ == '__main__':
