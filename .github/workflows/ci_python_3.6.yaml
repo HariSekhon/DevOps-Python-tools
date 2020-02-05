@@ -13,8 +13,8 @@
 
 name: CI Python 3.6
 
-env:
-  DEBUG: 1
+#env:
+#  DEBUG: 1
 
 on:
   push:
