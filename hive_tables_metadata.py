@@ -85,11 +85,11 @@ class HiveTablesMetadata(HiveForEachTable):
         # Python 3.x
         # super().__init__()
         if self.field is None:
-            field = self.get_opt('field')
-        if not field:
+            self.field = self.get_opt('field')
+        if not self.field:
             self.usage('--field not specified')
-        validate_regex(field, 'field')
-        self.field = re.compile(field)
+        validate_regex(self.field, 'field')
+        self.field = re.compile(self.field)
 
     # discard last param query and construct our own based on the table DDL of cols
     def execute(self, conn, database, table, query):
