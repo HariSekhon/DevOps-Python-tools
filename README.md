@@ -121,6 +121,8 @@ Environment variables are supported for convenience and also to hide credentials
     - ```hive_tables_row_counts_any_nulls.py``` / ```impala_tables_row_counts_any_nulls.py``` - outputs tables row counts where any field is NULL. Useful for reconciliation between cluster migrations or catching data quality problems or subtle ETL bugs
     - ```hive_tables_null_columns.py``` / ```impala_tables_null_columns.py``` - outputs tables columns containing only NULLs. Useful for catching data quality problems or subtle ETL bugs
     - ```hive_tables_null_rows.py``` / ```impala_tables_null_rows.py``` - outputs tables row counts where all fields contain NULLs. Useful for catching data quality problems or subtle ETL bugs
+    - ```hive_tables_metadata.py``` / ```impala_tables_metadata.py``` - outputs for each table the matching regex metadata DDL property from describe table
+    - ```hive_tables_locations.py``` / ```impala_tables_locations.py``` - outputs for each table its data location
   - [HBase](https://hbase.apache.org/):
     - ```hbase_generate_data.py``` - inserts random generated data in to a given [HBase](https://hbase.apache.org/) table, with optional skew support with configurable skew percentage. Useful for testing region splitting, balancing, CI tests etc. Outputs stats for number of rows written, time taken, rows per sec and volume per sec written.
     - ```hbase_show_table_region_ranges.py``` - dumps HBase table region ranges information, useful when pre-splitting tables
