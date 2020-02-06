@@ -101,7 +101,7 @@ python:
 
 	# Python >= 3.4 - try but accept failure in case we're not on the right version of Python
 	#@if [ "$$(echo "$$(python -V 2>&1 | grep -Eo '[[:digit:]]+\.[[:digit:]]+') >= 3.4" | bc -l)" = 1 ]; then bash-tools/python_pip_install.sh "avro-python3"; fi
-	NO_FAIL=1 bash-tools/python_pip_install.sh "avro-python3"
+	bash-tools/python_pip_install.sh "avro-python3" || :
 
 	@# for impyla
 	@#$(SUDO_PIP) pip install --upgrade setuptools || :
