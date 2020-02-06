@@ -51,6 +51,11 @@ build:
 	@echo DevOps Python Tools Build
 	@echo =========================
 
+	type -P python
+	python -V
+
+	pip -V
+
 	$(MAKE) init
 	if [ -z "$(CPANM)" ]; then make; exit $$?; fi
 	$(MAKE) system-packages-python
