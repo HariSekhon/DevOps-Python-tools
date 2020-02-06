@@ -22,7 +22,7 @@ curl
 iputils
 
 # for htpasswd for docker registry authenticated checks
-https-tools
+httpd-tools
 
 # needed to build pyhs2
 # libgsasl-devel saslwrapper-devel
