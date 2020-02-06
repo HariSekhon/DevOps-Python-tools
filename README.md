@@ -6,9 +6,10 @@ Hari Sekhon - DevOps Python Tools
 [![GitHub forks](https://img.shields.io/github/forks/harisekhon/devops-python-tools.svg)](https://github.com/harisekhon/devops-python-tools/network)
 [![PyUp](https://pyup.io/repos/github/HariSekhon/DevOps-Python-tools/shield.svg)](https://pyup.io/account/repos/github/HariSekhon/DevOps-Python-tools/)
 [![Python 3](https://pyup.io/repos/github/HariSekhon/DevOps-Python-tools/python-3-shield.svg)](https://pyup.io/repos/github/HariSekhon/DevOps-Python-tools/)
+
+[![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20OS%20X-blue.svg)](https://github.com/harisekhon/devops-python-tools#hari-sekhon-pytools)
 [![DockerHub](https://img.shields.io/badge/docker-available-blue.svg)](https://hub.docker.com/r/harisekhon/pytools/)
 [![MicroBadger](https://images.microbadger.com/badges/image/harisekhon/pytools.svg)](http://microbadger.com/#/images/harisekhon/pytools)
-[![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20OS%20X-blue.svg)](https://github.com/harisekhon/devops-python-tools#hari-sekhon-pytools)
 
 [![CI Mac](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Mac/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Mac%22)
 [![CI Ubuntu](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Ubuntu/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Ubuntu%22)
