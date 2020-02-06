@@ -29,6 +29,9 @@
 
 # ===================
 
+# would fail bootstrapping on Alpine
+#SHELL := /usr/bin/env bash
+
 ifneq ("$(wildcard bash-tools/Makefile.in)", "")
 	include bash-tools/Makefile.in
 endif
@@ -51,10 +54,11 @@ build:
 	@echo DevOps Python Tools Build
 	@echo =========================
 
-	type -P python
-	python -V
-
-	pip -V
+	# executing in sh where type is not available
+	#type -P python
+	which python || :
+	python -V || :
+	pip -V || :
 
 	$(MAKE) init
 	if [ -z "$(CPANM)" ]; then make; exit $$?; fi
@@ -62,6 +66,12 @@ build:
 	if type apk 2>/dev/null; then $(MAKE) apk-packages-extra; fi
 	if type apt-get 2>/dev/null; then $(MAKE) apt-packages-extra; fi
 	$(MAKE) python
+
+	# executing in sh where type is not available
+	#type -P python
+	which python
+	python -V
+	pip -V
 
 .PHONY: init
 init:
