@@ -17,6 +17,7 @@ gcc-c++
 # needed to build python-krbV and cloudera/thrift_sasl
 cyrus-sasl-devel
 krb5-devel
+openldap-devel
 openssl-devel
 
 # moved to optional to account for changed package names on CentOS 8
