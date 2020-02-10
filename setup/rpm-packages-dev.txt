@@ -18,5 +18,7 @@ gcc-c++
 cyrus-sasl-devel
 krb5-devel
 openssl-devel
+
+# moved to optional to account for changed package names on CentOS 8
 # needed to build python-snappy for avro module
-snappy-devel
+#snappy-devel
