@@ -20,6 +20,11 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$srcdir/..";
 
 # shellcheck disable=SC1091
-#. ./tests/utils.sh
+. ./tests/utils.sh
+
+# Fedora doesn't have /var/log/wtmp
+if ! [ -f /var/log/wtmp ]; then
+    $sudo touch /var/log/wtmp || :
+fi
 
 ./welcome.py "$@"
