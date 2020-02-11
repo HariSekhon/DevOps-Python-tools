@@ -15,4 +15,6 @@
 
 openldap-dev
 snappy-dev
-unzip
+
+# installed by bash-tools submodule now
+#unzip
