@@ -13,24 +13,27 @@
 #                          Alpine Package Requirements
 # ============================================================================ #
 
-# full mktemp needed for json tests
-# full split needed for anonymize_parallel.sh
-coreutils
-
-grep
-
-# needed for tests/test_spark* and ambari_cancel_all_requests.sh
-curl
-
 # for htpasswd for docker registry authenticated checks
 apache2-utils
-
-# for anonymize_parallel.sh
-parallel
 
 #which java || $(SUDO) apk add openjdk8-jre-base
 
 # Spark Java Py4J gets java linking error without this
 #if [ -f /lib/libc.musl-x86_64.so.1 ]; then [ -e /lib/ld-linux-x86-64.so.2 ] || ln -sv /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2; fi
 
-zip
+# =====================================
+# installed by bash-tools submodule now
+
+# full mktemp needed for json tests
+# full split needed for anonymize_parallel.sh
+#coreutils
+
+# needed for tests/test_spark* and ambari_cancel_all_requests.sh
+#curl
+
+#grep
+
+# for anonymize_parallel.sh
+#parallel
+
+#zip
