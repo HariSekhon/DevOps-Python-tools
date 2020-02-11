@@ -14,8 +14,9 @@
 #                    Mac OS X - Homebrew Package Requirements
 # ============================================================================ #
 
+# installed by bash-tools submodule now
 # for anonymize_parallel.sh
-parallel
+#parallel
 
 parquet-tools
 snappy
