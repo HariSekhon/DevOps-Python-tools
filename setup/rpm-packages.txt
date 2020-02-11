@@ -15,12 +15,6 @@
 
 java
 
-# needed for tests/test_spark* and ambari_cancel_all_requests.sh
-curl
-
-# for ping mode of find_active_server.py
-iputils
-
 # for htpasswd for docker registry authenticated checks
 httpd-tools
 
@@ -28,8 +22,17 @@ httpd-tools
 # libgsasl-devel saslwrapper-devel
 #cyrus-sasl-devel
 
-# for anonymize_parallel.sh
-parallel
+# =====================================
+# installed by bash-tools submodule now
 
-unzip
-zip
+# needed for tests/test_spark* and ambari_cancel_all_requests.sh
+#curl
+
+# for ping mode of find_active_server.py
+#iputils
+
+# for anonymize_parallel.sh
+#parallel
+
+#unzip
+#zip
