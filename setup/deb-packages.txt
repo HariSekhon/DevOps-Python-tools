@@ -13,21 +13,8 @@
 #                            Deb Package Requirements
 # ============================================================================ #
 
-# needed for tests/test_spark* and ambari_cancel_all_requests.sh
-curl
-
-# either of these should do to ensure ping command is present for find_active_server.py's ping mode
-iputils-ping
-#inetutils-ping
-
 # for htpasswd for docker registry authenticated checks
 apache2-utils
-
-# for anonymize_parallel.sh
-parallel
-
-# needed for serf test's 'uptime' command
-procps
 
 # installs 343MB of dependencies - install by hand if needed
 #ffmpeg
@@ -41,5 +28,21 @@ procps
 
 #which java || $(SUDO) apt-get install -y openjdk-8-jdk || $(SUDO) apt-get install -y openjdk-7-jdk
 
-zip
-unzip
+# =====================================
+# installed by bash-tools submodule now
+
+# needed for tests/test_spark* and ambari_cancel_all_requests.sh
+#curl
+
+# either of these should do to ensure ping command is present for find_active_server.py's ping mode
+#iputils-ping
+##inetutils-ping
+
+# for anonymize_parallel.sh
+#parallel
+
+# needed for serf test's 'uptime' command
+#procps
+
+#zip
+#unzip
