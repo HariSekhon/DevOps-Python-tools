@@ -54,8 +54,8 @@ build:
 	@echo DevOps Python Tools Build
 	@echo =========================
 
-	# executing in sh where type is not available
-	#type -P python
+	@# executing in sh where type is not available
+	@#type -P python
 	which python || :
 	python -V || :
 	pip -V || :
