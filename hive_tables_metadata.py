@@ -58,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 
 
 class HiveTablesMetadata(HiveForEachTable):
@@ -94,7 +94,7 @@ class HiveTablesMetadata(HiveForEachTable):
     # discard last param query and construct our own based on the table DDL of cols
     def execute(self, conn, database, table, query):
         log.info("describing table '%s.%s'", database, table)
-        location = 'UNKNOWN'
+        field = 'UNKNOWN'
         with conn.cursor() as table_cursor:
             # doesn't support parameterized query quoting from dbapi spec
             #table_cursor.execute('use %(database)s', {'database': database})
@@ -103,9 +103,9 @@ class HiveTablesMetadata(HiveForEachTable):
             table_cursor.execute(query.format(table=table))
             for row in table_cursor:
                 if self.field.search(row[0]):
-                    location = row[1]
+                    field = row[1]
                     break
-        print('{db}.{table}\t{location}'.format(db=database, table=table, location=location))
+        print('{db}.{table}\t{field}'.format(db=database, table=table, field=field))
 
 
 if __name__ == '__main__':
