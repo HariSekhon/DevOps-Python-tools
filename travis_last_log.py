@@ -61,6 +61,7 @@ import re
 #import string
 import sys
 import traceback
+import git
 srcdir = os.path.abspath(os.path.dirname(__file__))
 libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
@@ -76,7 +77,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.0'
+__version__ = '0.6.0'
 
 
 class TravisLastBuildLog(CLI):
@@ -147,7 +148,9 @@ class TravisLastBuildLog(CLI):
                 self.repo = travis_user + self.repo
             validate_chars(self.repo, 'repo', r'\/\w\.-')
         else:
-            self.usage('--job-id / --repo not specified')
+            self.repo = self.get_local_repo_name()
+            if not self.repo:
+                self.usage('--job-id / --repo not specified')
         validate_alnum(self.travis_token, 'travis token')
         self.headers['Authorization'] = 'token {0}'.format(self.travis_token)
         self.num = self.get_opt('num')
@@ -162,6 +165,18 @@ class TravisLastBuildLog(CLI):
         # test for interactive, switch off color if piping stdout somewhere
         #if not self.color and not (sys.__stdin__.isatty() and sys.__stdout__.isatty()):
         #    self.plaintext = True
+
+    @staticmethod
+    def get_local_repo_name():
+        try:
+            _ = git.Repo('.')
+            for remote in _.remotes:
+                for url in remote.urls:
+                    repo = '/'.join(url.split('/')[-2:])
+                    log.debug('determined repo to be {} from remotes'.format(repo))
+                    return repo
+        except git.InvalidGitRepositoryError:
+            log.debug('failed to determine git repository locally: %s', _)
 
     def run(self):
         if self.job_id:
