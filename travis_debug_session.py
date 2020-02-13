@@ -48,6 +48,7 @@ import re
 import sys
 import time
 import traceback
+import git
 try:
     import requests
 except ImportError:
@@ -68,7 +69,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.4'
+__version__ = '0.9.0'
 
 
 class TravisDebugSession(CLI):
@@ -151,9 +152,23 @@ class TravisDebugSession(CLI):
                 self.repo = travis_user + self.repo
             validate_chars(self.repo, 'repo', r'\/\w\.-')
         else:
-            self.usage('--job-id / --repo not specified')
+            self.repo = self.get_local_repo_name()
+            if not self.repo:
+                self.usage('--job-id / --repo not specified')
         validate_alnum(self.travis_token, 'travis token')
         self.headers['Authorization'] = 'token {0}'.format(self.travis_token)
+
+    @staticmethod
+    def get_local_repo_name():
+        try:
+            _ = git.Repo('.')
+            for remote in _.remotes:
+                for url in remote.urls:
+                    repo = '/'.join(url.split('/')[-2:])
+                    log.debug('determined repo to be {} from remotes'.format(repo))
+                    return repo
+        except git.InvalidGitRepositoryError:
+            log.debug('failed to determine git repository locally: %s', _)
 
     def run(self):
         if not self.job_id:
