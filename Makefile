@@ -150,7 +150,7 @@ apk-packages-extra:
 
 .PHONY: apt-packages-extra
 apt-packages-extra:
-	if [ -z "$(NOJAVA)" ]; then which java || $(SUDO) apt-get install -y openjdk-8-jdk || $(SUDO) apt-get install -y openjdk-7-jdk; fi
+	if [ -z "$(NOJAVA)" ]; then which java || $(SUDO) apt-get install -y default-jdk; fi
 
 # for validate_multimedia.py
 # available in Alpine 2.6, 2.7 and 3.x
