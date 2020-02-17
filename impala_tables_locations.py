@@ -25,6 +25,8 @@ Caveats:
 
     Impala is faster than Hive for the first ~1000 tables but then slows down
     so if you have a lot of tables I recommend you use the Hive version of this instead
+    eg. by ~1900 tables the Hive version will overtake the Impala version and
+    for thousands of tables Impala actuallys runs 1.5 - 2x slower than the Hive version overall
 
 Tested on Impala 2.7.0, 2.12.0 on CDH 5.10, 5.16 with Kerberos and SSL
 
