@@ -24,6 +24,9 @@ cd "$srcdir/..";
 
 # Fedora doesn't have /var/log/wtmp
 if ! [ -f /var/log/wtmp ]; then
+    echo "/var/log/wtmp doesn't exist, touching..."
+    # assigned in utils.sh
+    # shellcheck disable=SC2154
     $sudo touch /var/log/wtmp || :
 fi
 
