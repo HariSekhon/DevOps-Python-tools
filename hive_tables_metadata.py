@@ -19,6 +19,11 @@
 Connect to HiveServer2 and print the matching DDL metadata field (eg. 'Location')
 for all tables in all databases, or only those matching given db / table regexes
 
+Examples:
+
+./hive_tables_metadata.py --field Location ...
+./hive_tables_metadata.py --field SerDe ...
+
 Tested on Hive 1.1.0 on CDH 5.10, 5.16 with Kerberos and SSL
 
 Due to a thrift / impyla bug this needs exactly thrift==0.9.3, see
