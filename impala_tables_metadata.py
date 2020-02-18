@@ -19,6 +19,11 @@
 Connect to an Impala daemon and list the locations of all tables in all databases,
 or only those matching given db / table regexes
 
+Examples:
+
+./impala_tables_metadata.py --field Location ...
+./impala_tables_metadata.py --field SerDe ...
+
 Caveats:
 
     Hive is more reliable as Impala breaks on some table metadata definitions where Hive doesn't
