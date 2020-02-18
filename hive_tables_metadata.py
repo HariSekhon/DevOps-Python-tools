@@ -19,7 +19,7 @@
 Connect to HiveServer2 and print the matching DDL metadata field (eg. 'Location')
 for all tables in all databases, or only those matching given db / table regexes
 
-Examples:
+Examples (fields are case sensitive):
 
 ./hive_tables_metadata.py --field Location ...
 ./hive_tables_metadata.py --field SerDe ...
