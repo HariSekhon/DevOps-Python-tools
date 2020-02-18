@@ -19,7 +19,7 @@
 Connect to an Impala daemon and list the locations of all tables in all databases,
 or only those matching given db / table regexes
 
-Examples:
+Examples (fields are case sensitive):
 
 ./impala_tables_metadata.py --field Location ...
 ./impala_tables_metadata.py --field SerDe ...
