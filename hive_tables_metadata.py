@@ -19,7 +19,7 @@
 Connect to HiveServer2 and print the matching DDL metadata field (eg. 'Location')
 for all tables in all databases, or only those matching given db / table regexes
 
-Examples (fields are case sensitive):
+Examples (fields are case sensitive regex and return N/A without match):
 
 ./hive_tables_metadata.py --field Location ...
 ./hive_tables_metadata.py --field SerDe ...
@@ -99,7 +99,7 @@ class HiveTablesMetadata(HiveForEachTable):
     # discard last param query and construct our own based on the table DDL of cols
     def execute(self, conn, database, table, query):
         log.info("describing table '%s.%s'", database, table)
-        field = 'UNKNOWN'
+        field = 'N/A'
         with conn.cursor() as table_cursor:
             # doesn't support parameterized query quoting from dbapi spec
             #table_cursor.execute('use %(database)s', {'database': database})
