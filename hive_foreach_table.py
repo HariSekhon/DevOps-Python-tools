@@ -16,7 +16,7 @@
 
 """
 
-Connect to HiveServer2 and execute a query for all tables in all databases,
+Connect to HiveServer2 and execute a query for each table in each database,
 or only those matching given db / table regexes
 
 Useful for getting row counts of all tables or analyzing tables:
