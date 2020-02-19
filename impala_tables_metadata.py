@@ -16,8 +16,8 @@
 
 """
 
-Connect to an Impala daemon and list the locations of all tables in all databases,
-or only those matching given db / table regexes
+Connect to an Impala daemon and print the first matching DDL metadata field (eg. 'Location')
+for each table in each database, or only those matching given db / table regexes
 
 Examples (fields are case sensitive regex and return  N/A without match):
 
