@@ -25,3 +25,5 @@ python2-psutil
 #python-flask
 #python-markupsafe
 #python2-bitarray
+
+python3-snappy
