@@ -16,9 +16,6 @@
 
 """
 
-Connect to an Impala daemon and find tables with columns containing only NULLs
-for all tables in all databases, or only those matching given db / table regexes
-
 Connect to an Impala daemon and count the number of columns for each table in each database,
 or only those matching given db / table regexes
 
