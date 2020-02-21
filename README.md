@@ -138,6 +138,7 @@ Environment variables are supported for convenience and also to hide credentials
     - ```hive_foreach_table.py``` / ```impala_foreach_table.py``` - execute any query or statement against every Hive / Impala table
     - ```hive_tables_row_counts.py``` / ```impala_tables_row_counts.py``` - outputs tables row counts. Useful for reconciliation between cluster migrations
     - ```hive_tables_column_counts.py``` / ```impala_tables_column_counts.py``` - outputs tables column counts. Useful for finding unusually wide tables
+    - ```hive_tables_row_column_counts.py``` / ```impala_tables_row_column_counts.py``` - outputs tables row and column counts. Useful for finding unusually big tables
     - ```hive_tables_row_counts_any_nulls.py``` / ```impala_tables_row_counts_any_nulls.py``` - outputs tables row counts where any field is NULL. Useful for reconciliation between cluster migrations or catching data quality problems or subtle ETL bugs
     - ```hive_tables_null_columns.py``` / ```impala_tables_null_columns.py``` - outputs tables columns containing only NULLs. Useful for catching data quality problems or subtle ETL bugs
     - ```hive_tables_null_rows.py``` / ```impala_tables_null_rows.py``` - outputs tables row counts where all fields contain NULLs. Useful for catching data quality problems or subtle ETL bugs
