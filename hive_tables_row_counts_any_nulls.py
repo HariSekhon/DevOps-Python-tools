@@ -64,6 +64,7 @@ except ImportError as _:
 __author__ = 'Hari Sekhon'
 __version__ = '0.5.0'
 
+
 class HiveTablesRowsWithNulls(HiveForEachTable):
 
     def __init__(self):
