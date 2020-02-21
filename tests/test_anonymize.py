@@ -40,8 +40,12 @@ def run():
     print('running anonymize tests using: {} {}'.format(anonymize, args))
     cmd = [anonymize] + [_ for _ in args.split()]
     process = subprocess.Popen(cmd, stdin=PIPE, stdout=PIPE)
+    # encode as bytes for Python 3 :-/
+    test_input = str.encode(test_input, 'utf-8')
     (stdout, _) = process.communicate(input=test_input)
     index = 0
+    # convert bytes to string
+    stdout = stdout.decode("utf-8")
     for line in stdout.split('\n'):   # pylint: disable=redefined-outer-name
         key = src_keys[index]
         _input = src[key]
