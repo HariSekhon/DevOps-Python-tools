@@ -41,7 +41,8 @@ python-snappy==0.5
 sasl==0.2.1
 sh==1.12.14
 # pulls in python-KrbV as a dependency which doesn't build on Mac any more
-# moved to Makefile as best effort
+# relies on python-krbV is unmaintained and unported to Python 3
+# - moved to Makefile as best effort
 #snakebite[kerberos]==2.11.0
 snakebite==2.11.0
 thrift-sasl==0.2.1
