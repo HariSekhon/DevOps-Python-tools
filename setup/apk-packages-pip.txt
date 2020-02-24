@@ -16,6 +16,7 @@
 py-dicttoxml
 py-psutil
 py-pyldap
-py2-jinja2
-py2-numpy
-#py-flask
+py3-jinja2
+py3-numpy
+#py3-flask
+py3-pygit2
