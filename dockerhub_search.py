@@ -56,7 +56,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6'
+__version__ = '0.6.1'
 
 
 class DockerHubSearch(CLI):
@@ -71,7 +71,7 @@ class DockerHubSearch(CLI):
         self.quiet = False
 
     def add_options(self):
-        self.add_opt('-n', '--num', '--limit', default=50,
+        self.add_opt('-n', '--num', '--limit', default=50, type=int,
                      help='Number of results to return (default: 50)')
         self.add_opt('-q', '--quiet', action='store_true',
                      help='Output only the image names, one per line (useful for shell scripting)')
