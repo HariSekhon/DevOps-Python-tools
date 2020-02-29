@@ -1,6 +1,5 @@
 Hari Sekhon - DevOps Python Tools
 =================================
-[![Build Status](https://travis-ci.org/HariSekhon/DevOps-Python-tools.svg?branch=master)](https://travis-ci.org/HariSekhon/DevOps-Python-tools)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f7af72140c3b408b9659207ced17544f)](https://www.codacy.com/app/harisekhon/devops-python-tools)
 [![GitHub stars](https://img.shields.io/github/stars/harisekhon/devops-python-tools.svg)](https://github.com/harisekhon/devops-python-tools/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/harisekhon/devops-python-tools.svg)](https://github.com/harisekhon/devops-python-tools/network)
@@ -13,6 +12,19 @@ Hari Sekhon - DevOps Python Tools
 [![DockerHub Build Automated](https://img.shields.io/docker/automated/harisekhon/pytools.svg)](https://hub.docker.com/r/harisekhon/pytools/)
 [![Docker Build Status](https://img.shields.io/docker/build/harisekhon/pytools.svg)](https://hub.docker.com/r/harisekhon/pytools/builds)
 [![MicroBadger](https://images.microbadger.com/badges/image/harisekhon/pytools.svg)](http://microbadger.com/#/images/harisekhon/pytools)
+
+[![Travis CI](https://img.shields.io/travis/harisekhon/DevOps-Python-tools/master?logo=travis)](https://travis-ci.org/HariSekhon/DevOps-Python-tools)
+[![AppVeyor](https://img.shields.io/appveyor/build/harisekhon/DevOps-Python-tools/master?logo=appveyor)](https://ci.appveyor.com/project/HariSekhon/DevOps-Python-tools/branch/master)
+[![Drone](https://img.shields.io/drone/build/HariSekhon/DevOps-Python-tools/master?logo=drone)](https://cloud.drone.io/HariSekhon/DevOps-Python-tools)
+[![CircleCI](https://circleci.com/gh/HariSekhon/DevOps-Python-tools.svg?style=svg)](https://circleci.com/gh/HariSekhon/DevOps-Python-tools)
+[![Codeship Status for HariSekhon/DevOps-Python-tools](https://app.codeship.com/projects/b281baa0-3c5f-0138-caef-66210e546d42/status?branch=master)](https://app.codeship.com/projects/387251)
+[![Shippable](https://api.shippable.com/projects/5e52c63445c70f0007ff5144/badge?branch=master)](https://app.shippable.com/github/HariSekhon/DevOps-Python-tools/dashboard/jobs)
+[![Codefresh](https://g.codefresh.io/api/badges/pipeline/harisekhon/GitHub%2FDevOps-Python-tools?branch=master&key=eyJhbGciOiJIUzI1NiJ9.NWU1MmM5OGNiM2FiOWUzM2Y3ZDZmYjM3.O69674cW7vYom3v5JOGKXDbYgCVIJU9EWhXUMHl3zwA&type=cf-1)](https://g.codefresh.io/pipelines/DevOps-Python-tools/builds)
+[![Wercker](https://app.wercker.com/status/b40735fb89e7d989dbaf5659a9af9a20/s/master "wercker status")](https://app.wercker.com/project/byKey/b40735fb89e7d989dbaf5659a9af9a20)
+
+[![Azure DevOps Pipeline](https://dev.azure.com/harisekhon/GitHub/_apis/build/status/HariSekhon.DevOps-Python-tools?branchName=master)](https://dev.azure.com/harisekhon/GitHub/_build/latest?definitionId=8&branchName=master)
+[![BitBucket Pipeline](https://img.shields.io/bitbucket/pipelines/harisekhon/DevOps-Python-tools/master?logo=bitbucket)](https://bitbucket.org/harisekhon/DevOps-Python-tools/addon/pipelines/home#!/)
+[![GitLab Pipeline](https://img.shields.io/gitlab/pipeline/harisekhon/DevOps-Python-tools?logo=gitlab)](https://gitlab.com/HariSekhon/DevOps-Python-tools/pipelines)
 
 [![CI Mac](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Mac/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Mac%22)
 [![CI Ubuntu](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Ubuntu/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Ubuntu%22)
