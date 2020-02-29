@@ -23,7 +23,7 @@ Hari Sekhon - DevOps Python Tools
 [![Wercker](https://app.wercker.com/status/b40735fb89e7d989dbaf5659a9af9a20/s/master "wercker status")](https://app.wercker.com/project/byKey/b40735fb89e7d989dbaf5659a9af9a20)
 
 [![Azure DevOps Pipeline](https://dev.azure.com/harisekhon/GitHub/_apis/build/status/HariSekhon.DevOps-Python-tools?branchName=master)](https://dev.azure.com/harisekhon/GitHub/_build/latest?definitionId=8&branchName=master)
-[![BitBucket Pipeline](https://img.shields.io/bitbucket/pipelines/harisekhon/DevOps-Python-tools/master?logo=bitbucket)](https://bitbucket.org/harisekhon/DevOps-Python-tools/addon/pipelines/home#!/)
+[![BitBucket Pipeline](https://img.shields.io/bitbucket/pipelines/harisekhon/devops-python-tools/master?logo=bitbucket)](https://bitbucket.org/harisekhon/DevOps-Python-tools/addon/pipelines/home#!/)
 [![GitLab Pipeline](https://img.shields.io/gitlab/pipeline/harisekhon/DevOps-Python-tools?logo=gitlab)](https://gitlab.com/HariSekhon/DevOps-Python-tools/pipelines)
 
 [![CI Mac](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Mac/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Mac%22)
