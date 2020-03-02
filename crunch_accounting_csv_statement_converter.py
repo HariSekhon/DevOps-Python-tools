@@ -61,7 +61,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.3'
+__version__ = '0.7.0'
 
 
 class CrunchAccountingCsvStatementConverter(CLI):
@@ -157,7 +157,7 @@ class CrunchAccountingCsvStatementConverter(CLI):
         return tmp_filename
 
     def detect_columns(self, csvreader):
-        headers = csvreader.next()
+        headers = next(csvreader)
         if headers[0][0] == '{':
             log.error('JSON opening braces detected, not a CSV?')
             return False
@@ -224,7 +224,7 @@ class CrunchAccountingCsvStatementConverter(CLI):
                     log.error('non-alphanumeric / quote opening character detected in CSV')
                     return None
                 count += 1
-        except csv.Error  as _:
+        except csv.Error as _:
             log.warning('file %s, line %s: %s', filename, csvreader.line_num, _)
             return None
         if count == 0:
