@@ -41,9 +41,9 @@ except ImportError as _:
 
 # pylint: disable=no-name-in-module,import-error
 if isPythonMinVersion(3):
-    from urllib.parse import quote
+    from urllib.parse import quote_plus as quote
 else:
-    from urllib import quote
+    from urllib import quote_plus as quote
 
 __author__ = 'Hari Sekhon'
 __version__ = '0.1.0'
