@@ -48,6 +48,7 @@ else:
 __author__ = 'Hari Sekhon'
 __version__ = '0.1.0'
 
+
 class URLEncode(CLI):
 
     def run(self):
@@ -63,6 +64,7 @@ class URLEncode(CLI):
     def encode(string):
         #print(urllib.parse.quote(string))
         print(quote(string))
+
 
 if __name__ == '__main__':
     URLEncode().main()
