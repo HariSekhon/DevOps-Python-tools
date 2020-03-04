@@ -42,7 +42,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 
 class Center(CLI):
 
@@ -53,6 +53,7 @@ class Center(CLI):
         # super().__init__()
         self.re_bound = re.compile(r'(\b)')
         self.re_chars = re.compile(r'([^\s])(?!\s)')
+        self.timeout_default = None
 
     def add_options(self):
         self.add_opt('-w', '--width', default=80, type='int', metavar='<num_chars>',
