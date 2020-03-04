@@ -63,7 +63,12 @@ class URLEncode(CLI):
             for arg in sys.argv[1:]:
                 self.encode(arg)
         else:
-            for line in sys.stdin:
+            # buffered - Control-D char meshes with late output
+            #for line in sys.stdin:
+            while True:
+                line = sys.stdin.readline()
+                if not line:
+                    break
                 line = line.rstrip('\n').rstrip('\r')
                 self.encode(line)
 
