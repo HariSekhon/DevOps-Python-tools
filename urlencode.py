@@ -46,10 +46,17 @@ else:
     from urllib import quote_plus as quote
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 
 class URLEncode(CLI):
+
+    def __init__(self):
+        # Python 2.x
+        super(URLEncode, self).__init__()
+        # Python 3.x
+        # super().__init__()
+        self.timeout_default = None
 
     def run(self):
         if len(sys.argv) > 1:
@@ -64,6 +71,7 @@ class URLEncode(CLI):
     def encode(string):
         #print(urllib.parse.quote(string))
         print(quote(string))
+        sys.stdout.flush()
 
 
 if __name__ == '__main__':
