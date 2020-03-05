@@ -45,7 +45,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 
 
 class Welcome(CLI):
@@ -121,7 +121,7 @@ class Welcome(CLI):
             print(msg)
             return
         try:
-            charmap = list(string.uppercase + string.lowercase + '@#$%^&*()')
+            charmap = list(string.ascii_uppercase + string.ascii_lowercase + '@#$%^&*()')
             # print '',
             # print('', end='')
             for i in range(0, len(msg)):
