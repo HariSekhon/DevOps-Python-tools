@@ -23,7 +23,9 @@ set -eu
 isExcluded(){
     local prog="$1"
     [[ "$prog" =~ ^\* ]] && return 0
-    [[ "$prog" =~ spark_.*.py ]] && return 0
+    [[ "$prog" =~ spark_.*\.py ]] && return 0
+    [[ "$prog" =~ \.jy ]] && return 0
+    [[ "$prog" =~ hdfs_find_replication_factor_1\.py ]] && return 0  # python-krbV doesn't build on Python 3
     #[[ $prog =~ ipython-notebook ]] && return 0
     # this external git check is expensive, skip it when in CI as using fresh git checkouts
     is_CI && return 1
