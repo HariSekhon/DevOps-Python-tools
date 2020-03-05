@@ -33,10 +33,8 @@ for x in ${@:-$(echo ./*.py 2>/dev/null)}; do
     echo; hr
     if [ $status = 0 ]; then
         [[ "$x" =~ ambari_blueprints.py$ ]] && continue
-        [[ "$x" =~ (hive|impala)_schemas_csv.py$ ]] && continue
-        [[ "$x" =~ (hive|impala)_foreach_table.py$ ]] && continue
-        [[ "$x" =~ (hive|impala)_tables_row_counts.py$ ]] && continue
         [[ "$x" =~ pythonpath.py$ ]] && continue
+        [[ "$x" =~ aws_s3_presign.py$ ]] && continue
     elif [ $status = 1 ]; then
         if [[ "$x" =~ hdfs_find_replication_factor_1.py$ ]] &&
            ! python -c 'import krbV'; then  # best effort, not available on Mac any more
