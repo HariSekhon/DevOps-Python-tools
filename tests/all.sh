@@ -29,7 +29,8 @@ section "Running PyTools ALL"
 
 # runs against . by default
 cd "$srcdir/..";
-bash-tools/check_all.sh
+# has to be included so that isExcluded function is inherited
+. bash-tools/check_all.sh
 
 #tests/test_yamllint.sh
 
