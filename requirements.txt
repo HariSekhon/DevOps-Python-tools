@@ -44,7 +44,7 @@ sh==1.12.14
 # relies on python-krbV is unmaintained and unported to Python 3
 # - moved to Makefile as best effort
 #snakebite[kerberos]==2.11.0
-snakebite==2.11.0
+#snakebite==2.11.0
 thrift-sasl==0.2.1
 thrift==0.9.3
 thriftpy==0.3.9
