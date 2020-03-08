@@ -79,7 +79,7 @@ class HiveTablesNullRows(HiveForEachTable):
         self.ignore_errors = False
 
     # discard last param query and construct our own based on the table DDL of cols
-    def execute(self, conn, database, table, query):
+    def execute(self, conn, database, table, _query):
         columns = []
         log.info("describing table '%s.%s'", database, table)
         with conn.cursor() as column_cursor:
