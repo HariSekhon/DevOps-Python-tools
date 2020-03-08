@@ -88,6 +88,12 @@ docker run harisekhon/pytools <program> <args>
 
 #### Automated Build from source #####
 
+installs git, make, pulls the repo and build the dependencies:
+```
+curl https://raw.githubusercontent.com/HariSekhon/DevOps-Python-tools/master/setup/bootstrap.sh | sh
+```
+
+or manually:
 ```
 git clone https://github.com/harisekhon/devops-python-tools pytools
 cd pytools
