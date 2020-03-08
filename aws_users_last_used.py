@@ -103,10 +103,10 @@ class AWSUsersLastUsed(CLI):
                 break
             log.info('waiting for credentials report')
             time.sleep(1)
-        try:
-            result = iam.get_credential_report()
-        except ClientError as _:
-            raise
+        #try:
+        result = iam.get_credential_report()
+        #except ClientError as _:
+        #    raise
         csv_content = result['Content']
         log.debug('%s', csv_content)
         filehandle = StringIO(unicode(csv_content))
