@@ -1,14 +1,14 @@
 Hari Sekhon - DevOps Python Tools
 =================================
 
+[![GitHub stars](https://img.shields.io/github/stars/harisekhon/devops-python-tools)](https://github.com/harisekhon/devops-python-tools/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/harisekhon/devops-python-tools)](https://github.com/harisekhon/devops-python-tools/network)
 [![Codacy](https://api.codacy.com/project/badge/Grade/f7af72140c3b408b9659207ced17544f)](https://www.codacy.com/app/harisekhon/devops-python-tools)
 [![CodeFactor](https://www.codefactor.io/repository/github/harisekhon/DevOps-Python-tools/badge)](https://www.codefactor.io/repository/github/harisekhon/DevOps-Python-tools)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=alert_status)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=security_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
-[![GitHub stars](https://img.shields.io/github/stars/harisekhon/devops-python-tools.svg)](https://github.com/harisekhon/devops-python-tools/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/harisekhon/devops-python-tools.svg)](https://github.com/harisekhon/devops-python-tools/network)
 
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=ncloc)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
 [![PyUp](https://pyup.io/repos/github/HariSekhon/DevOps-Python-tools/shield.svg)](https://pyup.io/account/repos/github/HariSekhon/DevOps-Python-tools/)
