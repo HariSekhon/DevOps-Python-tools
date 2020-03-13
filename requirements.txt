@@ -26,7 +26,9 @@ ldif3==3.2.2
 # Python 3.5+
 #numpy==1.17.2
 numpy==1.16.5
-psycopg2==2.8.4
+# requires pg_config to build from source
+#psycopg2==2.8.4
+psycopg2-binary==2.8.4
 python-cson==1.0.9
 psutil==5.7.0
 # parquet support in pyarrow is weaker, gone back to using parquet-tools
