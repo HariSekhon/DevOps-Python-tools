@@ -27,7 +27,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log, validate_host, validate_port
+    from harisekhon.utils import log, validate_host, validate_port, validate_user, validate_password
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -66,12 +66,14 @@ class PostgreSQLCLI(CLI):
     def process_options(self):
         super(PostgreSQLCLI, self).process_options()
         self.host = self.get_opt('host')
-        self.port = self.get_opt('port')
+        self.host = self.get_opt('host')
+        self.user = self.get_opt('user')
+        self.password = self.get_opt('password')
         validate_host(self.host)
         validate_port(self.port)
+        validate_user(self.user)
+        validate_password(self.password)
         self.port = int(self.port)
-        self.user = self.user
-        self.password = self.password
         #self.ssl = self.get_opt('ssl')
 
     def connect(self, database):
