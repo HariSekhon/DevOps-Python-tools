@@ -24,6 +24,7 @@ python-ldap
 python-ldif3
 python-numpy
 python-psutil
+python-psycopg2
 python-sh
 python-snappy
 python-thrift
