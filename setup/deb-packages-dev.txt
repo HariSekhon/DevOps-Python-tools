@@ -14,6 +14,7 @@
 # ============================================================================ #
 
 libldap2-dev
+libpq-dev  # postgres pg_config
 # needed to build python-snappy for avro module
 libsnappy-dev
 
