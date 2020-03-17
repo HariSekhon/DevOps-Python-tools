@@ -58,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.11.1'
+__version__ = '0.11.2'
 
 
 class JsonValidatorTool(CLI):
@@ -210,7 +210,7 @@ class JsonValidatorTool(CLI):
                 return True
             self.failed = True
             if not self.passthru:
-                die(self.self.invalid_json_msg_single_quotes)
+                die(self.invalid_json_msg_single_quotes)
         else:
             log.debug('not valid json')
             if self.rewind_check_multirecord_json():
