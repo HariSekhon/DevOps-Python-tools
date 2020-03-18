@@ -491,6 +491,9 @@ dest[141]="Failed to open HDFS file hdfs://<hostname>/user/<user>/warehouse/<dat
 src[142]="ERROR: AnalysisException: Failed to load metadata for table: 'myCustomerTable2'"
 dest[142]="ERROR: AnalysisException: Failed to load metadata for table: '<table>'"
 
+src[143]="PS /pwd> Connect-AppVeyorToComputer -AppVeyorUrl https://ci.appveyor.com -ApiToken a12bcdef3a45b6cdefab"
+dest[143]="PS /pwd> Connect-AppVeyorToComputer -AppVeyorUrl https://<fqdn> -ApiToken <token>"
+
 
 # TODO: move proxy hosts to host matches and re-enable
 #src[103]="proxy blah port 8080"
