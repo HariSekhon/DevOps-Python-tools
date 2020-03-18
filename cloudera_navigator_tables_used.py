@@ -16,16 +16,20 @@
 
 """
 
-Processes Cloudera Navigator API exported CSV logs to list the tables used (selected from)
+Processes Cloudera Navigator API exported CSV logs to list the tables used (SELECT'ed from)
 
-This allows you to see if you wasting time maintaining datasets nobody is using
+This allows you to see if you're wasting time maintaining datasets nobody is using
 
 Handles more than naive filtering delimited column numbers which will miss many table and database names:
 
     1. table/database name fields are often blank and need to be inferred from SQL queries field
-    2. SQL queries often contain newlines which break the rows up
-    3. multi-line SQL queries with commented out lines are stripped to avoid false positives of what is being used
-    4. optionally ignore users by regex, matching user or kerberos principal to omit ETL service account
+    2. SQL queries often contain newlines which break the rows up - these are recombined in to single records
+    3. multi-line SQL queries have comments stripped out to avoid false positives of what is being used
+    4. where table/database field aren't available, also checks resource field for suitable contents as another heuristic
+       to determine database and table name before parsing SQL which is a last resort
+    5. optionally ignore selected users by regex
+       - matches user or kerberos principal
+       - eg. to omit ETL service account from skewing data access results
 
 See cloudera_navigator_audit_logs_download.sh for a script to export these logs
 
@@ -57,7 +61,7 @@ sys.path.append(pylib)
 sys.path.append(lib)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import CriticalError, log, validate_regex
+    from harisekhon.utils import CriticalError, log, validate_regex, isInt
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -128,7 +132,7 @@ class ClouderaNavigatorTablesUsed(CLI):
             for username in ignored_users:
                 validate_regex(username, 'ignored user')
             # account for kerberized names - user, user@domain.com or user/host@domain.com
-            self.re_ignored_users = re.compile('^' + '|'.join(ignored_users) + '(?:@|/|$)', re.I)
+            self.re_ignored_users = re.compile('^(?:' + '|'.join(ignored_users) + ')(?:[@/]|$)', re.I)
         if not self.args:
             self.usage('no CSV file argument given')
 
@@ -247,6 +251,7 @@ class ClouderaNavigatorTablesUsed(CLI):
         for current_row in csv_reader:
             if not current_row:
                 continue
+            # originally did this by counting fields but SQL fragmentation generates extra fields
             if self.re_timestamp.match(current_row[0]):
                 row = last_row
                 last_row = current_row
@@ -259,6 +264,8 @@ class ClouderaNavigatorTablesUsed(CLI):
         self.process_row(last_row)
 
     def process_row(self, row):
+        if not row:
+            return
         log.debug('row = %s', row)
         len_row = len(row)
         if len_row > self.len_headers:
@@ -314,16 +321,20 @@ class ClouderaNavigatorTablesUsed(CLI):
         table = table.lower().strip('`')
         database = database.lower().strip('`')
         if ' ' in table:
-            raise CriticalError('table "{}"'.format(table))
+            raise CriticalError('table \'{}\' has spaces - parsing error for row: {}'.format(table, row))
         if ' ' in database:
-            raise CriticalError('database "{}"'.format(database))
+            raise CriticalError('database \'{}\' has spaces - parsing error for row: {}'.format(database, row))
+        if table == 'null':
+            raise CriticalError('table == null - parsing error for row: {}'.format(row))
         return (database, table)
 
     def get_db_table_from_resource(self, row):
         database = None
         table = None
         resource = row[self.indicies['resource_index']]
-        if resource:
+        if resource and \
+           ':' in resource and \
+           'null:null' not in resource:
             # database:table in Resource field
             (database, table) = resource.split(':', 1)
         return (database, table)
@@ -350,7 +361,13 @@ class ClouderaNavigatorTablesUsed(CLI):
         len_row = len(row)
         if len_row > self.len_headers:
             log.debug('collapsing fields in row: %s', row)
-            difference = len_row - self.len_headers
+            # divide by 2 to account for this having been done twice in duplicated SQL operational text
+            difference = (len_row - self.len_headers) / 2
+            # slice indicies must be integers
+            if not isInt(difference):
+                raise CriticalError("difference in field length '{}' is not an integer for row: {}"\
+                                    .format(difference, row))
+            difference = int(difference)
             row[sql_index] = ','.join([self.sql_decomment(_) for _ in row[sql_index:difference]])
             row = row[:sql_index] + row[sql_index+difference:]
             row[sql_index2] = ','.join([self.sql_decomment(_) for _ in row[sql_index2:difference]])
