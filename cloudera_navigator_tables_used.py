@@ -23,9 +23,10 @@ This allows you to see if you're wasting time maintaining datasets nobody is usi
 Handles more than naive filtering delimited column numbers which will miss many table and database names:
 
     1. table/database name fields are often blank and need to be inferred from SQL queries field
+       (currently limited to 'SELECT ... FROM ...' because JOINs are often complicated by use of table aliases)
     2. SQL queries often contain newlines which break the rows up - these are recombined in to single records
     3. multi-line SQL queries have comments stripped out to avoid false positives of what is being used
-    4. where table/database field aren't available, also checks resource field for suitable contents as another heuristic
+    4. where table/database field aren't available, also checks if inferrable from resource field
        to determine database and table name before parsing SQL which is a last resort
     5. optionally ignore selected users by regex
        - matches user or kerberos principal
@@ -41,6 +42,7 @@ Output is quoted CSV format to stdout (same as hive_schemas_csv.py for easier co
 "database","table"
 
 Tested on Navigator logs for Hive/Impala on Cloudera Enterprise 5.10
+(but may require ongoing tweaks depending on quirks in your data set or changes in the API / logs)
 
 """
 
@@ -61,7 +63,7 @@ sys.path.append(pylib)
 sys.path.append(lib)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import CriticalError, log, validate_regex, isInt
+    from harisekhon.utils import log, validate_regex, isInt
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -99,6 +101,7 @@ class ClouderaNavigatorTablesUsed(CLI):
         self.timeout_default = None
         self.table_regex = r'[\w\.`]+'
         self.re_table = re.compile(self.table_regex)
+        # doesn't handle JOINs because SQL pros usually use table aliases
         self.re_select_from_table = re.compile(r'\bSELECT\b.+\bFROM\b(?:\s|\n)+({table_regex})'\
                                                .format(table_regex=self.table_regex), \
                                                re.I | re.MULTILINE | re.DOTALL)
@@ -221,18 +224,29 @@ class ClouderaNavigatorTablesUsed(CLI):
         user_index = 1
         operation_index = 4
         resource_index = 5
-        table_index = 19
-        database_index = 21
+        object_index = 22  # used by collapse_sql_fields to check if SQL was split, do not change to index 33!
+        # --
+        # with massive queries taking the latter 2 is more likely to succeed,
+        # possibly because there is a rare and subtle issue in collapse_sql_fields
+        #table_index = 19
+        #database_index = 21
+        # or
+        table_index = 41
+        database_index = 40
+        # --
         # fields 18 and 36 are identical SQL - need both to collapse rows later
         sql_index = 18
         sql_index2 = 36
+        #assert headers[table_index] == 'table_name'  # index 19
+        #assert headers[database_index] == 'database_name'  # index 21
+        assert headers[table_index] == 'Table Name'  # index 41
+        assert headers[database_index] == 'Database Name'  # index 40
         assert headers[user_index] == 'Username'
         assert headers[operation_index] == 'Operation'
         assert headers[resource_index] == 'Resource'
-        assert headers[table_index] == 'table_name'
-        assert headers[database_index] == 'database_name'
         assert headers[sql_index] == 'operation_text'
         assert headers[sql_index2] == 'Operation Text'
+        assert headers[object_index] == 'object_type'
         self.indicies = {
             'user_index': user_index,
             'operation_index': operation_index,
@@ -241,6 +255,7 @@ class ClouderaNavigatorTablesUsed(CLI):
             'database_index': database_index,
             'sql_index': sql_index,
             'sql_index2': sql_index2,  # needed for collapsing rows inflated by SQL fragmentation
+            'object_index': object_index
         }
         self.process_rows(csv_reader)
 
@@ -249,6 +264,7 @@ class ClouderaNavigatorTablesUsed(CLI):
     def process_rows(self, csv_reader):
         last_row = []
         for current_row in csv_reader:
+            #log.debug('current row = %s', current_row)
             if not current_row:
                 continue
             # originally did this by counting fields but SQL fragmentation generates extra fields
@@ -266,13 +282,14 @@ class ClouderaNavigatorTablesUsed(CLI):
     def process_row(self, row):
         if not row:
             return
-        log.debug('row = %s', row)
+        log.debug('processing row = %s', row)
         len_row = len(row)
+        log.debug('row len = %s', len_row)
         if len_row > self.len_headers:
             row = self.collapse_sql_fields(row=row)
         len_row = len(row)
         if len_row != self.len_headers:
-            raise CriticalError('row items ({}) != header items ({}) for offending row: {}'\
+            raise AssertionError('row items ({}) != header items ({}) for offending row: {}'\
                                 .format(len_row, self.len_headers, row))
         (database, table) = self.parse_table(row)
         self.output(row=row, database=database, table=table)
@@ -318,14 +335,18 @@ class ClouderaNavigatorTablesUsed(CLI):
                 return (None, None)
         if not table and not database:
             return (None, None)
-        table = table.lower().strip('`')
-        database = database.lower().strip('`')
-        if ' ' in table:
-            raise CriticalError('table \'{}\' has spaces - parsing error for row: {}'.format(table, row))
-        if ' ' in database:
-            raise CriticalError('database \'{}\' has spaces - parsing error for row: {}'.format(database, row))
+        if table:
+            table = table.lower().strip('`')
+            if ' ' in table:
+                raise AssertionError('table \'{}\' has spaces - parsing error for row: {}'\
+                                    .format(table, self.index_output(row)))
+        if database:
+            database = database.lower().strip('`')
+            if ' ' in database:
+                raise AssertionError('database \'{}\' has spaces - parsing error for row: {}'\
+                                    .format(database, self.index_output(row)))
         if table == 'null':
-            raise CriticalError('table == null - parsing error for row: {}'.format(row))
+            raise AssertionError('table == null - parsing error for row: {}'.format(row))
         return (database, table)
 
     def get_db_table_from_resource(self, row):
@@ -343,6 +364,8 @@ class ClouderaNavigatorTablesUsed(CLI):
         if not self.re_table.match('{}.{}'.format(database, table)):
             log.warning('%s.%s does not match table regex', database, table)
             return
+        # instead of collecting in ram, now just post-process through sort -u
+        # this way it is easier to see live extractions, --debug and correlate
         #self.data[database] = self.data.get(database, {})
         #self.data[database][table] = 1
         if table and not database:
@@ -358,18 +381,29 @@ class ClouderaNavigatorTablesUsed(CLI):
     def collapse_sql_fields(self, row):
         sql_index = self.indicies['sql_index']
         sql_index2 = self.indicies['sql_index2']
+        object_index = self.indicies['object_index']
         len_row = len(row)
         if len_row > self.len_headers:
             log.debug('collapsing fields in row: %s', row)
             # divide by 2 to account for this having been done twice in duplicated SQL operational text
-            difference = (len_row - self.len_headers) / 2
-            # slice indicies must be integers
-            if not isInt(difference):
-                raise CriticalError("difference in field length '{}' is not an integer for row: {}"\
-                                    .format(difference, row))
-            difference = int(difference)
-            row[sql_index] = ','.join([self.sql_decomment(_) for _ in row[sql_index:difference]])
-            row = row[:sql_index] + row[sql_index+difference:]
+            # Update: appears this broke as only 2nd occurence of SQL operational text field got split to new fields,
+            # which is weird because the log shows both 1st and 2nd SQL text fields were double quoted
+            difference = len_row - self.len_headers
+            # seems first occurrence doesn't get split in some occurence,
+            # wasn't related to open in newline universal mode though
+            # if 2 fields after isn't the /user/hive/warehouse/blah.db then 1st SQL wasn't split
+            # would have to regex /user/hive/warehouse/blah.db(?:/table)?
+            #if not row[sql_index+2].endswith('.db'):
+            # if object field is TABLE or DATABASE then 1st sql field wasn't split
+            if row[object_index] not in ('TABLE', 'DATABASE'):
+                difference /= 2
+                # slice indicies must be integers
+                if not isInt(difference):
+                    raise AssertionError("difference in field length '{}' is not an integer for row: {}"\
+                                        .format(difference, row))
+                difference = int(difference)
+                row[sql_index] = ','.join([self.sql_decomment(_) for _ in row[sql_index:difference]])
+                row = row[:sql_index] + row[sql_index+difference:]
             row[sql_index2] = ','.join([self.sql_decomment(_) for _ in row[sql_index2:difference]])
             row = row[:sql_index2] + row[sql_index2+difference:]
             log.debug('collapsed row: %s', row)
@@ -380,6 +414,10 @@ class ClouderaNavigatorTablesUsed(CLI):
     @staticmethod
     def sql_decomment(string):
         return string.split('--')[0].strip()
+
+    @staticmethod
+    def index_output(obj):
+        return '\n'.join(['{}\t{}'.format(index, item) for (index, item) in enumerate(obj)])
 
 
 if __name__ == '__main__':
