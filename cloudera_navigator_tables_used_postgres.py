@@ -122,25 +122,23 @@ class ClouderaNavigatorTablesUsedPostgreSQL(ClouderaNavigatorTablesUsed):
         self.len_headers = len(headers)
         # needed to ensure row joining works later on with number of fields left
         assert self.len_headers == 14 or self.len_headers == 16
+		user_index = 4
+		assert headers[user_index] == 'username'
 		# Hive postgres audit log
 		if self.len_headers == 14:
-			user_index = 4
 			operation_index = 6
 			database_index = 7
 			table_index = 9
 			sql_index = 10
 			resource_index = 12
-			assert headers[user_index] == 'username'
 			assert headers[resource_index] == 'resource_path'
 		# Impala postgres audit log
 		elif self.len_headers == 16:
-			user_index = 5  # impersonator field contains actual user, user field is always 'impala'
 			operation_index = 7
 			database_index = 11
 			table_index = 13
 			sql_index = 15
 			resource_index = None
-			assert headers[user_index] == 'impersonator'
 		else:
 			raise AssertionError('headers != 14 or 16 - unrecognized audit log - not Hive or Impala')
 		assert headers[sql_index] == 'operation_text'
