@@ -113,7 +113,7 @@ class ClouderaNavigatorTablesUsed(CLI):
             'GET_SCHEMAS',
             'VIEW_METADATA',
             'ANALYZE',
-            r'COMPUTE\s+STATS'
+            r'COMPUTE\s+STATS',
             'REFRESH',
             r'INVALIDATE\s+METADATA',
         ]
