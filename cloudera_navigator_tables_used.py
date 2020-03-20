@@ -32,6 +32,9 @@ Handles more than naive filtering delimited column numbers which will miss many 
        - matches user or kerberos principal
        - eg. to omit ETL service account from skewing data access results
 
+Supports reading directly from gzipped logs if they end in .gz file extension.
+However, the gzip library may have issues around universal newline support, if so, gunzip first.
+
 See cloudera_navigator_audit_logs_download.sh for a script to export these logs
 
 ./cloudera_navigator_tables_used.py navigator_audit_2019_hive.csv navigator_audit_2019_impala.csv \\
@@ -164,9 +167,11 @@ class ClouderaNavigatorTablesUsed(CLI):
                                          fieldnames=fieldnames)
         for filename in self.args:
             if filename.endswith('.gz'):
+                log.debug("processing gzip'd file: %s", filename)
                 with gzip.open(filename, 'rU') as filehandle:
                     self.process_file(filehandle)
             else:
+                log.debug("processing file: %s", filename)
                 with open(filename, 'rU') as filehandle:
                     self.process_file(filehandle)
 
