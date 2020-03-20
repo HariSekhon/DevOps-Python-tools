@@ -96,7 +96,17 @@ class ClouderaNavigatorTablesUsed(CLI):
         self.re_select_from_table = re.compile(r'\bSELECT\b.+\bFROM\b(?:\s|\n)+({table_regex})'\
                                                .format(table_regex=self.table_regex), \
                                                re.I | re.MULTILINE | re.DOTALL)
-        self.re_ignore = re.compile(r'\b(?:SHOW|DESCRIBE|USE|REFRESH|INVALIDATE\S+METADATA|GET_TABLES|GET_SCHEMAS)\b',\
+        ignore_statements = [
+            'SHOW',
+            'DESCRIBE',
+            'USE',
+            'REFRESH',
+            r'INVALIDATE\S+METADATA',
+            'GET_TABLES',
+            'GET_SCHEMAS',
+            'VIEW_METADATA',
+        ]
+        self.re_ignore = re.compile(r'\b(?:' + '|'.join(ignore_statements) + ')\b',\
                                     re.I | re.MULTILINE | re.DOTALL)
         # 2020-01-31T20:45:59.000Z
         self.re_timestamp = re.compile(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
