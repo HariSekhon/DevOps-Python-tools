@@ -104,13 +104,20 @@ class ClouderaNavigatorTablesUsed(CLI):
             'SHOW',
             'DESCRIBE',
             'USE',
-            'REFRESH',
-            r'INVALIDATE\S+METADATA',
+            'CREATE',
+            'DROP',
+            'INSERT',
+            'DELETE',
+            'UPDATE',
             'GET_TABLES',
             'GET_SCHEMAS',
             'VIEW_METADATA',
+            'ANALYZE',
+            r'COMPUTE\s+STATS'
+            'REFRESH',
+            r'INVALIDATE\s+METADATA',
         ]
-        self.re_ignore = re.compile(r'\b(?:' + '|'.join(ignore_statements) + r')\b',\
+        self.re_ignore = re.compile(r'^\s*\b(?:' + '|'.join(ignore_statements) + r')\b',\
                                     re.I | re.MULTILINE | re.DOTALL)
         # 2020-01-31T20:45:59.000Z
         self.re_timestamp = re.compile(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
