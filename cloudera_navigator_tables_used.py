@@ -166,6 +166,7 @@ class ClouderaNavigatorTablesUsed(CLI):
         if self.quotechar == '':
             quoting = csv.QUOTE_NONE
 
+        #fieldnames = ['database', 'table', 'user']
         fieldnames = ['database', 'table']
         self.csv_writer = csv.DictWriter(sys.stdout,
                                          delimiter=self.delimiter,
@@ -415,6 +416,7 @@ class ClouderaNavigatorTablesUsed(CLI):
             log.info('got database but not table for row: %s', row)
         if not table and not database:
             return
+        #self.csv_writer.writerow({'database': database, 'table': table, 'user': row[self.indicies['user_index']]})
         self.csv_writer.writerow({'database': database, 'table': table})
         if log.isEnabledFor(logging.DEBUG):
             sys.stdout.flush()
