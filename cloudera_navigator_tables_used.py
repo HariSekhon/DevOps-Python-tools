@@ -169,14 +169,15 @@ class ClouderaNavigatorTablesUsed(CLI):
         mode = 'rtU'
         if isPythonMinVersion(3):
             mode = 'rt'
+        # open(..., encoding="utf-8") is Python 3 only - uses system default otherwise
         for filename in self.args:
             if filename.endswith('.gz'):
                 log.debug("processing gzip'd file: %s", filename)
-                with gzip.open(filename, mode, encoding="utf8") as filehandle:
+                with gzip.open(filename, mode) as filehandle:
                     self.process_file(filehandle)
             else:
                 log.debug("processing file: %s", filename)
-                with open(filename, mode, encoding="utf8") as filehandle:
+                with open(filename, mode) as filehandle:
                     self.process_file(filehandle)
 
         #csv_writer.writeheader()
