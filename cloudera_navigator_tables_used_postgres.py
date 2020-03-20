@@ -22,10 +22,11 @@ This allows you to see if you're wasting time maintaining datasets nobody is usi
 
 See cloudera_navigator_audit_logs_export_postgres.sh for a script to export these logs
 
-Supports reading directly from gzipped logs if they end in .gz file extension
+Supports reading directly from gzipped logs if they end in .gz file extension.
+However, the gzip library may have issues around universal newline support, if so, gunzip first.
 
-./cloudera_navigator_tables_used_postgres.py nav.public.hive_audit_events_2019_11_*.csv.gz \\
-                                             nav.public.impala_audit_events_2019_11_*.csv.gz ...
+./cloudera_navigator_tables_used_postgres.py nav.public.hive_audit_events_*.csv.gz \\
+                                             nav.public.impala_audit_events_*.csv.gz ...
 
 Output is quoted CSV format to stdout (same as hive_schemas_csv.py for easier comparison):
 
@@ -63,7 +64,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 
 class ClouderaNavigatorTablesUsedPostgreSQL(ClouderaNavigatorTablesUsed):
@@ -97,24 +98,55 @@ class ClouderaNavigatorTablesUsedPostgreSQL(ClouderaNavigatorTablesUsed):
 #     12  resource_path
 #     13  object_usage_type
 
+# gzcat nav.public.impala_audit_events_2019_11_19.csv.gz | csv_header_indices.sh
+#      0  id
+#      1  event_time
+#      2  allowed
+#      3  service_name
+#      4  username
+#      5  impersonator
+#      6  ip_addr
+#      7  operation
+#      8  query_id
+#      9  session_id
+#     10  status
+#     11  database_name
+#     12  object_type
+#     13  table_name
+#     14  privilege
+#     15  operation_text
+
     def process_file(self, filehandle):
         csv_reader = csv.reader(filehandle, delimiter=',', quotechar='"', escapechar='\\')
         headers = csv_reader.next()
         self.len_headers = len(headers)
         # needed to ensure row joining works later on with number of fields left
-        assert self.len_headers == 14
-        user_index = 4
-        operation_index = 6
-        database_index = 7
-        table_index = 9
-        sql_index = 10
-        resource_index = 12
-        assert headers[user_index] == 'username'
-        assert headers[operation_index] == 'operation'
-        assert headers[table_index] == 'table_name'
-        assert headers[database_index] == 'database_name'
-        assert headers[sql_index] == 'operation_text'
-        assert headers[resource_index] == 'resource_path'
+        assert self.len_headers == 14 or self.len_headers == 16
+		# Hive postgres audit log
+		if self.len_headers == 14:
+			user_index = 4
+			operation_index = 6
+			database_index = 7
+			table_index = 9
+			sql_index = 10
+			resource_index = 12
+			assert headers[user_index] == 'username'
+			assert headers[resource_index] == 'resource_path'
+		# Impala postgres audit log
+		elif self.len_headers == 16:
+			user_index = 5  # impersonator field contains actual user, user field is always 'impala'
+			operation_index = 7
+			database_index = 11
+			table_index = 13
+			sql_index = 15
+			resource_index = None
+			assert headers[user_index] == 'impersonator'
+		else:
+			raise AssertionError('headers != 14 or 16 - unrecognized audit log - not Hive or Impala')
+		assert headers[sql_index] == 'operation_text'
+		assert headers[database_index] == 'database_name'
+		assert headers[table_index] == 'table_name'
+		assert headers[operation_index] == 'operation'
         self.indicies = {
             'user_index': user_index,
             'operation_index': operation_index,
@@ -185,6 +217,9 @@ class ClouderaNavigatorTablesUsedPostgreSQL(ClouderaNavigatorTablesUsed):
         return (database, table)
 
     def get_db_table_from_resource(self, row):
+		# only available for hive audit logs, not impala
+		if self.indicies['resource_index'] is None:
+			return (None, None)
         database = None
         table = None
         resource = row[self.indicies['resource_index']]
