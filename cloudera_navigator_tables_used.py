@@ -67,7 +67,7 @@ sys.path.append(pylib)
 sys.path.append(lib)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log, validate_regex, isInt
+    from harisekhon.utils import log, validate_regex, isInt, isPythonMinVersion
     from harisekhon import CLI
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
@@ -86,6 +86,7 @@ class ClouderaNavigatorTablesUsed(CLI):
         super(ClouderaNavigatorTablesUsed, self).__init__()
         # Python 3.x
         # super().__init__()
+        csv.field_size_limit(sys.maxsize)
         self.delimiter = None
         self.quotechar = None
         self.escapechar = None
@@ -109,7 +110,7 @@ class ClouderaNavigatorTablesUsed(CLI):
             'GET_SCHEMAS',
             'VIEW_METADATA',
         ]
-        self.re_ignore = re.compile(r'\b(?:' + '|'.join(ignore_statements) + ')\b',\
+        self.re_ignore = re.compile(r'\b(?:' + '|'.join(ignore_statements) + r')\b',\
                                     re.I | re.MULTILINE | re.DOTALL)
         # 2020-01-31T20:45:59.000Z
         self.re_timestamp = re.compile(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
@@ -165,14 +166,17 @@ class ClouderaNavigatorTablesUsed(CLI):
                                          escapechar=self.escapechar,
                                          quoting=quoting,
                                          fieldnames=fieldnames)
+        mode = 'rtU'
+        if isPythonMinVersion(3):
+            mode = 'rt'
         for filename in self.args:
             if filename.endswith('.gz'):
                 log.debug("processing gzip'd file: %s", filename)
-                with gzip.open(filename, 'rU') as filehandle:
+                with gzip.open(filename, mode, encoding="utf8") as filehandle:
                     self.process_file(filehandle)
             else:
                 log.debug("processing file: %s", filename)
-                with open(filename, 'rU') as filehandle:
+                with open(filename, mode, encoding="utf8") as filehandle:
                     self.process_file(filehandle)
 
         #csv_writer.writeheader()
@@ -237,7 +241,12 @@ class ClouderaNavigatorTablesUsed(CLI):
 
     def process_file(self, filehandle):
         csv_reader = csv.reader(filehandle, delimiter=',', quotechar='"', escapechar='\\')
-        headers = csv_reader.next()
+        try:
+            # Python 2
+            headers = csv_reader.next()
+        except AttributeError:
+            # Python 3
+            headers = next(csv_reader)
         self.len_headers = len(headers)
         # needed to ensure row joining works later on with number of fields left
         assert self.len_headers == 44
