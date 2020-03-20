@@ -52,6 +52,7 @@ from __future__ import print_function
 #from __future__ import unicode_literals
 
 import csv
+import gzip
 import logging
 import os
 import re
@@ -72,7 +73,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 
 class ClouderaNavigatorTablesUsed(CLI):
@@ -85,20 +86,10 @@ class ClouderaNavigatorTablesUsed(CLI):
         self.delimiter = None
         self.quotechar = None
         self.escapechar = None
+        self.timeout_default = None
         #self.data = {}
         self.indicies = {}
         self.len_headers = None
-        self.operations_to_ignore = [
-            '',
-            'HIVEREPLICATIONCOMMAND',
-            'START',
-            'STOP',
-            'RESTART',
-            'LOAD',
-            'SWITCHDATABASE',
-            'USE',
-        ]
-        self.timeout_default = None
         self.table_regex = r'[\w\.`]+'
         self.re_table = re.compile(self.table_regex)
         # doesn't handle JOINs because SQL pros usually use table aliases
@@ -111,6 +102,16 @@ class ClouderaNavigatorTablesUsed(CLI):
         self.re_timestamp = re.compile(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
         self.re_ignored_users = None
         self.csv_writer = None
+        self.operations_to_ignore = [
+            '',
+            'HIVEREPLICATIONCOMMAND',
+            'START',
+            'STOP',
+            'RESTART',
+            'LOAD',
+            'SWITCHDATABASE',
+            'USE',
+        ]
 
     def add_options(self):
         super(ClouderaNavigatorTablesUsed, self).add_options()
@@ -152,8 +153,12 @@ class ClouderaNavigatorTablesUsed(CLI):
                                          quoting=quoting,
                                          fieldnames=fieldnames)
         for filename in self.args:
-            with open(filename, 'rU') as filehandle:
-                self.process_file(filehandle)
+            if filename.endswith('.gz'):
+                with gzip.open(filename, 'rU') as filehandle:
+                    self.process_file(filehandle)
+            else:
+                with open(filename, 'rU') as filehandle:
+                    self.process_file(filehandle)
 
         #csv_writer.writeheader()
         #for database in sorted(self.data):
@@ -267,8 +272,7 @@ class ClouderaNavigatorTablesUsed(CLI):
             #log.debug('current row = %s', current_row)
             if not current_row:
                 continue
-            # originally did this by counting fields but SQL fragmentation generates extra fields
-            if self.re_timestamp.match(current_row[0]):
+            if self.is_new_record(current_row):
                 row = last_row
                 last_row = current_row
             else:
@@ -278,6 +282,10 @@ class ClouderaNavigatorTablesUsed(CLI):
                 continue
             self.process_row(row)
         self.process_row(last_row)
+
+    # originally did this by counting fields but SQL fragmentation generates extra fields
+    def is_new_record(self, current_row):
+        return self.re_timestamp.match(current_row[0])
 
     def process_row(self, row):
         if not row:
@@ -297,7 +305,8 @@ class ClouderaNavigatorTablesUsed(CLI):
     def parse_table(self, row):
         #log.debug(row)
         user = row[self.indicies['user_index']]
-        # 'hari.sekhon' in 'hari.sekhon@somedomain.com' in kerberos
+        # user: 'hari.sekhon'
+        # kerberos principals: 'hari.sekhon@somedomain.com' or 'impala/fqdn@domain.com'
         if self.re_ignored_users and self.re_ignored_users.match(user):
             log.debug('skipping row for ignored user %s: %s', user, row)
             return (None, None)
