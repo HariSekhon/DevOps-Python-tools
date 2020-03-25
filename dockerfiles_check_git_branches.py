@@ -91,7 +91,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.2'
+__version__ = '0.7.3'
 
 
 class DockerfileGitBranchCheckTool(CLI):
@@ -321,8 +321,8 @@ class DockerfileGitBranchCheckTool(CLI):
 
     def check_dockerfile_arg(self, filename, branch):
         log.debug('check_dockerfile_arg({0}, {1})'.format(filename, branch))
-        branch_base = str(branch).replace('-dev', '')
-        (branch_base, branch_versions) = self.branch_version(branch)
+        branch_stripped = str(branch).replace('-dev', '')
+        (branch_base, branch_versions) = self.branch_version(branch_stripped)
         with open(filename) as filehandle:
             version_index = 0
             for line in filehandle:
