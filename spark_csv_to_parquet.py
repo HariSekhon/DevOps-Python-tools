@@ -52,11 +52,11 @@ pyspark_path()
 from pyspark import SparkContext    # pylint: disable=wrong-import-position,import-error
 from pyspark import SparkConf       # pylint: disable=wrong-import-position,import-error
 from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,import-error
-from pyspark.sql.types import *     # pylint: disable=wrong-import-position,import-error,wildcard-import
+from pyspark.sql.types import *     # lgtm [py/polluting-import]  pylint: disable=wrong-import-position,import-error,wildcard-import
 from pyspark.sql.types import StructType, StructField  # pylint: disable=wrong-import-position,import-error
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.0'
+__version__ = '0.8.1'
 
 
 class SparkCSVToParquet(CLI):
