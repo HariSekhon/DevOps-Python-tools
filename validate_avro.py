@@ -39,7 +39,7 @@ import sys
 try:
     from avro3.datafile import DataFileReader, DataFileException
     from avro3.io import DatumReader
-except:
+except Exception:  # pylint: disable=broad-except
     from avro.datafile import DataFileReader, DataFileException
     from avro.io import DatumReader
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
@@ -55,7 +55,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.9.1'
+__version__ = '0.9.2'
 
 
 class AvroValidatorTool(CLI):
