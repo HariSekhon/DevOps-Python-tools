@@ -8,6 +8,7 @@ Hari Sekhon - DevOps Python Tools
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=security_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/HariSekhon/DevOps-Python-tools.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/HariSekhon/DevOps-Python-tools/alerts/)
 [![GitHub stars](https://img.shields.io/github/stars/harisekhon/devops-python-tools)](https://github.com/harisekhon/devops-python-tools/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/harisekhon/devops-python-tools)](https://github.com/harisekhon/devops-python-tools/network)
 
