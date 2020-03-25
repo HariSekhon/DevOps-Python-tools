@@ -54,7 +54,6 @@ from datetime import datetime
 from io import StringIO
 from math import floor
 import boto3
-from botocore.exceptions import ClientError
 srcdir = os.path.abspath(os.path.dirname(__file__))
 libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
