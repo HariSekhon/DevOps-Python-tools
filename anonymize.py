@@ -72,18 +72,20 @@ try:
     # pylint: disable=unused-import
     from harisekhon.utils import \
         aws_host_ip_regex, \
-        domain_regex, \
         domain_regex_strict, \
-        email_regex, \
         filename_regex, \
         fqdn_regex, \
         host_regex, \
         hostname_regex, \
         ip_prefix_regex, \
         ip_regex, \
-        mac_regex, \
         subnet_mask_regex, \
         user_regex
+    from harisekhon.utils import \
+        domain_regex, \
+        email_regex, \
+        mac_regex \
+        # lgtm [py/unused-import] - used by dynamic code so code analyzer cannot comprehend
     from harisekhon import CLI
 except ImportError as _:
     print(traceback.format_exc(), end='')
