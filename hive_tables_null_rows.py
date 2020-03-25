@@ -62,7 +62,7 @@ except ImportError as _:
 
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.0'
+__version__ = '0.6.0'
 
 
 class HiveTablesNullRows(HiveForEachTable):
@@ -79,11 +79,11 @@ class HiveTablesNullRows(HiveForEachTable):
         self.ignore_errors = False
 
     # discard last param query and construct our own based on the table DDL of cols
-    def execute(self, conn, database, table, _query):
+    def execute(self, conn, database, table, _):
         columns = []
         log.info("describing table '%s.%s'", database, table)
         with conn.cursor() as column_cursor:
-            # doesn't support parameterized query quoting from dbapi spec
+            # impala library doesn't support parameterized query quoting from dbapi spec
             #column_cursor.execute('use %(database)s', {'database': database})
             #column_cursor.execute('describe %(table)s', {'table': table})
             column_cursor.execute('use `{}`'.format(database))
@@ -92,15 +92,20 @@ class HiveTablesNullRows(HiveForEachTable):
                 column = column_row[0]
                 #column_type = column_row[1]
                 columns.append(column)
-        query = "SELECT count(*) FROM `{db}`.`{table}` WHERE `"\
-                .format(db=database, table=table) + \
-                "` IS NULL AND `".join(columns) + "` IS NULL"
+        query = self.generate_sql(database, table, columns)
         with conn.cursor() as table_cursor:
             log.debug('executing query:  %s', query)
             table_cursor.execute(query)
             for result in table_cursor:
                 count = result[0]
                 print('{db}.{table}\t{count}'.format(db=database, table=table, count=count))
+
+    @staticmethod
+    def generate_sql(database, table, columns):
+        sql = "SELECT count(*) FROM `{db}`.`{table}` WHERE `"\
+              .format(db=database, table=table) + \
+              "` IS NULL AND `".join(columns) + "` IS NULL"
+        return sql
 
 
 if __name__ == '__main__':
