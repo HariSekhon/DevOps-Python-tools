@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.10.11'
+__version__ = '0.10.12'
 
 ip_regex = r'(?!127\.0\.0\.)' + ip_regex
 subnet_mask_regex = r'(?!127\.0\.0\.)' + subnet_mask_regex
@@ -219,7 +219,7 @@ class Anonymize(CLI):
             #'countryCode',
             'displayName',
             'displayNamePrintable',
-            'division'
+            'division',
             'employeeID',
             'groupMembershipSAM',
             'info',
