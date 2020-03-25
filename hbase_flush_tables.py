@@ -44,7 +44,7 @@ import re
 import sys
 import traceback
 import subprocess
-from subprocess import PIPE
+PIPE = subprocess.PIPE
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'pylib'))
 sys.path.append(libdir)
 try:
