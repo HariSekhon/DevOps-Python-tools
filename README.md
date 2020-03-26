@@ -33,7 +33,7 @@ Hari Sekhon - DevOps Python Tools
 [![Drone](https://img.shields.io/drone/build/HariSekhon/DevOps-Python-tools/master?logo=drone&label=Drone)](https://cloud.drone.io/HariSekhon/DevOps-Python-tools)
 [![CircleCI](https://circleci.com/gh/HariSekhon/DevOps-Python-tools.svg?style=svg)](https://circleci.com/gh/HariSekhon/DevOps-Python-tools)
 [![Codeship Status for HariSekhon/DevOps-Python-tools](https://app.codeship.com/projects/b281baa0-3c5f-0138-caef-66210e546d42/status?branch=master)](https://app.codeship.com/projects/387251)
-[![Shippable](https://img.shields.io/shippable/5e52c63645c70f0007ff5152/master?label=Shippable)](https://app.shippable.com/github/HariSekhon/DevOps-Python-tools/dashboard/jobs)
+[![Shippable](https://img.shields.io/shippable/5e52c63445c70f0007ff5144/master?label=Shippable)](https://app.shippable.com/github/HariSekhon/DevOps-Python-tools/dashboard/jobs)
 [![Codefresh](https://g.codefresh.io/api/badges/pipeline/harisekhon/GitHub%2FDevOps-Python-tools?branch=master&key=eyJhbGciOiJIUzI1NiJ9.NWU1MmM5OGNiM2FiOWUzM2Y3ZDZmYjM3.O69674cW7vYom3v5JOGKXDbYgCVIJU9EWhXUMHl3zwA&type=cf-1)](https://g.codefresh.io/pipelines/DevOps-Python-tools/builds)
 [![Wercker](https://app.wercker.com/status/b40735fb89e7d989dbaf5659a9af9a20/s/master "wercker status")](https://app.wercker.com/project/byKey/b40735fb89e7d989dbaf5659a9af9a20)
 [![BuildKite](https://img.shields.io/buildkite/314d5913c332d6f1eebad4a10f23da906bca544bdde6550595/master?label=BuildKite)](https://buildkite.com/hari-sekhon/devops-python-tools)
