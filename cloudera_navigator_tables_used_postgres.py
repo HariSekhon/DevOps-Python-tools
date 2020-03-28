@@ -49,7 +49,6 @@ import sys
 srcdir = os.path.abspath(os.path.dirname(__file__))
 pylib = os.path.join(srcdir, 'pylib')
 lib = os.path.join(srcdir, 'lib')
-import gzip
 sys.path.append(pylib)
 sys.path.append(lib)
 try:
@@ -64,7 +63,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 
 class ClouderaNavigatorTablesUsedPostgreSQL(ClouderaNavigatorTablesUsed):
@@ -122,29 +121,29 @@ class ClouderaNavigatorTablesUsedPostgreSQL(ClouderaNavigatorTablesUsed):
         self.len_headers = len(headers)
         # needed to ensure row joining works later on with number of fields left
         assert self.len_headers == 14 or self.len_headers == 16
-		user_index = 4
-		assert headers[user_index] == 'username'
-		# Hive postgres audit log
-		if self.len_headers == 14:
-			operation_index = 6
-			database_index = 7
-			table_index = 9
-			sql_index = 10
-			resource_index = 12
-			assert headers[resource_index] == 'resource_path'
-		# Impala postgres audit log
-		elif self.len_headers == 16:
-			operation_index = 7
-			database_index = 11
-			table_index = 13
-			sql_index = 15
-			resource_index = None
-		else:
-			raise AssertionError('headers != 14 or 16 - unrecognized audit log - not Hive or Impala')
-		assert headers[sql_index] == 'operation_text'
-		assert headers[database_index] == 'database_name'
-		assert headers[table_index] == 'table_name'
-		assert headers[operation_index] == 'operation'
+        user_index = 4
+        assert headers[user_index] == 'username'
+        # Hive postgres audit log
+        if self.len_headers == 14:
+            operation_index = 6
+            database_index = 7
+            table_index = 9
+            sql_index = 10
+            resource_index = 12
+            assert headers[resource_index] == 'resource_path'
+        # Impala postgres audit log
+        elif self.len_headers == 16:
+            operation_index = 7
+            database_index = 11
+            table_index = 13
+            sql_index = 15
+            resource_index = None
+        else:
+            raise AssertionError('headers != 14 or 16 - unrecognized audit log - not Hive or Impala')
+        assert headers[sql_index] == 'operation_text'
+        assert headers[database_index] == 'database_name'
+        assert headers[table_index] == 'table_name'
+        assert headers[operation_index] == 'operation'
         self.indicies = {
             'user_index': user_index,
             'operation_index': operation_index,
@@ -215,9 +214,9 @@ class ClouderaNavigatorTablesUsedPostgreSQL(ClouderaNavigatorTablesUsed):
         return (database, table)
 
     def get_db_table_from_resource(self, row):
-		# only available for hive audit logs, not impala
-		if self.indicies['resource_index'] is None:
-			return (None, None)
+        # only available for hive audit logs, not impala
+        if self.indicies['resource_index'] is None:
+            return (None, None)
         database = None
         table = None
         resource = row[self.indicies['resource_index']]
