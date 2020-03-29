@@ -41,6 +41,7 @@ Hari Sekhon - DevOps Python Tools
 [![Cirrus CI](https://img.shields.io/cirrus/github/HariSekhon/DevOps-Python-tools/master?logo=Cirrus%20CI&label=Cirrus%20CI)](https://cirrus-ci.com/github/HariSekhon/DevOps-Python-tools)
 [![Concourse](https://img.shields.io/badge/Concourse-ready-blue)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/.concourse.yml)
 [![GoCD](https://img.shields.io/badge/GoCD-ready-blue)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/.gocd.yml)
+[![Jenkins](https://img.shields.io/badge/Jenkins-ready-blue)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/Jenkinsfile)
 
 [![Azure DevOps Pipeline](https://dev.azure.com/harisekhon/GitHub/_apis/build/status/HariSekhon.DevOps-Python-tools?branchName=master)](https://dev.azure.com/harisekhon/GitHub/_build/latest?definitionId=8&branchName=master)
 [![BitBucket Pipeline](https://img.shields.io/bitbucket/pipelines/harisekhon/devops-python-tools/master?logo=bitbucket&label=BitBucket)](https://bitbucket.org/harisekhon/devops-python-tools/addon/pipelines/home#!/)
