@@ -17,7 +17,6 @@ gcc-c++
 # needed to build python-krbV and cloudera/thrift_sasl
 cyrus-sasl-devel
 krb5-devel
-libpq-devel # postgres pg_config
 openldap-devel
 openssl-devel
 
