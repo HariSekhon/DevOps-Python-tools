@@ -57,6 +57,8 @@ build:
 	@echo =========================
 	@echo DevOps Python Tools Build
 	@echo =========================
+	@bash-tools/git_summary_line.sh
+	@echo
 
 	@# executing in sh where type is not available
 	@#type -P python
