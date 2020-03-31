@@ -58,7 +58,6 @@ build: init
 	@echo DevOps Python Tools Build
 	@echo =========================
 	@$(MAKE) git-summary
-	@echo
 
 	@# executing in sh where type is not available
 	@#type -P python
