@@ -53,11 +53,11 @@ ifndef SKIP_PARQUET
 endif
 
 .PHONY: build
-build:
+build: init
 	@echo =========================
 	@echo DevOps Python Tools Build
 	@echo =========================
-	@bash-tools/git_summary_line.sh
+	@$(MAKE) git-summary
 	@echo
 
 	@# executing in sh where type is not available
@@ -66,7 +66,6 @@ build:
 	python -V || :
 	pip -V || :
 
-	$(MAKE) init
 	if [ -z "$(CPANM)" ]; then make; exit $$?; fi
 	$(MAKE) system-packages-python
 	if type apk 2>/dev/null; then $(MAKE) apk-packages-extra; fi
