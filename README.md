@@ -16,8 +16,11 @@ Hari Sekhon - DevOps Python Tools
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=ncloc)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
 -->
 [![Lines of Code](https://img.shields.io/badge/lines%20of%20code-26k-lightgrey)](https://github.com/HariSekhon/DevOps-Python-tools)
+
+<!-- site broken
 [![PyUp](https://pyup.io/repos/github/HariSekhon/DevOps-Python-tools/shield.svg)](https://pyup.io/account/repos/github/HariSekhon/DevOps-Python-tools/)
 [![Python 3](https://pyup.io/repos/github/HariSekhon/DevOps-Python-tools/python-3-shield.svg)](https://pyup.io/repos/github/HariSekhon/DevOps-Python-tools/)
+-->
 
 [![Linux](https://img.shields.io/badge/OS-Linux-blue?logo=linux)](https://github.com/HariSekhon/DevOps-Python-tools)
 [![Mac](https://img.shields.io/badge/OS-Mac-blue?logo=apple)](https://github.com/HariSekhon/DevOps-Python-tools)
