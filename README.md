@@ -441,3 +441,5 @@ You might also be interested in the following really nice Jupyter notebook for H
 ### Stargazers over time
 
 [![Stargazers over time](https://starchart.cc/HariSekhon/DevOps-Python-tools.svg)](https://starchart.cc/HariSekhon/DevOps-Python-tools)
+
+[git.io/python-tools](https://git.io/python-tools)
