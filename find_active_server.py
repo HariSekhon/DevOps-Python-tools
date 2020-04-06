@@ -112,7 +112,8 @@ import socket
 import subprocess
 import sys
 #from threading import Thread
-from multiprocessing.pool import ThreadPool, cpu_count
+from multiprocessing.pool import ThreadPool
+from multiprocessing import cpu_count
 # prefer blocking semantics of que.get() rather than handling deque.popleft() => 'IndexError: pop from an empty deque'
 #from collections import deque
 import Queue
@@ -137,7 +138,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.4'
+__version__ = '0.8.5'
 
 
 class FindActiveServer(CLI):
