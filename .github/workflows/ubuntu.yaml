@@ -37,7 +37,9 @@ jobs:
         key: ${{ runner.os }}-pip-devops-python-tools  # ${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-devops-python-tools
+    - name: init
+      run: make init
     - name: build
-      run: make
+      run: make ci
     - name: test
       run: make test
