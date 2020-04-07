@@ -120,11 +120,12 @@ import traceback
 from random import shuffle
 # Python 2 Queue vs Python 3 queue module :-/
 if sys.version[0] == '2':
-    import Queue as queue
+    import Queue as queue  # pylint: disable=import-error
 else:
-    import queue as queue
+    import queue as queue  # pylint: disable=import-error
 try:
-    import requests
+    # false positive from pylint, queue is imported first
+    import requests  # pylint: disable=wrong-import-order
 except ImportError:
     print(traceback.format_exc(), end='')
     sys.exit(4)
