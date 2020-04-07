@@ -27,12 +27,12 @@ on:
 jobs:
   build:
     #name: build
-    timeout-minutes: 10
+    timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-        #python-version: [2.7, 3.6, 3.7, 3.8, pypy2, pypy3]
+        #python-version: [2.7, 3.5, 3.6, 3.7, 3.8, pypy2, pypy3]
         python-version: [2.7]
     steps:
     - uses: actions/checkout@v2
@@ -42,8 +42,12 @@ jobs:
     - uses: actions/cache@v1
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        key: ${{ runner.os }}-pip-devops-python-tools  # -${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
-          ${{ runner.os }}-pip-
-    - name: build & test
-      run: make build test
+          ${{ runner.os }}-pip-devops-python-tools
+    - name: init
+      run: make init
+    - name: build
+      run: make ci
+    - name: test
+      run: make test
