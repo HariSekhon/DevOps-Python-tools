@@ -41,7 +41,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 class HeadTail(CLI):
 
@@ -60,6 +60,7 @@ class HeadTail(CLI):
         self.sep = '-' * 80
         self.docsep = '=' * 80
         self.quiet = False
+        self.timeout_default = None
 
     def add_options(self):
         #self.timeout_default = 300
