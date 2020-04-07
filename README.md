@@ -54,6 +54,7 @@ Hari Sekhon - DevOps Python Tools
 [![Repo on BitBucket](https://img.shields.io/badge/repo-BitBucket-blue?logo=bitbucket)](https://bitbucket.org/HariSekhon/DevOps-Python-tools)
 
 [![CI Mac](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Mac/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Mac%22)
+[![CI Mac 10.15](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Mac%2010.15/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Mac+10.15%22)
 [![CI Ubuntu](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Ubuntu/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Ubuntu%22)
 [![CI Ubuntu 14.04](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Ubuntu%2014.04/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Ubuntu+14.04%22)
 [![CI Ubuntu 16.04](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Ubuntu%2016.04/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Ubuntu+16.04%22)
@@ -69,7 +70,12 @@ Hari Sekhon - DevOps Python Tools
 [![CI Alpine](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Alpine/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Alpine%22)
 [![CI Alpine 3](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Alpine%203/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Alpine+3%22)
 [![CI Python 2.7](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Python%202.7/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Python+2.7%22)
+[![CI Python 3.5](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Python%203.5/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Python+3.5%22)
 [![CI Python 3.6](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Python%203.6/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Python+3.6%22)
+[![CI Python 3.7](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Python%203.7/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Python+3.7%22)
+[![CI Python 3.8](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20Python%203.8/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+Python+3.8%22)
+[![CI PyPy 2](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20PyPy%202/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+PyPy+2%22)
+[![CI PyPy 3](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20PyPy%203/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+PyPy+3%22)
 
 ### AWS, Docker, Spark / PySpark, Hadoop, HBase, Hive, Impala, Pig, Ambari, IPython and Linux Tools ###
 
