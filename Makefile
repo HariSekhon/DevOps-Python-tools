@@ -61,14 +61,12 @@ build: init
 
 	@# executing in sh where type is not available
 	@#type -P python
-	which python || :
-	which python2 || :
-	which python3 || :
-	python -V || :
-	which pip || :
-	which pip2 || :
-	which pip3 || :
-	pip -V || :
+	which python && python -V || :
+	which python2 && python2 -V || :
+	which python3 && python3 -V || :
+	which pip && pip -V || :
+	which pip2 && pip2 -V || :
+	which pip3 && pip3 -V || :
 
 	if [ -z "$(CPANM)" ]; then make; exit $$?; fi
 	$(MAKE) system-packages-python
