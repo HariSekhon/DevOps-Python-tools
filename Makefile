@@ -53,39 +53,25 @@ ifndef SKIP_PARQUET
 endif
 
 .PHONY: build
-build: init
+build: init python-version
 	@echo =========================
 	@echo DevOps Python Tools Build
 	@echo =========================
 	@$(MAKE) git-summary
 
-	@# executing in sh where type is not available
-	@#type -P python
-	which python && python -V || :
-	which python2 && python2 -V || :
-	which python3 && python3 -V || :
-	which pip && pip -V || :
-	which pip2 && pip2 -V || :
-	which pip3 && pip3 -V || :
-
 	if [ -z "$(CPANM)" ]; then make; exit $$?; fi
 	$(MAKE) system-packages-python
 	if type apk 2>/dev/null; then $(MAKE) apk-packages-extra; fi
 	if type apt-get 2>/dev/null; then $(MAKE) apt-packages-extra; fi
-	$(MAKE) python
 
-	# executing in sh where type is not available
-	#type -P python
-	which python
-	python -V
-	pip -V
+	$(MAKE) python
 
 .PHONY: init
 init:
 	git submodule update --init --recursive
 
 .PHONY: python
-python:
+python: python-version
 	cd pylib && $(MAKE)
 	@# don't pull parquet tools in to docker image by default, will bloat it
 	@# can fetch separately by running 'make parquet-tools' if you really want to
