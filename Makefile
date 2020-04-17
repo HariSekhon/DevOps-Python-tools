@@ -185,11 +185,6 @@ test: test-lib
 basic-test: test-lib
 	bash-tools/check_all.sh
 
-.PHONY: test2
-test2:
-	cd pylib && $(MAKE) test2
-	tests/all.sh
-
 .PHONY: install
 install: build
 	@echo "No installation needed, just add '$(PWD)' to your \$$PATH"
