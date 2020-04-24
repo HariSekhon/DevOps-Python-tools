@@ -45,7 +45,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '2.0.3'
+__version__ = '2.0.4'
 
 
 class Welcome(CLI):
@@ -59,7 +59,7 @@ class Welcome(CLI):
         self.timeout_default = 20
 
     @staticmethod
-    def case_user(user):
+    def titlecase_user(user):
         if user == 'root':
             user = user.upper()
         elif len(user) < 4 or re.search(r'\d', user):
@@ -76,7 +76,7 @@ class Welcome(CLI):
             # print("invalid user '%s' determined from environment variable $USER, failed regex validation" % user)
             print("invalid user '%s' returned by getpass.getuser(), failed regex validation" % user)
             sys.exit(ERRORS['CRITICAL'])
-        user = self.case_user(user)
+        user = self.titlecase_user(user)
         msg = 'Welcome %s - ' % user
         last = ''
         if which("last"):
