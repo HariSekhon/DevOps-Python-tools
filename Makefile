@@ -21,15 +21,15 @@
 #
 # Alpine:
 #
-#   apk add --no-cache git make && git clone https://github.com/harisekhon/devops-python-tools && cd pytools && make
+#   apk add --no-cache git make && git clone https://github.com/harisekhon/devops-python-tools pytools && cd pytools && make
 #
 # Debian / Ubuntu:
 #
-#   apt-get update && apt-get install -y make git && git clone https://github.com/harisekhon/devops-python-tools && cd pytools && make
+#   apt-get update && apt-get install -y make git && git clone https://github.com/harisekhon/devops-python-tools pytools && cd pytools && make
 #
 # RHEL / CentOS:
 #
-#   yum install -y make git && git clone https://github.com/harisekhon/devops-python-tools && cd pytools && make
+#   yum install -y make git && git clone https://github.com/harisekhon/devops-python-tools pytools && cd pytools && make
 
 # ===================
 
