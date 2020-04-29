@@ -32,6 +32,7 @@ from __future__ import print_function
 import json
 import logging
 import os
+import re
 import sys
 import traceback
 import urllib
@@ -52,7 +53,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.2'
+__version__ = '0.6.3'
 
 
 class DockerHubTags(CLI):
@@ -79,8 +80,11 @@ class DockerHubTags(CLI):
             self.usage('no repos given as args')
         self.quiet = self.get_opt('quiet')
         if not self.quiet:
+            # cheaper but lgtm hassling me, not a security issue but will shut them up
             print('\nDocker', end='')
-            if 'registry.hub.docker.com' in self.url_base:
+            #if 'registry.hub.docker.com' in self.url_base:
+            # match anchors but I prefer explicit anchor, more intuitive for other generic language coders
+            if re.match(r'^https://registry\.hub\.docker\.com/', self.url_base):
                 print('Hub')
             else:
                 print(' Registry:  {0}'.format(self.url_base.split('/v2', 1)[0]))

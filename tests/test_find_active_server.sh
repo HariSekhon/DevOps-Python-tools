@@ -144,7 +144,7 @@ ERRCODE=1 run_grep "^NO_AVAILABLE_SERVER$" ./find_active_server.py --https local
 echo "testing https with url path and regex matching:"
 echo
 
-run_grep "^github.com$" ./find_active_server.py $opts --https $WEBSITE2 github.com -u /harisekhon --regex 'python-tools'
+run_grep "^github.com$" ./find_active_server.py $opts --https $WEBSITE2 github.com -u /harisekhon --regex '(?i)python-tools'
 
 # ============================================================================ #
 

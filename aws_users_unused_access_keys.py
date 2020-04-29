@@ -65,7 +65,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 
 class AWSUnusedAccessKeys(CLI):
@@ -113,7 +113,7 @@ class AWSUnusedAccessKeys(CLI):
         filehandle = StringIO(unicode(csv_content))
         filehandle.seek(0)
         csvreader = csv.reader(filehandle)
-        headers = csvreader.next()
+        headers = next(csvreader)
         log.debug('headers: %s', headers)
         assert headers[0] == 'user'
         assert headers[8] == 'access_key_1_active'

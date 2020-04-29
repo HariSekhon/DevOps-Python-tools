@@ -20,26 +20,68 @@ version: ~> 1.0
 #  - linux
 #  - osx
 
+python:
+  - "2.7"
+  #- "3.4" supported by pip as of March 2019
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "pypy"   # currently Python 2.7.13, PyPy 7.1.1
+  - "pypy3"  # currently Python 3.6.1,  PyPy 7.1.1-beta0
+
 matrix:
+  fast_finish: true
   include:
+    # numpy has gone 2.7+ only now, so had to drop Python 2.6 support
     - os: linux
       language: python
-      python:
-      #  - "2.6"
-        - "2.7"
-      # MySQL in lib doesn't build from pip in Python 3
-      #  - "3.2"
-      #  - "3.3"
-      #  - "3.4"
-      #  - "3.5"
-      #  python-krbV fails to compile on PyPy
-      #  - "pypy"
-      #  - "pypy3"
-    # workaround is to use generic and install to system python
-    - os: osx
-      language: generic
+      python: "2.7"
 
-dist: trusty
+    - os: osx
+      language: generic # workaround since Mac doesn't have Python support yet, so install to system Python
+
+    - os: linux
+      language: python
+      python: "3.5"
+
+    - os: linux
+      language: python
+      python: "3.6"
+
+    - os: linux
+      language: python
+      python: "3.7"
+
+    - os: linux
+      language: python
+      python: "3.8"
+
+      # python-krbV fails to compile on PyPy
+      #
+      # psutil doesn't build:
+      #
+      # RuntimeError: broken / incompatible Python implementation, see: https://github.com/giampaolo/psutil/issues/1659
+      #
+    #- os: linux
+    #  language: python
+    #  python: "pypy"
+
+    - os: linux
+      language: python
+      python: "pypy3"
+
+
+#   allow_failures:
+#     - python: "3.4"
+#     - python: "3.5"
+#     - python: "3.6"
+#     - python: "3.7"
+#     - python: "3.8"
+#     - python: "pypy"
+#     - python: "pypy3"
+
+#dist: trusty
 
 sudo: required
 

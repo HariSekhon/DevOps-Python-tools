@@ -11,12 +11,12 @@
 #  https://www.linkedin.com/in/harisekhon
 #
 
-name: CI CentOS 7
+name: CI Ubuntu GitHub
 
 #env:
 #  DEBUG: 1
 
-on:
+on: # [push]
   push:
     branches:
       - master
@@ -29,19 +29,17 @@ jobs:
     #name: build
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    container: centos:7
-    env:
-      repo: devops-python-tools
     steps:
-    # untars repo in docker container so git submodule update fails
-    #- uses: actions/checkout@v2
-    - name: install git & make
-      run: yum install -y git make
-    - name: git clone
-      run: cd /tmp && git clone "https://github.com/harisekhon/$repo"
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-devops-python-tools  # ${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-devops-python-tools
     - name: init
-      run: cd "/tmp/$repo" && git submodule update --init --recursive
+      run: make init
     - name: build
-      run: cd "/tmp/$repo" && make ci
+      run: make ci
     - name: test
-      run: cd "/tmp/$repo" && make test
+      run: make test

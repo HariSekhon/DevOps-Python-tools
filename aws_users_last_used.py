@@ -54,7 +54,6 @@ from datetime import datetime
 from io import StringIO
 from math import floor
 import boto3
-from botocore.exceptions import ClientError
 srcdir = os.path.abspath(os.path.dirname(__file__))
 libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
@@ -67,7 +66,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 
 class AWSUsersLastUsed(CLI):
@@ -103,16 +102,16 @@ class AWSUsersLastUsed(CLI):
                 break
             log.info('waiting for credentials report')
             time.sleep(1)
-        try:
-            result = iam.get_credential_report()
-        except ClientError as _:
-            raise
+        #try:
+        result = iam.get_credential_report()
+        #except ClientError as _:
+        #    raise
         csv_content = result['Content']
         log.debug('%s', csv_content)
         filehandle = StringIO(unicode(csv_content))
         filehandle.seek(0)
         csvreader = csv.reader(filehandle)
-        headers = csvreader.next()
+        headers = next(csvreader)
         assert headers[0] == 'user'
         assert headers[4] == 'password_last_used'
         assert headers[10] == 'access_key_1_last_used_date'

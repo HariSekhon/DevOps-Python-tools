@@ -112,14 +112,20 @@ import socket
 import subprocess
 import sys
 #from threading import Thread
-from multiprocessing.pool import ThreadPool, cpu_count
+from multiprocessing.pool import ThreadPool
+from multiprocessing import cpu_count
 # prefer blocking semantics of que.get() rather than handling deque.popleft() => 'IndexError: pop from an empty deque'
 #from collections import deque
-import Queue
 import traceback
 from random import shuffle
+# Python 2 Queue vs Python 3 queue module :-/
+if sys.version[0] == '2':
+    import Queue as queue  # pylint: disable=import-error
+else:
+    import queue as queue  # pylint: disable=import-error
 try:
-    import requests
+    # false positive from pylint, queue is imported first
+    import requests  # pylint: disable=wrong-import-order
 except ImportError:
     print(traceback.format_exc(), end='')
     sys.exit(4)
@@ -137,7 +143,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.8.4'
+__version__ = '0.8.6'
 
 
 class FindActiveServer(CLI):
@@ -156,7 +162,7 @@ class FindActiveServer(CLI):
         self.request_timeout = None
         self.default_num_threads = min(cpu_count() * 4, 100)
         self.num_threads = None
-        self.queue = Queue.Queue()
+        self.queue = queue.Queue()
         self.pool = None
 
     def add_options(self):

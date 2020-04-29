@@ -77,7 +77,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.0'
+__version__ = '0.6.1'
 
 
 class TravisLastBuildLog(CLI):
@@ -151,7 +151,7 @@ class TravisLastBuildLog(CLI):
             self.repo = self.get_local_repo_name()
             if not self.repo:
                 self.usage('--job-id / --repo not specified')
-        validate_alnum(self.travis_token, 'travis token')
+        validate_alnum(self.travis_token, 'travis token', is_secret=True)
         self.headers['Authorization'] = 'token {0}'.format(self.travis_token)
         self.num = self.get_opt('num')
         validate_int(self.num, 'num', 1)

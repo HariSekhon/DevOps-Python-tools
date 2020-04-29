@@ -20,3 +20,4 @@ py3-jinja2
 py3-numpy
 #py3-flask
 py3-pygit2
+py3-psycopg2

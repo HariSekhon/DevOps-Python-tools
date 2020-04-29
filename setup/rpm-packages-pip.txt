@@ -26,4 +26,7 @@ python2-psutil
 #python-markupsafe
 #python2-bitarray
 
+python2-psycopg2
+python3-psycopg2
+
 python3-snappy

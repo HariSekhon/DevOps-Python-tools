@@ -72,25 +72,27 @@ try:
     # pylint: disable=unused-import
     from harisekhon.utils import \
         aws_host_ip_regex, \
-        domain_regex, \
         domain_regex_strict, \
-        email_regex, \
         filename_regex, \
         fqdn_regex, \
         host_regex, \
         hostname_regex, \
         ip_prefix_regex, \
         ip_regex, \
-        mac_regex, \
         subnet_mask_regex, \
         user_regex
+    from harisekhon.utils import \
+        domain_regex, \
+        email_regex, \
+        mac_regex \
+        # lgtm [py/unused-import] - used by dynamic code so code analyzer cannot comprehend
     from harisekhon import CLI
 except ImportError as _:
     print(traceback.format_exc(), end='')
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.10.10'
+__version__ = '0.10.12'
 
 ip_regex = r'(?!127\.0\.0\.)' + ip_regex
 subnet_mask_regex = r'(?!127\.0\.0\.)' + subnet_mask_regex
@@ -219,7 +221,7 @@ class Anonymize(CLI):
             #'countryCode',
             'displayName',
             'displayNamePrintable',
-            'division'
+            'division',
             'employeeID',
             'groupMembershipSAM',
             'info',
@@ -377,6 +379,9 @@ class Anonymize(CLI):
                                  sep=arg_sep,
                                  pass_word_phrase=pass_word_phrase,
                                  pw=password_quoted),
+            'password4': r'([\.-]?(?:api-?)?token{sep}){pw}'\
+                         .format(sep=arg_sep,
+                                 pw=password_quoted),
             'ip': r'(?<!\d\.)' + ip_regex + r'/\d{1,2}',
             'ip2': r'(?<!\d\.)' + ip_regex + r'(?!\w*[.-]\w)',
             'ip3': aws_host_ip_regex + r'(?!-)',
@@ -488,6 +493,7 @@ class Anonymize(CLI):
             'password': r'\1<password>',
             'password2': r'\1<user>:<password>',
             'password3': r'\1<user>\2<password>',
+            'password4': r'\1<token>',
             'ip': r'<ip_x.x.x.x>/<cidr_mask>',
             'ip2': r'<ip_x.x.x.x>',
             'ip3': r'<ip-x-x-x-x>',

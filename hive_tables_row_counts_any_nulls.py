@@ -52,8 +52,7 @@ pylib = os.path.join(srcdir, 'pylib')
 sys.path.append(pylib)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log
-    from hive_foreach_table import HiveForEachTable
+    from hive_tables_null_rows import HiveTablesNullRows
 except ImportError as _:
     print('module import failed: %s' % _, file=sys.stderr)
     print("Did you remember to build the project by running 'make'?", file=sys.stderr)
@@ -62,45 +61,18 @@ except ImportError as _:
 
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.0'
+__version__ = '0.6.0'
 
 
-class HiveTablesRowsWithNulls(HiveForEachTable):
+class HiveTablesRowsWithNulls(HiveTablesNullRows):
 
-    def __init__(self):
-        # Python 2.x
-        super(HiveTablesRowsWithNulls, self).__init__()
-        # Python 3.x
-        # super().__init__()
-        self.query = 'placeholder'  # constructed later dynamically per table, here to suppress --query CLI option
-        self.database = None
-        self.table = None
-        #self.partition = None
-        self.ignore_errors = False
-
-    # discard last param query and construct our own based on the table DDL of cols
-    def execute(self, conn, database, table, query):
-        columns = []
-        log.info("describing table '%s.%s'", database, table)
-        with conn.cursor() as column_cursor:
-            # doesn't support parameterized query quoting from dbapi spec
-            #column_cursor.execute('use %(database)s', {'database': database})
-            #column_cursor.execute('describe %(table)s', {'table': table})
-            column_cursor.execute('use `{}`'.format(database))
-            column_cursor.execute('describe `{}`'.format(table))
-            for column_row in column_cursor:
-                column = column_row[0]
-                #column_type = column_row[1]
-                columns.append(column)
-        query = "SELECT count(*) FROM `{db}`.`{table}` WHERE `"\
-                .format(db=database, table=table) + \
-                "` IS NULL OR `".join(columns) + "` IS NULL"
-        with conn.cursor() as table_cursor:
-            log.debug('executing query:  %s', query)
-            table_cursor.execute(query)
-            for result in table_cursor:
-                count = result[0]
-                print('{db}.{table}\t{count}'.format(db=database, table=table, count=count))
+    @staticmethod
+    def generate_sql(database, table, columns):
+        # impala library doesn't support parameterized query quoting from dbapi spec
+        sql = "SELECT count(*) FROM `{db}`.`{table}` WHERE `"\
+              .format(db=database, table=table) + \
+              "` IS NULL OR `".join(columns) + "` IS NULL"
+        return sql
 
 
 if __name__ == '__main__':
