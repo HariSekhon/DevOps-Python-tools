@@ -53,11 +53,14 @@ ifndef SKIP_PARQUET
 endif
 
 .PHONY: build
-build: init python-version
+build: init
 	@echo =========================
 	@echo DevOps Python Tools Build
 	@echo =========================
 	@$(MAKE) git-summary
+	# defer via external sub-call, otherwise will result in error like
+	# make: *** No rule to make target 'python-version', needed by 'build'.  Stop.
+	$(MAKE) python-version
 
 	if [ -z "$(CPANM)" ]; then make; exit $$?; fi
 	$(MAKE) system-packages-python
@@ -71,7 +74,10 @@ init:
 	git submodule update --init --recursive
 
 .PHONY: python
-python: python-version
+python:
+	# defer via external sub-call, otherwise will result in error like
+	# make: *** No rule to make target 'python-version', needed by 'build'.  Stop.
+	$(MAKE) python-version
 	cd pylib && $(MAKE)
 	@# don't pull parquet tools in to docker image by default, will bloat it
 	@# can fetch separately by running 'make parquet-tools' if you really want to
