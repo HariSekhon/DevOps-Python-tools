@@ -158,19 +158,23 @@ Environment variables are supported for convenience and also to hide credentials
   - ```aws_users_unused_access_keys.py``` - lists users access keys that haven't been used in the last N days or that have never been used (these should generally be removed/disabled). Optionally filters for only active keys
   - ```aws_users_last_used.py``` - lists all users and their days since last use across both passwords and access keys. Optionally filters for users not used in the last N days to find old accounts to remove
   - ```aws_users_pw_last_used.py``` - lists all users and dates since their passwords were last used. Optionally filters for users with passwords not used in the last N days
-- [Hadoop](http://hadoop.apache.org/) & NoSQL:
-  - [Spark](https://spark.apache.org/) & Data Format Converters:
-    - ```spark_avro_to_parquet.py``` - PySpark Avro => Parquet converter
-    - ```spark_parquet_to_avro.py``` - PySpark Parquet => Avro converter
-    - ```spark_csv_to_avro.py``` - PySpark CSV => Avro converter, supports both inferred and explicit schemas
-    - ```spark_csv_to_parquet.py``` - PySpark CSV => Parquet converter, supports both inferred and explicit schemas
-    - ```spark_json_to_avro.py``` - PySpark JSON => Avro converter
-    - ```spark_json_to_parquet.py``` - PySpark JSON => Parquet converter
-    - ```xml_to_json.py``` - XML to JSON converter
-    - ```json_to_xml.py``` - JSON to XML converter
-    - ```json_to_yaml.py``` - JSON to YAML converter
-    - ```json_docs_to_bulk_multiline.py``` - converts json files to bulk multi-record one-line-per-json-document format for pre-processing and loading to big data systems like [Hadoop](http://hadoop.apache.org/) and [MongoDB](https://www.mongodb.com/), can recurse directory trees, and mix json-doc-per-file / bulk-multiline-json / directories / standard input, combines all json documents and outputs bulk-one-json-document-per-line to standard output for convenient command line chaining and redirection, optionally continues on error, collects broken records to standard error for logging and later reprocessing for bulk batch jobs, even supports single quoted json while not technically valid json is used by MongoDB and even handles embedded double quotes in 'single quoted json'
-    - see also ```validate_*.py``` further down for all these formats and more
+- [Docker](https://www.docker.com/):
+  - ```docker_registry_show_tags.py``` / ```dockerhub_show_tags.py``` / ```quay_show_tags.py``` - shows tags for docker repos in a docker registry or on [DockerHub](https://hub.docker.com/u/harisekhon/) or [Quay.io](https://quay.io/) - Docker CLI doesn't support this yet but it's a very useful thing to be able to see live on the command line or use in shell scripts (use `-q`/`--quiet` to return only the tags for easy shell scripting). You can use this to pre-download all tags of a docker image before running tests across versions in a simple bash for loop, eg. ```docker_pull_all_tags.sh```
+  - ```dockerhub_search.py``` - search DockerHub with a configurable number of returned results (official `docker search` is limited to only 25 results), using `--verbose` will also show you how many results were returned to the termainal and how many DockerHub has in total (use ```-q / --quiet``` to return only the image names for easy shell scripting). This can be used to download all of my DockerHub images in a simple bash for loop eg. ```docker_pull_all_images.sh``` and can be chained with ```dockerhub_show_tags.py``` to download all tagged versions for all docker images eg. ```docker_pull_all_images_all_tags.sh```
+  - ```dockerfiles_check_git*.py``` - check Git tags & branches align with the containing Dockerfile's ```ARG *_VERSION```
+- [Spark](https://spark.apache.org/) & Data Format Converters:
+  - ```spark_avro_to_parquet.py``` - PySpark Avro => Parquet converter
+  - ```spark_parquet_to_avro.py``` - PySpark Parquet => Avro converter
+  - ```spark_csv_to_avro.py``` - PySpark CSV => Avro converter, supports both inferred and explicit schemas
+  - ```spark_csv_to_parquet.py``` - PySpark CSV => Parquet converter, supports both inferred and explicit schemas
+  - ```spark_json_to_avro.py``` - PySpark JSON => Avro converter
+  - ```spark_json_to_parquet.py``` - PySpark JSON => Parquet converter
+  - ```xml_to_json.py``` - XML to JSON converter
+  - ```json_to_xml.py``` - JSON to XML converter
+  - ```json_to_yaml.py``` - JSON to YAML converter
+  - ```json_docs_to_bulk_multiline.py``` - converts json files to bulk multi-record one-line-per-json-document format for pre-processing and loading to big data systems like [Hadoop](http://hadoop.apache.org/) and [MongoDB](https://www.mongodb.com/), can recurse directory trees, and mix json-doc-per-file / bulk-multiline-json / directories / standard input, combines all json documents and outputs bulk-one-json-document-per-line to standard output for convenient command line chaining and redirection, optionally continues on error, collects broken records to standard error for logging and later reprocessing for bulk batch jobs, even supports single quoted json while not technically valid json is used by MongoDB and even handles embedded double quotes in 'single quoted json'
+  - see also ```validate_*.py``` further down for all these formats and more
+- [Hadoop](http://hadoop.apache.org/) ecosystem & NoSQL:
   - [Ambari](https://hortonworks.com/apache/ambari/):
     - ```ambari_blueprints.py``` - Blueprint cluster templating and deployment tool using Ambari API
       - list blueprints
@@ -220,27 +224,22 @@ Environment variables are supported for convenience and also to hide credentials
     - ```pig-text-to-elasticsearch.pig``` - bulk index unstructured files in [Hadoop](http://hadoop.apache.org/) to [Elasticsearch](https://www.elastic.co/products/elasticsearch)
     - ```pig-text-to-solr.pig``` - bulk index unstructured files in [Hadoop](http://hadoop.apache.org/) to [Solr](http://lucene.apache.org/solr/) / [SolrCloud clusters](https://wiki.apache.org/solr/SolrCloud)
     - ```pig_udfs.jy``` - Pig Jython UDFs for Hadoop
-  - ```ipython-notebook-pyspark.py``` - per-user authenticated IPython Notebook + PySpark integration to allow each user to auto-create their own password protected IPython Notebook running Spark
-  - ```find_active_server.py``` - returns first available healthy server or active master in high availability deployments, useful for chaining with single argument tools. Configurable tests include socket, http, https, ping, url and/or regex content match, multi-threaded for speed. Designed to extend tools that only accept a single ```--host``` option but for which the technology has later added multi-master support or active-standby masters (eg. Hadoop, HBase) or where you want to query cluster wide information available from any online peer (eg. Elasticsearch)
-    - The following are simplified specialisations of the above program, just pass host arguments, all the details have been baked in, no switches required
-      - ```find_active_hadoop_namenode.py``` - returns active [Hadoop](http://hadoop.apache.org/) Namenode in HDFS HA
-      - ```find_active_hadoop_resource_manager.py``` - returns active [Hadoop](http://hadoop.apache.org/) Resource Manager in Yarn HA
-      - ```find_active_hbase_master.py``` - returns active [HBase](https://hbase.apache.org/) Master in HBase HA
-      - ```find_active_hbase_thrift.py``` - returns first available [HBase](https://hbase.apache.org/) Thrift Server (run multiple of these for load balancing)
-      - ```find_active_hbase_stargate.py``` - returns first available [HBase](https://hbase.apache.org/) Stargate rest server (run multiple of these for load balancing)
-      - ```find_active_apache_drill.py``` - returns first available [Apache Drill](https://drill.apache.org/) node
-      - ```find_active_cassandra.py``` - returns first available [Apache Cassandra](https://cassandra.apache.org/) node
-      - ```find_active_impala*.py``` - returns first available [Impala](https://impala.apache.org/) node of either Impalad, Catalog or Statestore
-      - ```find_active_presto_coordinator.py``` - returns first available [Presto](https://prestodb.io/) Coordinator
-      - ```find_active_kubernetes_api.py``` - returns first available [Kubernetes](https://kubernetes.io/) API server
-      - ```find_active_oozie.py``` - returns first active [Oozie](http://oozie.apache.org/) server
-      - ```find_active_solrcloud.py``` - returns first available [Solr](http://lucene.apache.org/solr/) / [SolrCloud](https://wiki.apache.org/solr/SolrCloud) node
-      - ```find_active_elasticsearch.py``` - returns first available [Elasticsearch](https://www.elastic.co/products/elasticsearch) node
-      - see also: [Advanced HAProxy configurations](https://github.com/harisekhon/haproxy-configs) which are part of the [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins)
-- [Docker](https://www.docker.com/):
-  - ```docker_registry_show_tags.py``` / ```dockerhub_show_tags.py``` / ```quay_show_tags.py``` - shows tags for docker repos in a docker registry or on [DockerHub](https://hub.docker.com/u/harisekhon/) or [Quay.io](https://quay.io/) - Docker CLI doesn't support this yet but it's a very useful thing to be able to see live on the command line or use in shell scripts (use `-q`/`--quiet` to return only the tags for easy shell scripting). You can use this to pre-download all tags of a docker image before running tests across versions in a simple bash for loop, eg. ```docker_pull_all_tags.sh```
-  - ```dockerhub_search.py``` - search DockerHub with a configurable number of returned results (official `docker search` is limited to only 25 results), using `--verbose` will also show you how many results were returned to the termainal and how many DockerHub has in total (use ```-q / --quiet``` to return only the image names for easy shell scripting). This can be used to download all of my DockerHub images in a simple bash for loop eg. ```docker_pull_all_images.sh``` and can be chained with ```dockerhub_show_tags.py``` to download all tagged versions for all docker images eg. ```docker_pull_all_images_all_tags.sh```
-  - ```dockerfiles_check_git*.py``` - check Git tags & branches align with the containing Dockerfile's ```ARG *_VERSION```
+- ```find_active_server.py``` - returns first available healthy server or active master in high availability deployments, useful for chaining with single argument tools. Configurable tests include socket, http, https, ping, url and/or regex content match, multi-threaded for speed. Designed to extend tools that only accept a single ```--host``` option but for which the technology has later added multi-master support or active-standby masters (eg. Hadoop, HBase) or where you want to query cluster wide information available from any online peer (eg. Elasticsearch)
+  - The following are simplified specialisations of the above program, just pass host arguments, all the details have been baked in, no switches required
+    - ```find_active_hadoop_namenode.py``` - returns active [Hadoop](http://hadoop.apache.org/) Namenode in HDFS HA
+    - ```find_active_hadoop_resource_manager.py``` - returns active [Hadoop](http://hadoop.apache.org/) Resource Manager in Yarn HA
+    - ```find_active_hbase_master.py``` - returns active [HBase](https://hbase.apache.org/) Master in HBase HA
+    - ```find_active_hbase_thrift.py``` - returns first available [HBase](https://hbase.apache.org/) Thrift Server (run multiple of these for load balancing)
+    - ```find_active_hbase_stargate.py``` - returns first available [HBase](https://hbase.apache.org/) Stargate rest server (run multiple of these for load balancing)
+    - ```find_active_apache_drill.py``` - returns first available [Apache Drill](https://drill.apache.org/) node
+    - ```find_active_cassandra.py``` - returns first available [Apache Cassandra](https://cassandra.apache.org/) node
+    - ```find_active_impala*.py``` - returns first available [Impala](https://impala.apache.org/) node of either Impalad, Catalog or Statestore
+    - ```find_active_presto_coordinator.py``` - returns first available [Presto](https://prestodb.io/) Coordinator
+    - ```find_active_kubernetes_api.py``` - returns first available [Kubernetes](https://kubernetes.io/) API server
+    - ```find_active_oozie.py``` - returns first active [Oozie](http://oozie.apache.org/) server
+    - ```find_active_solrcloud.py``` - returns first available [Solr](http://lucene.apache.org/solr/) / [SolrCloud](https://wiki.apache.org/solr/SolrCloud) node
+    - ```find_active_elasticsearch.py``` - returns first available [Elasticsearch](https://www.elastic.co/products/elasticsearch) node
+    - see also: [Advanced HAProxy configurations](https://github.com/harisekhon/haproxy-configs) which are part of the [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins)
 - [Travis CI](https://travis-ci.org/):
     - ```travis_last_log.py``` - fetches [Travis CI](https://travis-ci.org/) latest running / completed / failed build log for given repo - useful for quickly getting the log of the last failed build when CCMenu or BuildNotify applets turn red
     - ```travis_debug_session.py``` - launches a [Travis CI](https://travis-ci.org/) interactive debug build session via Travis API, tracks session creation and drops user straight in to the SSH shell on the remote Travis build, very convenient one shot debug launcher for Travis CI
