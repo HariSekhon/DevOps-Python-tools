@@ -33,7 +33,7 @@ Additional methods available:
 4. regex capture matching portion - specify a regex to match against the filenames with capture (brackets) and the
                                     captured portion will be compared among files. If no capture brackets are detected
                                     then will treat the entire regex as the capture.
-                                    Regex is case insensitive by default
+                                    Regex is case insensitive by default and applies only to the file's basename
 
 Can restrict methods of finding duplicates to any combination of --name / --size / --checksum (checksum implies size as
 an efficiency shortcut) / --regex. If none are specified then will try name, size + checksum. If specifying any one of
@@ -81,7 +81,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.4'
+__version__ = '0.6.0'
 
 
 class FindDuplicateFiles(CLI):
@@ -165,7 +165,7 @@ class FindDuplicateFiles(CLI):
         log_option('compare by name', self.compare_by_name)
         log_option('compare by size', self.compare_by_size)
         log_option('compare by checksum', self.compare_by_checksum)
-        log_option('compare by regex', True if self.regex else False)
+        log_option('compare by regex', bool(self.regex))
         return args
 
     @staticmethod
@@ -297,6 +297,7 @@ class FindDuplicateFiles(CLI):
 
     def is_file_dup(self, filepath):
         log.debug("checking file path '%s'", filepath)
+        # pylint: disable=no-else-return
         if os.path.islink(filepath):
             log.debug("ignoring symlink '%s'", filepath)
             return False
@@ -340,8 +341,7 @@ class FindDuplicateFiles(CLI):
             self.dups_by_name[basename].add(self.files[basename])
             self.dups_by_name[basename].add(filepath)
             return True
-        else:
-            self.files[basename] = filepath
+        self.files[basename] = filepath
         return False
 
     def is_file_dup_by_size(self, filepath):
@@ -397,7 +397,9 @@ class FindDuplicateFiles(CLI):
         return False
 
     def is_file_dup_by_regex(self, filepath):
-        match = re.search(self.regex, filepath)
+        #match = re.search(self.regex, filepath)
+        basename = os.path.basename(filepath)
+        match = re.search(self.regex, basename)
         if match:
             log.debug("regex matched file '%s'", filepath)
             if match.groups():
@@ -407,8 +409,7 @@ class FindDuplicateFiles(CLI):
                     self.dups_by_regex[capture].add(self.regex_captures[capture])
                     self.dups_by_regex[capture].add(filepath)
                     return True
-                else:
-                    self.regex_captures[capture] = filepath
+                self.regex_captures[capture] = filepath
             else:
                 log.error('no capture detected! Did you forget to specify the (brackets) to capture in the regex?')
         return False
