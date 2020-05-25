@@ -81,7 +81,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.0'
+__version__ = '0.6.1'
 
 
 class FindDuplicateFiles(CLI):
@@ -404,14 +404,14 @@ class FindDuplicateFiles(CLI):
             log.debug("regex matched file '%s'", filepath)
             if match.groups():
                 capture = match.group(1)
-                if capture in self.regex_captures:
-                    self.dups_by_regex[capture] = self.dups_by_regex.get(capture, set())
-                    self.dups_by_regex[capture].add(self.regex_captures[capture])
-                    self.dups_by_regex[capture].add(filepath)
-                    return True
-                self.regex_captures[capture] = filepath
             else:
-                log.error('no capture detected! Did you forget to specify the (brackets) to capture in the regex?')
+                capture = match.group(0)
+            if capture in self.regex_captures:
+                self.dups_by_regex[capture] = self.dups_by_regex.get(capture, set())
+                self.dups_by_regex[capture].add(self.regex_captures[capture])
+                self.dups_by_regex[capture].add(filepath)
+                return True
+            self.regex_captures[capture] = filepath
         return False
 
 
