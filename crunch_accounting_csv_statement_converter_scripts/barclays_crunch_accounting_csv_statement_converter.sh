@@ -30,4 +30,4 @@ export STATEMENT_GLOB="Barclays_Statement_[[:digit:]][[:digit:]][[:digit:]][[:di
     #perl -pi -e 's/^\s+,/,/' "$statement"
 #done
 
-generate_crunch_statements
+generate_crunch_statements --reverse-order
