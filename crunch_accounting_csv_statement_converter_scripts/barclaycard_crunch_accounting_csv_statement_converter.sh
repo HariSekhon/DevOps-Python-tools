@@ -23,4 +23,4 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # statements should be named in format: Barclaycard_Statement_YYYY-MM-DD.csv
 export STATEMENT_GLOB="Barclaycard_Statement_[[:digit:]][[:digit:]][[:digit:]][[:digit:]]-[[:digit:]][[:digit:]]-[[:digit:]][[:digit:]].csv"
 
-generate_crunch_statements
+generate_crunch_statements --credit-card --reverse-order
