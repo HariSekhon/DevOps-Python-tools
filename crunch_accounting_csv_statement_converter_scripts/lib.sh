@@ -84,7 +84,7 @@ generate_crunch_statements(){
         if [ $passed_latest_statement -lt 1 ]; then
             continue
         fi
-        "$converter" --credit-card --reverse-order --starting-balance "$starting_balance" "$statement"
+        "$converter" "$@" --starting-balance "$starting_balance" "$statement"
         starting_balance="$(get_final_balance_from_statement "$crunch_statement")"
     done
 }
