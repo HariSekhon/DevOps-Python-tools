@@ -61,7 +61,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 
 class CrunchAccountingCsvStatementConverter(CLI):
@@ -168,13 +168,17 @@ class CrunchAccountingCsvStatementConverter(CLI):
             # want Transaction Date and not Posted Date
             if 'Date' in value and not 'Posted' in value:
                 positions['date'] = position
-            elif 'Merchant Name' in value:
-                positions['desc'] = position
             # Original Amount column will be original currency eg 499 USD, but we only want native currency eg. 421.33
             elif 'Amount' in value and not 'Original' in value:
                 positions['amount'] = position
             elif 'Balance' in value:
                 balance_position = position
+            # Barclaycard CSVs
+            elif 'Merchant Name' in value:
+                positions['desc'] = position
+            # Barclays CSVs
+            elif 'Memo' in value:
+                positions['desc'] = position
         for pos in positions:
             if positions[pos] is None:
                 log.error('field %s not found', pos)
