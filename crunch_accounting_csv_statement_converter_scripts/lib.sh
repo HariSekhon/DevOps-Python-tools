@@ -30,7 +30,7 @@ get_latest_crunch_statement(){
             latest_crunch_statement="$crunch_statement"
         fi
     done
-    if [ -n "$latest_crunch_statement" ]; then
+    if [ -n "${latest_crunch_statement:-}" ]; then
         echo "$latest_crunch_statement"
     fi
 }
@@ -46,13 +46,15 @@ get_final_balance_from_statement(){
 
 get_starting_balance(){
     local starting_balance
+    local latest_crunch_statement="$1"
     if [ -n "${latest_crunch_statement:-}" ]; then
         echo "latest crunch statement is $latest_crunch_statement" >&2
         starting_balance="$(get_final_balance_from_statement "$latest_crunch_statement")"
     else
+        echo "no latest crunch statement, getting starting balance from environment variable \$STARTING_BALANCE" >&2
         starting_balance="${STARTING_BALANCE:-}"
-        if [ -n "$starting_balance" ]; then
-            echo "last crunch statement not found, you must specify the last balance manually via the environment variable \$LAST_BALANCE" >&2
+        if [ -z "$starting_balance" ]; then
+            echo "last crunch statement not found, you must specify the last balance manually via the environment variable \$STARTING_BALANCE" >&2
             exit 1
         fi
     fi
@@ -61,15 +63,20 @@ get_starting_balance(){
 }
 
 generate_crunch_statements(){
+    # only generate statements newer than the last generated one which provides the starting balance
     local passed_latest_statement=0
     local latest_crunch_statement
     local starting_balance
     latest_crunch_statement="$(get_latest_crunch_statement)"
+    if [ -z "$latest_crunch_statement" ]; then
+        passed_latest_statement=1
+    fi
     starting_balance="$(get_starting_balance "$latest_crunch_statement")"
     for statement in $STATEMENT_GLOB; do
         crunch_statement="${statement%.csv}_crunch.csv"
         if [ -f "$crunch_statement" ]; then
-            if [ "$crunch_statement" = "$latest_crunch_statement" ]; then
+            if [ $passed_latest_statement = 0 ] &&
+               [ "$crunch_statement" = "$latest_crunch_statement" ]; then
                 passed_latest_statement=1
             fi
             continue
