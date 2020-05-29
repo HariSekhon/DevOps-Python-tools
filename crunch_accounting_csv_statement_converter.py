@@ -182,7 +182,7 @@ class CrunchAccountingCsvStatementConverter(CLI):
         for pos in positions:
             if positions[pos] is None:
                 log.error('field %s not found', pos)
-                return False
+                sys.exit(1)
         if balance_position is None and self.running_balance is None:
             self.usage('no balance column detected, please specify --starting-balance')
         return (positions, balance_position)
