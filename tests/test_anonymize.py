@@ -34,11 +34,11 @@ def run():
     global dest # pylint: disable=global-statement
     src = {int(k) : v for k, v in src.items()}
     dest = {int(k) : v for k, v in dest.items()}
-    src_keys = [key for key in sorted(src)]  # pylint: disable=redefined-outer-name
-    test_input = '\n'.join([src[key] for key in src_keys])
+    src_keys = sorted(src)
+    test_input = '\n'.join([src[_] for _ in src_keys])
 
     print('running anonymize tests using: {} {}'.format(anonymize, args))
-    cmd = [anonymize] + [_ for _ in args.split()]
+    cmd = [anonymize] + args.split()
     process = subprocess.Popen(cmd, stdin=PIPE, stdout=PIPE)
     # encode as bytes for Python 3 :-/
     test_input = str.encode(test_input, 'utf-8')
@@ -46,7 +46,8 @@ def run():
     index = 0
     # convert bytes to string
     stdout = stdout.decode("utf-8")
-    for line in stdout.split('\n'):   # pylint: disable=redefined-outer-name
+    # pylint: disable=redefined-outer-name
+    for line in stdout.split('\n'):
         key = src_keys[index]
         _input = src[key]
         expected = dest[key]
