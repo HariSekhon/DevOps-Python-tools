@@ -357,8 +357,8 @@ class Anonymize(CLI):
             'group2': r'({group_name}{sep}){user}'.format(group_name=group_name, sep=arg_sep, user=user_regex),
             'group3': r'for\s+group\s+{group}'.format(group=user_regex),
             'group4': r'(["\']{group_name}["\']\s*:\s*["\']?){group}'.format(group_name=group_name, group=user_regex),
-            'group5': r'(arn:aws:iam:[^:]*:)\d+(:group/){group}'.format(\
-                                                         group='({}/)*{}'.format(user_regex, user_regex)),
+            'group5': r'(arn:aws:iam:[^:]*:)\d+(:group/){group}'.format(
+                group='({user_regex}/)*{user_regex}'.format(user_regex=user_regex)),
             'user': r'([-\.]{user_name}{sep})\S+'.format(user_name=user_name, sep=arg_sep),
             'user2': r'/(home|user)/{user}'.format(user=user_regex),
             'user3': r'({user_name}{sep}){user}'.format(user_name=user_name, sep=arg_sep, user=user_regex),
@@ -370,7 +370,8 @@ class Anonymize(CLI):
             'user7': r'(["\'](?:{user_name}|owner)["\']\s*:\s*["\']?){user}'\
                      .format(user_name=user_name, user=user_regex),
             #'user8': r'arn:aws:iam::\d{12}:user/{user}'.format(user=user_regex),
-            'user8': r'(arn:aws:iam:[^:]*:)\d+(:user/){user}'.format(user='({}/)*{}'.format(user_regex, user_regex)),
+            'user8': r'(arn:aws:iam:[^:]*:)\d+(:user/){user}'.format(
+                user='({user_regex}/)*{user_regex}'.format(user_regex=user_regex)),
             'password': r'([\.-]?{pass_word_phrase}{sep}){pw}'\
                         .format(pass_word_phrase=pass_word_phrase,
                                 sep=arg_sep,
@@ -658,6 +659,7 @@ class Anonymize(CLI):
                 self.anonymizations['ip'] = False
         else:
             for _ in self.anonymizations:
+                # pylint: disable=no-else-continue
                 if _ in ('subnet_mask', 'mac', 'group'):
                     continue
                 elif _ == 'database':
@@ -891,8 +893,7 @@ class Anonymize(CLI):
             if line is None:
                 if method:
                     raise AssertionError('anonymize_{} returned None'.format(_))
-                else:
-                    raise AssertionError('anonymize_dynamic({}, line)'.format(_))
+                raise AssertionError('anonymize_dynamic({}, line)'.format(_))
         line += line_ending
         return line
 
