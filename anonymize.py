@@ -81,6 +81,8 @@ try:
         ip_regex, \
         subnet_mask_regex, \
         user_regex
+    # used dynamically
+    # pylint: disable=unused-import
     from harisekhon.utils import \
         domain_regex, \
         email_regex, \
