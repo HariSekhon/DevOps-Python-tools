@@ -210,27 +210,27 @@ class FindDuplicateFiles(CLI):
                 for filepath in sorted(self.dup_filepaths):
                     print(filepath)
                 sys.exit(4)
-            print('Duplicates detected!\n')
+            print('Duplicates detected!')
             if self.dups_by_name:
-                print('Duplicates by name:\n')
+                print('\nDuplicates by name:\n')
                 for basename in self.dups_by_name:
                     print("--\nbasename '{0}':".format(basename))
                     for filepath in sorted(self.dups_by_name[basename]):
                         print(filepath)
             if self.dups_by_size:
-                print('Duplicates by size:\n')
+                print('\nDuplicates by size:\n')
                 for size in self.dups_by_size:
                     print("--\nsize '{0}' bytes:".format(size))
                     for filepath in sorted(self.dups_by_size[size]):
                         print(filepath)
             if self.dups_by_hash:
-                print('Duplicates by checksum:\n')
+                print('\nDuplicates by checksum:\n')
                 for checksum in self.dups_by_hash:
                     print("--\nchecksum '{0}':".format(checksum))
                     for filepath in sorted(self.dups_by_hash[checksum]):
                         print(filepath)
             if self.dups_by_regex:
-                print('Duplicates by regex match ({0}):\n'.format(self.regex))
+                print('\nDuplicates by regex match ({0}):\n'.format(self.regex))
                 for matching_portion in self.dups_by_regex:
                     print("--\nregex matching portion '{0}':".format(matching_portion))
                     for filepath in sorted(self.dups_by_regex[matching_portion]):
