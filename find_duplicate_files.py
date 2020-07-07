@@ -35,6 +35,8 @@ Additional methods available:
                                     then will treat the entire regex as the capture.
                                     Regex is case insensitive by default and applies only to the file's basename
 
+Exits with exit code 4 if duplicates are found
+
 Can restrict methods of finding duplicates to any combination of --name / --size / --checksum (checksum implies size as
 an efficiency shortcut) / --regex. If none are specified then will try name, size + checksum. If specifying any one of
 these options then the others will not run unless also explicitly specified.
