@@ -49,10 +49,12 @@ slight imperfection in one of the files (eg. multimedia files) as that would res
 - By default this program will short-circuit to stop processing a file as soon as it is determined to be a duplicate
 file via one of the above methods in that order for efficiency. This means that if 2 files have duplicate names,
 and a third has a different name but the same checksum as the second one, the second one's size + checksum will not have
-been recorded stored and so the third duplicate will not be detected. However, if you removed one duplicate the next
-run of this program would find the other duplicate via the other dimension of checking. Given it's a rare condition
-it's probably not worth the extra overhead in everyday use but this behaviour can be overridden by specifying the
---no-short-circuit option too run every check on every file. Be aware this will slow down the process.
+been checked and so a third duplicate with a different name will not be detected by size / checksum. In most cases this
+is a good thing to finish quicker and avoid unnecessary checksumming which is computationally expensive and time
+consuming for large files. If you remove one duplicate then the next run of this program would find the other
+duplicate via the additional checks of size and checksumming. Given it's a rare condition it's probably not worth the
+extra overhead in everyday use but this behaviour can be overridden by specifying the --no-short-circuit option to run
+every check on every file. Be aware this will slow down the process.
 
 To see progress of which files are matching size, backtracking to hash them for comparison etc
 use --verbose twice or -vv. To see which files are being checked use triple verbose mode -vvv
