@@ -41,6 +41,9 @@ Can restrict methods of finding duplicates to any combination of --name / --size
 an efficiency shortcut) / --regex. If none are specified then will try name, size + checksum. If specifying any one of
 these options then the others will not run unless also explicitly specified.
 
+If you want to find files that are probably the same by byte count but may not have the same checksum due to minor
+corruption, such as large media files, then specify --size but do not specify --checksum which supercedes it
+
 Caveats:
 
 - The limitation of the checksum approach is that it can't determine files as duplicates if there is any
