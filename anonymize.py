@@ -83,6 +83,7 @@ try:
         user_regex
     # used dynamically
     # pylint: disable=unused-import
+    # lgtm [py/unused-import] - used by dynamic code so code analyzer cannot comprehend
     from harisekhon.utils import \
         domain_regex, \
         email_regex, \
