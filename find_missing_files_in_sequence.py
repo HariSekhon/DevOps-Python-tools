@@ -21,9 +21,9 @@ Finds missing files by numeric sequence, assuming a uniformly numbered file nami
 
 Files / directories are given as arguments or via standard input
 
-Directories are recursed
+Directories are recursed and their files examined for missing numbers before each one
 
-You must only give directories that should be sharing a contiguously numbered file naming convention for each
+Only supply files / directories that should be sharing a contiguously numbered file naming convention in each
 single run of this tool
 
 Accounts for zero padding in numbered files
@@ -35,19 +35,21 @@ Caveats:
   match your use case
 
 - Won't detect missing files higher than the highest numbered file as there is no way to know how many there should be.
-  If you are looking for missing MP3 files, then you might be able to use 'mediainfo' to get the max track position and
-  see if the files go that high
+  If you are looking for missing MP3 files, then you might be able to use 'mediainfo' to get the total number of tracks
+  and see if the files go that high
 
-- Returns globs instead of explicit missing filenames since suffixes can vary after numbers. If you have a simple enough
-  use case with a single fixed filename convention such as 'blah_01.txt' then you can find code to print the missing
-  files more explicitly, but in the general case you cannot account for suffix naming that isn't consistent, such as
-  chapters of audiobooks eg.
+- Returns globs by default instead of explicit missing filenames since suffixes can vary after numbers. If you have a
+  simple enough use case with a single fixed filename convention such as 'blah_01.txt' then you can find code to print
+  the missing files more explicitly, but in the general case you cannot account for suffix naming that isn't consistent,
+  such as chapters of audiobooks eg.
 
-        'blah 01 - chapter 1.mp3'
-        'blah 02 - chapter 2.mp3'
+        'blah 01 - chapter about X.mp3'
+        'blah 02 - chapter about Y.mp3'
 
-  so in the general case you cannot always infer suffixes, hence why it is left as globs.
-  Simpler single use case scripts would be better for printing explicit missing files as they can use hardcoded suffixes
+  so in the general case you cannot always infer suffixes, hence why it is left as globs. If you are sure that the
+  suffixes don't change then you can specify --fixed-suffix and it will infer each file's suffix as the basis for any
+  numerically missing files in the sequence, but if used where this is not the case, it'll generate a lot of false
+  positives that the default globbing mode would have handled
 
 - Doesn't currently find entire missing CD / disks in the naming format, but you should be able to see those cases
   easily by eye
@@ -76,7 +78,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2.0'
 
 
 class FindMissingFiles(CLI):
@@ -87,10 +89,11 @@ class FindMissingFiles(CLI):
         # Python 3.x
         # super().__init__()
         self.paths = []
-        self.regex_default = r'(?<!dis[ck]\s)(?<!CD\s)(?<!0)(\d+(?:\.\d+)?)'
+        self.regex_default = r'(?<!dis[ck]\s)(?<!CD\s)(?<!0)(?<!\.mp)(\d+(?:\.\d+)?)'
         self.regex = None
         self.include = None
         self.exclude = None
+        self.fixed_suffix = False
 
     def add_options(self):
         super(FindMissingFiles, self).add_options()
@@ -102,26 +105,27 @@ class FindMissingFiles(CLI):
                      help='Include only files that match the given case-insensitive regex (eg. ".mp3$")')
         self.add_opt('-e', '--exclude', metavar='REGEX',
                      help='Exclude files that match the given case-insensitive regex (eg. ".mp3$")')
+        self.add_opt('-s', '--fixed-suffix', action='store_true',
+                     help='Assume fixed suffixes and infer explicit filenames rather than globs. The reason this ' + \
+                          'is not the default is that if this is not the case and there is some variation in ' + \
+                          'suffixes, such as with audiobook chapters, then you will hit a lot of false positives ' + \
+                          'that would have been caught by globbing')
 
     def process_options(self):
         super(FindMissingFiles, self).process_options()
         self.regex = self.get_opt('regex')
         self.include = self.get_opt('include')
         self.exclude = self.get_opt('exclude')
+        self.fixed_suffix = self.get_opt('fixed_suffix')
         validate_regex(self.regex)
-        # file names are often not exactly 'blah 01.mp3' and may instead be:
-        # 'blah 01 - chapter 1.mp3'
-        # 'blah 02 - chapter 2.mp3'
-        # - so you cannot infer suffixes
-        #self.regex = re.compile('(.*?)' + self.regex + '(.*)', re.I)
-        self.regex = re.compile('(.*?)' + self.regex, re.I)
+        self.regex = re.compile('(.*?)' + self.regex + '(.*)', re.I)
         if self.include is not None:
             validate_regex(self.include)
             self.include = re.compile(self.include, re.I)
         if self.exclude is not None:
             validate_regex(self.exclude)
             self.exclude = re.compile(self.exclude, re.I)
-        if len(self.args) > 0:
+        if self.args:
             self.paths = self.args
         else:
             self.paths = sys.stdin.readlines()
@@ -183,23 +187,34 @@ class FindMissingFiles(CLI):
         # or if you've got pre-captures - let this bubble to user to fix their regex
         file_prefix = match.group(1)
         file_number = match.group(2)
+        file_suffix = match.group(3)
         if not isFloat(file_number):
             raise UnknownError('regex captured non-float for filename: {}'.format(filename))
         if file_prefix is None:
             file_prefix = ''
+        if file_suffix is None:
+            file_suffix = ''
         padding = len(file_number)
         file_number = int(file_number)
-        self.determine_missing_file_backfill(file_prefix, file_number, padding)
+        self.determine_missing_file_backfill(file_prefix, file_number, padding, file_suffix)
 
-    def determine_missing_file_backfill(self, file_prefix, file_number, padding):
+    def determine_missing_file_backfill(self, file_prefix, file_number, padding, file_suffix):
         if file_number != 1:
             file_number -= 1
-            expected_last_filename_glob = '{}{:0>%(padding)s}*' % locals()
-            expected_last_filename_glob = expected_last_filename_glob.format(file_prefix, file_number)
-            if not glob.glob(expected_last_filename_glob):
-                # by recursing and printing on the unwind we get correctly ordered file numbering ascending
-                self.determine_missing_file_backfill(file_prefix, file_number, padding)
-                print(expected_last_filename_glob)
+            if self.fixed_suffix:
+                explicit_last_filename = '{}{:0>%(padding)s}{}' % locals()
+                explicit_last_filename = explicit_last_filename.format(file_prefix, file_number, file_suffix)
+                if not os.path.isfile(explicit_last_filename):
+                    # by recursing and printing on the unwind we get correctly ordered file numbering ascending
+                    self.determine_missing_file_backfill(file_prefix, file_number, padding, file_suffix)
+                    print(explicit_last_filename)
+            else:
+                expected_last_filename_glob = '{}{:0>%(padding)s}*' % locals()
+                expected_last_filename_glob = expected_last_filename_glob.format(file_prefix, file_number)
+                if not glob.glob(expected_last_filename_glob):
+                    # by recursing and printing on the unwind we get correctly ordered file numbering ascending
+                    self.determine_missing_file_backfill(file_prefix, file_number, padding, file_suffix)
+                    print(expected_last_filename_glob)
 
 
 if __name__ == '__main__':
