@@ -113,9 +113,9 @@ class FindMissingFiles(CLI):
                           '(default: "{}" )'\
                           .format(self.regex_default))
         self.add_opt('-i', '--include', metavar='REGEX',
-                     help='Include only files that match the given case-insensitive regex (eg. ".mp3$")')
+                     help='Include only paths that match the given case-insensitive regex (eg. ".mp3$")')
         self.add_opt('-e', '--exclude', metavar='REGEX', default=self.exclude_default,
-                     help='Exclude files that match the given case-insensitive regex (default: "{}" )'\
+                     help='Exclude paths that match the given case-insensitive regex (default: "{}" )'\
                           .format(self.exclude_default))
         self.add_opt('-s', '--fixed-suffix', action='store_true',
                      help='Assume fixed suffixes and infer explicit filenames rather than globs. The reason this ' + \
