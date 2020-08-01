@@ -113,7 +113,7 @@ class FindMissingFiles(CLI):
                           '(default: "{}" )'\
                           .format(self.regex_default))
         self.add_opt('-i', '--include', metavar='REGEX',
-                     help='Include only paths that match the given case-insensitive regex (eg. ".mp3$")')
+                     help=r"Include only paths that match the given case-insensitive regex (eg. '\.mp3$')")
         self.add_opt('-e', '--exclude', metavar='REGEX', default=self.exclude_default,
                      help='Exclude paths that match the given case-insensitive regex (default: "{}" )'\
                           .format(self.exclude_default))
