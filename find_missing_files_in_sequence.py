@@ -195,7 +195,7 @@ class FindMissingFiles(CLI):
         log.debug('checking file \'%s\'', filename)
         match = self.regex.search(os.path.basename(filename))
         if not match:
-            log.debug('failed to find numeric regex match for file, probably not a sequential file' + \
+            log.debug('no numeric regex match for file, probably not a sequential file' + \
                       ', skipping \'%s\'', filename)
             return
         # will error out here if you've supplied your own regex without capture brackets
