@@ -30,13 +30,14 @@ Accounts for zero padding in numbered files
 
 Caveats:
 
-- This is more complicated than you'd first think as there are so many file naming variations so this is not the most
-  universally bulletproof piece of code in this repo by a long shot and may require advanced tuning --regex tuning to
-  match your use case
+- This is more complicated than you'd first think as there are so many file naming variations that no code could ever
+  be universally bulletproof and will require advanced regex tuning to match your use case (this is tuned for the most
+  common use cases I've found but yours may vary since there are huge file naming variations between people and
+  environments)
 
 - Won't detect missing files higher than the highest numbered file as there is no way to know how many there should be.
-  If you are looking for missing MP3 files, then you might be able to use 'mediainfo' to get the total number of tracks
-  and see if the files go that high
+  If you are looking for missing MP3 files, then you might be able to check the mp3 tag metadata using programs like
+  'mediainfo' to get the total number of tracks and see if the files go that high
 
 - Returns globs by default instead of explicit missing filenames since suffixes can vary after numbers. If you have a
   simple enough use case with a single fixed filename convention such as 'blah_01.txt' then you can find code to print
@@ -71,16 +72,17 @@ srcdir = os.path.abspath(os.path.dirname(__file__))
 libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
 try:
-    from harisekhon.utils import log, log_option, validate_regex, isFloat, UnknownError
+    from harisekhon.utils import log, log_option, validate_regex, isInt, UnknownError
     from harisekhon import CLI
 except ImportError as _:
     print(traceback.format_exc(), end='')
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 
+# pylint: disable=too-many-instance-attributes
 class FindMissingFiles(CLI):
 
     def __init__(self):
@@ -89,22 +91,34 @@ class FindMissingFiles(CLI):
         # Python 3.x
         # super().__init__()
         self.paths = []
-        self.regex_default = r'(?<!dis[ck]\s)(?<!CD\s)(?<!0)(?<!\.mp)(\d+(?:\.\d+)?)'
+        self.regex_default = r'(?<!dis[ck]\s)' + \
+                             r'(?<!CD\s)' + \
+                             r'(?<!-)' + \
+                             r'(?<!0)' + \
+                             r'(?<!\d\.)' + \
+                             r'(?<!\.mp)' + \
+                             r'(\d+)' + \
+                             r'(?![\w,@-])' + \
+                             r'(?!\.\d)'
+        self.exclude_default = r'^\d+\s'
         self.regex = None
         self.include = None
         self.exclude = None
         self.fixed_suffix = False
+        self.missing_files = []
 
     def add_options(self):
         super(FindMissingFiles, self).add_options()
         self.add_opt('-r', '--regex', metavar='REGEX', default=self.regex_default,
                      help='Regex capture of the portion of the filename to compare ' + \
-                          '(default: "{}" -  must have capture brackets capturing an integer or float)'\
+                          '-  must have capture brackets capturing an integer ' + \
+                          '(default: "{}" )'\
                           .format(self.regex_default))
         self.add_opt('-i', '--include', metavar='REGEX',
                      help='Include only files that match the given case-insensitive regex (eg. ".mp3$")')
-        self.add_opt('-e', '--exclude', metavar='REGEX',
-                     help='Exclude files that match the given case-insensitive regex (eg. ".mp3$")')
+        self.add_opt('-e', '--exclude', metavar='REGEX', default=self.exclude_default,
+                     help='Exclude files that match the given case-insensitive regex (default: "{}" )'\
+                          .format(self.exclude_default))
         self.add_opt('-s', '--fixed-suffix', action='store_true',
                      help='Assume fixed suffixes and infer explicit filenames rather than globs. The reason this ' + \
                           'is not the default is that if this is not the case and there is some variation in ' + \
@@ -175,20 +189,23 @@ class FindMissingFiles(CLI):
                     continue
                 if self.is_excluded(dir_path):
                     continue
+                # massive depth directories will hit a recursion limit here but this is very rare in the real world
+                # and probably a sign the filesystem should be better structured
                 self.process_directory(directory=dir_path)
 
     def check_file(self, filename):
         log.debug('checking file \'%s\'', filename)
         match = self.regex.search(filename)
         if not match:
-            log.debug('failed to match file \'%s\', skipping...', filename)
+            log.debug('failed to find numeric regex match for file, probably not a sequential file' + \
+                      ', skipping \'%s\'', filename)
             return
         # will error out here if you've supplied your own regex without capture brackets
         # or if you've got pre-captures - let this bubble to user to fix their regex
         file_prefix = match.group(1)
         file_number = match.group(2)
         file_suffix = match.group(3)
-        if not isFloat(file_number):
+        if not isInt(file_number):
             raise UnknownError('regex captured non-float for filename: {}'.format(filename))
         if file_prefix is None:
             file_prefix = ''
@@ -196,25 +213,29 @@ class FindMissingFiles(CLI):
             file_suffix = ''
         padding = len(file_number)
         file_number = int(file_number)
-        self.determine_missing_file_backfill(file_prefix, file_number, padding, file_suffix)
+        while file_number > 1:
+            file_number = self.determine_missing_file_backfill(file_prefix, file_number, padding, file_suffix)
+        if self.missing_files:
+            print('\n'.join(reversed(self.missing_files)))
+        self.missing_files = []
 
     def determine_missing_file_backfill(self, file_prefix, file_number, padding, file_suffix):
-        if file_number != 1:
-            file_number -= 1
-            if self.fixed_suffix:
-                explicit_last_filename = '{}{:0>%(padding)s}{}' % locals()
-                explicit_last_filename = explicit_last_filename.format(file_prefix, file_number, file_suffix)
-                if not os.path.isfile(explicit_last_filename):
-                    # by recursing and printing on the unwind we get correctly ordered file numbering ascending
-                    self.determine_missing_file_backfill(file_prefix, file_number, padding, file_suffix)
-                    print(explicit_last_filename)
+        file_number -= 1
+        if self.fixed_suffix:
+            explicit_last_filename = '{}{:0>%(padding)s}{}' % {'padding': padding}
+            explicit_last_filename = explicit_last_filename.format(file_prefix, file_number, file_suffix)
+            if not os.path.isfile(explicit_last_filename):
+                self.missing_files.append(explicit_last_filename)
             else:
-                expected_last_filename_glob = '{}{:0>%(padding)s}*' % locals()
-                expected_last_filename_glob = expected_last_filename_glob.format(file_prefix, file_number)
-                if not glob.glob(expected_last_filename_glob):
-                    # by recursing and printing on the unwind we get correctly ordered file numbering ascending
-                    self.determine_missing_file_backfill(file_prefix, file_number, padding, file_suffix)
-                    print(expected_last_filename_glob)
+                file_number = -1
+        else:
+            expected_last_filename_glob = '{}{:0>%(padding)s}*' % locals()
+            expected_last_filename_glob = expected_last_filename_glob.format(file_prefix, file_number)
+            if not glob.glob(expected_last_filename_glob):
+                self.missing_files.append(expected_last_filename_glob)
+            else:
+                file_number = -1
+        return file_number
 
 
 if __name__ == '__main__':
