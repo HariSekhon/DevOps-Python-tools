@@ -77,7 +77,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 
 # pylint: disable=too-many-instance-attributes
@@ -92,6 +92,8 @@ class FindMissingFiles(CLI):
         self.regex_default = r'(?<!dis[ck]\s)' + \
                              r'(?<!CD\s)' + \
                              r'(?<!-)' + \
+                             r'(?<!-\d)' + \
+                             r'(?<!-\d\d)' + \
                              r'(?<!0)' + \
                              r'(?<!\d\.)' + \
                              r'(?<!\.mp)' + \
