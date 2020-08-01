@@ -31,9 +31,7 @@ Accounts for zero padding in numbered files
 Caveats:
 
 - This is more complicated than you'd first think as there are so many file naming variations that no code could ever
-  be universally bulletproof and will require advanced regex tuning to match your use case (this is tuned for the most
-  common use cases I've found but yours may vary since there are huge file naming variations between people and
-  environments)
+  be universally bulletproof and will likely require advanced regex tuning to match your use case and naming convention
 
 - Won't detect missing files higher than the highest numbered file as there is no way to know how many there should be.
   If you are looking for missing MP3 files, then you might be able to check the mp3 tag metadata using programs like
@@ -79,7 +77,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 
 
 # pylint: disable=too-many-instance-attributes
@@ -195,14 +193,14 @@ class FindMissingFiles(CLI):
 
     def check_file(self, filename):
         log.debug('checking file \'%s\'', filename)
-        match = self.regex.search(filename)
+        match = self.regex.search(os.path.basename(filename))
         if not match:
             log.debug('failed to find numeric regex match for file, probably not a sequential file' + \
                       ', skipping \'%s\'', filename)
             return
         # will error out here if you've supplied your own regex without capture brackets
         # or if you've got pre-captures - let this bubble to user to fix their regex
-        file_prefix = match.group(1)
+        file_prefix = os.path.join(os.path.dirname(filename), match.group(1))
         file_number = match.group(2)
         file_suffix = match.group(3)
         if not isInt(file_number):
