@@ -6,3 +6,6 @@
 	path = bash-tools
 	url = https://github.com/harisekhon/bash-tools
 	branch = master
+[submodule "sql"]
+	path = sql
+	url = https://github.com/HariSekhon/SQL-scripts
