@@ -27,7 +27,7 @@ srcdir="$(dirname "$0")"
 
 repo="https://github.com/HariSekhon/devops-python-tools"
 
-directory="pytools"
+directory="python-tools"
 
 sudo=""
 [ "$(whoami)" = "root" ] || sudo=sudo
