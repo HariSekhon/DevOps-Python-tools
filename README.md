@@ -52,7 +52,7 @@ Hari Sekhon - DevOps Python Tools
 <!--[![Wercker](https://img.shields.io/wercker/ci/5e58ef8d14b91a0800356b6d/master?label=Wercker&logo=oracle)](https://app.wercker.com/harisekhon/DevOps-Python-tools/runs)-->
 
 [![Azure DevOps Pipeline](https://dev.azure.com/harisekhon/GitHub/_apis/build/status/HariSekhon.DevOps-Python-tools?branchName=master)](https://dev.azure.com/harisekhon/GitHub/_build/latest?definitionId=8&branchName=master)
-[![BitBucket Pipeline](https://img.shields.io/bitbucket/pipelines/harisekhon/devops-python-tools/master?logo=bitbucket&label=BitBucket)](https://bitbucket.org/harisekhon/devops-python-tools/addon/pipelines/home#!/)
+[![BitBucket Pipeline](https://img.shields.io/bitbucket/pipelines/harisekhon/devops-python-tools/master?logo=bitbucket&label=BitBucket%20CI)](https://bitbucket.org/harisekhon/devops-python-tools/addon/pipelines/home#!/)
 [![GitLab Pipeline](https://img.shields.io/gitlab/pipeline/harisekhon/DevOps-Python-tools?logo=gitlab&label=GitLab%20CI)](https://gitlab.com/HariSekhon/DevOps-Python-tools/pipelines)
 [![Repo on GitHub](https://img.shields.io/badge/repo-GitHub-blue?logo=github)](https://github.com/HariSekhon/DevOps-Python-tools)
 [![Repo on GitLab](https://img.shields.io/badge/repo-GitLab-blue?logo=gitlab)](https://gitlab.com/HariSekhon/DevOps-Python-tools)
