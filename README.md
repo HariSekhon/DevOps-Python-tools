@@ -12,11 +12,10 @@ Hari Sekhon - DevOps Python Tools
 [![GitHub stars](https://img.shields.io/github/stars/harisekhon/devops-python-tools?logo=github)](https://github.com/harisekhon/devops-python-tools/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/harisekhon/devops-python-tools?logo=github)](https://github.com/harisekhon/devops-python-tools/network)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/HariSekhon/DevOps-Python-tools?logo=github)](https://github.com/HariSekhon/DevOps-Python-tools/commits/master)
-
+[![Lines of Code](https://img.shields.io/badge/lines%20of%20code-26k-lightgrey?logo=codecademy)](https://github.com/HariSekhon/DevOps-Python-tools)
 <!-- doesn't include /tests?/ or comments
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=ncloc)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
 -->
-[![Lines of Code](https://img.shields.io/badge/lines%20of%20code-26k-lightgrey?logo=codecademy)](https://github.com/HariSekhon/DevOps-Python-tools)
 
 <!-- site broken
 [![PyUp](https://pyup.io/repos/github/HariSekhon/DevOps-Python-tools/shield.svg)](https://pyup.io/account/repos/github/HariSekhon/DevOps-Python-tools/)
