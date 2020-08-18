@@ -29,7 +29,8 @@ Written to convert old AWS CloudFormation json templates to yaml
 
 See also:
 
-    https://www.commandlinefu.com/commands/view/12221/convert-json-to-yaml
+
+    json2yaml.sh - https://github.com/HariSekhon/DevOps-Bash-tools
 
 """
 
