@@ -32,7 +32,7 @@ Written to convert .gitlab-ci.yml files to JSON for inputting to the GitLab API 
 
 See also:
 
-    yaml2json.sh in the DevOps-Bash-tools repo
+    yaml2json.sh - https://github.com/HariSekhon/DevOps-Bash-tools
 
 """
 
