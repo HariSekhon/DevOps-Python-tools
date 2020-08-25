@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 #  vim:ts=4:sts=4:sw=4:et
+#  args: -s <<< "Auth & Config"
+#  args: -s <<< "GKE Clusters"
 #
 #  Author: Hari Sekhon
 #  Date: 2016-01-29 21:05:38 +0000 (Fri, 29 Jan 2016)
@@ -51,10 +53,10 @@ class Center(CLI):
         super(Center, self).__init__()
         # Python 3.x
         # super().__init__()
-        self.re_bound = re.compile(r'(\b)')
         # this doesn't put enough spaces around ampersands, eg. in "Auth & Config"
-        #self.re_chars = re.compile(r'([^\s])(?!\s)')
-        self.re_chars = re.compile(r'([^\s])')
+        #self.re_bound = re.compile(r'(\b)')
+        self.re_spaces = re.compile(r'(\s)')
+        self.re_chars = re.compile(r'([^\s])(?!\s)')
         self.timeout_default = None
 
     def add_options(self):
@@ -76,7 +78,8 @@ class Center(CLI):
                 self.process_line(line)
 
     def space(self, line):
-        line = self.re_bound.sub(r' ', line)
+        #line = self.re_bound.sub(r' ', line)
+        line = self.re_spaces.sub(r'\1\1\1', line)
         line = self.re_chars.sub(r'\1 ', line)
         return line
 
