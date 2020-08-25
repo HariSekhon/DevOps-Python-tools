@@ -42,7 +42,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.1'
+__version__ = '0.4.2'
 
 class Center(CLI):
 
@@ -52,7 +52,9 @@ class Center(CLI):
         # Python 3.x
         # super().__init__()
         self.re_bound = re.compile(r'(\b)')
-        self.re_chars = re.compile(r'([^\s])(?!\s)')
+        # this doesn't put enough spaces around ampersands, eg. in "Auth & Config"
+        #self.re_chars = re.compile(r'([^\s])(?!\s)')
+        self.re_chars = re.compile(r'([^\s])')
         self.timeout_default = None
 
     def add_options(self):
