@@ -61,7 +61,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.3'
+__version__ = '0.7.4'
 
 
 class CrunchAccountingCsvStatementConverter(CLI):
@@ -225,7 +225,7 @@ class CrunchAccountingCsvStatementConverter(CLI):
                 # extra protection along the same lines as anti-json:
                 # the first char of field should be alphanumeric, not syntax
                 # however instead of isAlnum allow quotes for quoted CSVs to pass validation
-                if field_list[0] != "" and not isChars(field_list[0][0], 'A-Za-z0-9"'):
+                if field_list[0] not in ("", " ") and not isChars(field_list[0][0], 'A-Za-z0-9"'):
                     log.error('non-alphanumeric / quote opening character detected in CSV')
                     return None
                 count += 1
