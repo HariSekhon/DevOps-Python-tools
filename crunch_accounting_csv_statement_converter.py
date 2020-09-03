@@ -61,7 +61,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.7.3'
+__version__ = '0.7.4'
 
 
 class CrunchAccountingCsvStatementConverter(CLI):
@@ -203,7 +203,8 @@ class CrunchAccountingCsvStatementConverter(CLI):
             csvreader = csv.reader(filehandle, dialect)
         except csv.Error as _:
             log.warning('file %s: %s', filename, _)
-            return None
+            # in Python 2 must be string not unicode
+            csvreader = csv.reader(filehandle, delimiter=str(','), quotechar=None)
         csvreader = CrunchAccountingCsvStatementConverter.validate_csvreader(csvreader, filename)
         filehandle.seek(0)
         return csvreader
@@ -225,9 +226,10 @@ class CrunchAccountingCsvStatementConverter(CLI):
                 # extra protection along the same lines as anti-json:
                 # the first char of field should be alphanumeric, not syntax
                 # however instead of isAlnum allow quotes for quoted CSVs to pass validation
-                if field_list[0] != "" and not isChars(field_list[0][0], 'A-Za-z0-9"'):
-                    log.error('non-alphanumeric / quote opening character detected in CSV')
-                    return None
+                if field_list[0] not in ("", " ") and not isChars(field_list[0][0], 'A-Za-z0-9"'):
+                    log.warning('non-alphanumeric / quote opening character detected in CSV first field' + \
+                                '"{}"'.format(field_list[0]))
+                    #return None
                 count += 1
         except csv.Error as _:
             log.warning('file %s, line %s: %s', filename, csvreader.line_num, _)
