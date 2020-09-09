@@ -85,7 +85,9 @@ Hari Sekhon - DevOps Python Tools
 [![CI PyPy 2](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20PyPy%202/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+PyPy+2%22)
 [![CI PyPy 3](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20PyPy%203/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+PyPy+3%22)
 
-[git.io/python-tools](https://git.io/python-tools) / [git.io/pytools](https://git.io/pytools)
+[git.io/python-tools](https://git.io/python-tools)
+
+[git.io/pytools](https://git.io/pytools)
 
 ### AWS, Docker, Spark / PySpark, Hadoop, HBase, Hive, Impala, Pig, Ambari, IPython and Linux Tools ###
 
@@ -461,4 +463,5 @@ You might also be interested in the following really nice Jupyter notebook for H
 [![Stargazers over time](https://starchart.cc/HariSekhon/DevOps-Python-tools.svg)](https://starchart.cc/HariSekhon/DevOps-Python-tools)
 
 [git.io/python-tools](https://git.io/python-tools)
+
 [git.io/pytools](https://git.io/pytools)
