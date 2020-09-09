@@ -85,13 +85,11 @@ Hari Sekhon - DevOps Python Tools
 [![CI PyPy 2](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20PyPy%202/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+PyPy+2%22)
 [![CI PyPy 3](https://github.com/HariSekhon/DevOps-Python-tools/workflows/CI%20PyPy%203/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22CI+PyPy+3%22)
 
-[git.io/python-tools](https://git.io/python-tools)
-
 [git.io/pytools](https://git.io/pytools)
 
-### AWS, Docker, Spark / PySpark, Hadoop, HBase, Hive, Impala, Pig, Ambari, IPython and Linux Tools ###
+### AWS, Docker, Spark, Hadoop, HBase, Hive, Impala, Python & Linux Tools
 
-A few of the Cloud, Big Data, NoSQL & Linux tools I've written over the years. All programs have `--help` to list the available options.
+DevOps, Cloud, Big Data, NoSQL, Python & Linux tools. All programs have `--help`.
 
 See also the [DevOps Bash Tools](https://github.com/harisekhon/devops-bash-tools), [DevOps Perl Tools](https://github.com/harisekhon/devops-perl-tools) and [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) repos which contains hundreds more scripts and programs for Cloud, Big Data, SQL, NoSQL, Web and Linux.
 
