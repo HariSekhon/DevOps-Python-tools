@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #  vim:ts=4:sts=4:sw=4:et
+#  args: harisekhon
 #
 #  Author: Hari Sekhon
 #  Date: 2016-05-27 13:15:30 +0100 (Fri, 27 May 2016)
@@ -20,11 +21,19 @@ Tool to search DockerHub repos and return a configurable number of results
 
 Mimics 'docker search' results format but more flexible
 
-Docker CLI doesn't currently support configuring the returned number of search results and always returns 25:
+Older Docker CLI didn't support configuring the returned number of search results and always returned 25:
 
 https://github.com/docker/docker/issues/23055
 
 Verbose mode will also show a summary for number of results displayed and total number of results available
+
+Caveat: maxes out at 100 results, to iterate for more than that see dockerhub_search.sh
+
+See also:
+
+    dockerhub_search.sh
+
+in the DevOps Bash tools repo - https://github.com/harisekhon/devops-python-tools
 
 """
 
@@ -56,7 +65,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 
 
 class DockerHubSearch(CLI):
@@ -71,7 +80,7 @@ class DockerHubSearch(CLI):
         self.quiet = False
 
     def add_options(self):
-        self.add_opt('-n', '--num', '--limit', default=50, type=int,
+        self.add_opt('-l', '--limit', default=50, type=int,
                      help='Number of results to return (default: 50)')
         self.add_opt('-q', '--quiet', action='store_true',
                      help='Output only the image names, one per line (useful for shell scripting)')
@@ -84,9 +93,9 @@ class DockerHubSearch(CLI):
         self.quiet = self.get_opt('quiet')
         term = self.args[0]
         log.info('term: %s', term)
-        num = self.get_opt('num')
-        validate_int(num, 'limit', 1, 1000)
-        self.print_results(self.args[0], num)
+        limit = self.get_opt('limit')
+        validate_int(limit, 'limit', 1, 1000)
+        self.print_results(self.args[0], limit)
 
     def print_results(self, term, limit=None):
         data = self.search(term, limit)
