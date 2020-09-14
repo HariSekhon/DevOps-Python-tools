@@ -29,7 +29,7 @@ section "Testing DockerHub Show Tags"
 
 check './dockerhub_search.py centos' "DockerHub Search for CentOS"
 check './dockerhub_search.py harisekhon' "DockerHub Search for harisekhon"
-check './dockerhub_search.py harisekhon -n 30' "DockerHub Search for harisekhon -n 30"
+check './dockerhub_search.py harisekhon -l 30' "DockerHub Search for harisekhon -l 30"
 # this no longer works, API must have changed
 #check './dockerhub_search.py harisekhon/hadoop-dev | grep harisekhon/hadoop-dev' "DockerHub Search for harisekhon/hadoop-dev"
 check './dockerhub_search.py hadoop-dev | grep harisekhon/hadoop-dev' "DockerHub Search for harisekhon/hadoop-dev"
