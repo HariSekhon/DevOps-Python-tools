@@ -121,7 +121,7 @@ docker run harisekhon/pytools <program> <args>
 
 installs git, make, pulls the repo and build the dependencies:
 ```
-curl https://raw.githubusercontent.com/HariSekhon/DevOps-Python-tools/master/setup/bootstrap.sh | sh
+curl -L git.io/python-bootstrap | sh
 ```
 
 or manually:
