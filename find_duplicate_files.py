@@ -88,7 +88,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 
 
 class FindDuplicateFiles(CLI):
@@ -217,36 +217,36 @@ class FindDuplicateFiles(CLI):
                 for filepath in sorted(self.dup_filepaths):
                     print(filepath)
                 sys.exit(4)
-            print('Duplicates detected!')
+            print('# Duplicates detected!')
             if self.dups_by_name:
-                print('\nDuplicates by name:\n')
+                print('\n# Duplicates by name:\n')
                 for basename in self.dups_by_name:
-                    print("--\nbasename '{0}':".format(basename))
+                    print("# --\n# basename '{0}':".format(basename))
                     for filepath in sorted(self.dups_by_name[basename]):
                         print(filepath)
             if self.dups_by_size:
-                print('\nDuplicates by size:\n')
+                print('\n# Duplicates by size:\n')
                 for size in self.dups_by_size:
-                    print("--\nsize '{0}' bytes:".format(size))
+                    print("# --\n# size '{0}' bytes:".format(size))
                     for filepath in sorted(self.dups_by_size[size]):
                         print(filepath)
             if self.dups_by_hash:
-                print('\nDuplicates by checksum:\n')
+                print('\n# Duplicates by checksum:\n')
                 for checksum in self.dups_by_hash:
-                    print("--\nchecksum '{0}':".format(checksum))
+                    print("# --\n# checksum '{0}':".format(checksum))
                     for filepath in sorted(self.dups_by_hash[checksum]):
                         print(filepath)
             if self.dups_by_regex:
-                print('\nDuplicates by regex match ({0}):\n'.format(self.regex))
+                print('\n# Duplicates by regex match ({0}):\n'.format(self.regex))
                 for matching_portion in self.dups_by_regex:
-                    print("--\nregex matching portion '{0}':".format(matching_portion))
+                    print("# --\n# regex matching portion '{0}':".format(matching_portion))
                     for filepath in sorted(self.dups_by_regex[matching_portion]):
                         print(filepath)
             sys.exit(4)
         elif self.failed:
             sys.exit(2)
         else:
-            print('No Duplicates Found')
+            print('# No Duplicates Found')
             sys.exit(0)
 
 #    def check_path(self, path):
