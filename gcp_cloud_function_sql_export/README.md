@@ -20,7 +20,7 @@ Upload the function to GCF in the current GCP project:
 ### Solution Dependencies
 
 - [Cloud PubSub](https://cloud.google.com/pubsub) topic must exist
-- [Cloud Scheduler](https://cloud.google.com/scheduler) must be set to trigger notifications on schedule for any instances and databases in those instances you want backed up to GCS
-  - see `gcp_cloud_schedule_sql_exports.sh` in [DevOps Bash tools](https://github.com/HariSekhon/DevOps-Bash-tools/) repo - creates jobs for every database in every Cloud SQL instance in the current project (except replicas and stopped instances)
-- service account with permissions to access [Cloud SQL](https://cloud.google.com/sql) and the [GCS](https://cloud.google.com/storage) bucket
+- [Cloud Scheduler](https://cloud.google.com/scheduler) jobs to trigger backups
+  - see `gcp_cloud_schedule_sql_exports.sh` in [DevOps Bash tools](https://github.com/HariSekhon/DevOps-Bash-tools/) repo
+- a service account with permissions to access [Cloud SQL](https://cloud.google.com/sql) and the [GCS](https://cloud.google.com/storage) bucket
   - see `gcp_sql_exports_create_service_account.sh` in [DevOps Bash tools](https://github.com/HariSekhon/DevOps-Bash-tools/) repo
