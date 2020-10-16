@@ -19,7 +19,7 @@ Upload the function to GCF in the current GCP project:
 
 ### Solution Dependencies
 
-- [Cloud PubSub](https://cloud.google.com/pubsub) topic must exist
+- a [Cloud PubSub](https://cloud.google.com/pubsub) topic
 - [Cloud Scheduler](https://cloud.google.com/scheduler) jobs to trigger backups
   - see `gcp_cloud_schedule_sql_exports.sh` in [DevOps Bash tools](https://github.com/HariSekhon/DevOps-Bash-tools/) repo
 - a service account with permissions to access [Cloud SQL](https://cloud.google.com/sql) and the [GCS](https://cloud.google.com/storage) bucket
