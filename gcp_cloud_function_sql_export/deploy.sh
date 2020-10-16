@@ -30,4 +30,11 @@ service_account="cloud-function-sql-backup@$project.iam.gserviceaccount.com"
 # since we're only accessing the SQL Admin API we don't need this
 #vpc_connector="cloud-sql-backups"
 
-gcloud functions deploy "$name" --trigger-topic "$topic" --runtime python37 --entry-point main --service-account "$service_account" --region "$region" --timeout 60 --memory 128MB # --vpc-connector "$vpc_connector"
+gcloud functions deploy "$name" --trigger-topic "$topic" \
+                                --runtime python37 \
+                                --entry-point main \
+                                --service-account "$service_account" \
+                                --region "$region" \
+                                --timeout 60 \
+                                --memory 128MB
+                                # --vpc-connector "$vpc_connector"
