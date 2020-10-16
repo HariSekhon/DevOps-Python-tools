@@ -1,0 +1,3 @@
+# https://cloud.google.com/functions/docs/writing/specifying-dependencies-python
+google-api-python-client
+Oauth2client
