@@ -15,5 +15,7 @@
 
 # see also: massive generic .gcloudignore at https://github.com/HariSekhon/DevOps-Bash-tools/blob/master/.gcloudignore
 
+.git
+.gcloudignore
 deploy.sh
 test/
