@@ -36,5 +36,6 @@ gcloud functions deploy "$name" --trigger-topic "$topic" \
                                 --service-account "$service_account" \
                                 --region "$region" \
                                 --timeout 60 \
-                                --memory 128MB
+                                --memory 128MB \
+                                --max-instances 1  # this isn't good enough because it sets off an async API call, so successive calls can fail if called before that SQL Admin API export has finished
                                 # --vpc-connector "$vpc_connector"
