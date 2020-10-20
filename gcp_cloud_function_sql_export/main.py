@@ -102,4 +102,4 @@ def main(event, context):
     except HttpError as err:
         logging.error("Backup FAILED. Reason: %s", err)
     else:
-        logging.info("Backup task status: %s", response)
+        logging.info("Backup Task triggered: %s", response)
