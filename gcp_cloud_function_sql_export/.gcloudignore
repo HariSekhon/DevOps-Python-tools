@@ -19,3 +19,4 @@
 .gcloudignore
 deploy.sh
 test/
+tests/
