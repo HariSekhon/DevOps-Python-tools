@@ -11,7 +11,7 @@ https://cloud.google.com/solutions/scheduling-cloud-sql-database-exports-using-c
 - `requirements.txt` - the pip modules to bootstrap
 - `deploy.sh` - upload the code and deps
 
-Upload the function to GCF in the current GCP project:
+Upload the function to GCF in the current GCP project - this script will call `gcloud functions deploy` with the required switches:
 
 ```
 ./deploy.sh
