@@ -35,8 +35,8 @@ gcloud functions deploy "$name" --trigger-topic "$topic" \
                                 --entry-point main \
                                 --service-account "$service_account" \
                                 --region "$region" \
-                                --timeout 60 \
-                                --memory 128MB
+                                --memory 128MB \
+                                --timeout 60
                                 # may want multiple concurrent calls to different SQL instances at the same time
                                 #
                                 # also doesn't prevent:
