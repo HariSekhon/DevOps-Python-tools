@@ -20,7 +20,8 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$srcdir"
 
 project="$(gcloud config list --format="value(core.project)")"
-region="europe-west3"  # not available in all regions yet
+region="$(gcloud config list --format="value(compute.region)")"
+region="${region:-${GOOGLE_REGION:-europe-west3}}"  # not available in all regions yet
 
 name="cloud-sql-backups"
 topic="cloud-sql-backups"
