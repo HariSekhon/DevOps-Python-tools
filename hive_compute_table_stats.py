@@ -38,6 +38,7 @@ import os
 import re
 import socket
 import sys
+# pylint: disable=import-error
 from impala.dbapi import connect
 
 __author__ = 'Hari Sekhon'
