@@ -154,6 +154,7 @@ def compute_table_stats(conn, args, database, table, partition_regex):
             partition_value = partitions_row[1]
             partitions_found = True
             if not partition_regex.match(partition_value):
+                # pylint: disable=logging-not-lazy
                 log.debug("skipping database '%s' table '%s' partition key '%s' value '%s', " +
                           "value does not match regex '%s'",
                           database,
