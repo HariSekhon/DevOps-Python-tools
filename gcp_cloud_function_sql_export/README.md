@@ -29,7 +29,7 @@ Upload the function to GCF in the current GCP project - this script will call `g
 
 ### Serverless Framework
 
-You can also use the [Serverless](https://www.serverless.com/) framework for which a `serverless.yml` config is provided:
+Instead of `deploy.sh` you can alternatively use the [Serverless](https://www.serverless.com/) framework for which a `serverless.yml` config is provided:
 
 ```
 serverless deploy
