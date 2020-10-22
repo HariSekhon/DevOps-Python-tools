@@ -1,0 +1,137 @@
+#  vim:ts=2:sts=2:sw=2:et
+#
+#  Author: Hari Sekhon
+#  Date: 2020-10-21 11:19:06 +0100 (Wed, 21 Oct 2020)
+#
+#  https://github.com/HariSekhon/DevOps-Python-tools
+#
+#  License: see accompanying Hari Sekhon LICENSE file
+#
+#  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback to help steer this or other code I publish
+#
+#  https://www.linkedin.com/in/HariSekhon
+#
+
+# ============================================================================ #
+#                              S e r v e r l e s s
+# ============================================================================ #
+
+# Deploys the Google Cloud Function with a name <service>-<stage>-<func>
+#
+# eg. cloud-sql-backups-production-main
+
+# Requires the same permissions as the simpler adjacent deploy.sh script but also:
+#
+#   Deployment Manager Editor
+#   Storage Admin  (Storage Object Admin is not enough as it needs to create staging buckets and you'll get weird errors otherwise)
+#
+# for the credential file's service account which is also used to run the Cloud Function
+
+# Check generated config after environment variable interpolation:
+#
+#   cd "$(dirname $0)" && serverless print
+#
+# My advanced vimrc has a hotkey for this:
+#
+#   https://github.com/HariSekhon/DevOps-Bash-tools/blob/master/.vimrc
+
+frameworkVersion: '2'
+plugins:
+  - serverless-google-cloudfunctions
+
+# to prevent:
+#
+# Serverless: Configuration warning: Unrecognized provider 'google'
+# Serverless:
+# Serverless: You're relying on provider plugin which doesn't provide a validation schema for its config.
+configValidationMode: off
+# after the GCP plugin matures, switch to
+#configValidationMode: error
+
+service: cloud-sql-backups
+provider:
+  name: google
+  stage: production
+  runtime: python37
+  region: ${env:GOOGLE_REGION, "europe-west1"}
+  project: ${env:GOOGLE_PROJECT_ID}
+
+  # https://serverless.com/framework/docs/providers/google/guide/credentials/
+  #
+  # path to credentials file needs to be absolute
+  #
+  # download a credentials file for the service account:
+  #
+  #   https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-gcloud
+  #
+  #   mkdir -pv ~/.gcloud && gcloud iam service-accounts keys create ~/.gcloud/cloud-function-sql-backup-keyfile.json --iam-account "cloud-function-sql-backup@$(gcloud config list --format="get(core.project)").iam.gserviceaccount.com"
+  #
+  credentials: ~/.gcloud/cloud-function-sql-backup-keyfile.json
+  #
+  # or use personal creds - see $GOOGLE_APPLICATION_CREDENTIALS or generate:
+  #
+  #   gcloud auth application-default login  # [ --client-id-file=~/.gcloud/keyfile.json ]
+  #
+  #credentials: ~/.config/gcloud/application_default_credentials.json
+  #credentials: ${env:HOME}/.config/gcloud/application_default_credentials.json
+  #credentials: /Users/harisekhon/.config/gcloud/application_default_credentials.json
+
+# https://www.serverless.com/framework/docs/providers/google/guide/packaging/
+package:
+  exclude:
+    ## needs more granular excluding in production as only the serverless provider npm
+    ## package should be excluded (and not the whole node_modules directory)
+    #- node_modules/**
+    #- deploy.sh
+    #- test/**
+    #- tests/**
+    #- .gitignore
+    #- .gcloudignore
+    #- .git/**
+    #- package.json
+    #- package-lock.json
+    #- README.md
+    # XXX: exclude all hidden files and directories
+    - .*
+    # XXX: more robust to only whitelist include as per .dockerignore best practice too (unfortunately not supported in .gcloudignore)
+    - ./**
+  include:
+    - main.py
+    - requirements.txt
+  # or specify your own zipfile and skip packaging:
+  #artifact: path/to/my-artifact.zip
+
+# https://www.serverless.com/framework/docs/providers/google/guide/functions/
+#
+# use an array of includes for bigger serverless deployments of multiple functions
+#functions:
+#  - ${file(../foo-functions.yml)}
+#  - ${file(../bar-functions.yml)}
+#
+functions:
+  #myfunc:
+  #  handler: http
+  #  events:
+  #    - http: path
+  # NOTE: the following uses an "event" event (pubSub event in this case).
+  # Please create the corresponding resources in the Google Cloud
+  # before deploying this service through Serverless
+  main:
+    handler: main
+    memorySize: 128
+    timeout: 60s
+    events:
+      - event:
+          eventType: providers/cloud.pubsub/eventTypes/topic.publish
+          #resource: projects/*/topics/my-topic
+          resource: projects/${env:GOOGLE_PROJECT_ID}/topics/cloud-sql-backups
+# you can define resources, templates etc. the same way you would in a
+# Google Cloud deployment configuration
+resources:
+  resources:
+    # generates the bucket that the cloud function will send the backups to
+    # there is another bucket also created for uploading the package (sls-cloud-sql-backups-production-1603283101338), not to be confused with this one
+    - type: storage.v1.bucket
+      name: ${env:GOOGLE_PROJECT_ID}-sql-backups
+#  imports:
+#    - path: my_template.jinja
