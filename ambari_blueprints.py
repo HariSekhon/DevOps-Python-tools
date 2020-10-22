@@ -90,7 +90,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.10.2'
+__version__ = '0.10.3'
 
 class AmbariBlueprintTool(CLI):
 
@@ -116,7 +116,7 @@ class AmbariBlueprintTool(CLI):
         #log.info("contacting Ambari as '%s'" % self.user)
         if not isHost(host) or not isPort(port) or not isUser(user) or not password:
             raise InvalidOptionException('invalid options passed to AmbariBlueprint()')
-        proto = 'http' # pylint: disable=unused-variable
+        proto = 'http'  # pylint: disable=unused-variable,possibly-unused-variable
         if ssl:
             proto = 'https'
         self.host = host
@@ -140,8 +140,8 @@ class AmbariBlueprintTool(CLI):
         except IOError as _:
             die("'failed to create dir '%s': %s" % (self.blueprint_dir, _))
 
-    # TODO: change to @staticmethod
-    def parse_cluster_name(self, item): # pylint: disable=no-self-use
+    @staticmethod
+    def parse_cluster_name(item):
         if isStr(item):
             item = json.loads(item)
         try:
@@ -154,8 +154,8 @@ class AmbariBlueprintTool(CLI):
         json_data = self.list('clusters')
         return [self.parse_cluster_name(item) for item in json_data['items']]
 
-    # TODO: change to @staticmethod
-    def parse_blueprint_name(self, item): # pylint: disable=no-self-use
+    @staticmethod
+    def parse_blueprint_name(item):
         if isStr(item):
             item = json.loads(item)
         try:
@@ -168,8 +168,8 @@ class AmbariBlueprintTool(CLI):
         json_data = self.list('blueprints')
         return [self.parse_blueprint_name(item) for item in json_data['items']]
 
-    # TODO: change to @staticmethod
-    def parse_host_name(self, item): # pylint: disable=no-self-use
+    @staticmethod
+    def parse_host_name(item):
         if isStr(item):
             item = json.loads(item)
         try:
@@ -320,7 +320,7 @@ class AmbariBlueprintTool(CLI):
             except KeyError as _:
                 pass
         if not name:
-            name = os.path.splitext(os.path.basename(file))[0]
+            name = os.path.splitext(os.path.basename(filename))[0]
             log.info("name not specified and couldn't determine blueprint name from blueprint data, reverting to using filename without extension '%s'" % name) # pylint: disable=line-too-long
         # this solves the issue of having duplicate Blueprint.blueprint_name keys
         try:
@@ -329,7 +329,7 @@ class AmbariBlueprintTool(CLI):
             data = json.dumps(json_data)
             log.info("reset blueprint field name to '%s'" % name)
         except ValueError as _:
-            qquit('CRITICAL', "invalid json found in file '%s': %s" % (file, name))
+            qquit('CRITICAL', "invalid json found in file '%s': %s" % (filename, name))
         except KeyError as _:
             log.warn('failed to reset the Blueprint name: %s' % _)
         return self.send_blueprint(name, data)
@@ -399,8 +399,8 @@ class AmbariBlueprintTool(CLI):
             log.debug("cluster '%s' blueprint content = '%s'" % (cluster, data))
         self.save(cluster, path, data)
 
-    # TODO: change to @staticmethod
-    def save(self, name, path, data): # pylint: disable=no-self-use
+    @staticmethod
+    def save(name, path, data):
         # log.debug('save(%s, %s)' % (name, data))
         if data is None:
             err = "blueprint '%s' returned None" % name
