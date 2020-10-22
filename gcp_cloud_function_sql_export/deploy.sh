@@ -21,7 +21,7 @@ cd "$srcdir"
 
 project="$(gcloud config list --format="value(core.project)")"
 region="$(gcloud config list --format="value(compute.region)")"
-region="${region:-${GOOGLE_REGION:-europe-west3}}"  # not available in all regions yet
+region="${region:-${GOOGLE_REGION:-europe-west1}}"  # not available in all regions yet
 
 name="cloud-sql-backups"
 topic="cloud-sql-backups"
