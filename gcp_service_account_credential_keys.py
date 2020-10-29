@@ -32,6 +32,11 @@ You can supply a service account credentials file to authenticate with or just u
 
     gcloud auth application-default login
 
+
+See Also - similar scripts in the DevOps Bash tools repo:
+
+    https://github.com/HariSekhon/DevOps-Bash-tools/
+
 """
 
 from __future__ import absolute_import
