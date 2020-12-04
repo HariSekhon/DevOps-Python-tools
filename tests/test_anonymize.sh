@@ -546,6 +546,8 @@ fi
 # this gives the number of elements and prevents testing the last element(s) if commenting something out in the middle
 #for (( i = 0 ; i < ${#src[@]} ; i++ )); do
 run_tests(){
+    # expands to the list of indicies in the array, starting at zero - this is easier to work with that ${#src} which is a total
+    # that is off by one for index usage and doesn't support sparse arrays for any  missing/disabled test indicies
     test_numbers="${*:-${!src[*]}}"
     for i in $test_numbers; do
         [ -n "${src[$i]:-}" ]  || { echo "code error: src[$i] not defined";  exit 1; }
