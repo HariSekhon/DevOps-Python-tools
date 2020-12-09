@@ -124,9 +124,9 @@ notifications:
 # https://docs.travis-ci.com/user/caching/
 
 before_cache:
-  #- rm -f $HOME/.cache/pip/log/debug.log
+  - rm -f $HOME/.cache/pip/log/debug.log
   # XXX: cache breaks pypy builds, so clear it
-  - rm -f $HOME/.cache/pip
+  #- rm -f $HOME/.cache/pip
 
 cache:
   - pip
