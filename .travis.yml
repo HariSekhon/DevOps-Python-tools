@@ -13,13 +13,22 @@
 #  https://www.linkedin.com/in/harisekhon
 #
 
+# ============================================================================ #
+#                               T r a v i s   C I
+# ============================================================================ #
+
+# https://docs.travis-ci.com/user/customizing-the-build/
+
 version: ~> 1.0
 
+# ============================
 # Mac Python 2.7 not available - see https://travis-ci.org/HariSekhon/pylib/jobs/584226228
 #os:
 #  - linux
 #  - osx
 
+# =================================================
+# https://docs.travis-ci.com/user/languages/python/
 python:
   - "2.7"
   #- "3.4" supported by pip as of March 2019
@@ -30,6 +39,9 @@ python:
   - "pypy"   # currently Python 2.7.13, PyPy 7.1.1
   - "pypy3"  # currently Python 3.6.1,  PyPy 7.1.1-beta0
 
+# =============================================
+# https://docs.travis-ci.com/user/build-matrix/
+# https://docs.travis-ci.com/user/build-stages/matrix-expansion/
 matrix:
   fast_finish: true
   include:
@@ -74,6 +86,8 @@ matrix:
       language: python
       python: "pypy3"
 
+  # ===================================================================================================
+  # https://docs.travis-ci.com/user/multi-os/#allowing-failures-on-jobs-running-on-one-operating-system
 #   allow_failures:
 #     - python: "3.4"
 #     - python: "3.5"
@@ -83,23 +97,41 @@ matrix:
 #     - python: "pypy"
 #     - python: "pypy3"
 
-sudo: required
+# =======================================
+# https://docs.travis-ci.com/user/docker/
+services:
+  - docker
 
+# ======================================================
+# https://docs.travis-ci.com/user/environment-variables/
 env:
 #  - DEBUG=1
   - DOCKER_COMPOSE_VERSION=1.16.1 PYTHONUNBUFFERED=1
 
+# ==============================================
+# https://docs.travis-ci.com/user/notifications/
 notifications:
   email: false
 
-branches:
-  only:
-    - master
+# =================================================================================
+# https://docs.travis-ci.com/user/customizing-the-build/#building-specific-branches
+# https://docs.travis-ci.com/user/conditional-builds-stages-jobs
+#branches:
+#  only:
+#    - master
 
-cache: pip
+# ========================================
+# https://docs.travis-ci.com/user/caching/
 
-services:
-  - docker
+cache:
+  - pip
+  - directories:
+    - $HOME/.cache
+    - $HOME/.cpanm
+    - $HOME/.cpan
+
+# ==============================================
+# https://docs.travis-ci.com/user/job-lifecycle/
 
 # avoid package checksum mismatches when installing packages
 before_install:
