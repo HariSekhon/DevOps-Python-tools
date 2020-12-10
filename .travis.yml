@@ -88,14 +88,9 @@ matrix:
 
   # ===================================================================================================
   # https://docs.travis-ci.com/user/multi-os/#allowing-failures-on-jobs-running-on-one-operating-system
-#   allow_failures:
-#     - python: "3.4"
-#     - python: "3.5"
-#     - python: "3.6"
-#     - python: "3.7"
-#     - python: "3.8"
-#     - python: "pypy"
-#     - python: "pypy3"
+  allow_failures:
+    - python: "pypy"
+    - python: "pypy3"
 
 # =======================================
 # https://docs.travis-ci.com/user/docker/
@@ -124,9 +119,9 @@ notifications:
 # https://docs.travis-ci.com/user/caching/
 
 before_cache:
-  - rm -f $HOME/.cache/pip/log/debug.log
+  #- rm -f $HOME/.cache/pip/log/debug.log
   # XXX: cache breaks pypy builds, so clear it
-  #- rm -f $HOME/.cache/pip
+  - rm -f $HOME/.cache/pip
 
 cache:
   - pip
