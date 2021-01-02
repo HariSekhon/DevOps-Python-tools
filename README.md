@@ -110,9 +110,9 @@ Cloud & Big Data Contractor, United Kingdom
 
 ##### Make sure you run ```make update``` if updating and not just ```git pull``` as you will often need the latest library submodule and possibly new upstream libraries. #####
 
-### Quick Start ###
+## Quick Start
 
-#### Ready to run Docker image #####
+### Ready to run Docker image
 
 All programs and their pre-compiled dependencies can be found ready to run on [DockerHub](https://hub.docker.com/r/harisekhon/pytools/).
 
@@ -125,7 +125,7 @@ Run any given program:
 docker run harisekhon/pytools <program> <args>
 ```
 
-#### Automated Build from source #####
+### Automated Build from source
 
 installs git, make, pulls the repo and build the dependencies:
 ```
@@ -143,13 +143,13 @@ Make sure to read [Detailed Build Instructions](https://github.com/HariSekhon/de
 
 Some Hadoop tools with require Jython, see [Jython for Hadoop Utils](https://github.com/harisekhon/devops-python-tools#jython-for-hadoop-utils) for details.
 
-### Usage ###
+### Usage
 
 All programs come with a ```--help``` switch which includes a program description and the list of command line options.
 
 Environment variables are supported for convenience and also to hide credentials from being exposed in the process list eg. ```$PASSWORD```, ```$TRAVIS_TOKEN```. These are indicated in the ```--help``` descriptions in brackets next to each option and often have more specific overrides with higher precedence eg. ```$AMBARI_HOST```, ```$HBASE_HOST``` take priority over ```$HOST```.
 
-### DevOps Python Tools ###
+### DevOps Python Tools
 
 - Linux:
   - ```anonymize.py``` - anonymizes your configs / logs from files or stdin (for pasting to Apache Jira tickets or mailing lists)
