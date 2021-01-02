@@ -104,7 +104,7 @@ See Also:
 - [DevOps Bash Tools](https://github.com/harisekhon/devops-bash-tools)
 - [DevOps Perl Tools](https://github.com/harisekhon/devops-perl-tools)
 - [DevOps Golang Tools](https://github.com/HariSekhon/DevOps-Golang-tools)
-- [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) 
+- [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins)
 
 repos which contains hundreds more scripts and programs for Cloud, Big Data, SQL, NoSQL, Web and Linux.
 
@@ -156,7 +156,7 @@ All programs come with a ```--help``` switch which includes a program descriptio
 
 Environment variables are supported for convenience and also to hide credentials from being exposed in the process list eg. ```$PASSWORD```, ```$TRAVIS_TOKEN```. These are indicated in the ```--help``` descriptions in brackets next to each option and often have more specific overrides with higher precedence eg. ```$AMBARI_HOST```, ```$HBASE_HOST``` take priority over ```$HOST```.
 
-### DevOps Python Tools
+### DevOps Python Tools - Inventory:
 
 - Linux:
   - ```anonymize.py``` - anonymizes your configs / logs from files or stdin (for pasting to Apache Jira tickets or mailing lists)
