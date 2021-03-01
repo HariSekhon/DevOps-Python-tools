@@ -56,3 +56,4 @@ thriftpy==0.3.9
 toml==0.10.0
 xmltodict==0.10.2
 yamllint==1.15.0
+rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
