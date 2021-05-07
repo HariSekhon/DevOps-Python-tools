@@ -147,6 +147,11 @@ cd pytools
 make
 ```
 
+To only install pip dependencies for a single script, you can just type make and the filename with a `.pyc` extension instead of `.py`:
+```
+make anonymize.pyc
+```
+
 Make sure to read [Detailed Build Instructions](https://github.com/HariSekhon/devops-python-tools#detailed-build-instructions) further down for more information.
 
 Some Hadoop tools with require Jython, see [Jython for Hadoop Utils](https://github.com/harisekhon/devops-python-tools#jython-for-hadoop-utils) for details.
