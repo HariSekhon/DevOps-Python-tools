@@ -80,10 +80,10 @@ init:
 #
 %.pyc: %.py
 	@# this utility script supports taking .pyc or .pyo names and still does the right thing
-	bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
+	@bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
 	python -m py_compile `echo $@ | sed 's/\.pyc$$/.py/'`
 %.pyo: %.py
-	bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
+	@bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
 	python -O -m py_compile `echo $@ | sed 's/\.pyo$$/.py/'`
 
 .PHONY: pylib
