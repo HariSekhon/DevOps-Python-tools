@@ -78,13 +78,13 @@ init:
 #
 # dependency of same % stem prefix checks for a matching .py file to consider it a valid target
 #
-%.pyc: %.py
+%.pyc:: %.py
 	@# this utility script supports taking .pyc or .pyo names and still does the right thing,
 	@bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
 	python -m py_compile $< && \
 	echo && \
 	echo Generated $@
-%.pyo: %.py
+%.pyo:: %.py
 	@bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
 	python -O -m py_compile $< && \
 	echo && \
