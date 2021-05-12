@@ -55,7 +55,7 @@ sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
     from harisekhon.utils import log
-    from harisekhon.utils import validate_host, validate_port, validate_url, validate_regex
+    from harisekhon.utils import validate_host, validate_port, validate_url, validate_regex, die
     from harisekhon import CLI
 except ImportError as _:
     print(traceback.format_exc(), end='')
@@ -130,14 +130,17 @@ class SeleniumTest(CLI):
         log.info("Checking url '%s'", url)
         driver.get(self.url)
         content = driver.page_source
-        if self.expected_content:
-            log.info("Checking url content matches '%s'", self.expected_content)
-            if self.expected_content not in content:
-                raise AssertionError('Page source content failed content match')
         if self.expected_regex:
             log.info("Checking url content matches regex")
             if not self.expected_regex.search(content):
-                raise AssertionError('Page source content failed regex search')
+                die('ERROR: Page source content failed regex search')
+        elif self.expected_content:
+            log.info("Checking url content matches '%s'", self.expected_content)
+            if self.expected_content not in content:
+                die('ERROR: Page source content failed content match')
+        elif '404' in driver.title:
+            die('ERROR: Page title contains a 404 / error ' +
+                '(if this is expected, use --content / --regex instead): {}'.format(driver.title))
         driver.quit()
         log.info("Succeeded with capability '%s' against url '%s'", capability, url)
 
