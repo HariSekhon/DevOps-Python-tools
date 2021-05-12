@@ -20,9 +20,15 @@
 Tests a Selenium Hub / Selenoid using the given capability eg. FIREFOX, CHROME
 against a given URL and content (defaults to google.com)
 
+Capabilities to check default to 'FIREFOX' and 'CHROME'
+URL defaults to 'google.com'
+There is no content / regex check by default
+
 Example:
 
-    ./selenium_test.py --host <selenium_hub_host> [options] <capabilities>
+    ./selenium_test.py --host <selenium_hub_host> [options] [<capabilities>]
+
+    ./selenium_test.py --host selenium-hub
 
     ./selenium_test.py --host selenium-hub FIREFOX CHROME
 
@@ -106,7 +112,9 @@ class SeleniumTest(CLI):
         if self.get_opt('ssl'):
             self.protocol = 'https'
         if not self.args:
-            self.usage()
+            # test basic Chrome and Firefox are available
+            self.args.append('CHROME')
+            self.args.append('FIREFOX')
 
     def check_selenium(self, capability, url):
         selenium_url = '{protocol}://{host}:{port}/{path}'\
