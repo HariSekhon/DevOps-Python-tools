@@ -17,16 +17,16 @@
 
 """
 
-Tests a Selenium Hub / Selenoid using the given capability eg. FIREFOX, CHROME
+Tests a Selenium Hub / Selenoid using the given browsers eg. FIREFOX, CHROME
 against a given URL and content (defaults to google.com)
 
-Capabilities to check default to 'FIREFOX' and 'CHROME'
+Browsers default to 'FIREFOX' and 'CHROME' if not specified
 URL defaults to 'google.com'
 There is no content / regex check by default
 
 Example:
 
-    ./selenium_test.py --host <selenium_hub_host> [options] [<capabilities>]
+    ./selenium_test.py --host <selenium_hub_host> [<browsers>] [<options>]
 
     ./selenium_test.py --host selenium-hub
 
@@ -113,21 +113,21 @@ class SeleniumTest(CLI):
             self.protocol = 'https'
         if not self.args:
             # test basic Chrome and Firefox are available
-            self.args.append('CHROME')
-            self.args.append('FIREFOX')
+            self.args.append('chrome')
+            self.args.append('firefox')
 
-    def check_selenium(self, capability, url):
+    def check_selenium(self, browser):
         selenium_url = '{protocol}://{host}:{port}/{path}'\
                     .format(protocol=self.protocol, \
                             host=self.host, \
                             port=self.port, \
                             path=self.path)
-        log.info("Connecting to '%s' with capability '%s'", selenium_url, capability)
+        log.info("Connecting to '%s' for browser '%s'", selenium_url, browser)
         driver = webdriver.Remote(
             command_executor=selenium_url,
-            desired_capabilities=getattr(DesiredCapabilities, capability)
+            desired_capabilities=getattr(DesiredCapabilities, browser)
         )
-        log.info("Checking url '%s'", url)
+        log.info("Checking url '%s'", self.url)
         driver.get(self.url)
         content = driver.page_source
         title = driver.title
@@ -143,12 +143,12 @@ class SeleniumTest(CLI):
         elif '404' in title:
             die('ERROR: Page title contains a 404 / error ' +
                 '(if this is expected, use --content / --regex instead): {}'.format(title))
-        log.info("Succeeded with capability '%s' against url '%s'", capability, url)
+        log.info("Succeeded with capability '%s' against url '%s'", browser, self.url)
 
     def run(self):
         start_time = time.time()
-        for capability in self.args:
-            self.check_selenium(capability, self.url)
+        for browser in self.args:
+            self.check_selenium(browser.upper())
         query_time = time.time() - start_time
         log.info('Finished checks in {:.2f} secs'.format(query_time))
 
