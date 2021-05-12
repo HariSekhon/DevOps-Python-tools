@@ -130,6 +130,8 @@ class SeleniumTest(CLI):
         log.info("Checking url '%s'", url)
         driver.get(self.url)
         content = driver.page_source
+        title = driver.title
+        driver.quit()
         if self.expected_regex:
             log.info("Checking url content matches regex")
             if not self.expected_regex.search(content):
@@ -138,10 +140,9 @@ class SeleniumTest(CLI):
             log.info("Checking url content matches '%s'", self.expected_content)
             if self.expected_content not in content:
                 die('ERROR: Page source content failed content match')
-        elif '404' in driver.title:
+        elif '404' in title:
             die('ERROR: Page title contains a 404 / error ' +
-                '(if this is expected, use --content / --regex instead): {}'.format(driver.title))
-        driver.quit()
+                '(if this is expected, use --content / --regex instead): {}'.format(title))
         log.info("Succeeded with capability '%s' against url '%s'", capability, url)
 
     def run(self):
