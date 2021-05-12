@@ -65,11 +65,11 @@ __author__ = 'Hari Sekhon'
 __version__ = '0.1'
 
 
-class SeleniumTest(CLI):
+class SeleniumHubBrowserTest(CLI):
 
     def __init__(self):
         # Python 2.x
-        super(SeleniumTest, self).__init__()
+        super(SeleniumHubBrowserTest, self).__init__()
         # Python 3.x
         # super().__init__()
         self.host = None
@@ -86,7 +86,7 @@ class SeleniumTest(CLI):
         self.verbose_default = 2
 
     def add_options(self):
-        super(SeleniumTest, self).add_options()
+        super(SeleniumHubBrowserTest, self).add_options()
         self.add_hostoption(name='Selenium Hub', default_port=4444)
         self.add_opt('-u', '--url', default=self.url_default,
                      help='URL to use for the test (default: {})'.format(self.url_default))
@@ -95,7 +95,7 @@ class SeleniumTest(CLI):
         self.add_opt('-S', '--ssl', action='store_true', help='Use SSL to connect to Selenium Hub')
 
     def process_options(self):
-        super(SeleniumTest, self).process_options()
+        super(SeleniumHubBrowserTest, self).process_options()
         self.host = self.get_opt('host')
         self.port = self.get_opt('port')
         self.url = self.get_opt('url')
@@ -154,4 +154,4 @@ class SeleniumTest(CLI):
 
 
 if __name__ == '__main__':
-    SeleniumTest().main()
+    SeleniumHubBrowserTest().main()
