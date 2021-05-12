@@ -26,14 +26,32 @@ There is no content / regex check by default
 
 Example:
 
-    ./selenium_test.py --host <selenium_hub_host> [<browsers>] [<options>]
+    ./seleniumhub_browser_test.py --host <selenium_hub_host> [<browsers>] [<options>]
 
-    ./selenium_test.py --host selenium-hub
+Where browsers are one or more of these and must be supported by the remote Selenium Hub:
 
-    ./selenium_test.py --host selenium-hub FIREFOX CHROME
+ANDROID
+CHROME
+EDGE
+FIREFOX
+HTMLUNIT
+HTMLUNITWITHJS
+INTERNETEXPLORER
+IPAD
+IPHONE
+OPERA
+PHANTOMJS
+SAFARI
+WEBKITGTK
 
-    ./selenium_test.py --host selenium-hub FIREFOX CHROME --url google.com --content google
-    ./selenium_test.py --host selenium-hub FIREFOX CHROME --url google.com --regex 'goog.*'
+Examples:
+
+    ./seleniumhub_browser_test.py --host x.x.x.x
+
+    ./seleniumhub_browser_test.py --host x.x.x.x FIREFOX CHROME
+
+    ./seleniumhub_browser_test.py --host x.x.x.x FIREFOX CHROME --url google.com --content google
+    ./seleniumhub_browser_test.py --host x.x.x.x FIREFOX CHROME --url google.com --regex 'goog.*'
 
 """
 
