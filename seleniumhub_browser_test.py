@@ -99,6 +99,7 @@ class SeleniumHubBrowserTest(CLI):
         self.url_default = 'http://google.com'
         self.url = self.url_default
         self.expected_content = None
+        self.expected_content_default = 'google'
         self.expected_regex = None
         self.timeout_default = 600
         self.verbose_default = 2
@@ -133,6 +134,8 @@ class SeleniumHubBrowserTest(CLI):
             # test basic Chrome and Firefox are available
             self.args.append('chrome')
             self.args.append('firefox')
+        if self.url == self.url_default:
+            self.expected_content = self.expected_content_default
 
     def check_selenium(self, browser):
         selenium_url = '{protocol}://{host}:{port}/{path}'\
