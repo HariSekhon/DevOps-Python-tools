@@ -80,7 +80,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 class SeleniumHubBrowserTest(CLI):
@@ -127,7 +127,7 @@ class SeleniumHubBrowserTest(CLI):
         validate_host(self.host)
         validate_port(self.port)
         validate_url(self.url)
-        if self.get_opt('ssl'):
+        if self.get_opt('ssl') or int(self.port) == 443:
             self.protocol = 'https'
         if not self.args:
             # test basic Chrome and Firefox are available
