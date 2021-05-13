@@ -21,8 +21,8 @@ Tests a Selenium Hub / Selenoid using the given browsers eg. FIREFOX, CHROME
 against a given URL and content (defaults to google.com)
 
 Browsers default to 'FIREFOX' and 'CHROME' if not specified
-URL defaults to 'google.com'
-There is no content / regex check by default
+URL defaults to 'google.com' checking for content 'google'
+If you define a different URL then you must specify a --content or --regex validation otherwise none is used
 
 Example:
 
