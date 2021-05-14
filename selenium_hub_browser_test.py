@@ -96,7 +96,6 @@ class SeleniumHubBrowserTest(CLI):
         self.port = None
         self.protocol = 'http'
         self.name = 'Selenium Hub'
-        self.default_port = 80
         self.path = 'wd/hub'
         self.hub_url = None
         self.url_default = 'http://google.com'
@@ -110,7 +109,7 @@ class SeleniumHubBrowserTest(CLI):
     def add_options(self):
         super(SeleniumHubBrowserTest, self).add_options()
         self.add_hostoption(name='Selenium Hub', default_port=4444)
-        self.add_opt('-U', '--hub-url', help='Selenium Hub URL')
+        self.add_opt('-U', '--hub-url', help='Selenium Hub URL (takes priority over --host/--port/--ssl)')
         self.add_opt('-u', '--url', default=self.url_default,
                      help='URL to use for the test (default: {})'.format(self.url_default))
         self.add_opt('-c', '--content', help='URL content to expect')
