@@ -20,7 +20,7 @@ GitPython==2.1.15
 happybase==1.0.0
 humanize==0.5.1
 impyla==0.16.0
-Jinja2==2.11.3
+jinja2==2.11.3
 #kazoo==2.2.1
 ldif3==3.2.2
 #MarkupSafe==0.23
@@ -45,6 +45,7 @@ python-ldap==3.2.0
 python-snappy==0.5
 sasl==0.2.1
 sh==1.12.14
+selenium==3.141.0
 # pulls in python-KrbV as a dependency which doesn't build on Mac any more
 # relies on python-krbV is unmaintained and unported to Python 3
 # - moved to Makefile as best effort

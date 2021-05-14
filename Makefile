@@ -74,12 +74,31 @@ build: init
 init:
 	git submodule update --init --recursive
 
-.PHONY: python
-python:
-	# defer via external sub-call, otherwise will result in error like
-	# make: *** No rule to make target 'python-version', needed by 'build'.  Stop.
+# Magic to build the dependencies for only given program(s)
+#
+# dependency of same % stem prefix checks for a matching .py file to consider it a valid target
+#
+%.pyc:: %.py
+	@# this utility script supports taking .pyc or .pyo names and still does the right thing,
+	@bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
+	python -m py_compile $< && \
+	echo && \
+	echo Generated $@
+%.pyo:: %.py
+	@bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
+	python -O -m py_compile $< && \
+	echo && \
+	echo Generated $@
+
+.PHONY: pylib
+pylib:
 	@$(MAKE) python-version
 	cd pylib && $(MAKE)
+
+.PHONY: python
+python: pylib
+	# defer via external sub-call, otherwise will result in error like
+	# make: *** No rule to make target 'python-version', needed by 'build'.  Stop.
 	@# don't pull parquet tools in to docker image by default, will bloat it
 	@# can fetch separately by running 'make parquet-tools' if you really want to
 	@if [ -f /.dockerenv -o -n "$(SKIP_PARQUET)" ]; then \

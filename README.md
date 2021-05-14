@@ -49,17 +49,17 @@ Hari Sekhon - DevOps Python Tools
 [![Shippable](https://img.shields.io/shippable/5e52c63445c70f0007ff5144/master?label=Shippable&logo=jfrog)](https://app.shippable.com/github/HariSekhon/DevOps-Python-tools/dashboard/jobs)
 [![Codefresh](https://g.codefresh.io/api/badges/pipeline/harisekhon/GitHub%2FDevOps-Python-tools?branch=master&key=eyJhbGciOiJIUzI1NiJ9.NWU1MmM5OGNiM2FiOWUzM2Y3ZDZmYjM3.O69674cW7vYom3v5JOGKXDbYgCVIJU9EWhXUMHl3zwA&type=cf-1)](https://g.codefresh.io/pipelines/edit/new/builds?id=5e58e2e6353f5d1ada385bf2&pipeline=DevOps-Python-tools&projects=GitHub&projectId=5e52ca8ea284e00f882ea992&context=github&filter=page:1;pageSize:10;timeFrameStart:week)
 [![BuildKite](https://img.shields.io/buildkite/8377537d0d9dddf4bf32826a6bf1c4e9ab88bc265007e1882c/master?label=BuildKite&logo=buildkite)](https://buildkite.com/hari-sekhon/devops-python-tools)
-[![buddy pipeline](https://app.buddy.works/harisekhon/devops-python-tools/pipelines/pipeline/246990/badge.svg?token=7f63afa3c423a65e6e39a79be0386959e98c4105ea1e20f7f8b05d6d6b587038 "buddy pipeline")](https://app.buddy.works/harisekhon/devops-python-tools/pipelines/pipeline/246990)
 [![Cirrus CI](https://img.shields.io/cirrus/github/HariSekhon/DevOps-Python-tools/master?logo=Cirrus%20CI&label=Cirrus%20CI)](https://cirrus-ci.com/github/HariSekhon/DevOps-Python-tools)
 [![Semaphore](https://harisekhon.semaphoreci.com/badges/DevOps-Python-tools.svg)](https://harisekhon.semaphoreci.com/projects/DevOps-Python-tools)
 [![Wercker](https://app.wercker.com/status/b40735fb89e7d989dbaf5659a9af9a20/s/master "wercker status")](https://app.wercker.com/harisekhon/DevOps-Python-tools/runs)
+[![Buddy](https://img.shields.io/badge/Buddy-ready-1A86FD?logo=buddy)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/buddy.yml)
 <!--[![Wercker](https://img.shields.io/wercker/ci/5e58ef8d14b91a0800356b6d/master?label=Wercker&logo=oracle)](https://app.wercker.com/harisekhon/DevOps-Python-tools/runs)-->
 
 [![Azure DevOps Pipeline](https://dev.azure.com/harisekhon/GitHub/_apis/build/status/HariSekhon.DevOps-Python-tools?branchName=master)](https://dev.azure.com/harisekhon/GitHub/_build/latest?definitionId=8&branchName=master)
 [![GitLab Pipeline](https://img.shields.io/gitlab/pipeline/harisekhon/DevOps-Python-tools?logo=gitlab&label=GitLab%20CI)](https://gitlab.com/HariSekhon/DevOps-Python-tools/pipelines)
 [![BitBucket Pipeline](https://img.shields.io/bitbucket/pipelines/harisekhon/devops-python-tools/master?logo=bitbucket&label=BitBucket%20CI)](https://bitbucket.org/harisekhon/devops-python-tools/addon/pipelines/home#!/)
 [![AWS CodeBuild](https://img.shields.io/badge/AWS%20CodeBuild-ready-blue?logo=amazon%20aws)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/buildspec.yml)
-[![GCP Cloud Build](https://img.shields.io/badge/GCP%20Cloud%20Build-ready-blue?logo=google%20cloud)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/cloudbuild.yaml)
+[![GCP Cloud Build](https://img.shields.io/badge/GCP%20Cloud%20Build-ready-blue?logo=google%20cloud&logoColor=white)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/cloudbuild.yaml)
 
 [![Repo on Azure DevOps](https://img.shields.io/badge/repo-Azure%20DevOps-0078D7?logo=azure%20devops)](https://dev.azure.com/harisekhon/GitHub/_git/DevOps-Python-tools)
 [![Repo on GitHub](https://img.shields.io/badge/repo-GitHub-2088FF?logo=github)](https://github.com/HariSekhon/DevOps-Python-tools)
@@ -145,6 +145,11 @@ or manually:
 git clone https://github.com/harisekhon/devops-python-tools pytools
 cd pytools
 make
+```
+
+To only install pip dependencies for a single script, you can just type make and the filename with a `.pyc` extension instead of `.py`:
+```
+make anonymize.pyc
 ```
 
 Make sure to read [Detailed Build Instructions](https://github.com/HariSekhon/devops-python-tools#detailed-build-instructions) further down for more information.
@@ -272,6 +277,7 @@ Environment variables are supported for convenience and also to hide credentials
 - [Travis CI](https://travis-ci.org/):
     - ```travis_last_log.py``` - fetches [Travis CI](https://travis-ci.org/) latest running / completed / failed build log for given repo - useful for quickly getting the log of the last failed build when CCMenu or BuildNotify applets turn red
     - ```travis_debug_session.py``` - launches a [Travis CI](https://travis-ci.org/) interactive debug build session via Travis API, tracks session creation and drops user straight in to the SSH shell on the remote Travis build, very convenient one shot debug launcher for Travis CI
+- ```selenium_hub_browser_test.py``` - checks [Selenium Grid Hub / Selenoid](https://www.selenium.dev/documentation/en/grid/) is working by calling browsers such as Chrome and Firefox to fetch a given URL and content/regex match the result
 - Data Validation (useful in CI):
   - ```validate_*.py``` - validate files, directory trees and/or standard input streams
     - supports the following file formats:
