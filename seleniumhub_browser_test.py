@@ -26,7 +26,9 @@ If you define a different URL then you must specify a --content or --regex valid
 
 Example:
 
-    ./seleniumhub_browser_test.py --host <selenium_hub_host> [<browsers>] [<options>]
+    ./selenium_hub_browser_test.py --host <selenium_hub_host> [<browsers>] [<options>]
+
+    ./selenium_hub_browser_test.py --hub-url https://<selenium_hub_host>:4444/wd/hub/ [<browsers>] [<options>]
 
 Where browsers are one or more of these and must be supported by the remote Selenium Hub:
 
@@ -46,12 +48,12 @@ WEBKITGTK
 
 Examples:
 
-    ./seleniumhub_browser_test.py --host x.x.x.x
+    ./selenium_hub_browser_test.py --host x.x.x.x
 
-    ./seleniumhub_browser_test.py --host x.x.x.x FIREFOX CHROME
+    ./selenium_hub_browser_test.py --host x.x.x.x FIREFOX CHROME
 
-    ./seleniumhub_browser_test.py --host x.x.x.x FIREFOX CHROME --url google.com --content google
-    ./seleniumhub_browser_test.py --host x.x.x.x FIREFOX CHROME --url google.com --regex 'goog.*'
+    ./selenium_hub_browser_test.py --host x.x.x.x FIREFOX CHROME --url google.com --content google
+    ./selenium_hub_browser_test.py --host x.x.x.x FIREFOX CHROME --url google.com --regex 'goog.*'
 
 """
 
@@ -80,7 +82,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2'
+__version__ = '0.3'
 
 
 class SeleniumHubBrowserTest(CLI):
@@ -96,6 +98,7 @@ class SeleniumHubBrowserTest(CLI):
         self.name = 'Selenium Hub'
         self.default_port = 80
         self.path = 'wd/hub'
+        self.hub_url = None
         self.url_default = 'http://google.com'
         self.url = self.url_default
         self.expected_content = None
@@ -107,6 +110,7 @@ class SeleniumHubBrowserTest(CLI):
     def add_options(self):
         super(SeleniumHubBrowserTest, self).add_options()
         self.add_hostoption(name='Selenium Hub', default_port=4444)
+        self.add_opt('-U', '--hub-url', help='Selenium Hub URL')
         self.add_opt('-u', '--url', default=self.url_default,
                      help='URL to use for the test (default: {})'.format(self.url_default))
         self.add_opt('-c', '--content', help='URL content to expect')
@@ -115,8 +119,21 @@ class SeleniumHubBrowserTest(CLI):
 
     def process_options(self):
         super(SeleniumHubBrowserTest, self).process_options()
-        self.host = self.get_opt('host')
-        self.port = self.get_opt('port')
+        self.hub_url = self.get_opt('hub_url')
+        if self.hub_url:
+            validate_url(self.hub_url, 'hub')
+        else:
+            self.host = self.get_opt('host')
+            self.port = self.get_opt('port')
+            validate_host(self.host)
+            validate_port(self.port)
+            if self.get_opt('ssl') or int(self.port) == 443:
+                self.protocol = 'https'
+            self.hub_url = '{protocol}://{host}:{port}/{path}'\
+                           .format(protocol=self.protocol, \
+                                   host=self.host, \
+                                   port=self.port, \
+                                   path=self.path)
         self.url = self.get_opt('url')
         if ':' not in self.url:
             self.url = 'http://' + self.url
@@ -125,11 +142,7 @@ class SeleniumHubBrowserTest(CLI):
         if self.expected_regex:
             validate_regex(self.expected_regex)
             self.expected_regex = re.compile(self.expected_regex)
-        validate_host(self.host)
-        validate_port(self.port)
         validate_url(self.url)
-        if self.get_opt('ssl') or int(self.port) == 443:
-            self.protocol = 'https'
         if not self.args:
             # test basic Chrome and Firefox are available
             self.args.append('chrome')
@@ -138,14 +151,9 @@ class SeleniumHubBrowserTest(CLI):
             self.expected_content = self.expected_content_default
 
     def check_selenium(self, browser):
-        selenium_url = '{protocol}://{host}:{port}/{path}'\
-                    .format(protocol=self.protocol, \
-                            host=self.host, \
-                            port=self.port, \
-                            path=self.path)
-        log.info("Connecting to '%s' for browser '%s'", selenium_url, browser)
+        log.info("Connecting to '%s' for browser '%s'", self.hub_url, browser)
         driver = webdriver.Remote(
-            command_executor=selenium_url,
+            command_executor=self.hub_url,
             desired_capabilities=getattr(DesiredCapabilities, browser)
         )
         log.info("Checking url '%s'", self.url)
