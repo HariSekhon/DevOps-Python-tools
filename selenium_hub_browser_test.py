@@ -28,7 +28,7 @@ Example:
 
     ./selenium_hub_browser_test.py --host <selenium_hub_host> [<browsers>] [<options>]
 
-    ./selenium_hub_browser_test.py --hub-url https://<selenium_hub_host>:4444/wd/hub/ [<browsers>] [<options>]
+    ./selenium_hub_browser_test.py --hub-url http://<selenium_hub_host>:4444/wd/hub/ [<browsers>] [<options>]
 
 Where browsers are one or more of these and must be supported by the remote Selenium Hub:
 
@@ -55,6 +55,8 @@ Examples:
     ./selenium_hub_browser_test.py --host x.x.x.x FIREFOX CHROME --url google.com --content google
     ./selenium_hub_browser_test.py --host x.x.x.x FIREFOX CHROME --url google.com --regex 'goog.*'
 
+
+Tested on Selenium Grid Hub v.3.141.59, and Selenoid 1.10.1
 """
 
 from __future__ import absolute_import
