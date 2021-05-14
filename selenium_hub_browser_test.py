@@ -169,7 +169,7 @@ class SeleniumHubBrowserTest(CLI):
                 die('ERROR: Page source content failed content match')
         elif '404' in title:
             die('ERROR: Page title contains a 404 / error ' +
-                '(if this is expected, use --content / --regex instead): {}'.format(title))
+                '(if this is expected, specify --content / --regex to check instead): {}'.format(title))
         log.info("Succeeded for browser '%s' against url '%s'", browser, self.url)
 
     def run(self):
