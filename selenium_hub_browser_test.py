@@ -136,18 +136,18 @@ class SeleniumHubBrowserTest(CLI):
         self.url = self.get_opt('url')
         if ':' not in self.url:
             self.url = 'http://' + self.url
+        validate_url(self.url)
         self.expected_content = self.get_opt('content')
         self.expected_regex = self.get_opt('regex')
         if self.expected_regex:
             validate_regex(self.expected_regex)
             self.expected_regex = re.compile(self.expected_regex)
-        validate_url(self.url)
+        elif self.url == self.url_default:
+            self.expected_content = self.expected_content_default
         if not self.args:
             # test basic Chrome and Firefox are available
             self.args.append('chrome')
             self.args.append('firefox')
-        if self.url == self.url_default:
-            self.expected_content = self.expected_content_default
 
     def check_selenium(self, browser):
         log.info("Connecting to '%s' for browser '%s'", self.hub_url, browser)
