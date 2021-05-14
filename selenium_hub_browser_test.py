@@ -74,9 +74,8 @@ libdir = os.path.join(srcdir, 'pylib')
 sys.path.append(libdir)
 try:
     # pylint: disable=wrong-import-position
-    from harisekhon.utils import log
-    from harisekhon.utils import validate_host, validate_port, validate_url, validate_regex, die
     from harisekhon import CLI
+    from harisekhon.utils import log, validate_host, validate_port, validate_url, validate_regex, die
 except ImportError as _:
     print(traceback.format_exc(), end='')
     sys.exit(4)
