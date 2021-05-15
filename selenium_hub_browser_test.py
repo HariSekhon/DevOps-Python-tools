@@ -170,7 +170,7 @@ class SeleniumHubBrowserTest(CLI):
             if self.expected_content not in content:
                 die('ERROR: Page source content failed content match')
         # not really recommended but in this case we cannot predict
-        # what to expect on a random url if not specified by --content/--regex:
+        # what to expect on a random url if not specified by --content/--regex (provided in the default test case)
         #
         # https://www.selenium.dev/documentation/en/worst_practices/http_response_codes/
         elif '404' in title:
