@@ -57,4 +57,4 @@ thriftpy==0.3.9
 toml==0.10.0
 xmltodict==0.10.2
 yamllint==1.15.0
-pyyaml>=5.4 # not directly required, pinned by Snyk to avoid a vulnerability
+#pyyaml>=5.4 # not directly required, pinned by Snyk to avoid a vulnerability. update: this breaks Python 3.5 build where this requirement is not found
