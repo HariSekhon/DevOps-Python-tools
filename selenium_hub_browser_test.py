@@ -169,6 +169,10 @@ class SeleniumHubBrowserTest(CLI):
             log.info("Checking url content matches '%s'", self.expected_content)
             if self.expected_content not in content:
                 die('ERROR: Page source content failed content match')
+        # not really recommended but in this case we cannot predict
+        # what to expect on a random url if not specified by --content/--regex:
+        #
+        # https://www.selenium.dev/documentation/en/worst_practices/http_response_codes/
         elif '404' in title:
             die('ERROR: Page title contains a 404 / error ' +
                 '(if this is expected, specify --content / --regex to check instead): {}'.format(title))
