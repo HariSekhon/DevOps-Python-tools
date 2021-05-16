@@ -56,7 +56,7 @@ Examples:
     ./selenium_hub_browser_test.py --host x.x.x.x FIREFOX CHROME --url google.com --regex 'goog.*'
 
 
-Tested on Selenium Grid Hub v.3.141.59, and Selenoid 1.10.1
+Tested on Selenium Grid Hub v.3.141.59, v4.0.0 and Selenoid 1.10.1
 """
 
 from __future__ import absolute_import
