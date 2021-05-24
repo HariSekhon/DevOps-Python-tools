@@ -22,12 +22,17 @@ routing via specified VPC Network to using default NAT Gateway
 
 Example usage: check GCF source IP to compare if it's permitted through Cloudflare / Firewall rules
 
-The HTTP request is irrelevant, although we could pass the website to query via an arg
-in which case this would just act as a proxy. See the adjacent gcp_cloud_function_proxy/main.py
+The HTTP request is irrelevant, just pass an empty JSON document '{}', although we could pass the website to query
+in a field in which case this would just act as a proxy.
+
+See Also: gcp_cloud_function_proxy/main.py
+
 
 Tested on GCP Cloud Functions with Python 3.9
 
 """
+
+# https://cloud.google.com/functions/docs/writing/http#writing_http_content-python
 
 # https://cloud.google.com/functions/docs/writing/specifying-dependencies-python
 
