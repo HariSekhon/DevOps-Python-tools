@@ -19,9 +19,11 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 cd "$srcdir"
 
-project="$(gcloud config list --format="value(core.project)")"
-region="$(gcloud config list --format="value(compute.region)")"
-region="${region:-${GOOGLE_REGION:-europe-west1}}"  # not available in all regions yet
+# needed to define the $service_account further down
+project="${CLOUDSDK_CORE_PROJECT:-$(gcloud config list --format="value(core.project)")}"
+
+region="$(gcloud config list --format="value(compute.region)" 2>&1 || :)"
+region="${CLOUDSDK_COMPUTE_REGION:-${region:-europe-west1}}"  # not available in all regions yet
 
 name="cloud-sql-backups"
 topic="cloud-sql-backups"
