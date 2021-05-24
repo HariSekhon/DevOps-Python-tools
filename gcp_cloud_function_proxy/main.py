@@ -37,6 +37,8 @@ Tested on GCP Cloud Functions with Python 3.9
 
 """
 
+# https://cloud.google.com/functions/docs/writing/http#writing_http_content-python
+
 # https://cloud.google.com/functions/docs/writing/specifying-dependencies-python
 
 import json
