@@ -22,7 +22,8 @@ routing via specified VPC Network to using default NAT Gateway
 
 Example usage: check GCF source IP to compare if it's permitted through Cloudflare / Firewall rules
 
-The HTTP request is irrelevant, although we could pass the website to query via an arg in which case this would just act as a proxy
+The HTTP request is irrelevant, although we could pass the website to query via an arg
+in which case this would just act as a proxy. See the adjacent gcp_cloud_function_proxy/main.py
 
 Tested on GCP Cloud Functions with Python 3.9
 
@@ -32,7 +33,7 @@ Tested on GCP Cloud Functions with Python 3.9
 
 import requests
 
-def main(request):
+def main(_):
     """Responds to any HTTP request.
     Args:
         request (flask.Request): HTTP request object.
@@ -41,8 +42,8 @@ def main(request):
         Response object using
         `make_response <http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response>`.
     """
-    r = requests.get('http://ifconfig.co/json')  # show our IP information for debugging VPC connector routing
-    status_code = r.status_code
-    status_message = r.reason
-    content = r.text
+    req = requests.get('http://ifconfig.co/json')  # show our IP information for debugging VPC connector routing
+    status_code = req.status_code
+    status_message = req.reason
+    content = req.text
     return "{} {}\n\n{}".format(status_code, status_message, content)
