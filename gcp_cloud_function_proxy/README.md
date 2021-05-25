@@ -11,9 +11,18 @@ Query content:
 Response:
 
 ```
-200 OK
+<http_status_code> <http_status_message>
 
 <html_content>
+```
+
+eg.
+
+```
+200 OK
+
+<html>
+...
 ```
 
 
