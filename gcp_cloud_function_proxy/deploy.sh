@@ -21,9 +21,13 @@ cd "$srcdir"
 
 name="proxy"
 
+# Cloud Functions not available in all regions yet:
+#
+#   https://cloud.google.com/functions/docs/locations
+#
 # gcloud functions deploy doesn't seem to infer CLOUDSDK_COMPUTE_REGION from environment
 region="$(gcloud config list --format="value(compute.region)" 2>&1 || :)"
-region="${CLOUDSDK_COMPUTE_REGION:-${region:-europe-west1}}"  # not available in all regions yet
+region="${CLOUDSDK_COMPUTE_REGION:-${region:-europe-west1}}"
 
 # https://console.cloud.google.com/marketplace/product/google/vpcaccess.googleapis.com
 # for serverless VPC access to resources using their Private IPs
