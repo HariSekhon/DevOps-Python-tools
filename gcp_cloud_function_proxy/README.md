@@ -1,12 +1,21 @@
-Google Cloud Function - SQL Backup Exporter to GCS
+Google Cloud Function - Proxy
 =====================
 
 Queries a given URL from GCF to check connectivity eg. for testing with Cloudflare / Firewall rules
 
-The query string should be like so:
+Query content:
 ```
 {"url": "http://ifconfig.co/json"}
 ```
+
+Response:
+
+```
+200 OK
+
+<html_content>
+```
+
 
 - `main.py` - the code
 - `requirements.txt` - the pip modules to bootstrap
