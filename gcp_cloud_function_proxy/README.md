@@ -8,23 +8,13 @@ Query content:
 {"url": "http://ifconfig.co/json"}
 ```
 
-Response:
-
-```
-<http_status_code> <http_status_message>
-
-<html_content>
-```
-
-eg.
+Response is HTTP status code and message, blank line and then the content:
 
 ```
 200 OK
 
-<html>
-...
+<raw_content>
 ```
-
 
 - `main.py` - the code
 - `requirements.txt` - the pip modules to bootstrap
