@@ -22,9 +22,13 @@ cd "$srcdir"
 # needed to define the $service_account further down
 project="${CLOUDSDK_CORE_PROJECT:-$(gcloud config list --format="value(core.project)")}"
 
+# Cloud Functions not available in all regions yet:
+#
+#   https://cloud.google.com/functions/docs/locations
+#
 # gcloud functions deploy doesn't seem to infer CLOUDSDK_COMPUTE_REGION from environment
 region="$(gcloud config list --format="value(compute.region)" 2>&1 || :)"
-region="${CLOUDSDK_COMPUTE_REGION:-${region:-europe-west1}}"  # not available in all regions yet
+region="${CLOUDSDK_COMPUTE_REGION:-${region:-europe-west1}}"
 
 name="cloud-sql-backups"
 topic="cloud-sql-backups"
