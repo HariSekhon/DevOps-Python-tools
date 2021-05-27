@@ -34,6 +34,13 @@ region="${CLOUDSDK_COMPUTE_REGION:-${region:-europe-west1}}"
 # since we're only accessing the SQL Admin API we don't need this
 #vpc_connector="my-vpc-connector"
 
+opts=()
+if [ -n "${vpc_connector:-}" ]; then
+    # routes all traffic through VPC connector to re-use the VPC's Cloud NAT IP eg. for permitting in firewall rules
+    opts+=(--vpc-connector "$vpc_connector" --egress-settings all)
+fi
+
+set -x
 gcloud functions deploy "$name" --trigger-http \
                                 --security-level=secure-always \
                                 --runtime python39 \
@@ -41,9 +48,6 @@ gcloud functions deploy "$name" --trigger-http \
                                 --memory 128MB \
                                 --region "$region" \
                                 --timeout 60 \
+                                "${opts[@]}" \
                                 --quiet  # don't prompt to --allow-unauthenticated
-                                # routes private traffic only by default - need to change this if you want to
-                                # use the Cloud NAT gateway from the VPC for Firewall rules purposes
-                                #--vpc-connector "$vpc_connector" \
-                                #--egress-settings all  # sends all traffic through connector to exit via network's Cloud NAT IP
                                 #--max-instances 1
