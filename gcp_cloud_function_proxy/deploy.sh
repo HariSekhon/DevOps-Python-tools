@@ -45,4 +45,5 @@ gcloud functions deploy "$name" --trigger-http \
                                 # routes private traffic only by default - need to change this if you want to
                                 # use the Cloud NAT gateway from the VPC for Firewall rules purposes
                                 #--vpc-connector "$vpc_connector" \
+                                #--egress-settings all  # sends all traffic through connector to exit via network's Cloud NAT IP
                                 #--max-instances 1
