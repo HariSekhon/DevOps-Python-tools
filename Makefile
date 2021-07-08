@@ -78,8 +78,14 @@ init:
 #
 # dependency of same % stem prefix checks for a matching .py file to consider it a valid target
 #
+# doesn't work
+#.PHONY: all
+#.PHONY: %.pyc
+# TODO: doesn't work, says nothing to be done even when .pyc isn't present, and allows make anonymize22.py which breaks
+#%.py: %.pyc
+#	@$(MAKE) $@c
 %.pyc:: %.py
-	@# this utility script supports taking .pyc or .pyo names and still does the right thing,
+	@# this utility script supports taking .pyc or .pyo names and still does the right thing
 	@bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
 	python -m py_compile $< && \
 	echo && \
