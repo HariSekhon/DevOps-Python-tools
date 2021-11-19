@@ -30,6 +30,7 @@ from __future__ import print_function
 #from __future__ import unicode_literals
 
 import os
+import re
 import sys
 import traceback
 srcdir = os.path.abspath(os.path.dirname(__file__))
@@ -43,7 +44,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.6.2'
+__version__ = '0.6.3'
 
 
 class QuayTags(DockerHubTags):
@@ -61,7 +62,10 @@ class QuayTags(DockerHubTags):
         self.quiet = self.get_opt('quiet')
         if not self.quiet:
             print('\nQuay.io ', end='')
+        re_quay = re.compile('^quay.io/', re.I)
         for arg in self.args:
+            if re_quay.match(arg):
+                arg = re_quay.sub('', arg)
             self.print_tags(arg)
 
 
