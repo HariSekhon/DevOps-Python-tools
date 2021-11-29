@@ -37,7 +37,7 @@ psutil==5.7.0
 #pyarrow==0.6.0
 #PyHive==0.6.1
 #PyInstaller==3.3.1
-python-ldap==3.2.0
+python-ldap==3.4.0
 #python-jenkins==0.4.13
 # pulled in automatically by snakebite[kerberos]
 #python-krbV==1.0.90
