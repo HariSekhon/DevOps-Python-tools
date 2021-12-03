@@ -37,7 +37,7 @@ psutil==5.7.0
 #pyarrow==0.6.0
 #PyHive==0.6.1
 #PyInstaller==3.3.1
-python-ldap==3.2.0
+python-ldap==3.4.0
 #python-jenkins==0.4.13
 # pulled in automatically by snakebite[kerberos]
 #python-krbV==1.0.90
@@ -52,9 +52,11 @@ selenium==3.141.0
 #snakebite[kerberos]==2.11.0
 #snakebite==2.11.0
 thrift-sasl==0.2.1
-thrift==0.9.3
+thrift==0.13.0
 thriftpy==0.3.9
 toml==0.10.0
 xmltodict==0.10.2
 yamllint==1.15.0
 #pyyaml>=5.4 # not directly required, pinned by Snyk to avoid a vulnerability. update: this breaks Python 3.5 build where this requirement is not found
+pyyaml>=5.4 # not directly required, pinned by Snyk to avoid a vulnerability
+rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
