@@ -1,7 +1,7 @@
 Hari Sekhon - DevOps Python Tools
 =================================
 
-[![Codacy](https://api.codacy.com/project/badge/Grade/f7af72140c3b408b9659207ced17544f)](https://www.codacy.com/app/harisekhon/devops-python-tools)
+[![Codacy](https://app.codacy.com/project/badge/Grade/40a82d53f3394f4b99aa6eccb08e3c8d)](https://www.codacy.com/gh/HariSekhon/DevOps-Python-tools/dashboard)
 [![CodeFactor](https://www.codefactor.io/repository/github/harisekhon/DevOps-Python-tools/badge)](https://www.codefactor.io/repository/github/harisekhon/DevOps-Python-tools)
 [![Codiga Grade](https://api.codiga.io/project/8839/status/svg)](https://app.codiga.io/project/8839/dashboard)
 [![Codiga Score](https://api.codiga.io/project/8839/score/svg)](https://app.codiga.io/project/8839/dashboard)
