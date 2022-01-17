@@ -9,6 +9,8 @@
 [submodule "sql"]
 	path = sql
 	url = https://github.com/HariSekhon/SQL-scripts
+	branch = master
 [submodule "templates"]
 	path = templates
 	url = https://github.com/HariSekhon/Templates
+	branch = master
