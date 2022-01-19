@@ -15,19 +15,19 @@
 
 set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
-srcdir="$(cd "$(dirname "$0")" && pwd)"
+srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-cd "$srcdir";
+cd "$srcdir"
 
-# shellcheck disable=SC1091
-. utils.sh
+# shellcheck disable=SC1091,SC1090
+. "$srcdir/utils.sh"
 
-# shellcheck disable=SC1091
-. ../bash-tools/lib/utils.sh
+# shellcheck disable=SC1091,SC1090
+. "$srcdir/../bash-tools/lib/utils.sh"
 
 section "XML => YAML"
 
-cd ..
+cd "$srcdir/.."
 
 testdata="tests/data/simple.xml"
 
