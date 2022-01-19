@@ -29,8 +29,9 @@ section "Running PyTools ALL"
 
 # runs against . by default
 cd "$srcdir/..";
+# shellcheck disable=SC1090
 # has to be included so that isExcluded function is inherited
-. bash-tools/check_all.sh
+. "$srcdir/../bash-tools/check_all.sh"
 
 #tests/test_yamllint.sh
 
