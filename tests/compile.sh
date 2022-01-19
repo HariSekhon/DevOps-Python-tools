@@ -19,17 +19,18 @@ srcdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "$srcdir/..";
 
-. ./tests/utils.sh
+# shellcheck disable=SC1090
+. "$srcdir/utils.sh"
 
 hr
 echo "Compiling all Python files"
 hr
 echo
 
-for x in $(find . -iname '*.py' -o -iname '*.jy'); do
-    isExcluded "$x" && continue
-    echo "compiling $x"
-    python -m py_compile $x
-done
+while read -r filename; do
+    isExcluded "$filename" && continue
+    echo "compiling $filename"
+    python -m py_compile "$filename"
+done < <(find . -iname '*.py' -o -iname '*.jy')
 echo
 echo
