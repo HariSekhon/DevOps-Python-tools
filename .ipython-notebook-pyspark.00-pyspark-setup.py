@@ -24,4 +24,4 @@ if not spark_home:
 sys.path.insert(0, os.path.join(spark_home, 'python'))
 for lib in glob.glob(os.path.join(spark_home, 'python/lib/py4j-*-src.zip')):
     sys.path.insert(0, lib)
-execfile(os.path.join(spark_home, 'python/pyspark/shell.py'))
+execfile(os.path.join(spark_home, 'python/pyspark/shell.py'))  # pylint: disable=undefined-variable
