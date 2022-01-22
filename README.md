@@ -55,7 +55,6 @@ Hari Sekhon - DevOps Python Tools
 [![Wercker](https://app.wercker.com/status/b40735fb89e7d989dbaf5659a9af9a20/s/master "wercker status")](https://app.wercker.com/harisekhon/DevOps-Python-tools/runs)
 [![Buddy](https://img.shields.io/badge/Buddy-ready-1A86FD?logo=buddy)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/buddy.yml)
 [![Travis CI](https://img.shields.io/badge/TravisCI-legacy-lightgrey?logo=travis&label=Travis%20CI)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/.travis.yml)
-[![Validation](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/validate.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/validate.yaml)
 <!--[![Wercker](https://img.shields.io/wercker/ci/5e58ef8d14b91a0800356b6d/master?label=Wercker&logo=oracle)](https://app.wercker.com/harisekhon/DevOps-Python-tools/runs)-->
 
 [![Azure DevOps Pipeline](https://dev.azure.com/harisekhon/GitHub/_apis/build/status/HariSekhon.DevOps-Python-tools?branchName=master)](https://dev.azure.com/harisekhon/GitHub/_build/latest?definitionId=8&branchName=master)
@@ -68,6 +67,8 @@ Hari Sekhon - DevOps Python Tools
 [![Repo on GitHub](https://img.shields.io/badge/repo-GitHub-2088FF?logo=github)](https://github.com/HariSekhon/DevOps-Python-tools)
 [![Repo on GitLab](https://img.shields.io/badge/repo-GitLab-FCA121?logo=gitlab)](https://gitlab.com/HariSekhon/DevOps-Python-tools)
 [![Repo on BitBucket](https://img.shields.io/badge/repo-BitBucket-0052CC?logo=bitbucket)](https://bitbucket.org/HariSekhon/DevOps-Python-tools)
+[![Validation](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/validate.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/validate.yaml)
+[![Semgrep](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/semgrep.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/semgrep.yaml)
 
 [![GitHub Actions Ubuntu](https://github.com/HariSekhon/DevOps-Python-tools/workflows/GitHub%20Actions%20Ubuntu/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22GitHub+Actions+Ubuntu%22)
 [![Mac](https://github.com/HariSekhon/DevOps-Python-tools/workflows/Mac/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22Mac%22)
