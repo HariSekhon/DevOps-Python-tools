@@ -28,7 +28,7 @@ ldif3==3.2.2
 #Markdown==2.6.8
 # Python 3.5+
 #numpy==1.17.2
-numpy==1.16.5
+numpy==1.22.0
 # requires pg_config to build from source
 #psycopg2==2.8.4
 psycopg2-binary==2.8.4
