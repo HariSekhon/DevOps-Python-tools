@@ -1,23 +1,30 @@
 avro==1.8.1
+
 # requires Python == 3.4, build in Makefile instead
 #avro-python3==1.9.0
+
 # AWS CLIv1 is obsolete and doesn't support SSO - use CLIv2 - see https://github.com/HariSekhon/DevOps-Bash-tools/blob/master/setup/install_aws_cli.sh
 #awscli==1.16.241
 #bitarray==0.8.1
+
 #boto==2.49.0
 boto3==1.10.37
 #cassandra-driver==3.6.0
 dicttoxml==1.7.4
+
 # Elasticsearch library must match major version :(
 # for Elasticsearch 2.x
 #elasticsearch>=2.0.0,<3.0.0
 # for Elasticsearch 1.x
 #elasticsearch>=1.0.0,<2.0.0
+
 # fails on requiring newer version of setuptools
 #Flask==0.10.1
 GitPython==2.1.15
+
 # this GCP API is surprisingly awful, not using
 #google-api-python-client==1.11.0
+
 happybase==1.0.0
 humanize==0.5.1
 impyla==0.16.0
@@ -26,36 +33,49 @@ jinja2==2.11.3
 ldif3==3.2.2
 #MarkupSafe==0.23
 #Markdown==2.6.8
+
 # Python 3.5+
 #numpy==1.17.2
 numpy==1.16.5
+
 # requires pg_config to build from source
 #psycopg2==2.8.4
 psycopg2-binary==2.8.4
+
 python-cson==1.0.9
 psutil==5.7.0
+
 # parquet support in pyarrow is weaker, gone back to using parquet-tools
 #pyarrow==0.6.0
 #PyHive==0.6.1
+
+# doesn't work with non-trivial code
 #PyInstaller==3.3.1
-python-ldap==3.2.0
+
+# gcc compile error on Alpine, don't think this is used either
+#python-ldap==3.2.0
+
 #python-jenkins==0.4.13
 # pulled in automatically by snakebite[kerberos]
 #python-krbV==1.0.90
 # needed by avro
+
 python-snappy==0.5
 sasl==0.2.1
 sh==1.12.14
 selenium==3.141.0
+
 # pulls in python-KrbV as a dependency which doesn't build on Mac any more
 # relies on python-krbV is unmaintained and unported to Python 3
 # - moved to Makefile as best effort
 #snakebite[kerberos]==2.11.0
 #snakebite==2.11.0
+
 thrift-sasl==0.2.1
 thrift==0.9.3
 thriftpy==0.3.9
 toml==0.10.0
 xmltodict==0.10.2
 yamllint==1.15.0
+
 #pyyaml>=5.4 # not directly required, pinned by Snyk to avoid a vulnerability. update: this breaks Python 3.5 build where this requirement is not found
