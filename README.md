@@ -70,6 +70,12 @@ Hari Sekhon - DevOps Python Tools
 [![Validation](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/validate.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/validate.yaml)
 [![Semgrep](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/semgrep.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/semgrep.yaml)
 
+[![Docker Build (Alpine)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_alpine.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_alpine.yaml)
+[![Docker Build (CentOS)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_centos.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_centos.yaml)
+[![Docker Build (Debian)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_debian.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_debian.yaml)
+[![Docker Build (Fedora)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_fedora.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_fedora.yaml)
+[![Docker Build (Ubuntu)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_ubuntu.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_ubuntu.yaml)
+
 [![GitHub Actions Ubuntu](https://github.com/HariSekhon/DevOps-Python-tools/workflows/GitHub%20Actions%20Ubuntu/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22GitHub+Actions+Ubuntu%22)
 [![Mac](https://github.com/HariSekhon/DevOps-Python-tools/workflows/Mac/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22Mac%22)
 [![Mac 10.15](https://github.com/HariSekhon/DevOps-Python-tools/workflows/Mac%2010.15/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions?query=workflow%3A%22Mac+10.15%22)
