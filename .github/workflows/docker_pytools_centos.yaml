@@ -12,7 +12,7 @@
 #
 
 ---
-name: DockerHub Build (CentOS)
+name: Docker Build (CentOS)
 
 on:
   push:
@@ -26,8 +26,9 @@ jobs:
     name: Docker Build
     uses: HariSekhon/GitHub-Actions/.github/workflows/docker_build.yaml@master
     with:
-      repo: harisekhon/pytools
-      tags: latest centos
+      repo_tags: |
+        harisekhon/pytools:centos
+        ghcr.io/harisekhon/pytools:centos
       dockerfile-repo: HariSekhon/Dockerfiles
       context: Dockerfiles/devops-python-tools-centos
     secrets:
