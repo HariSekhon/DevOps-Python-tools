@@ -1,6 +1,20 @@
 Hari Sekhon - DevOps Python Tools
 =================================
 
+[![GitHub stars](https://img.shields.io/github/stars/harisekhon/devops-python-tools?logo=github)](https://github.com/harisekhon/devops-python-tools/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/harisekhon/devops-python-tools?logo=github)](https://github.com/harisekhon/devops-python-tools/network)
+[![License](https://img.shields.io/github/license/HariSekhon/DevOps-Python-tools)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/LICENSE)
+[![Lines of Code](https://img.shields.io/badge/lines%20of%20code-26k-lightgrey?logo=codecademy)](https://github.com/HariSekhon/DevOps-Python-tools)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/HariSekhon/DevOps-Python-tools?logo=github)](https://github.com/HariSekhon/DevOps-Python-tools/commits/master)
+<!-- doesn't include /tests?/ or comments
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=ncloc)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
+-->
+
+<!-- site broken
+[![PyUp](https://pyup.io/repos/github/HariSekhon/DevOps-Python-tools/shield.svg)](https://pyup.io/account/repos/github/HariSekhon/DevOps-Python-tools/)
+[![Python 3](https://pyup.io/repos/github/HariSekhon/DevOps-Python-tools/python-3-shield.svg)](https://pyup.io/repos/github/HariSekhon/DevOps-Python-tools/)
+-->
+
 [![Codacy](https://app.codacy.com/project/badge/Grade/40a82d53f3394f4b99aa6eccb08e3c8d)](https://www.codacy.com/gh/HariSekhon/DevOps-Python-tools/dashboard)
 [![CodeFactor](https://www.codefactor.io/repository/github/harisekhon/DevOps-Python-tools/badge)](https://www.codefactor.io/repository/github/harisekhon/DevOps-Python-tools)
 [![Codiga Grade](https://api.codiga.io/project/8839/status/svg)](https://app.codiga.io/project/8839/dashboard)
@@ -11,18 +25,6 @@ Hari Sekhon - DevOps Python Tools
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=security_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/HariSekhon/DevOps-Python-tools.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/HariSekhon/DevOps-Python-tools/alerts/)
-[![GitHub stars](https://img.shields.io/github/stars/harisekhon/devops-python-tools?logo=github)](https://github.com/harisekhon/devops-python-tools/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/harisekhon/devops-python-tools?logo=github)](https://github.com/harisekhon/devops-python-tools/network)
-[![GitHub Last Commit](https://img.shields.io/github/last-commit/HariSekhon/DevOps-Python-tools?logo=github)](https://github.com/HariSekhon/DevOps-Python-tools/commits/master)
-[![Lines of Code](https://img.shields.io/badge/lines%20of%20code-26k-lightgrey?logo=codecademy)](https://github.com/HariSekhon/DevOps-Python-tools)
-<!-- doesn't include /tests?/ or comments
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=ncloc)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
--->
-
-<!-- site broken
-[![PyUp](https://pyup.io/repos/github/HariSekhon/DevOps-Python-tools/shield.svg)](https://pyup.io/account/repos/github/HariSekhon/DevOps-Python-tools/)
-[![Python 3](https://pyup.io/repos/github/HariSekhon/DevOps-Python-tools/python-3-shield.svg)](https://pyup.io/repos/github/HariSekhon/DevOps-Python-tools/)
--->
 
 [![Linux](https://img.shields.io/badge/OS-Linux-blue?logo=linux)](https://github.com/HariSekhon/DevOps-Python-tools)
 [![Mac](https://img.shields.io/badge/OS-Mac-blue?logo=apple)](https://github.com/HariSekhon/DevOps-Python-tools)
