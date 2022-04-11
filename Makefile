@@ -210,7 +210,8 @@ test-lib:
 	cd pylib && $(MAKE) test
 
 .PHONY: test
-test: test-lib
+#test: test-lib
+test:
 	tests/all.sh
 
 .PHONY: basic-test
