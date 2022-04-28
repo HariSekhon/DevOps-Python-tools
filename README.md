@@ -71,6 +71,7 @@ Hari Sekhon - DevOps Python Tools
 [![Repo on BitBucket](https://img.shields.io/badge/repo-BitBucket-0052CC?logo=bitbucket)](https://bitbucket.org/HariSekhon/DevOps-Python-tools)
 [![Validation](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/validate.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/validate.yaml)
 [![Semgrep](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/semgrep.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/semgrep.yaml)
+[![Kics](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/kics.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/kics.yaml)
 
 [![Docker Build (Alpine)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_alpine.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_alpine.yaml)
 [![Docker Build (CentOS)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_centos.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_centos.yaml)
