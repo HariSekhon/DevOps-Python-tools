@@ -4,7 +4,7 @@
 #  Author: Hari Sekhon
 #  Date: 2016-02-14 16:16:00 +0000 (Sun, 14 Feb 2016)
 #
-#  https://github.com/harisekhon/bash-tools
+#  https://github.com/HariSekhon/DevOps-Python-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
