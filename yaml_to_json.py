@@ -5,7 +5,7 @@
 #  Author: Hari Sekhon
 #  Date: 2020-08-18 01:17:56 +0100 (Tue, 18 Aug 2020)
 #
-#  https://github.com/harisekhon/devops-python-tools
+#  https://github.com/HariSekhon/DevOps-Python-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #

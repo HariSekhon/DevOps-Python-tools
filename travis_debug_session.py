@@ -4,14 +4,14 @@
 #  Author: Hari Sekhon
 #  Date: 2016-08-10 18:18:03 +0100 (Wed, 10 Aug 2016)
 #
-#  https://github.com/harisekhon/devops-python-tools
+#  https://github.com/HariSekhon/DevOps-Python-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
 #  If you're using my code you're welcome to connect with me on LinkedIn
 #  and optionally send me feedback to help steer this or other code I publish
 #
-#  https://www.linkedin.com/in/harisekhon
+#  https://www.linkedin.com/in/HariSekhon
 #
 
 """

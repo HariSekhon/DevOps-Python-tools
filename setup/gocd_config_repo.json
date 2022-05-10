@@ -4,7 +4,7 @@
   "material": {
     "type": "git",
     "attributes": {
-  	"url": "https://github.com/harisekhon/devops-python-tools",
+  	"url": "https://github.com/HariSekhon/DevOps-Python-tools",
   	"branch": "master",
   	"auto_update": true
     }

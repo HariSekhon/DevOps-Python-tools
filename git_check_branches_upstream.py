@@ -4,21 +4,21 @@
 #  Author: Hari Sekhon
 #  Date: 2016-07-21 16:19:19 +0100 (Thu, 21 Jul 2016)
 #
-#  https://github.com/harisekhon/devops-python-tools
+#  https://github.com/HariSekhon/DevOps-Python-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
 #  If you're using my code you're welcome to connect with me on LinkedIn
 #  and optionally send me feedback to help steer this or other code I publish
 #
-#  https://www.linkedin.com/in/harisekhon
+#  https://www.linkedin.com/in/HariSekhon
 #
 
 """
 
 Tool to check Git branches have their upstream origin branch set consistently and auto-fix if necessary
 
-Mainly written for my https://github.com/harisekhon/Dockerfiles repo
+Mainly written for my https://github.com/HariSekhon/Dockerfiles repo
 which has over 100 branches which get merged, pulled and pushed around
 
 """

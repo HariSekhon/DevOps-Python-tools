@@ -4,14 +4,14 @@
 #  Author: Hari Sekhon
 #  Date: 2018-09-09 23:06:06 +0100 (Sun, 09 Sep 2018)
 #
-#  https://github.com/harisekhon/devops-python-tools
+#  https://github.com/HariSekhon/DevOps-Python-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
 #  If you're using my code you're welcome to connect with me on LinkedIn and optionally send me feedback
 #  to help improve or steer this or other code I publish # pylint: disable=line-too-long
 #
-#  https://www.linkedin.com/in/harisekhon
+#  https://www.linkedin.com/in/HariSekhon
 #
 
 """

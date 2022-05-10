@@ -2,11 +2,11 @@
 #  Author: Hari Sekhon
 #  Date: 2013-02-03 10:25:36 +0000 (Sun, 03 Feb 2013)
 #
-#  https://github.com/harisekhon/devops-python-tools
+#  https://github.com/HariSekhon/DevOps-Python-tools
 #
 #  License: see accompanying LICENSE file
 #
-#  https://www.linkedin.com/in/harisekhon
+#  https://www.linkedin.com/in/HariSekhon
 #
 
 # Travis has custom python install earlier in $PATH even in Perl builds so need to install PyPI modules to non-system python otherwise they're not found by programs.
@@ -21,15 +21,15 @@
 #
 # Alpine:
 #
-#   apk add --no-cache git make && git clone https://github.com/harisekhon/devops-python-tools pytools && cd pytools && make
+#   apk add --no-cache git make && git clone https://github.com/HariSekhon/DevOps-Python-tools pytools && cd pytools && make
 #
 # Debian / Ubuntu:
 #
-#   apt-get update && apt-get install -y make git && git clone https://github.com/harisekhon/devops-python-tools pytools && cd pytools && make
+#   apt-get update && apt-get install -y make git && git clone https://github.com/HariSekhon/DevOps-Python-tools pytools && cd pytools && make
 #
 # RHEL / CentOS:
 #
-#   yum install -y make git && git clone https://github.com/harisekhon/devops-python-tools pytools && cd pytools && make
+#   yum install -y make git && git clone https://github.com/HariSekhon/DevOps-Python-tools pytools && cd pytools && make
 
 # ===================
 

@@ -1,6 +1,6 @@
 [submodule "pylib"]
 	path = pylib
-	url = https://github.com/harisekhon/pylib
+	url = https://github.com/HariSekhon/pylib
 	branch = master
 [submodule "bash-tools"]
 	path = bash-tools

@@ -1,8 +1,8 @@
 Hari Sekhon - DevOps Python Tools
 =================================
 
-[![GitHub stars](https://img.shields.io/github/stars/harisekhon/devops-python-tools?logo=github)](https://github.com/harisekhon/devops-python-tools/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/harisekhon/devops-python-tools?logo=github)](https://github.com/harisekhon/devops-python-tools/network)
+[![GitHub stars](https://img.shields.io/github/stars/harisekhon/devops-python-tools?logo=github)](https://github.com/HariSekhon/DevOps-Python-tools/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/harisekhon/devops-python-tools?logo=github)](https://github.com/HariSekhon/DevOps-Python-tools/network)
 [![License](https://img.shields.io/github/license/HariSekhon/DevOps-Python-tools)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/LICENSE)
 [![Lines of Code](https://img.shields.io/badge/lines%20of%20code-26k-lightgrey?logo=codecademy)](https://github.com/HariSekhon/DevOps-Python-tools)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/HariSekhon/DevOps-Python-tools?logo=github)](https://github.com/HariSekhon/DevOps-Python-tools/commits/master)
@@ -116,10 +116,10 @@ DevOps, Cloud, Big Data, NoSQL, Python & Linux tools. All programs have `--help`
 
 See Also:
 
-  - [DevOps Bash Tools](https://github.com/harisekhon/devops-bash-tools)
-  - [DevOps Perl Tools](https://github.com/harisekhon/devops-perl-tools)
+  - [DevOps Bash Tools](https://github.com/HariSekhon/DevOps-Bash-tools)
+  - [DevOps Perl Tools](https://github.com/HariSekhon/DevOps-Perl-tools)
   - [DevOps Golang Tools](https://github.com/HariSekhon/DevOps-Golang-tools)
-  - [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins)
+  - [Advanced Nagios Plugins Collection](https://github.com/HariSekhon/Nagios-Plugins)
 
 repos which contains hundreds more scripts and programs for Cloud, Big Data, SQL, NoSQL, Web and Linux.
 
@@ -127,7 +127,7 @@ Hari Sekhon
 
 Cloud & Big Data Contractor, United Kingdom
 
-[![My LinkedIn](https://img.shields.io/badge/LinkedIn%20Profile-HariSekhon-blue?logo=linkedin)](https://www.linkedin.com/in/harisekhon/)
+[![My LinkedIn](https://img.shields.io/badge/LinkedIn%20Profile-HariSekhon-blue?logo=linkedin)](https://www.linkedin.com/in/HariSekhon/)
 ###### (you're welcome to connect with me on LinkedIn)
 
 ##### Make sure you run ```make update``` if updating and not just ```git pull``` as you will often need the latest library submodule and possibly new upstream libraries. #####
@@ -156,7 +156,7 @@ curl -L https://git.io/python-bootstrap | sh
 
 or manually:
 ```
-git clone https://github.com/harisekhon/devops-python-tools pytools
+git clone https://github.com/HariSekhon/DevOps-Python-tools pytools
 cd pytools
 make
 ```
@@ -166,9 +166,9 @@ To only install pip dependencies for a single script, you can just type make and
 make anonymize.pyc
 ```
 
-Make sure to read [Detailed Build Instructions](https://github.com/HariSekhon/devops-python-tools#detailed-build-instructions) further down for more information.
+Make sure to read [Detailed Build Instructions](https://github.com/HariSekhon/DevOps-Python-tools#detailed-build-instructions) further down for more information.
 
-Some Hadoop tools with require Jython, see [Jython for Hadoop Utils](https://github.com/harisekhon/devops-python-tools#jython-for-hadoop-utils) for details.
+Some Hadoop tools with require Jython, see [Jython for Hadoop Utils](https://github.com/HariSekhon/DevOps-Python-tools#jython-for-hadoop-utils) for details.
 
 ### Usage
 
@@ -290,7 +290,7 @@ Environment variables are supported for convenience and also to hide credentials
     - ```find_active_oozie.py``` - returns first active [Oozie](http://oozie.apache.org/) server
     - ```find_active_solrcloud.py``` - returns first available [Solr](http://lucene.apache.org/solr/) / [SolrCloud](https://wiki.apache.org/solr/SolrCloud) node
     - ```find_active_elasticsearch.py``` - returns first available [Elasticsearch](https://www.elastic.co/products/elasticsearch) node
-    - see also: [Advanced HAProxy configurations](https://github.com/harisekhon/haproxy-configs) which are part of the [Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins)
+    - see also: [Advanced HAProxy configurations](https://github.com/HariSekhon/HAProxy-configs) which are part of the [Advanced Nagios Plugins Collection](https://github.com/HariSekhon/Nagios-Plugins)
 - [Travis CI](https://travis-ci.org/):
     - ```travis_last_log.py``` - fetches [Travis CI](https://travis-ci.org/) latest running / completed / failed build log for given repo - useful for quickly getting the log of the last failed build when CCMenu or BuildNotify applets turn red
     - ```travis_debug_session.py``` - launches a [Travis CI](https://travis-ci.org/) interactive debug build session via Travis API, tracks session creation and drops user straight in to the SSH shell on the remote Travis build, very convenient one shot debug launcher for Travis CI
@@ -321,7 +321,7 @@ The automated build will use 'sudo' to install required Python PyPI libraries to
 Enter the pytools directory and run git submodule init and git submodule update to fetch my library repo:
 
 ```
-git clone https://github.com/harisekhon/devops-python-tools pytools
+git clone https://github.com/HariSekhon/DevOps-Python-tools pytools
 cd pytools
 git submodule init
 git submodule update
@@ -333,7 +333,7 @@ sudo pip install -r requirements.txt
 
 Download the DevOps Python Tools and Pylib git repos as zip files:
 
-https://github.com/HariSekhon/devops-python-tools/archive/master.zip
+https://github.com/HariSekhon/DevOps-Python-tools/archive/master.zip
 
 https://github.com/HariSekhon/pylib/archive/master.zip
 
@@ -433,7 +433,7 @@ Then add the Jython install bin directory to the $PATH or specify the full path 
 
 #### Configuration for Strict Domain / FQDN validation ####
 
-Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list is done via my [PyLib](https://github.com/harisekhon/pylib) library submodule - see there for details on configuring this to permit custom TLDs like `.local`, `.intranet`, `.vm`, `.cloud` etc. (all already included in there because they're common across companies internal environments).
+Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list is done via my [PyLib](https://github.com/HariSekhon/pylib) library submodule - see there for details on configuring this to permit custom TLDs like `.local`, `.intranet`, `.vm`, `.cloud` etc. (all already included in there because they're common across companies internal environments).
 
 #### Python SSL certificate verification problems
 
@@ -457,9 +457,9 @@ If you update often and want to just quickly git pull + submodule update but ski
 ### Testing
 
 [Continuous Integration](https://travis-ci.org/HariSekhon/devops-python-tools) is run on this repo with tests for success and failure scenarios:
-- unit tests for the custom supporting [python library](https://github.com/harisekhon/pylib)
+- unit tests for the custom supporting [python library](https://github.com/HariSekhon/pylib)
 - integration tests of the top level programs using the libraries for things like option parsing
-- [functional tests](https://github.com/HariSekhon/devops-python-tools/tree/master/tests) for the top level programs using local test data and [Docker containers](https://hub.docker.com/u/harisekhon/)
+- [functional tests](https://github.com/HariSekhon/DevOps-Python-tools/tree/master/tests) for the top level programs using local test data and [Docker containers](https://hub.docker.com/u/harisekhon/)
 
 To trigger all tests run:
 
@@ -475,7 +475,7 @@ Patches, improvements and even general feedback are welcome in the form of GitHu
 
 ### See Also ###
 
-- [DevOps Bash Tools](https://github.com/harisekhon/devops-bash-tools) - 700+ DevOps Bash Scripts, Advanced `.bashrc`, `.vimrc`, `.screenrc`, `.tmux.conf`, `.gitconfig`, CI configs & Utility Code Library - AWS, GCP, Kubernetes, Docker, Kafka, Hadoop, SQL, BigQuery, Hive, Impala, PostgreSQL, MySQL, LDAP, DockerHub, Jenkins, Spotify API & MP3 tools, Git tricks, GitHub API, GitLab API, BitBucket API, Code & build linting, package management for Linux / Mac / Python / Perl / Ruby / NodeJS / Golang, and lots more random goodies
+- [DevOps Bash Tools](https://github.com/HariSekhon/DevOps-Bash-tools) - 700+ DevOps Bash Scripts, Advanced `.bashrc`, `.vimrc`, `.screenrc`, `.tmux.conf`, `.gitconfig`, CI configs & Utility Code Library - AWS, GCP, Kubernetes, Docker, Kafka, Hadoop, SQL, BigQuery, Hive, Impala, PostgreSQL, MySQL, LDAP, DockerHub, Jenkins, Spotify API & MP3 tools, Git tricks, GitHub API, GitLab API, BitBucket API, Code & build linting, package management for Linux / Mac / Python / Perl / Ruby / NodeJS / Golang, and lots more random goodies
 
 - [SQL Scripts](https://github.com/HariSekhon/SQL-scripts) - 100+ SQL Scripts - PostgreSQL, MySQL, AWS Athena, Google BigQuery
 
@@ -483,7 +483,7 @@ Patches, improvements and even general feedback are welcome in the form of GitHu
 
 - [Kubernetes configs](https://github.com/HariSekhon/Kubernetes-configs) - Kubernetes YAML configs - Best Practices, Tips & Tricks are baked right into the templates for future deployments
 
-- [The Advanced Nagios Plugins Collection](https://github.com/harisekhon/nagios-plugins) - 450+ programs for Nagios monitoring your Hadoop & NoSQL clusters. Covers every Hadoop vendor's management API and every major NoSQL technology (HBase, Cassandra, MongoDB, Elasticsearch, Solr, Riak, Redis etc.) as well as message queues (Kafka, RabbitMQ), continuous integration (Jenkins, Travis CI) and traditional infrastructure (SSL, Whois, DNS, Linux)
+- [The Advanced Nagios Plugins Collection](https://github.com/HariSekhon/Nagios-Plugins) - 450+ programs for Nagios monitoring your Hadoop & NoSQL clusters. Covers every Hadoop vendor's management API and every major NoSQL technology (HBase, Cassandra, MongoDB, Elasticsearch, Solr, Riak, Redis etc.) as well as message queues (Kafka, RabbitMQ), continuous integration (Jenkins, Travis CI) and traditional infrastructure (SSL, Whois, DNS, Linux)
 
 - [DevOps Perl Tools](https://github.com/harisekhon/perl-tools) - 25+ DevOps CLI tools for Hadoop, HDFS, Hive, Solr/SolrCloud CLI, Log Anonymizer, Nginx stats & HTTP(S) URL watchers for load balanced web farms, Dockerfiles & SQL ReCaser (MySQL, PostgreSQL, AWS Redshift, Snowflake, Apache Drill, Hive, Impala, Cassandra CQL, Microsoft SQL Server, Oracle, Couchbase N1QL, Dockerfiles, Pig Latin, Neo4j, InfluxDB), Ambari FreeIPA Kerberos, Datameer, Linux...
 
@@ -491,9 +491,9 @@ Patches, improvements and even general feedback are welcome in the form of GitHu
 
 - [Dockerfiles](https://github.com/HariSekhon/Dockerfiles) - 50+ DockerHub public images for Docker & Kubernetes - Hadoop, Kafka, ZooKeeper, HBase, Cassandra, Solr, SolrCloud, Presto, Apache Drill, Nifi, Spark, Mesos, Consul, Riak, OpenTSDB, Jython, Advanced Nagios Plugins & DevOps Tools repos on Alpine, CentOS, Debian, Fedora, Ubuntu, Superset, H2O, Serf, Alluxio / Tachyon, FakeS3
 
-- [PyLib](https://github.com/harisekhon/pylib) - Python library leveraged throughout the programs in this repo as a submodule
+- [PyLib](https://github.com/HariSekhon/pylib) - Python library leveraged throughout the programs in this repo as a submodule
 
-- [Perl Lib](https://github.com/harisekhon/lib) - Perl version of above library
+- [Perl Lib](https://github.com/HariSekhon/lib) - Perl version of above library
 
 <!--
 - [Spark Apps eg. Spark => Elasticsearch](https://github.com/harisekhon/spark-to-elasticsearch) - Scala application to index from Spark to Elasticsearch. Used to index data in Hadoop clusters or local data via Spark standalone. This started as a Scala Spark port of ```pig-text-to-elasticsearch.pig``` from this repo.

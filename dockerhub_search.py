@@ -5,14 +5,14 @@
 #  Author: Hari Sekhon
 #  Date: 2016-05-27 13:15:30 +0100 (Fri, 27 May 2016)
 #
-#  https://github.com/harisekhon/devops-python-tools
+#  https://github.com/HariSekhon/DevOps-Python-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
 #  If you're using my code you're welcome to connect with me on LinkedIn
 #  and optionally send me feedback to help improve this or other code I publish
 #
-#  https://www.linkedin.com/in/harisekhon
+#  https://www.linkedin.com/in/HariSekhon
 #
 
 """
@@ -33,7 +33,7 @@ See also:
 
     dockerhub_search.sh
 
-in the DevOps Bash tools repo - https://github.com/harisekhon/devops-python-tools
+in the DevOps Bash tools repo - https://github.com/HariSekhon/DevOps-Python-tools
 
 """
 

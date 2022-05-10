@@ -4,7 +4,7 @@
 #  Author: Hari Sekhon
 #  Date: 2020-01-02 17:08:32 +0000 (Thu, 02 Jan 2020)
 #
-#  https://github.com/harisekhon/devops-python-tools
+#  https://github.com/HariSekhon/DevOps-Python-tools
 #
 #  License: GNU GPL version 2 (this file only), rest of this repo is licensed as per the adjacent LICENSE file
 #

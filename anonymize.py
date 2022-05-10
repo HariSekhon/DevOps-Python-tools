@@ -6,16 +6,16 @@
 #  Date: 2018-08-08 19:02:02 +0100 (Wed, 08 Aug 2018)
 #  Original Date: 2013-07-18 21:17:41 +0100 (Thu, 18 Jul 2013)
 #
-#  https://github.com/harisekhon/devops-python-tools
+#  https://github.com/HariSekhon/DevOps-Python-tools
 #
-#  ported from Perl version from DevOps Perl Tools repo (https://github.com/harisekhon/devops-perl-tools)
+#  ported from Perl version from DevOps Perl Tools repo (https://github.com/HariSekhon/DevOps-Perl-tools)
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
 #  If you're using my code you're welcome to connect with me on LinkedIn
 #  and optionally send me feedback to help steer this or other code I publish
 #
-#  https://www.linkedin.com/in/harisekhon
+#  https://www.linkedin.com/in/HariSekhon
 #
 
 
@@ -36,7 +36,7 @@ as this program, one PCRE format regex per line, blank lines and lines prefixed 
 
 Ignore phrases are in a similar file anonymize_ignore.conf, also adjacent to this program.
 
-Based on Perl Anonymize.pl from https://github.com/harisekhon/devops-perl-tools
+Based on Perl Anonymize.pl from https://github.com/HariSekhon/DevOps-Perl-tools
 
 The Perl version is incredibly faster than Python due to the better regex engine
 

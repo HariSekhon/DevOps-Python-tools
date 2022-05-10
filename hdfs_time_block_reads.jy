@@ -3,7 +3,7 @@
 #  Author: Hari Sekhon
 #  Date: 2013-06-08 22:06:27 +0100 (Sat, 08 Jun 2013)
 #
-#  https://github.com/harisekhon/devops-python-tools
+#  https://github.com/HariSekhon/DevOps-Python-tools
 #
 #  License: see accompanying LICENSE file
 #
@@ -28,7 +28,7 @@ __version__ = '0.9.1'
 import os
 
 usage_msg = """
-Hari Sekhon - https://github.com/harisekhon/devops-python-tools
+Hari Sekhon - https://github.com/HariSekhon/DevOps-Python-tools
 
 ================================================================================
 %s - version %s

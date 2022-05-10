@@ -3,7 +3,7 @@
 #  Author: Hari Sekhon
 #  Date: 2013-06-20 18:21:02 +0100 (Thu, 20 Jun 2013)
 #
-#  https://github.com/harisekhon/devops-python-tools
+#  https://github.com/HariSekhon/DevOps-Python-tools
 #
 #  License: see accompanying LICENSE file
 #
@@ -50,7 +50,7 @@ def usage(*msg):
     if msg:
         printerr("".join(msg))
     die("""
-Hari Sekhon - https://github.com/harisekhon/devops-python-tools
+Hari Sekhon - https://github.com/HariSekhon/DevOps-Python-tools
 
 ================================================================================
 %s - version %s
