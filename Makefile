@@ -122,7 +122,7 @@ python: pylib
 
 	@# python-krbV dependency doesn't build on Mac any more and is unmaintained and not ported to Python 3
 	@# python_pip_install_if_absent.sh would import snakebite module and not trigger to build the enhanced snakebite with [kerberos] bit
-	bash-tools/setup/python_install_snakebite.sh
+	bash-tools/setup/python_install_snakebite.sh || :
 
 	# Python >= 3.4 - try but accept failure in case we're not on the right version of Python
 	@#if [ "$$(echo "$$(python -V 2>&1 | grep -Eo '[[:digit:]]+\.[[:digit:]]+') >= 3.4" | bc -l)" = 1 ]; then bash-tools/python_pip_install.sh "avro-python3"; fi
