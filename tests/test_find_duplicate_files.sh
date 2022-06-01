@@ -110,10 +110,10 @@ for testdir in "$testdir1" "$testdir2"; do
     echo "now check the file basename matches on 'est'":
     run_fail 4 ./find_duplicate_files.py --regex 'est' "$testdir" "$testdir1" --quiet
 
-    echo "now check the file basename matches with specified capture subset '(est)\d'":
+    echo "now check the file basename matches with specified capture subset '(est)\\d'":
     run_fail 4 ./find_duplicate_files.py --regex '(est)\d' "$testdir" "$testdir1"
 
-    echo "now check the file basename doesn't match when the capture includes differing numbers 'est\d'":
+    echo "now check the file basename doesn't match when the capture includes differing numbers 'est\\d'":
     run ./find_duplicate_files.py --regex 'est\d' "$testdir" "$testdir1"
 
     rm "$testdir/test2.txt"
