@@ -48,6 +48,7 @@ parallelism="${PARALLELISM:-$(cpu_count)}"
 file_list=""
 
 while [ $# -gt 0 ]; do
+    # shellcheck disable=SC2119
     case $1 in
         -p|--parallel)  parallelism="$2"
                         shift
