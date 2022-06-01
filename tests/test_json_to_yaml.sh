@@ -17,17 +17,15 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$(cd "$(dirname "$0")" && pwd)"
 
-cd "$srcdir";
+cd "$srcdir/..";
 
-# shellcheck disable=SC1091
-. utils.sh
+# shellcheck disable=SC1091,SC1090
+. "$srcdir/utils.sh"
 
-# shellcheck disable=SC1091
-. ../bash-tools/lib/utils.sh
+# shellcheck disable=SC1091,SC1090
+. "$srcdir/../bash-tools/lib/utils.sh"
 
 section "JSON => YAML"
-
-cd ..
 
 tmpfile="$(mktemp json_to_yaml_test.XXXXX.yml)"
 #echo "tmpfile is $tmpfile"
