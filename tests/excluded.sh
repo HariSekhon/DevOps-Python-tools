@@ -22,6 +22,7 @@ set -eu
 
 isExcluded(){
     local prog="$1"
+    # shellcheck disable=SC2049
     [[ "$prog" =~ ^\* ]] && return 0
     [[ "$prog" =~ spark_.*\.py ]] && return 0
     [[ "$prog" =~ \.jy ]] && return 0
