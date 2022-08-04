@@ -93,6 +93,11 @@ def main(event, context):
     }
 
     try:
+        logging.info("Requesting project '%s' database instance '%s' runs a backup export to bucket '%s' path '%s'",
+                     project,
+                     instance,
+                     bucket,
+                     backup_uri)
         request = service.instances().export(
             project=project,
             instance=instance,
