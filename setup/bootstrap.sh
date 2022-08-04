@@ -15,11 +15,11 @@
 
 # Alpine / Wget:
 #
-#   wget -O- https://raw.githubusercontent.com/HariSekhon/devops-python-tools/master/setup/bootstrap.sh | sh
+#   wget -O- https://raw.githubusercontent.com/HariSekhon/DevOps-Python-tools/master/setup/bootstrap.sh | sh
 #
 # Curl:
 #
-#   curl https://raw.githubusercontent.com/HariSekhon/devops-python-tools/master/setup/bootstrap.sh | sh
+#   curl https://raw.githubusercontent.com/HariSekhon/DevOps-Python-tools/master/setup/bootstrap.sh | sh
 
 set -eu
 [ -n "${DEBUG:-}" ] && set -x
@@ -27,7 +27,7 @@ srcdir="$(dirname "$0")"
 
 repo="https://github.com/HariSekhon/DevOps-Python-tools"
 
-directory="python-tools"
+directory="pytools"
 
 sudo=""
 [ "$(whoami)" = "root" ] || sudo=sudo
@@ -81,4 +81,6 @@ else
     fi
 fi
 
-make
+if [ -z "${NO_MAKE:-}" ]; then
+    make
+fi
