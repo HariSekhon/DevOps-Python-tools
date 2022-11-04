@@ -36,7 +36,7 @@ ldif3==3.2.2
 
 # Python 3.5+
 #numpy==1.17.2
-numpy==1.16.5
+numpy==1.22.2
 
 # requires pg_config to build from source
 #psycopg2==2.8.4
