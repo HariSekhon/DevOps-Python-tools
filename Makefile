@@ -86,12 +86,12 @@ init:
 #	@$(MAKE) $@c
 %.pyc:: %.py
 	@# this utility script supports taking .pyc or .pyo names and still does the right thing
-	@bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
+	@PIP=$(PIP) bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
 	python -m py_compile $< && \
 	echo && \
 	echo Generated $@
 %.pyo:: %.py
-	@bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
+	@PIP=$(PIP) bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
 	python -O -m py_compile $< && \
 	echo && \
 	echo Generated $@
@@ -116,20 +116,20 @@ python: pylib
 	fi
 
 	@# only install pip packages not installed via system packages
-	@#$(SUDO_PIP) pip install --upgrade -r requirements.txt
-	@#$(SUDO_PIP) pip install -r requirements.txt
-	@PIP_OPTS="--ignore-installed" bash-tools/python_pip_install_if_absent.sh requirements.txt
+	@#$(SUDO_PIP) $(PIP) install --upgrade -r requirements.txt
+	@#$(SUDO_PIP) $(PIP) install -r requirements.txt
+	@PIP=$(PIP) PIP_OPTS="--ignore-installed" bash-tools/python_pip_install_if_absent.sh requirements.txt
 
 	@# python-krbV dependency doesn't build on Mac any more and is unmaintained and not ported to Python 3
 	@# python_pip_install_if_absent.sh would import snakebite module and not trigger to build the enhanced snakebite with [kerberos] bit
-	bash-tools/setup/python_install_snakebite.sh || :
+	PIP=$(PIP) bash-tools/setup/python_install_snakebite.sh || :
 
 	# Python >= 3.4 - try but accept failure in case we're not on the right version of Python
-	@#if [ "$$(echo "$$(python -V 2>&1 | grep -Eo '[[:digit:]]+\.[[:digit:]]+') >= 3.4" | bc -l)" = 1 ]; then bash-tools/python_pip_install.sh "avro-python3"; fi
-	bash-tools/python_pip_install.sh "avro-python3" || :
+	@#if [ "$$(echo "$$(python -V 2>&1 | grep -Eo '[[:digit:]]+\.[[:digit:]]+') >= 3.4" | bc -l)" = 1 ]; then PIP=$(PIP) bash-tools/python_pip_install.sh "avro-python3"; fi
+	PIP=$(PIP) bash-tools/python_pip_install.sh "avro-python3" || :
 
 	@# for impyla
-	@#$(SUDO_PIP) pip install --upgrade setuptools || :
+	@#$(SUDO_PIP) $(PIP) install --upgrade setuptools || :
 	@#
 	@# snappy may fail to install on Mac not finding snappy-c.h - workaround:
 	@#
@@ -140,21 +140,21 @@ python: pylib
 	@# /usr/local/include/snappy-c.h
 	@#
 	@# sudo su
-	@# LD_RUN_PATH=/usr/local/include pip install snappy
+	@# LD_RUN_PATH=/usr/local/include $(PIP) install snappy
 	@#
-	@#$(SUDO_PIP) pip install --upgrade -r requirements.txt
+	@#$(SUDO_PIP) $(PIP) install --upgrade -r requirements.txt
 
 	@# for ipython-notebook-pyspark.py
-	@#$(SUDO_PIP) pip install jinja2
+	@#$(SUDO_PIP) PIP=$(PIP) install jinja2
 	@# HiveServer2
-	@#$(SUDO_PIP) pip install pyhs2
+	@#$(SUDO_PIP) $(PIP) install pyhs2
 	@# Impala
-	@#$(SUDO_PIP) pip install impyla
+	@#$(SUDO_PIP) $(PIP) install impyla
 	@# must downgrade happybase library to work on Python 2.6
-	@#if [ "$$(python -c 'import sys; sys.path.append("pylib"); import harisekhon; print(harisekhon.utils.getPythonVersion())')" = "2.6" ]; then $(SUDO_PIP) pip install --upgrade "happybase==0.9"; fi
+	@#if [ "$$(python -c 'import sys; sys.path.append("pylib"); import harisekhon; print(harisekhon.utils.getPythonVersion())')" = "2.6" ]; then $(SUDO_PIP) $(PIP) install --upgrade "happybase==0.9"; fi
 
 	@# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
-	@bash-tools/python_pip_install.sh "ipython[notebook]" || :
+	@PIP=$(PIP) bash-tools/python_pip_install.sh "ipython[notebook]" || :
 	@echo
 	$(MAKE) pycompile
 	@echo
