@@ -1,5 +1,5 @@
 {
-  "id": "devops-python-tools",
+  "id": "DevOps-Python-tools",
   "plugin_id": "yaml.config.plugin",
   "material": {
     "type": "git",
