@@ -25,7 +25,9 @@ GitPython==2.1.15
 # this GCP API is surprisingly awful, not using
 #google-api-python-client==1.11.0
 
-happybase==1.0.0
+# XXX: install broken on new M1 Mac Python 3.9
+#happybase==1.0.0
+
 humanize==0.5.1
 impyla==0.16.0
 jinja2==2.11.3
@@ -36,11 +38,13 @@ ldif3==3.2.2
 
 # Python 3.5+
 #numpy==1.17.2
-numpy==1.16.5
+# XXX: install broken on new M1 Mac Python 3.9
+#numpy==1.16.5
 
 # requires pg_config to build from source
 #psycopg2==2.8.4
-psycopg2-binary==2.8.4
+# XXX: install broken on new M1 Mac Python 3.9
+#psycopg2-binary==2.8.4
 
 python-cson==1.0.9
 psutil==5.7.0
@@ -60,8 +64,12 @@ psutil==5.7.0
 #python-krbV==1.0.90
 # needed by avro
 
-python-snappy==0.5
-sasl==0.2.1
+# XXX: install broken on new M1 Mac Python 3.9
+#python-snappy==0.5
+
+# XXX: install broken on new M1 Mac Python 3.9
+#sasl==0.2.1
+
 sh==1.12.14
 selenium==3.141.0
 
@@ -71,9 +79,11 @@ selenium==3.141.0
 #snakebite[kerberos]==2.11.0
 #snakebite==2.11.0
 
-thrift-sasl==0.2.1
-thrift==0.9.3
-thriftpy==0.3.9
+# XXX: install broken on new M1 Mac Python 3.9
+#thrift-sasl==0.2.1
+#thrift==0.9.3
+#thriftpy==0.3.9
+
 toml==0.10.0
 xmltodict==0.10.2
 yamllint==1.15.0
