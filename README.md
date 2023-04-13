@@ -48,7 +48,6 @@
 [![BuildKite](https://img.shields.io/buildkite/8377537d0d9dddf4bf32826a6bf1c4e9ab88bc265007e1882c/master?label=BuildKite&logo=buildkite)](https://buildkite.com/hari-sekhon/devops-python-tools)
 [![AppVeyor](https://img.shields.io/appveyor/build/harisekhon/DevOps-Python-tools/master?logo=appveyor&label=AppVeyor)](https://ci.appveyor.com/project/HariSekhon/DevOps-Python-tools/branch/master)
 [![Drone](https://img.shields.io/drone/build/HariSekhon/DevOps-Python-tools/master?logo=drone&label=Drone)](https://cloud.drone.io/HariSekhon/DevOps-Python-tools)
-[![Codeship Status for HariSekhon/DevOps-Python-tools](https://app.codeship.com/projects/b281baa0-3c5f-0138-caef-66210e546d42/status?branch=master)](https://app.codeship.com/projects/387251)
 [![Codefresh](https://g.codefresh.io/api/badges/pipeline/harisekhon/GitHub%2FDevOps-Python-tools?branch=master&key=eyJhbGciOiJIUzI1NiJ9.NWU1MmM5OGNiM2FiOWUzM2Y3ZDZmYjM3.O69674cW7vYom3v5JOGKXDbYgCVIJU9EWhXUMHl3zwA&type=cf-1)](https://g.codefresh.io/pipelines/edit/new/builds?id=5e58e2e6353f5d1ada385bf2&pipeline=DevOps-Python-tools&projects=GitHub&projectId=5e52ca8ea284e00f882ea992&context=github&filter=page:1;pageSize:10;timeFrameStart:week)
 [![Cirrus CI](https://img.shields.io/cirrus/github/HariSekhon/DevOps-Python-tools/master?logo=Cirrus%20CI&label=Cirrus%20CI)](https://cirrus-ci.com/github/HariSekhon/DevOps-Python-tools)
 [![Semaphore](https://harisekhon.semaphoreci.com/badges/DevOps-Python-tools.svg)](https://harisekhon.semaphoreci.com/projects/DevOps-Python-tools)
