@@ -501,6 +501,8 @@ Patches, improvements and even general feedback are welcome in the form of GitHu
 
 - [Perl Lib](https://github.com/HariSekhon/lib) - Perl version of above library
 
+- [Diagrams-as-Code](https://github.com/HariSekhon/Diagrams-as-Code) - Cloud & Open Source architecture diagrams with Python source code provided - automatically regenerated via GitHub Actions CI/CD - AWS, GCP, Kubernetes, ArgoCD, Kong API Gateway, Nginx, Redis, PostgreSQL, Kafka, Spark, web farms, event processing...
+
 <!--
 - [Spark Apps eg. Spark => Elasticsearch](https://github.com/harisekhon/spark-to-elasticsearch) - Scala application to index from Spark to Elasticsearch. Used to index data in Hadoop clusters or local data via Spark standalone. This started as a Scala Spark port of ```pig-text-to-elasticsearch.pig``` from this repo.
 -->
