@@ -109,7 +109,6 @@ class SparkJSONToAvro(CLI):
             die("Spark version couldn't be determined. " + support_msg('pytools'))
 
         #  pylint: disable=invalid-name
-        df = None
         if isMinVersion(spark_version, 1.4):
             df = sqlContext.read.json(json_file)
         else:
