@@ -61,7 +61,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 
 class SerfEventHandler(CLI):
 
@@ -95,7 +95,7 @@ class SerfEventHandler(CLI):
 
     def enable_commands(self):
         if self.event in ['query', 'event']:
-            cmd = None
+            cmd = ''
             if self.event == 'query':
                 cmd = self.query_name
             elif self.event == 'user':
