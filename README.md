@@ -76,7 +76,6 @@
 [![Kics](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/kics.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/kics.yaml)
 
 [![Docker Build (Alpine)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_alpine.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_alpine.yaml)
-[![Docker Build (CentOS)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_centos.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_centos.yaml)
 [![Docker Build (Debian)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_debian.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_debian.yaml)
 [![Docker Build (Fedora)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_fedora.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_fedora.yaml)
 [![Docker Build (Ubuntu)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_ubuntu.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/docker_pytools_ubuntu.yaml)
