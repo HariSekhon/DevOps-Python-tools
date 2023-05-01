@@ -44,7 +44,8 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.4.2'
+__version__ = '0.5.0'
+
 
 class Center(CLI):
 
@@ -56,7 +57,9 @@ class Center(CLI):
         # this doesn't put enough spaces around ampersands, eg. in "Auth & Config"
         #self.re_bound = re.compile(r'(\b)')
         self.re_spaces = re.compile(r'(\s)')
+        self.re_multiple_spaces = re.compile(r'(\s){2}')
         self.re_chars = re.compile(r'([^\s])(?!\s)')
+        self.re_chars_spaced = re.compile(r'([^\s])\s')
         self.timeout_default = None
 
     def add_options(self):
@@ -66,11 +69,16 @@ class Center(CLI):
                      help='No comment prefix handling')
         self.add_opt('-s', '--space', action='store_true', default=False,
                      help='Space all chars out, makes bigger headings')
+        self.add_opt('-u', '--unspace', action='store_true', default=False,
+                     help='Removes spaces betweeen chars out, the inverse of --space')
 
     def run(self):
         log_option('width', self.get_opt('width'))
         log_option('no comment prefix', self.get_opt('no_comment'))
         log_option('space chars', self.get_opt('space'))
+        log_option('unspace chars', self.get_opt('unspace'))
+        if self.get_opt('space') and self.get_opt('unspace'):
+            self.usage("--space and --unspace are mutually exclusive!")
         if self.args:
             self.process_line(' '.join(self.args))
         else:
@@ -81,6 +89,11 @@ class Center(CLI):
         #line = self.re_bound.sub(r' ', line)
         line = self.re_spaces.sub(r'\1\1\1', line)
         line = self.re_chars.sub(r'\1 ', line)
+        return line
+
+    def unspace(self, line):
+        line = self.re_chars_spaced.sub(r'\1', line)
+        line = self.re_multiple_spaces.sub(r'\1', line)
         return line
 
     def process_line(self, line):
@@ -102,9 +115,12 @@ class Center(CLI):
                 line = line.lstrip(char)
         if self.get_opt('space'):
             line = self.space(line)
+        if self.get_opt('unspace'):
+            line = self.unspace(line)
         line = line.strip()
         side = int(max((self.get_opt('width') - len(line)) / 2, 0))
         print(char + ' ' * side + line)
+
 
 if __name__ == '__main__':
     Center().main()
