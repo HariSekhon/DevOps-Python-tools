@@ -55,8 +55,8 @@
 [![Travis CI](https://img.shields.io/badge/TravisCI-ready-blue?logo=travis&label=Travis%20CI)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/.travis.yml)
 
 [![Azure DevOps Pipeline](https://dev.azure.com/harisekhon/GitHub/_apis/build/status/HariSekhon.DevOps-Python-tools?branchName=master)](https://dev.azure.com/harisekhon/GitHub/_build/latest?definitionId=8&branchName=master)
-[![GitLab Pipeline](https://img.shields.io/gitlab/pipeline/harisekhon/DevOps-Python-tools?logo=gitlab&label=GitLab%20CI)](https://gitlab.com/HariSekhon/DevOps-Python-tools/pipelines)
-[![BitBucket Pipeline](https://img.shields.io/bitbucket/pipelines/harisekhon/devops-python-tools/master?logo=bitbucket&label=BitBucket%20CI)](https://bitbucket.org/harisekhon/devops-python-tools/addon/pipelines/home#!/)
+[![GitLab Pipeline](https://img.shields.io/badge/GitLab%20CI-legacy-lightgrey?logo=gitlab)](https://gitlab.com/HariSekhon/DevOps-Python-tools/pipelines)
+[![BitBucket Pipeline](https://img.shields.io/badge/Bitbucket%20CI-legacy-lightgrey?logo=bitbucket)](https://bitbucket.org/harisekhon/devops-python-tools/addon/pipelines/home#!/)
 [![AWS CodeBuild](https://img.shields.io/badge/AWS%20CodeBuild-ready-blue?logo=amazon%20aws)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/buildspec.yml)
 [![GCP Cloud Build](https://img.shields.io/badge/GCP%20Cloud%20Build-ready-blue?logo=google%20cloud&logoColor=white)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/cloudbuild.yaml)
 
