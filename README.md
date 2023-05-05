@@ -16,8 +16,6 @@
 
 [![Codacy](https://app.codacy.com/project/badge/Grade/40a82d53f3394f4b99aa6eccb08e3c8d)](https://www.codacy.com/gh/HariSekhon/DevOps-Python-tools/dashboard)
 [![CodeFactor](https://www.codefactor.io/repository/github/harisekhon/DevOps-Python-tools/badge)](https://www.codefactor.io/repository/github/harisekhon/DevOps-Python-tools)
-[![Codiga Grade](https://api.codiga.io/project/8839/status/svg)](https://app.codiga.io/project/8839/dashboard)
-[![Codiga Score](https://api.codiga.io/project/8839/score/svg)](https://app.codiga.io/project/8839/dashboard)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/HariSekhon/DevOps-Python-tools.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/HariSekhon/DevOps-Python-tools/context:python)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=alert_status)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
