@@ -43,6 +43,7 @@ except ImportError as _:
     print("Alternatively perhaps you tried to copy this program out without it's adjacent libraries?", file=sys.stderr)
     sys.exit(4)
 pyspark_path()
+# pylint: disable=import-outside-toplevel
 from pyspark import SparkContext    # pylint: disable=wrong-import-position,import-error
 from pyspark import SparkConf       # pylint: disable=wrong-import-position,import-error
 from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,import-error
