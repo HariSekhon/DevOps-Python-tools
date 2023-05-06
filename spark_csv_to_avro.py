@@ -166,7 +166,6 @@ class SparkCSVToAvro(CLI):
             die("Spark version couldn't be determined. " + support_msg('pytools'))
 
         #  pylint: disable=invalid-name
-        df = None
         if isMinVersion(spark_version, 1.4):
             if has_header and not schema:
                 log.info('inferring schema from CSV headers')
@@ -197,6 +196,7 @@ class SparkCSVToAvro(CLI):
         # this doesn't work in Spark <= 1.3 and the github docs don't mention the older methods for writing avro using
         # the databricks avro driver
         df.write.format('com.databricks.spark.avro').save(avro_dir)
+
 
 if __name__ == '__main__':
     SparkCSVToAvro().main()
