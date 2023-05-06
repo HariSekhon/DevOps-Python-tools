@@ -49,6 +49,7 @@ except ImportError as _:
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.databricks:spark-csv_2.11:1.5.0 %s' \
                                     % os.getenv('PYSPARK_SUBMIT_ARGS', '')
 pyspark_path()
+# pylint: disable=import-outside-toplevel
 from pyspark import SparkContext    # pylint: disable=wrong-import-position,import-error
 from pyspark import SparkConf       # pylint: disable=wrong-import-position,import-error
 from pyspark.sql import SQLContext  # pylint: disable=wrong-import-position,import-error
@@ -157,9 +158,7 @@ class SparkCSVToParquet(CLI):
         if not isVersionLax(spark_version):
             die("Spark version couldn't be determined. " + support_msg('pytools'))
 
-         # pylint: disable=invalid-name
-
-        df = None
+        # pylint: disable=invalid-name
         if isMinVersion(spark_version, 1.4):
             if has_header and not schema:
                 log.info('inferring schema from CSV headers')
