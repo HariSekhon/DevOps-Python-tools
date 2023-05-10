@@ -86,12 +86,12 @@ init:
 #	@$(MAKE) $@c
 %.pyc:: %.py
 	@# this utility script supports taking .pyc or .pyo names and still does the right thing
-	@PIP=$(PIP) bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
+	@PIP=$(PIP) bash-tools/python/python_pip_install_for_script.sh $@ --exclude harisekhon && \
 	python -m py_compile $< && \
 	echo && \
 	echo Generated $@
 %.pyo:: %.py
-	@PIP=$(PIP) bash-tools/python_pip_install_for_script.sh $@ --exclude harisekhon && \
+	@PIP=$(PIP) bash-tools/python/python_pip_install_for_script.sh $@ --exclude harisekhon && \
 	python -O -m py_compile $< && \
 	echo && \
 	echo Generated $@
@@ -118,15 +118,15 @@ python: pylib
 	@# only install pip packages not installed via system packages
 	@#$(SUDO_PIP) $(PIP) install --upgrade -r requirements.txt
 	@#$(SUDO_PIP) $(PIP) install -r requirements.txt
-	@PIP=$(PIP) PIP_OPTS="--ignore-installed" bash-tools/python_pip_install_if_absent.sh requirements.txt
+	@PIP=$(PIP) PIP_OPTS="--ignore-installed" bash-tools/python/python_pip_install_if_absent.sh requirements.txt
 
 	@# python-krbV dependency doesn't build on Mac any more and is unmaintained and not ported to Python 3
 	@# python_pip_install_if_absent.sh would import snakebite module and not trigger to build the enhanced snakebite with [kerberos] bit
 	PIP=$(PIP) bash-tools/setup/python_install_snakebite.sh || :
 
 	# Python >= 3.4 - try but accept failure in case we're not on the right version of Python
-	@#if [ "$$(echo "$$(python -V 2>&1 | grep -Eo '[[:digit:]]+\.[[:digit:]]+') >= 3.4" | bc -l)" = 1 ]; then PIP=$(PIP) bash-tools/python_pip_install.sh "avro-python3"; fi
-	PIP=$(PIP) bash-tools/python_pip_install.sh "avro-python3" || :
+	@#if [ "$$(echo "$$(python -V 2>&1 | grep -Eo '[[:digit:]]+\.[[:digit:]]+') >= 3.4" | bc -l)" = 1 ]; then PIP=$(PIP) bash-tools/python/python_pip_install.sh "avro-python3"; fi
+	PIP=$(PIP) bash-tools/python/python_pip_install.sh "avro-python3" || :
 
 	@# for impyla
 	@#$(SUDO_PIP) $(PIP) install --upgrade setuptools || :
@@ -154,7 +154,7 @@ python: pylib
 	@#if [ "$$(python -c 'import sys; sys.path.append("pylib"); import harisekhon; print(harisekhon.utils.getPythonVersion())')" = "2.6" ]; then $(SUDO_PIP) $(PIP) install --upgrade "happybase==0.9"; fi
 
 	@# Python >= 2.7 - won't build on 2.6, handle separately and accept failure
-	@PIP=$(PIP) bash-tools/python_pip_install.sh "ipython[notebook]" || :
+	@PIP=$(PIP) bash-tools/python/python_pip_install.sh "ipython[notebook]" || :
 	@echo
 	$(MAKE) pycompile
 	@echo
@@ -216,7 +216,7 @@ test:
 
 .PHONY: basic-test
 basic-test: test-lib
-	bash-tools/check_all.sh
+	bash-tools/checks/check_all.sh
 
 .PHONY: install
 install: build
