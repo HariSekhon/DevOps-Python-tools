@@ -31,7 +31,7 @@ section "Running PyTools ALL"
 cd "$srcdir/..";
 # shellcheck disable=SC1090
 # has to be included so that isExcluded function is inherited
-. "$srcdir/../bash-tools/check_all.sh"
+. "$srcdir/../bash-tools/checks/check_all.sh"
 
 #tests/test_yamllint.sh
 
@@ -41,4 +41,4 @@ exit 0
 # pyspark not found
 tests/help.sh
 
-bash-tools/run_tests.sh
+bash-tools/checks/run_tests.sh
