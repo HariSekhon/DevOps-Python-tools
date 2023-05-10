@@ -68,7 +68,7 @@ for filename in $file_list; do
     echo "Removing any pre-existing parts:"
     rm -v "$filename".* 2>/dev/null || :
     echo
-    "$srcdir/bash-tools/split.sh" --parts "$parallelism" "$filename"
+    "$srcdir/bash-tools/bin/split.sh" --parts "$parallelism" "$filename"
     echo "Anonymizing parts"
     for file_part in "$filename".*; do
         cmd="$srcdir/anonymize.py -a $file_part > $file_part.anonymized"
