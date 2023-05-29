@@ -44,7 +44,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 
 
 class Center(CLI):
@@ -104,7 +104,7 @@ class Center(CLI):
             char = ' '
             # preliminary strip() to be able to pick up # if it isn't the first char and their are spaces before it
             line = line.strip()
-            if isChars(line[0], '#'):
+            if line and isChars(line[0], '#'):
                 char = line[0]
                 line = line.lstrip(char)
             elif len(line) > 1 and isChars(line[0:1], '/'):
