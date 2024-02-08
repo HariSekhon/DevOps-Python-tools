@@ -3,7 +3,7 @@ avro==1.8.1
 # requires Python == 3.4, build in Makefile instead
 #avro-python3==1.9.0
 
-# AWS CLIv1 is obsolete and doesn't support SSO - use CLIv2 - see https://github.com/HariSekhon/DevOps-Bash-tools/blob/master/setup/install_aws_cli.sh
+# AWS CLIv1 is obsolete and doesn't support SSO - use CLIv2 - see https://github.com/HariSekhon/DevOps-Bash-tools/blob/master/install/install_aws_cli.sh
 #awscli==1.16.241
 #bitarray==0.8.1
 

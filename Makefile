@@ -165,7 +165,7 @@ python: pylib
 
 .PHONY: parquet-tools
 parquet-tools:
-	@BIN='.' bash-tools/setup/install_parquet-tools.sh
+	@BIN='.' bash-tools/install/install_parquet-tools.sh
 
 .PHONY: apk-packages-extra
 apk-packages-extra:

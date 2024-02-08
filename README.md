@@ -364,7 +364,7 @@ The automated build also works on Mac OS X but you'll need to install [Apple XCo
 I also recommend you get [HomeBrew](https://brew.sh/) to install other useful tools and libraries you may need like OpenSSL for development headers and tools such as wget (these are installed automatically if Homebrew is detected on Mac OS X):
 
 ```
-bash-tools/setup/install_homebrew.sh
+bash-tools/install/install_homebrew.sh
 ```
 
 ```
