@@ -71,7 +71,7 @@ psutil==5.7.0
 #sasl==0.2.1
 
 sh==1.12.14
-selenium==3.141.0
+selenium==4.15.1
 
 # pulls in python-KrbV as a dependency which doesn't build on Mac any more
 # relies on python-krbV is unmaintained and unported to Python 3
