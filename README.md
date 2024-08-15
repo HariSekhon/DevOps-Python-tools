@@ -59,10 +59,11 @@
 [![AWS CodeBuild](https://img.shields.io/badge/AWS%20CodeBuild-ready-blue?logo=amazon%20aws)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/cicd/buildspec.yml)
 [![GCP Cloud Build](https://img.shields.io/badge/GCP%20Cloud%20Build-ready-blue?logo=google%20cloud&logoColor=white)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/cicd/cloudbuild.yaml)
 
-[![Repo on Azure DevOps](https://img.shields.io/badge/repo-Azure%20DevOps-0078D7?logo=azure%20devops)](https://dev.azure.com/harisekhon/GitHub/_git/DevOps-Python-tools)
 [![Repo on GitHub](https://img.shields.io/badge/repo-GitHub-2088FF?logo=github)](https://github.com/HariSekhon/DevOps-Python-tools)
 [![Repo on GitLab](https://img.shields.io/badge/repo-GitLab-FCA121?logo=gitlab)](https://gitlab.com/HariSekhon/DevOps-Python-tools)
+[![Repo on Azure DevOps](https://img.shields.io/badge/repo-Azure%20DevOps-0078D7?logo=azure%20devops)](https://dev.azure.com/harisekhon/GitHub/_git/DevOps-Python-tools)
 [![Repo on BitBucket](https://img.shields.io/badge/repo-BitBucket-0052CC?logo=bitbucket)](https://bitbucket.org/HariSekhon/DevOps-Python-tools)
+
 [![ShellCheck](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/shellcheck.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/shellcheck.yaml)
 [![JSON](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/json.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/json.yaml)
 [![YAML](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/yaml.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/yaml.yaml)
