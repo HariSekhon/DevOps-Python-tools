@@ -4,7 +4,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/harisekhon/devops-python-tools?logo=github)](https://github.com/HariSekhon/DevOps-Python-tools/network)
 [![Lines of Code](https://img.shields.io/badge/lines%20of%20code-26k-lightgrey?logo=codecademy)](https://github.com/HariSekhon/DevOps-Python-tools)
 [![License](https://img.shields.io/github/license/HariSekhon/DevOps-Python-tools)](https://github.com/HariSekhon/DevOps-Python-tools/blob/master/LICENSE)
-[![My LinkedIn](https://img.shields.io/badge/LinkedIn%20Profile-HariSekhon-blue?logo=linkedin)](https://www.linkedin.com/in/HariSekhon/)
+[![My LinkedIn](https://img.shields.io/badge/LinkedIn%20Profile-HariSekhon-blue?logo=data:image/svg%2bxml;base64,PHN2ZyByb2xlPSJpbWciIGZpbGw9IiNmZmZmZmYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+TGlua2VkSW48L3RpdGxlPjxwYXRoIGQ9Ik0yMC40NDcgMjAuNDUyaC0zLjU1NHYtNS41NjljMC0xLjMyOC0uMDI3LTMuMDM3LTEuODUyLTMuMDM3LTEuODUzIDAtMi4xMzYgMS40NDUtMi4xMzYgMi45Mzl2NS42NjdIOS4zNTFWOWgzLjQxNHYxLjU2MWguMDQ2Yy40NzctLjkgMS42MzctMS44NSAzLjM3LTEuODUgMy42MDEgMCA0LjI2NyAyLjM3IDQuMjY3IDUuNDU1djYuMjg2ek01LjMzNyA3LjQzM2MtMS4xNDQgMC0yLjA2My0uOTI2LTIuMDYzLTIuMDY1IDAtMS4xMzguOTItMi4wNjMgMi4wNjMtMi4wNjMgMS4xNCAwIDIuMDY0LjkyNSAyLjA2NCAyLjA2MyAwIDEuMTM5LS45MjUgMi4wNjUtMi4wNjQgMi4wNjV6bTEuNzgyIDEzLjAxOUgzLjU1NVY5aDMuNTY0djExLjQ1MnpNMjIuMjI1IDBIMS43NzFDLjc5MiAwIDAgLjc3NCAwIDEuNzI5djIwLjU0MkMwIDIzLjIyNy43OTIgMjQgMS43NzEgMjRoMjAuNDUxQzIzLjIgMjQgMjQgMjMuMjI3IDI0IDIyLjI3MVYxLjcyOUMyNCAuNzc0IDIzLjIgMCAyMi4yMjIgMGguMDAzeiIvPjwvc3ZnPgo=)](https://www.linkedin.com/in/HariSekhon/)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/HariSekhon/DevOps-Python-tools?logo=github)](https://github.com/HariSekhon/DevOps-Python-tools/commits/master)
 <!-- doesn't include /tests?/ or comments
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=HariSekhon_DevOps-Python-tools&metric=ncloc)](https://sonarcloud.io/dashboard?id=HariSekhon_DevOps-Python-tools)
@@ -104,27 +104,18 @@
 
 [git.io/pytools](https://git.io/pytools)
 
-### AWS, Docker, Spark, Hadoop, HBase, Hive, Impala, Python & Linux Tools
+## AWS, Docker, Spark, Hadoop, HBase, Hive, Impala, Python & Linux Tools
 
 DevOps, Cloud, Big Data, NoSQL, Python & Linux tools. All programs have `--help`.
-
-See Also:
-
-  - [DevOps Bash Tools](https://github.com/HariSekhon/DevOps-Bash-tools)
-  - [DevOps Perl Tools](https://github.com/HariSekhon/DevOps-Perl-tools)
-  - [DevOps Golang Tools](https://github.com/HariSekhon/DevOps-Golang-tools)
-  - [Advanced Nagios Plugins Collection](https://github.com/HariSekhon/Nagios-Plugins)
-
-repos which contains hundreds more scripts and programs for Cloud, Big Data, SQL, NoSQL, Web and Linux.
 
 Hari Sekhon
 
 Cloud & Big Data Contractor, United Kingdom
 
-[![My LinkedIn](https://img.shields.io/badge/LinkedIn%20Profile-HariSekhon-blue?logo=linkedin)](https://www.linkedin.com/in/HariSekhon/)
-###### (you're welcome to connect with me on LinkedIn)
+[![My LinkedIn](https://img.shields.io/badge/LinkedIn%20Profile-HariSekhon-blue?logo=data:image/svg%2bxml;base64,PHN2ZyByb2xlPSJpbWciIGZpbGw9IiNmZmZmZmYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+TGlua2VkSW48L3RpdGxlPjxwYXRoIGQ9Ik0yMC40NDcgMjAuNDUyaC0zLjU1NHYtNS41NjljMC0xLjMyOC0uMDI3LTMuMDM3LTEuODUyLTMuMDM3LTEuODUzIDAtMi4xMzYgMS40NDUtMi4xMzYgMi45Mzl2NS42NjdIOS4zNTFWOWgzLjQxNHYxLjU2MWguMDQ2Yy40NzctLjkgMS42MzctMS44NSAzLjM3LTEuODUgMy42MDEgMCA0LjI2NyAyLjM3IDQuMjY3IDUuNDU1djYuMjg2ek01LjMzNyA3LjQzM2MtMS4xNDQgMC0yLjA2My0uOTI2LTIuMDYzLTIuMDY1IDAtMS4xMzguOTItMi4wNjMgMi4wNjMtMi4wNjMgMS4xNCAwIDIuMDY0LjkyNSAyLjA2NCAyLjA2MyAwIDEuMTM5LS45MjUgMi4wNjUtMi4wNjQgMi4wNjV6bTEuNzgyIDEzLjAxOUgzLjU1NVY5aDMuNTY0djExLjQ1MnpNMjIuMjI1IDBIMS43NzFDLjc5MiAwIDAgLjc3NCAwIDEuNzI5djIwLjU0MkMwIDIzLjIyNy43OTIgMjQgMS43NzEgMjRoMjAuNDUxQzIzLjIgMjQgMjQgMjMuMjI3IDI0IDIyLjI3MVYxLjcyOUMyNCAuNzc0IDIzLjIgMCAyMi4yMjIgMGguMDAzeiIvPjwvc3ZnPgo=)](https://www.linkedin.com/in/HariSekhon/)
+<br>*(you're welcome to connect with me on LinkedIn)*
 
-##### Make sure you run ```make update``` if updating and not just ```git pull``` as you will often need the latest library submodule and possibly new upstream libraries. #####
+**Make sure you run ```make update``` if updating and not just ```git pull``` as you will often need the latest library submodule and possibly new upstream libraries**
 
 ## Quick Start
 
@@ -133,30 +124,36 @@ Cloud & Big Data Contractor, United Kingdom
 All programs and their pre-compiled dependencies can be found ready to run on [DockerHub](https://hub.docker.com/r/harisekhon/pytools/).
 
 List all programs:
-```
+
+```shell
 docker run harisekhon/pytools
 ```
+
 Run any given program:
-```
+
+```shell
 docker run harisekhon/pytools <program> <args>
 ```
 
 ### Automated Build from source
 
 installs git, make, pulls the repo and build the dependencies:
-```
+
+```shell
 curl -L https://git.io/python-bootstrap | sh
 ```
 
 or manually:
-```
+
+```shell
 git clone https://github.com/HariSekhon/DevOps-Python-tools pytools
 cd pytools
 make
 ```
 
 To only install pip dependencies for a single script, you can just type make and the filename with a `.pyc` extension instead of `.py`:
-```
+
+```shell
 make anonymize.pyc
 ```
 
@@ -286,8 +283,8 @@ Environment variables are supported for convenience and also to hide credentials
     - ```find_active_elasticsearch.py``` - returns first available [Elasticsearch](https://www.elastic.co/products/elasticsearch) node
     - see also: [Advanced HAProxy configurations](https://github.com/HariSekhon/HAProxy-configs) which are part of the [Advanced Nagios Plugins Collection](https://github.com/HariSekhon/Nagios-Plugins)
 - [Travis CI](https://travis-ci.org/):
-    - ```travis_last_log.py``` - fetches [Travis CI](https://travis-ci.org/) latest running / completed / failed build log for given repo - useful for quickly getting the log of the last failed build when CCMenu or BuildNotify applets turn red
-    - ```travis_debug_session.py``` - launches a [Travis CI](https://travis-ci.org/) interactive debug build session via Travis API, tracks session creation and drops user straight in to the SSH shell on the remote Travis build, very convenient one shot debug launcher for Travis CI
+  - ```travis_last_log.py``` - fetches [Travis CI](https://travis-ci.org/) latest running / completed / failed build log for given repo - useful for quickly getting the log of the last failed build when CCMenu or BuildNotify applets turn red
+  - ```travis_debug_session.py``` - launches a [Travis CI](https://travis-ci.org/) interactive debug build session via Travis API, tracks session creation and drops user straight in to the SSH shell on the remote Travis build, very convenient one shot debug launcher for Travis CI
 - ```selenium_hub_browser_test.py``` - checks [Selenium Grid Hub / Selenoid](https://www.selenium.dev/documentation/en/grid/) is working by calling browsers such as Chrome and Firefox to fetch a given URL and content/regex match the result
 - Data Validation (useful in CI):
   - ```validate_*.py``` - validate files, directory trees and/or standard input streams
@@ -305,16 +302,15 @@ Environment variables are supported for convenience and also to hide credentials
 
 ### Detailed Build Instructions
 
-##### Python VirtualEnv localized installs
+#### Python VirtualEnv localized installs
 
 The automated build will use 'sudo' to install required Python PyPI libraries to the system unless running as root or it detects being inside a VirtualEnv. If you want to install some of the common Python libraries using your OS packages instead of installing from PyPI then follow the Manual Build section below.
 
-
-#### Manual Setup
+### Manual Setup
 
 Enter the pytools directory and run git submodule init and git submodule update to fetch my library repo:
 
-```
+```shell
 git clone https://github.com/HariSekhon/DevOps-Python-tools pytools
 cd pytools
 git submodule init
@@ -322,18 +318,17 @@ git submodule update
 sudo pip install -r requirements.txt
 ```
 
-
-#### Offline Setup
+### Offline Setup
 
 Download the DevOps Python Tools and Pylib git repos as zip files:
 
-https://github.com/HariSekhon/DevOps-Python-tools/archive/master.zip
+<https://github.com/HariSekhon/DevOps-Python-tools/archive/master.zip>
 
-https://github.com/HariSekhon/pylib/archive/master.zip
+<https://github.com/HariSekhon/pylib/archive/master.zip>
 
 Unzip both and move Pylib to the ```pylib``` folder under DevOps Python Tools.
 
-```
+```shell
 unzip devops-python-tools-master.zip
 unzip pylib-master.zip
 
@@ -348,168 +343,138 @@ All PyPI modules are listed in the `requirements.txt` and `pylib/requirements.tx
 
 Internal Mirror example ([JFrog Artifactory](https://jfrog.com/artifactory/) or similar):
 
-```
+```shell
 sudo pip install --index https://host.domain.com/api/pypi/repo/simple --trusted host.domain.com -r requirements.txt
 ```
 
 Proxy example:
 
-```
+```shell
 sudo pip install --proxy hari:mypassword@proxy-host:8080 -r requirements.txt
 ```
 
-##### Mac OS X
+#### Mac OS X
 
 The automated build also works on Mac OS X but you'll need to install [Apple XCode](https://developer.apple.com/download/) (on recent Macs just typing `git` is enough to trigger Xcode install).
 
 I also recommend you get [HomeBrew](https://brew.sh/) to install other useful tools and libraries you may need like OpenSSL for development headers and tools such as wget (these are installed automatically if Homebrew is detected on Mac OS X):
 
-```
+```shell
 bash-tools/install/install_homebrew.sh
 ```
 
-```
+```shell
 brew install openssl wget
 ```
 
 If failing to build an OpenSSL lib dependency, just prefix the build command like so:
 
-```
+```shell
 sudo OPENSSL_INCLUDE=/usr/local/opt/openssl/include OPENSSL_LIB=/usr/local/opt/openssl/lib ...
 ```
 
 You may get errors trying to install to Python library paths even as root on newer versions of Mac, sometimes this is caused by pip 10 vs pip 9 and downgrading will work around it:
 
-```
+```shell
 sudo pip install --upgrade pip==9.0.1
 make
 sudo pip install --upgrade pip
 make
 ```
 
-### Jython for Hadoop Utils ###
+### Jython for Hadoop Utils
 
 The 3 Hadoop utility programs listed below require Jython (as well as Hadoop to be installed and correctly configured)
 
-```
+```shell
 hdfs_time_block_reads.jy
 hdfs_files_native_checksums.jy
 hdfs_files_stats.jy
 ```
 
 Run like so:
-```
+
+```shell
 jython -J-cp $(hadoop classpath) hdfs_time_block_reads.jy --help
 ```
 
-The ```-J-cp $(hadoop classpath)``` part dynamically inserts the current Hadoop java classpath required to use the Hadoop APIs.
+The `-J-cp $(hadoop classpath)` part dynamically inserts the current Hadoop java classpath required to use the Hadoop APIs.
 
 See below for procedure to install Jython if you don't already have it.
 
-##### Automated Jython Install
+#### Automated Jython Install
 
 This will download and install jython to /opt/jython-2.7.0:
 
-```
+```shell
 make jython
 ```
 
-##### Manual Jython Install
+#### Manual Jython Install
 
-Jython is a simple download and unpack and can be fetched from http://www.jython.org/downloads.html
+Jython is a simple download and unpack and can be fetched from <http://www.jython.org/downloads.html>
 
 Then add the Jython install bin directory to the $PATH or specify the full path to the `jython` binary, eg:
 
-```
+```shell
 /opt/jython-2.7.0/bin/jython hdfs_time_block_reads.jy ...
 ```
 
-
-#### Configuration for Strict Domain / FQDN validation ####
+### Configuration for Strict Domain / FQDN validation
 
 Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list is done via my [PyLib](https://github.com/HariSekhon/pylib) library submodule - see there for details on configuring this to permit custom TLDs like `.local`, `.intranet`, `.vm`, `.cloud` etc. (all already included in there because they're common across companies internal environments).
 
-#### Python SSL certificate verification problems
+### Python SSL certificate verification problems
 
 If you end up with an error like:
-```
+
+```shell
 ./dockerhub_show_tags.py centos ubuntu
 [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:765)
 ```
+
 It can be caused by an issue with the underlying Python + libraries due to changes in OpenSSL and certificates. One quick fix is to do the following:
-```
+
+```shell
 sudo pip uninstall -y certifi &&
 sudo pip install certifi==2015.04.28
 ```
 
-### Updating ###
+### Updating
 
-Run ```make update```. This will git pull and then git submodule update which is necessary to pick up corresponding library updates.
+Run:
+
+```shell
+make update
+```
+
+This will git pull and then git submodule update which is necessary to pick up corresponding library updates.
 
 If you update often and want to just quickly git pull + submodule update but skip rebuilding all those dependencies each time then run ```make update-no-recompile``` (will miss new library dependencies - do full ```make update``` if you encounter issues).
 
 ### Testing
 
 [Continuous Integration](https://travis-ci.org/HariSekhon/devops-python-tools) is run on this repo with tests for success and failure scenarios:
+
 - unit tests for the custom supporting [python library](https://github.com/HariSekhon/pylib)
 - integration tests of the top level programs using the libraries for things like option parsing
 - [functional tests](https://github.com/HariSekhon/DevOps-Python-tools/tree/master/tests) for the top level programs using local test data and [Docker containers](https://hub.docker.com/u/harisekhon/)
 
 To trigger all tests run:
 
-```
+```shell
 make test
 ```
 
 which will start with the underlying libraries, then move on to top level integration tests and functional tests using docker containers if docker is available.
 
-### Contributions ###
+### Contributions
 
 Patches, improvements and even general feedback are welcome in the form of GitHub pull requests and issue tickets.
 
-## Related Repositories
-
-- [DevOps Bash Tools](https://github.com/HariSekhon/DevOps-Bash-tools) - 1000+ DevOps Bash Scripts, Advanced `.bashrc`, `.vimrc`, `.screenrc`, `.tmux.conf`, `.gitconfig`, CI configs & Utility Code Library - AWS, GCP, Kubernetes, Docker, Kafka, Hadoop, SQL, BigQuery, Hive, Impala, PostgreSQL, MySQL, LDAP, DockerHub, Jenkins, Spotify API & MP3 tools, Git tricks, GitHub API, GitLab API, BitBucket API, Code & build linting, package management for Linux / Mac / Python / Perl / Ruby / NodeJS / Golang, and lots more random goodies
-
-- [SQL Scripts](https://github.com/HariSekhon/SQL-scripts) - 100+ SQL Scripts - PostgreSQL, MySQL, AWS Athena, Google BigQuery
-
-- [Jenkins](https://github.com/HariSekhon/Jenkins) - Advanced Jenkinsfile & Jenkins Groovy Shared Library
-
-- [GitHub-Actions](https://github.com/HariSekhon/GitHub-Actions) - GitHub Actions master template & GitHub Actions Shared Workflows library
-
-- [Templates](https://github.com/HariSekhon/Templates) - dozens of Code & Config templates - AWS, GCP, Docker, Jenkins, Terraform, Vagrant, Puppet, Python, Bash, Go, Perl, Java, Scala, Groovy, Maven, SBT, Gradle, Make, GitHub Actions Workflows, CircleCI, Jenkinsfile, Makefile, Dockerfile, docker-compose.yml, M4 etc.
-
-- [Kubernetes configs](https://github.com/HariSekhon/Kubernetes-configs) - Kubernetes YAML configs - Best Practices, Tips & Tricks are baked right into the templates for future deployments
-
-- [Terraform](https://github.com/HariSekhon/Terraform) - Terraform templates for AWS / GCP / Azure / GitHub management
-
-- [DevOps Perl Tools](https://github.com/harisekhon/perl-tools) - 25+ DevOps CLI tools for Hadoop, HDFS, Hive, Solr/SolrCloud CLI, Log Anonymizer, Nginx stats & HTTP(S) URL watchers for load balanced web farms, Dockerfiles & SQL ReCaser (MySQL, PostgreSQL, AWS Redshift, Snowflake, Apache Drill, Hive, Impala, Cassandra CQL, Microsoft SQL Server, Oracle, Couchbase N1QL, Dockerfiles, Pig Latin, Neo4j, InfluxDB), Ambari FreeIPA Kerberos, Datameer, Linux...
-
-- [The Advanced Nagios Plugins Collection](https://github.com/HariSekhon/Nagios-Plugins) - 450+ programs for Nagios monitoring your Hadoop & NoSQL clusters. Covers every Hadoop vendor's management API and every major NoSQL technology (HBase, Cassandra, MongoDB, Elasticsearch, Solr, Riak, Redis etc.) as well as message queues (Kafka, RabbitMQ), continuous integration (Jenkins, Travis CI) and traditional infrastructure (SSL, Whois, DNS, Linux)
-
-- [Nagios Plugin Kafka](https://github.com/HariSekhon/Nagios-Plugin-Kafka) - Kafka API pub/sub Nagios Plugin written in Scala with Kerberos support
-
-- [HAProxy Configs](https://github.com/HariSekhon/HAProxy-configs) - 80+ HAProxy Configs for Hadoop, Big Data, NoSQL, Docker, Elasticsearch, SolrCloud, HBase, Cloudera, Hortonworks, MapR, MySQL, PostgreSQL, Apache Drill, Hive, Presto, Impala, ZooKeeper, OpenTSDB, InfluxDB, Prometheus, Kibana, Graphite, SSH, RabbitMQ, Redis, Riak, Rancher etc.
-
-- [Dockerfiles](https://github.com/HariSekhon/Dockerfiles) - 50+ DockerHub public images for Docker & Kubernetes - Hadoop, Kafka, ZooKeeper, HBase, Cassandra, Solr, SolrCloud, Presto, Apache Drill, Nifi, Spark, Mesos, Consul, Riak, OpenTSDB, Jython, Advanced Nagios Plugins & DevOps Tools repos on Alpine, CentOS, Debian, Fedora, Ubuntu, Superset, H2O, Serf, Alluxio / Tachyon, FakeS3
-
-- [HashiCorp Packer templates](https://github.com/HariSekhon/Packer-templates) - Linux automated bare-metal installs and portable virtual machines OVA format appliances using HashiCorp Packer, Redhat Kickstart, Debian Preseed and Ubuntu AutoInstaller / Cloud-Init
-
-- [PyLib](https://github.com/HariSekhon/pylib) - Python library leveraged throughout the programs in this repo as a submodule
-
-- [Perl Lib](https://github.com/HariSekhon/lib) - Perl version of above library
-
-- [Diagrams-as-Code](https://github.com/HariSekhon/Diagrams-as-Code) - Cloud & Open Source architecture diagrams with Python & D2 source code provided - automatically regenerated via GitHub Actions CI/CD - AWS, GCP, Kubernetes, Jenkins, ArgoCD, Traefik, Kong API Gateway, Nginx, Redis, PostgreSQL, Kafka, Spark, web farms, event processing...
-
-- [Knowledge-Base](https://github.com/HariSekhon/Knowledge-Base) - IT Knowledge Base from 20 years in DevOps, Linux, Cloud, Big Data, AWS, GCP etc.
-
-<!--
-- [Spark Apps eg. Spark => Elasticsearch](https://github.com/harisekhon/spark-to-elasticsearch) - Scala application to index from Spark to Elasticsearch. Used to index data in Hadoop clusters or local data via Spark standalone. This started as a Scala Spark port of ```pig-text-to-elasticsearch.pig``` from this repo.
--->
-
 You might also be interested in the following really nice Jupyter notebook for HDFS space analysis created by another Hortonworks guy Jonas Straub:
 
-- https://github.com/mr-jstraub/HDFSQuota/blob/master/HDFSQuota.ipynb
+<https://github.com/mr-jstraub/HDFSQuota/blob/master/HDFSQuota.ipynb>
 
 ### Stargazers over time
 
@@ -518,3 +483,74 @@ You might also be interested in the following really nice Jupyter notebook for H
 [git.io/python-tools](https://git.io/python-tools)
 
 [git.io/pytools](https://git.io/pytools)
+
+## More Core Repos
+
+<!-- OTHER_REPOS_START -->
+
+### Knowledge
+
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=Knowledge-Base&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/Knowledge-Base)
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=Diagrams-as-Code&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/Diagrams-as-Code)
+
+<!--
+
+Not support on GitHub Markdown:
+
+<iframe src="https://raw.githubusercontent.com/HariSekhon/HariSekhon/main/knowledge.md" width="100%" height="500px"></iframe>
+
+Does nothing:
+
+<embed src="https://raw.githubusercontent.com/HariSekhon/HariSekhon/main/knowledge.md" width="100%" height="500px" />
+
+-->
+
+### DevOps Code
+
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=DevOps-Bash-tools&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/DevOps-Bash-tools)
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=DevOps-Python-tools&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/DevOps-Python-tools)
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=DevOps-Perl-tools&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/DevOps-Perl-tools)
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=DevOps-Golang-tools&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/DevOps-Golang-tools)
+
+<!--
+[![Gist Card](https://github-readme-stats.vercel.app/api/gist?id=f8f551332440f1ca8897ff010e363e03)](https://gist.github.com/HariSekhon/f8f551332440f1ca8897ff010e363e03)
+-->
+
+### Containerization
+
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=Kubernetes-configs&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/Kubernetes-configs)
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=Dockerfiles&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/Dockerfiles)
+
+### CI/CD
+
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=GitHub-Actions&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/GitHub-Actions)
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=Jenkins&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/Jenkins)
+
+### DBA - SQL
+
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=SQL-scripts&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/SQL-scripts)
+
+### DevOps Reloaded
+
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=Nagios-Plugins&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/Nagios-Plugins)
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=HAProxy-configs&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/HAProxy-configs)
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=Templates&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/Templates)
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=Terraform&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/Terraform)
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=Packer-templates&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/Packer-templates)
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=Nagios-Plugin-Kafka&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/Nagios-Plugin-Kafka)
+
+### Misc
+
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=Template-repo&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/Template-repo)
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=Spotify-tools&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/Spotify-tools)
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=HariSekhon&repo=Spotify-playlists&theme=ambient_gradient&description_lines_count=3)](https://github.com/HariSekhon/Spotify-playlists)
+
+The rest of my original source repos are
+[here](https://github.com/HariSekhon?tab=repositories&q=&type=source&language=&sort=stargazers).
+
+Pre-built Docker images are available on my [DockerHub](https://hub.docker.com/u/harisekhon/).
+
+<!-- 1x1 pixel counter to record hits -->
+![](https://hit.yhype.me/github/profile?user_id=2211051)
+
+<!-- OTHER_REPOS_END -->
