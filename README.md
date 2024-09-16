@@ -232,7 +232,7 @@ Environment variables are supported for convenience and also to hide credentials
   - [Hadoop](http://hadoop.apache.org/) HDFS:
     - `hdfs_find_replication_factor_1.py` - finds HDFS files with replication factor 1, optionally resetting them to replication factor 3 to avoid missing block alerts during datanode maintenance windows
     - `hdfs_time_block_reads.jy` - HDFS per-block read timing debugger with datanode and rack locations for a given file or directory tree. Reports the slowest Hadoop datanodes in descending order at the end. Helps find cluster data layer bottlenecks such as slow datanodes, faulty hardware or misconfigured top-of-rack switch ports.
-    - `hdfs_files_native_checksums.jy` - fetches native HDFS checksums for quicker file comparisons (about 100x faster than doing hdfs dfs -cat | md5sum)
+    - `hdfs_files_native_checksums.jy` - fetches native HDFS checksums for quicker file comparisons (about 100x faster than doing `hdfs dfs -cat | md5sum`)
     - `hdfs_files_stats.jy` - fetches HDFS file stats. Useful to generate a list of all files in a directory tree showing block size, replication factor, underfilled blocks and small files
   - [Hive](https://hive.apache.org/) / [Impala](https://impala.apache.org/):
     - `hive_schemas_csv.py` / `impala_schemas_csv.py` - dumps all databases, tables, columns and types out in CSV format to standard output
