@@ -151,7 +151,8 @@ cd pytools
 make
 ```
 
-To only install pip dependencies for a single script, you can just type make and the filename with a `.pyc` extension instead of `.py`:
+To only install pip dependencies for a single script, you can just type make and the filename with a `.pyc` extension
+instead of `.py`:
 
 ```shell
 make anonymize.pyc
@@ -165,12 +166,15 @@ Some Hadoop tools with require Jython, see [Jython for Hadoop Utils](https://git
 
 All programs come with a `--help` switch which includes a program description and the list of command line options.
 
-Environment variables are supported for convenience and also to hide credentials from being exposed in the process list eg. `$PASSWORD`, `$TRAVIS_TOKEN`. These are indicated in the `--help` descriptions in brackets next to each option and often have more specific overrides with higher precedence eg. `$AMBARI_HOST`, `$HBASE_HOST` take priority over `$HOST`.
+Environment variables are supported for convenience and also to hide credentials from being exposed in the process list
+eg. `$PASSWORD`, `$TRAVIS_TOKEN`. These are indicated in the `--help` descriptions in brackets next to each option and
+often have more specific overrides with higher precedence eg. `$AMBARI_HOST`, `$HBASE_HOST` take priority over `$HOST`.
 
 ### DevOps Python Tools - Inventory
 
 - Linux:
-  - `anonymize.py` - anonymizes your configs / logs from files or stdin (for pasting to Apache Jira tickets or mailing lists)
+  - `anonymize.py` - anonymizes your configs / logs from files or stdin (for pasting to Apache Jira tickets or mailing
+  - lists)
     - anonymizations include these and more:
       - hostnames / domains / FQDNs
       - email addresses
@@ -181,27 +185,57 @@ Environment variables are supported for convenience and also to hide credentials
       - Cisco & Juniper ScreenOS configurations passwords, shared keys and SNMP strings
     - `anonymize_custom.conf` - put regex of your Name/Company/Project/Database/Tables to anonymize to `<custom>`
     - placeholder tokens indicate what was stripped out (eg. `<fqdn>`, `<password>`, `<custom>`)
-    - `--ip-prefix` leaves the last IP octect to aid in cluster debugging to still see differentiated nodes communicating with each other to compare configs and log communications
-    - `--hash-hostnames` - hashes hostnames to look like Docker temporary container ID hostnames so that vendors support teams can differentiate hosts in clusters
-    - `anonymize_parallel.sh` - splits files in to multiple parts and runs `anonymize.py` on each part in parallel before re-joining back in to a file of the same name with a `.anonymized` suffix. Preserves order of evaluation important for anonymization rules, as well as maintaining file content order. On servers this parallelization can result in a 30x speed up for large log files
-  - `find_duplicate_files.py` - finds duplicate files in one or more directory trees via multiple methods including file basename, size, MD5 comparison of same sized files, or bespoke regex capture of partial file basename
-  - `find_active_server.py` - finds fastest responding healthy server or active master in high availability deployments, useful for scripting against clustered technologies (eg. Elasticsearch, Hadoop, HBase, Cassandra etc). Multi-threaded for speed and highly configurable - socket, http, https, ping, url and/or regex content match. See further down for more details and sub-programs that simplify usage for many of the most common cluster technologies
-  - `welcome.py` - cool spinning welcome message greeting your username and showing last login time and user to put in your shell's `.profile` (there is also a perl version in my [DevOps Perl Tools](https://github.com/harisekhon/perl-tools) repo)
+    - `--ip-prefix` leaves the last IP octect to aid in cluster debugging to still see differentiated nodes
+      communicating with each other to compare configs and log communications
+    - `--hash-hostnames` - hashes hostnames to look like Docker temporary container ID hostnames so that vendors support
+      teams can differentiate hosts in clusters
+    - `anonymize_parallel.sh` - splits files in to multiple parts and runs `anonymize.py` on each part in parallel
+      before re-joining back in to a file of the same name with a `.anonymized` suffix. Preserves order of evaluation
+      important for anonymization rules, as well as maintaining file content order. On servers this parallelization can
+      result in a 30x speed up for large log files
+  - `find_duplicate_files.py` - finds duplicate files in one or more directory trees via multiple methods including file
+    basename, size, MD5 comparison of same sized files, or bespoke regex capture of partial file basename
+  - `find_active_server.py` - finds fastest responding healthy server or active master in high availability deployments,
+    useful for scripting against clustered technologies (eg. Elasticsearch, Hadoop, HBase, Cassandra etc).
+    Multi-threaded for speed and highly configurable - socket, http, https, ping, url and/or regex content match. See
+    further down for more details and sub-programs that simplify usage for many of the most common cluster technologies
+  - `welcome.py` - cool spinning welcome message greeting your username and showing last login time and user to put in
+    your shell's `.profile` (there is also a perl version in my [DevOps Perl Tools](https://github.com/harisekhon/perl-tools) repo)
 - [Amazon Web Services](https://aws.amazon.com/):
-  - `aws_users_access_key_age.py` - lists all users access keys, status, date of creation and age in days. Optionally filters for active keys and older than N days (for key rotation governance)
-  - `aws_users_unused_access_keys.py` - lists users access keys that haven't been used in the last N days or that have never been used (these should generally be removed/disabled). Optionally filters for only active keys
-  - `aws_users_last_used.py` - lists all users and their days since last use across both passwords and access keys. Optionally filters for users not used in the last N days to find old accounts to remove
-  - `aws_users_pw_last_used.py` - lists all users and dates since their passwords were last used. Optionally filters for users with passwords not used in the last N days
+  - `aws_users_access_key_age.py` - lists all users access keys, status, date of creation and age in days. Optionally
+    filters for active keys and older than N days (for key rotation governance)
+  - `aws_users_unused_access_keys.py` - lists users access keys that haven't been used in the last N days or that have
+    never been used (these should generally be removed/disabled). Optionally filters for only active keys
+  - `aws_users_last_used.py` - lists all users and their days since last use across both passwords and access keys.
+    Optionally filters for users not used in the last N days to find old accounts to remove
+  - `aws_users_pw_last_used.py` - lists all users and dates since their passwords were last used. Optionally filters for
+    users with passwords not used in the last N days
 - [Google Cloud Platform](https://cloud.google.com/):
   - [GCF](https://cloud.google.com/functions) - Google Cloud Functions written in Python:
-    - [gcp_cloud_function_sql_export/](https://github.com/HariSekhon/DevOps-Python-tools/tree/master/gcp_cloud_function_sql_export) - runs [Cloud SQL](https://cloud.google.com/sql) export backups to [GCS](https://cloud.google.com/storage), subscribing to [PubSub](https://cloud.google.com/pubsub) topic that is triggered by [Cloud Scheduler](https://cloud.google.com/scheduler)
-      - see the [DevOps Bash tools](https://github.com/HariSekhon/DevOps-Bash-tools/) repo for several related GCP SQL to set up service account permissions and [Cloud Scheduler](https://cloud.google.com/scheduler) jobs
-    - [gcp_cloud_function_ifconfig/](https://github.com/HariSekhon/DevOps-Python-tools/tree/master/gcp_cloud_function_ifconfig) - debug your cloud function public networking by determining its public IP address - use this to test your VPC connector public routing, comparison with firewall rules etc.
-    - [gcp_cloud_function_proxy/](https://github.com/HariSekhon/DevOps-Python-tools/tree/master/gcp_cloud_function_proxy) - debug your cloud function networking by querying a given URL to check its accessibility, returning the HTTP status code and content. Use this to validate access through firewall rules via VPC connector routing
-  - `gcp_service_account_credential_keys.py` - lists all GCP service account credential keys for a given project with their age and expiry details, optionally filtering by non-expiring, already expired, or will expire within N days
+    - [gcp_cloud_function_sql_export/](https://github.com/HariSekhon/DevOps-Python-tools/tree/master/gcp_cloud_function_sql_export) - runs [Cloud SQL](https://cloud.google.com/sql) export backups to
+      [GCS](https://cloud.google.com/storage), subscribing to [PubSub](https://cloud.google.com/pubsub) topic that is
+      triggered by [Cloud Scheduler](https://cloud.google.com/scheduler)
+      - see the [DevOps Bash tools](https://github.com/HariSekhon/DevOps-Bash-tools/) repo for several related GCP SQL to set up service account permissions and
+        [Cloud Scheduler](https://cloud.google.com/scheduler) jobs
+    - [gcp_cloud_function_ifconfig/](https://github.com/HariSekhon/DevOps-Python-tools/tree/master/gcp_cloud_function_ifconfig) - debug your cloud function public networking by determining its public IP
+      address - use this to test your VPC connector public routing, comparison with firewall rules etc.
+    - [gcp_cloud_function_proxy/](https://github.com/HariSekhon/DevOps-Python-tools/tree/master/gcp_cloud_function_proxy) - debug your cloud function networking by querying a given URL to check its
+      accessibility, returning the HTTP status code and content. Use this to validate access through firewall rules via
+      VPC connector routing
+  - `gcp_service_account_credential_keys.py` - lists all GCP service account credential keys for a given project with
+    their age and expiry details, optionally filtering by non-expiring, already expired, or will expire within N days
 - [Docker](https://www.docker.com/):
-  - `docker_registry_show_tags.py` / `dockerhub_show_tags.py` / `quay_show_tags.py` - shows tags for docker repos in a docker registry or on [DockerHub](https://hub.docker.com/u/harisekhon/) or [Quay.io](https://quay.io/) - Docker CLI doesn't support this yet but it's a very useful thing to be able to see live on the command line or use in shell scripts (use `-q`/`--quiet` to return only the tags for easy shell scripting). You can use this to pre-download all tags of a docker image before running tests across versions in a simple bash for loop, eg. `docker_pull_all_tags.sh`
-  - `dockerhub_search.py` - search DockerHub with a configurable number of returned results (older official `docker search` was limited to only 25 results), using `--verbose` will also show you how many results were returned to the termainal and how many DockerHub has in total (use `-q / --quiet` to return only the image names for easy shell scripting). This can be used to download all of my DockerHub images in a simple bash for loop eg. `docker_pull_all_images.sh` and can be chained with `dockerhub_show_tags.py` to download all tagged versions for all docker images eg. `docker_pull_all_images_all_tags.sh`
+  - `docker_registry_show_tags.py` / `dockerhub_show_tags.py` / `quay_show_tags.py` - shows tags for docker repos in a
+    docker registry or on [DockerHub](https://hub.docker.com/u/harisekhon/) or [Quay.io](https://quay.io/) - Docker CLI doesn't support this yet but it's a very
+    useful thing to be able to see live on the command line or use in shell scripts (use `-q`/`--quiet` to return only
+    the tags for easy shell scripting). You can use this to pre-download all tags of a docker image before running tests
+    across versions in a simple bash for loop, eg. `docker_pull_all_tags.sh`
+  - `dockerhub_search.py` - search DockerHub with a configurable number of returned results (older official
+    `docker search` was limited to only 25 results), using `--verbose` will also show you how many results were returned
+    to the termainal and how many DockerHub has in total (use `-q / --quiet` to return only the image names for easy
+    shell scripting). This can be used to download all of my DockerHub images in a simple bash for loop eg.
+    `docker_pull_all_images.sh` and can be chained with `dockerhub_show_tags.py` to download all tagged versions for all
+    docker images eg. `docker_pull_all_images_all_tags.sh`
   - `dockerfiles_check_git*.py` - check Git tags & branches align with the containing Dockerfile's `ARG *_VERSION`
 - [Spark](https://spark.apache.org/) & Data Format Converters:
   - `spark_avro_to_parquet.py` - PySpark Avro => Parquet converter
@@ -213,7 +247,13 @@ Environment variables are supported for convenience and also to hide credentials
   - `xml_to_json.py` - XML to JSON converter
   - `json_to_xml.py` - JSON to XML converter
   - `json_to_yaml.py` - JSON to YAML converter
-  - `json_docs_to_bulk_multiline.py` - converts json files to bulk multi-record one-line-per-json-document format for pre-processing and loading to big data systems like [Hadoop](http://hadoop.apache.org/) and [MongoDB](https://www.mongodb.com/), can recurse directory trees, and mix json-doc-per-file / bulk-multiline-json / directories / standard input, combines all json documents and outputs bulk-one-json-document-per-line to standard output for convenient command line chaining and redirection, optionally continues on error, collects broken records to standard error for logging and later reprocessing for bulk batch jobs, even supports single quoted json while not technically valid json is used by MongoDB and even handles embedded double quotes in 'single quoted json'
+  - `json_docs_to_bulk_multiline.py` - converts json files to bulk multi-record one-line-per-json-document format for
+    pre-processing and loading to big data systems like [Hadoop](http://hadoop.apache.org/) and
+    [MongoDB](https://www.mongodb.com/), can recurse directory trees, and mix json-doc-per-file / bulk-multiline-json /
+    directories / standard input, combines all json documents and outputs bulk-one-json-document-per-line to standard
+    output for convenient command line chaining and redirection, optionally continues on error, collects broken records
+    to standard error for logging and later reprocessing for bulk batch jobs, even supports single quoted json while not
+    technically valid json is used by MongoDB and even handles embedded double quotes in 'single quoted json'
   - `yaml_to_json.py` - YAML to JSON converter (because some APIs like GitLab CI Validation API require JSON)
   - see also `validate_*.py` further down for all these formats and more
 - [Hadoop](http://hadoop.apache.org/) ecosystem & NoSQL:
@@ -223,69 +263,119 @@ Environment variables are supported for convenience and also to hide credentials
       - fetch all blueprints or a specific blueprint to local json files
       - blueprint an existing cluster
       - create a new cluster using a blueprint
-      - sorts and prettifies the resulting JSON template for deterministic config and line-by-line diff necessary for proper revision control
+      - sorts and prettifies the resulting JSON template for deterministic config and line-by-line diff necessary for
+        proper revision control
       - optionally strips out the excessive and overly specific configs to create generic more reusable templates
-      - see the `ambari_blueprints/` directory for a variety of Ambari blueprint templates generated by and deployable using this tool
+      - see the `ambari_blueprints/` directory for a variety of Ambari blueprint templates generated by and deployable
+        using this tool
     - `ambari_ams_*.sh` - query the Ambari Metrics Collector API for a given metrics, list all metrics or hosts
     - `ambari_cancel_all_requests.sh` - cancel all ongoing operations using the Ambari API
     - `ambari_trigger_service_checks.py` - trigger service checks using the Ambari API
   - [Hadoop](http://hadoop.apache.org/) HDFS:
-    - `hdfs_find_replication_factor_1.py` - finds HDFS files with replication factor 1, optionally resetting them to replication factor 3 to avoid missing block alerts during datanode maintenance windows
-    - `hdfs_time_block_reads.jy` - HDFS per-block read timing debugger with datanode and rack locations for a given file or directory tree. Reports the slowest Hadoop datanodes in descending order at the end. Helps find cluster data layer bottlenecks such as slow datanodes, faulty hardware or misconfigured top-of-rack switch ports.
-    - `hdfs_files_native_checksums.jy` - fetches native HDFS checksums for quicker file comparisons (about 100x faster than doing `hdfs dfs -cat | md5sum`)
-    - `hdfs_files_stats.jy` - fetches HDFS file stats. Useful to generate a list of all files in a directory tree showing block size, replication factor, underfilled blocks and small files
+    - `hdfs_find_replication_factor_1.py` - finds HDFS files with replication factor 1, optionally resetting them to
+      replication factor 3 to avoid missing block alerts during datanode maintenance windows
+    - `hdfs_time_block_reads.jy` - HDFS per-block read timing debugger with datanode and rack locations for a given file
+      or directory tree. Reports the slowest Hadoop datanodes in descending order at the end. Helps find cluster data
+      layer bottlenecks such as slow datanodes, faulty hardware or misconfigured top-of-rack switch ports.
+    - `hdfs_files_native_checksums.jy` - fetches native HDFS checksums for quicker file comparisons (about 100x faster
+      than doing `hdfs dfs -cat | md5sum`)
+    - `hdfs_files_stats.jy` - fetches HDFS file stats. Useful to generate a list of all files in a directory tree
+      showing block size, replication factor, underfilled blocks and small files
   - [Hive](https://hive.apache.org/) / [Impala](https://impala.apache.org/):
-    - `hive_schemas_csv.py` / `impala_schemas_csv.py` - dumps all databases, tables, columns and types out in CSV format to standard output
+    - `hive_schemas_csv.py` / `impala_schemas_csv.py` - dumps all databases, tables, columns and types out in CSV format
+      to standard output
 
     The following programs can all optionally filter by database / table name regex:
 
-    - `hive_foreach_table.py` / `impala_foreach_table.py` - execute any query or statement against every Hive / Impala table
-    - `hive_tables_row_counts.py` / `impala_tables_row_counts.py` - outputs tables row counts. Useful for reconciliation between cluster migrations
-    - `hive_tables_column_counts.py` / `impala_tables_column_counts.py` - outputs tables column counts. Useful for finding unusually wide tables
-    - `hive_tables_row_column_counts.py` / `impala_tables_row_column_counts.py` - outputs tables row and column counts. Useful for finding unusually big tables
-    - `hive_tables_row_counts_any_nulls.py` / `impala_tables_row_counts_any_nulls.py` - outputs tables row counts where any field is NULL. Useful for reconciliation between cluster migrations or catching data quality problems or subtle ETL bugs
-    - `hive_tables_null_columns.py` / `impala_tables_null_columns.py` - outputs tables columns containing only NULLs. Useful for catching data quality problems or subtle ETL bugs
-    - `hive_tables_null_rows.py` / `impala_tables_null_rows.py` - outputs tables row counts where all fields contain NULLs. Useful for catching data quality problems or subtle ETL bugs
-    - `hive_tables_metadata.py` / `impala_tables_metadata.py` - outputs for each table the matching regex metadata DDL property from describe table
+    - `hive_foreach_table.py` / `impala_foreach_table.py` - execute any query or statement against every Hive / Impala
+      table
+    - `hive_tables_row_counts.py` / `impala_tables_row_counts.py` - outputs tables row counts. Useful for reconciliation
+      between cluster migrations
+    - `hive_tables_column_counts.py` / `impala_tables_column_counts.py` - outputs tables column counts. Useful for
+      finding unusually wide tables
+    - `hive_tables_row_column_counts.py` / `impala_tables_row_column_counts.py` - outputs tables row and column counts.
+      Useful for finding unusually big tables
+    - `hive_tables_row_counts_any_nulls.py` / `impala_tables_row_counts_any_nulls.py` - outputs tables row counts where
+      any field is NULL. Useful for reconciliation between cluster migrations or catching data quality problems or
+      subtle ETL bugs
+    - `hive_tables_null_columns.py` / `impala_tables_null_columns.py` - outputs tables columns containing only NULLs.
+      Useful for catching data quality problems or subtle ETL bugs
+    - `hive_tables_null_rows.py` / `impala_tables_null_rows.py` - outputs tables row counts where all fields contain
+      NULLs. Useful for catching data quality problems or subtle ETL bugs
+    - `hive_tables_metadata.py` / `impala_tables_metadata.py` - outputs for each table the matching regex metadata DDL
+      property from describe table
     - `hive_tables_locations.py` / `impala_tables_locations.py` - outputs for each table its data location
   - [HBase](https://hbase.apache.org/):
-    - `hbase_generate_data.py` - inserts random generated data in to a given [HBase](https://hbase.apache.org/) table, with optional skew support with configurable skew percentage. Useful for testing region splitting, balancing, CI tests etc. Outputs stats for number of rows written, time taken, rows per sec and volume per sec written.
-    - `hbase_show_table_region_ranges.py` - dumps HBase table region ranges information, useful when pre-splitting tables
-    - `hbase_table_region_row_distribution.py` - calculates the distribution of rows across regions in an HBase table, giving per region row counts and % of total rows for the table as well as median and quartile row counts per regions
-    - `hbase_table_row_key_distribution.py` - calculates the distribution of row keys by configurable prefix length in an HBase table, giving per prefix row counts and % of total rows for the table as well as median and quartile row counts per prefix
-    - `hbase_compact_tables.py` - compacts HBase tables (for off-peak compactions). Defaults to finding and iterating on all tables or takes an optional regex and compacts only matching tables.
-    - `hbase_flush_tables.py` - flushes HBase tables. Defaults to finding and iterating on all tables or takes an optional regex and flushes only matching tables.
-    - `hbase_regions_by_*size.py` - queries given RegionServers JMX to lists topN regions by storeFileSize or memStoreSize, ascending or descending
-    - `hbase_region_requests.py` - calculates requests per second per region across all given RegionServers or average since RegionServer startup, configurable intervals and count, can filter to any combination of reads / writes / total requests per second. Useful for watching more granular region stats to detect region hotspotting
-    - `hbase_regionserver_requests.py` - calculates requests per regionserver second across all given regionservers or average since regionserver(s) startup(s), configurable interval and count, can filter to any combination of read, write, total, rpcScan, rpcMutate, rpcMulti, rpcGet, blocked per second. Useful for watching more granular RegionServer stats to detect RegionServer hotspotting
-    - `hbase_regions_least_used.py` - finds topN biggest/smallest regions across given RegionServers than have received the least requests (requests below a given threshold)
+    - `hbase_generate_data.py` - inserts random generated data in to a given [HBase](https://hbase.apache.org/) table,
+      with optional skew support with configurable skew percentage. Useful for testing region splitting, balancing, CI
+      tests etc. Outputs stats for number of rows written, time taken, rows per sec and volume per sec written.
+    - `hbase_show_table_region_ranges.py` - dumps HBase table region ranges information, useful when pre-splitting
+      tables
+    - `hbase_table_region_row_distribution.py` - calculates the distribution of rows across regions in an HBase table,
+      giving per region row counts and % of total rows for the table as well as median and quartile row counts per
+      regions
+    - `hbase_table_row_key_distribution.py` - calculates the distribution of row keys by configurable prefix length in
+      an HBase table, giving per prefix row counts and % of total rows for the table as well as median and quartile row
+      counts per prefix
+    - `hbase_compact_tables.py` - compacts HBase tables (for off-peak compactions). Defaults to finding and iterating
+      on all tables or takes an optional regex and compacts only matching tables.
+    - `hbase_flush_tables.py` - flushes HBase tables. Defaults to finding and iterating on all tables or takes an
+      optional regex and flushes only matching tables.
+    - `hbase_regions_by_*size.py` - queries given RegionServers JMX to lists topN regions by storeFileSize or
+      memStoreSize, ascending or descending
+    - `hbase_region_requests.py` - calculates requests per second per region across all given RegionServers or average
+      since RegionServer startup, configurable intervals and count, can filter to any combination of reads / writes /
+      total requests per second. Useful for watching more granular region stats to detect region hotspotting
+    - `hbase_regionserver_requests.py` - calculates requests per regionserver second across all given regionservers or
+      average since regionserver(s) startup(s), configurable interval and count, can filter to any combination of read,
+      write, total, rpcScan, rpcMutate, rpcMulti, rpcGet, blocked per second. Useful for watching more granular
+      RegionServer stats to detect RegionServer hotspotting
+    - `hbase_regions_least_used.py` - finds topN biggest/smallest regions across given RegionServers than have received
+      the least requests (requests below a given threshold)
   - [OpenTSDB](http://opentsdb.net/):
-    - `opentsdb_import_metric_distribution.py` - calculates metric distribution in bulk import file(s) to find data skew and help avoid HBase region hotspotting
-    - `opentsdb_list_metrics*.sh` - lists OpenTSDB metric names, tagk or tagv via OpenTSDB API or directly from HBase tables with optionally their created date, sorted ascending
+    - `opentsdb_import_metric_distribution.py` - calculates metric distribution in bulk import file(s) to find data skew
+      and help avoid HBase region hotspotting
+    - `opentsdb_list_metrics*.sh` - lists OpenTSDB metric names, tagk or tagv via OpenTSDB API or directly from HBase
+      tables with optionally their created date, sorted ascending
   - [Pig](https://pig.apache.org/)
-    - `pig-text-to-elasticsearch.pig` - bulk index unstructured files in [Hadoop](http://hadoop.apache.org/) to [Elasticsearch](https://www.elastic.co/products/elasticsearch)
-    - `pig-text-to-solr.pig` - bulk index unstructured files in [Hadoop](http://hadoop.apache.org/) to [Solr](http://lucene.apache.org/solr/) / [SolrCloud clusters](https://wiki.apache.org/solr/SolrCloud)
+    - `pig-text-to-elasticsearch.pig` - bulk index unstructured files in [Hadoop](http://hadoop.apache.org/) to
+      [Elasticsearch](https://www.elastic.co/products/elasticsearch)
+    - `pig-text-to-solr.pig` - bulk index unstructured files in [Hadoop](http://hadoop.apache.org/) to
+      [Solr](http://lucene.apache.org/solr/) / [SolrCloud clusters](https://wiki.apache.org/solr/SolrCloud)
     - `pig_udfs.jy` - Pig Jython UDFs for Hadoop
-- `find_active_server.py` - returns first available healthy server or active master in high availability deployments, useful for chaining with single argument tools. Configurable tests include socket, http, https, ping, url and/or regex content match, multi-threaded for speed. Designed to extend tools that only accept a single `--host` option but for which the technology has later added multi-master support or active-standby masters (eg. Hadoop, HBase) or where you want to query cluster wide information available from any online peer (eg. Elasticsearch)
-  - The following are simplified specialisations of the above program, just pass host arguments, all the details have been baked in, no switches required
+- `find_active_server.py` - returns first available healthy server or active master in high availability deployments,
+  useful for chaining with single argument tools. Configurable tests include socket, http, https, ping, url and/or regex
+  content match, multi-threaded for speed. Designed to extend tools that only accept a single `--host` option but for
+  which the technology has later added multi-master support or active-standby masters (eg. Hadoop, HBase) or where you
+  want to query cluster wide information available from any online peer (eg. Elasticsearch)
+  - The following are simplified specialisations of the above program, just pass host arguments, all the details have
+    been baked in, no switches required
     - `find_active_hadoop_namenode.py` - returns active [Hadoop](http://hadoop.apache.org/) Namenode in HDFS HA
     - `find_active_hadoop_resource_manager.py` - returns active [Hadoop](http://hadoop.apache.org/) Resource Manager in Yarn HA
     - `find_active_hbase_master.py` - returns active [HBase](https://hbase.apache.org/) Master in HBase HA
-    - `find_active_hbase_thrift.py` - returns first available [HBase](https://hbase.apache.org/) Thrift Server (run multiple of these for load balancing)
-    - `find_active_hbase_stargate.py` - returns first available [HBase](https://hbase.apache.org/) Stargate rest server (run multiple of these for load balancing)
+    - `find_active_hbase_thrift.py` - returns first available [HBase](https://hbase.apache.org/) Thrift Server (run
+      multiple of these for load balancing)
+    - `find_active_hbase_stargate.py` - returns first available [HBase](https://hbase.apache.org/) Stargate rest server
+      (run multiple of these for load balancing)
     - `find_active_apache_drill.py` - returns first available [Apache Drill](https://drill.apache.org/) node
     - `find_active_cassandra.py` - returns first available [Apache Cassandra](https://cassandra.apache.org/) node
-    - `find_active_impala*.py` - returns first available [Impala](https://impala.apache.org/) node of either Impalad, Catalog or Statestore
+    - `find_active_impala*.py` - returns first available [Impala](https://impala.apache.org/) node of either Impalad,
+      Catalog or Statestore
     - `find_active_presto_coordinator.py` - returns first available [Presto](https://prestodb.io/) Coordinator
     - `find_active_kubernetes_api.py` - returns first available [Kubernetes](https://kubernetes.io/) API server
     - `find_active_oozie.py` - returns first active [Oozie](http://oozie.apache.org/) server
     - `find_active_solrcloud.py` - returns first available [Solr](http://lucene.apache.org/solr/) / [SolrCloud](https://wiki.apache.org/solr/SolrCloud) node
     - `find_active_elasticsearch.py` - returns first available [Elasticsearch](https://www.elastic.co/products/elasticsearch) node
-    - see also: [Advanced HAProxy configurations](https://github.com/HariSekhon/HAProxy-configs) which are part of the [Advanced Nagios Plugins Collection](https://github.com/HariSekhon/Nagios-Plugins)
+    - see also: [Advanced HAProxy configurations](https://github.com/HariSekhon/HAProxy-configs) which are part of the
+      [Advanced Nagios Plugins Collection](https://github.com/HariSekhon/Nagios-Plugins)
 - [Travis CI](https://travis-ci.org/):
-  - `travis_last_log.py` - fetches [Travis CI](https://travis-ci.org/) latest running / completed / failed build log for given repo - useful for quickly getting the log of the last failed build when CCMenu or BuildNotify applets turn red
-  - `travis_debug_session.py` - launches a [Travis CI](https://travis-ci.org/) interactive debug build session via Travis API, tracks session creation and drops user straight in to the SSH shell on the remote Travis build, very convenient one shot debug launcher for Travis CI
-- `selenium_hub_browser_test.py` - checks [Selenium Grid Hub / Selenoid](https://www.selenium.dev/documentation/en/grid/) is working by calling browsers such as Chrome and Firefox to fetch a given URL and content/regex match the result
+  - `travis_last_log.py` - fetches [Travis CI](https://travis-ci.org/) latest running / completed / failed build log for given repo -
+    useful for quickly getting the log of the last failed build when CCMenu or BuildNotify applets turn red
+  - `travis_debug_session.py` - launches a [Travis CI](https://travis-ci.org/) interactive debug build session via Travis API, tracks
+    session creation and drops user straight in to the SSH shell on the remote Travis build, very convenient one shot
+    debug launcher for Travis CI
+- `selenium_hub_browser_test.py` - checks [Selenium Grid Hub / Selenoid](https://www.selenium.dev/documentation/en/grid/) is working by calling browsers such as
+  Chrome and Firefox to fetch a given URL and content/regex match the result
 - Data Validation (useful in CI):
   - `validate_*.py` - validate files, directory trees and/or standard input streams
     - supports the following file formats:
@@ -297,14 +387,20 @@ Environment variables are supported for convenience and also to hide credentials
       - Parquet
       - XML
       - YAML
-    - directories are recursed, testing any files with relevant matching extensions (`.avro`, `.csv`, `json`, `parquet`, `.ini`/`.properties`, `.ldif`, `.xml`, `.yml`/`.yaml`)
-    - used for Continuous Integration tests of various adjacent Spark data converters as well as configuration files for things like Presto, Ambari, Apache Drill etc found in my [DockerHub](https://hub.docker.com/u/harisekhon/) images [Dockerfiles master repo](https://github.com/HariSekhon/Dockerfiles) which contains docker builds and configurations for many open source Big Data & Linux technologies
+    - directories are recursed, testing any files with relevant matching extensions (`.avro`, `.csv`, `json`, `parquet`,
+      `.ini`/`.properties`, `.ldif`, `.xml`, `.yml`/`.yaml`)
+    - used for Continuous Integration tests of various adjacent Spark data converters as well as configuration files for
+      things like Presto, Ambari, Apache Drill etc found in my [DockerHub](https://hub.docker.com/u/harisekhon/) images
+      [Dockerfiles master repo](https://github.com/HariSekhon/Dockerfiles) which contains docker builds and configurations for many open source Big Data &
+      Linux technologies
 
 ### Detailed Build Instructions
 
 #### Python VirtualEnv localized installs
 
-The automated build will use 'sudo' to install required Python PyPI libraries to the system unless running as root or it detects being inside a VirtualEnv. If you want to install some of the common Python libraries using your OS packages instead of installing from PyPI then follow the Manual Build section below.
+The automated build will use 'sudo' to install required Python PyPI libraries to the system unless running as root or it
+detects being inside a VirtualEnv. If you want to install some of the common Python libraries using your OS packages
+instead of installing from PyPI then follow the Manual Build section below.
 
 ### Manual Setup
 
@@ -337,7 +433,8 @@ mv -v pylib-master pylib
 mv -vf pylib pytools/
 ```
 
-Proceed to install PyPI modules for whichever programs you want to use using your usual procedure - usually an internal mirror or proxy server to PyPI, or rpms / debs (some libraries are packaged by Linux distributions).
+Proceed to install PyPI modules for whichever programs you want to use using your usual procedure - usually an internal
+mirror or proxy server to PyPI, or rpms / debs (some libraries are packaged by Linux distributions).
 
 All PyPI modules are listed in the `requirements.txt` and `pylib/requirements.txt` files.
 
@@ -355,9 +452,11 @@ sudo pip install --proxy hari:mypassword@proxy-host:8080 -r requirements.txt
 
 #### Mac OS X
 
-The automated build also works on Mac OS X but you'll need to install [Apple XCode](https://developer.apple.com/download/) (on recent Macs just typing `git` is enough to trigger Xcode install).
+The automated build also works on Mac OS X but you'll need to install [Apple XCode](https://developer.apple.com/download/) (on recent Macs just typing
+`git` is enough to trigger Xcode install).
 
-I also recommend you get [HomeBrew](https://brew.sh/) to install other useful tools and libraries you may need like OpenSSL for development headers and tools such as wget (these are installed automatically if Homebrew is detected on Mac OS X):
+I also recommend you get [HomeBrew](https://brew.sh/) to install other useful tools and libraries you may need like OpenSSL for
+development headers and tools such as wget (these are installed automatically if Homebrew is detected on Mac OS X):
 
 ```shell
 bash-tools/install/install_homebrew.sh
@@ -373,7 +472,8 @@ If failing to build an OpenSSL lib dependency, just prefix the build command lik
 sudo OPENSSL_INCLUDE=/usr/local/opt/openssl/include OPENSSL_LIB=/usr/local/opt/openssl/lib ...
 ```
 
-You may get errors trying to install to Python library paths even as root on newer versions of Mac, sometimes this is caused by pip 10 vs pip 9 and downgrading will work around it:
+You may get errors trying to install to Python library paths even as root on newer versions of Mac, sometimes this is
+caused by pip 10 vs pip 9 and downgrading will work around it:
 
 ```shell
 sudo pip install --upgrade pip==9.0.1
@@ -398,7 +498,8 @@ Run like so:
 jython -J-cp $(hadoop classpath) hdfs_time_block_reads.jy --help
 ```
 
-The `-J-cp $(hadoop classpath)` part dynamically inserts the current Hadoop java classpath required to use the Hadoop APIs.
+The `-J-cp $(hadoop classpath)` part dynamically inserts the current Hadoop java classpath required to use the Hadoop
+APIs.
 
 See below for procedure to install Jython if you don't already have it.
 
@@ -422,7 +523,10 @@ Then add the Jython install bin directory to the $PATH or specify the full path 
 
 ### Configuration for Strict Domain / FQDN validation
 
-Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list is done via my [PyLib](https://github.com/HariSekhon/pylib) library submodule - see there for details on configuring this to permit custom TLDs like `.local`, `.intranet`, `.vm`, `.cloud` etc. (all already included in there because they're common across companies internal environments).
+Strict validations include host/domain/FQDNs using TLDs which are populated from the official IANA list is done via my
+[PyLib](https://github.com/HariSekhon/pylib) library submodule - see there for details on configuring this to permit custom TLDs like `.local`,
+`.intranet`, `.vm`, `.cloud` etc. (all already included in there because they're common across companies internal
+environments).
 
 ### Python SSL certificate verification problems
 
@@ -433,7 +537,8 @@ If you end up with an error like:
 [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:765)
 ```
 
-It can be caused by an issue with the underlying Python + libraries due to changes in OpenSSL and certificates. One quick fix is to do the following:
+It can be caused by an issue with the underlying Python + libraries due to changes in OpenSSL and certificates. One
+quick fix is to do the following:
 
 ```shell
 sudo pip uninstall -y certifi &&
@@ -450,7 +555,9 @@ make update
 
 This will git pull and then git submodule update which is necessary to pick up corresponding library updates.
 
-If you update often and want to just quickly git pull + submodule update but skip rebuilding all those dependencies each time then run `make update-no-recompile` (will miss new library dependencies - do full `make update` if you encounter issues).
+If you update often and want to just quickly git pull + submodule update but skip rebuilding all those dependencies each
+time then run `make update-no-recompile` (will miss new library dependencies - do full `make update` if you encounter
+issues).
 
 ### Testing
 
@@ -466,13 +573,15 @@ To trigger all tests run:
 make test
 ```
 
-which will start with the underlying libraries, then move on to top level integration tests and functional tests using docker containers if docker is available.
+which will start with the underlying libraries, then move on to top level integration tests and functional tests using
+docker containers if docker is available.
 
 ### Contributions
 
 Patches, improvements and even general feedback are welcome in the form of GitHub pull requests and issue tickets.
 
-You might also be interested in the following really nice Jupyter notebook for HDFS space analysis created by another Hortonworks guy Jonas Straub:
+You might also be interested in the following really nice Jupyter notebook for HDFS space analysis created by another
+Hortonworks guy Jonas Straub:
 
 <https://github.com/mr-jstraub/HDFSQuota/blob/master/HDFSQuota.ipynb>
 
