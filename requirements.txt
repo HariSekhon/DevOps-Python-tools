@@ -29,7 +29,7 @@ GitPython==2.1.15
 #happybase==1.0.0
 
 humanize==0.5.1
-impyla==0.16.0
+impyla==0.19.0
 jinja2==2.11.3
 #kazoo==2.2.1
 ldif3==3.2.2
