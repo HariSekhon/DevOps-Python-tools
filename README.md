@@ -68,6 +68,7 @@
 [![JSON](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/json.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/json.yaml)
 [![YAML](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/yaml.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/yaml.yaml)
 [![XML](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/xml.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/xml.yaml)
+[![Markdown](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/markdown.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/markdown.yaml)
 [![Validation](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/validate.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/validate.yaml)
 [![Kics](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/kics.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/kics.yaml)
 [![Grype](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/grype.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Python-tools/actions/workflows/grype.yaml)
