@@ -58,7 +58,7 @@ except ImportError as _:
     sys.exit(4)
 
 __author__ = 'Hari Sekhon'
-__version__ = '0.12.2'
+__version__ = '0.12.3'
 
 
 class IniValidatorTool(CLI):
@@ -72,7 +72,7 @@ class IniValidatorTool(CLI):
         self.re_suffix = re.compile(r'.*\.(?:ini|properties)$', re.I)
         # In Windows ini key cannot contain equals sign = or semicolon ;
         #                                   key=val or [section]
-        self.re_ini_section = re.compile(r'^\s*\[([\w=\:\.-]+)\]\s*$')
+        self.re_ini_section = re.compile(r'^\s*\[([\w\s=\:\.-]+)\]\s*$')
         self.re_ini_key = re.compile(r'^\s*(?:[^\[;=]+)s*$')
         # INI value can be anything .* so not regex'ing it
         self.valid_ini_msg = '<unknown> => INI OK'
