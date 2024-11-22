@@ -46,10 +46,10 @@ repos:
       - id: detect-aws-credentials
         args: ['--allow-missing-credentials']
 
-  - repo: https://github.com/psf/black
-    rev: 24.8.0
-    hooks:
-      - id: black
+  #- repo: https://github.com/psf/black
+  #  rev: 24.8.0
+  #  hooks:
+  #    - id: black
 
   # Git secrets Leaks
   - repo: https://github.com/awslabs/git-secrets.git
