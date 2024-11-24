@@ -36,7 +36,7 @@ check './dockerhub_search.py hadoop-dev | grep harisekhon/hadoop-dev' "DockerHub
 # causes IOError: [Errno 32] Broken pipe
 #unset PYTHONUNBUFFERED
 # shellcheck disable=SC2016
-check '[ $(./dockerhub_search.py -q harisekhon | head -n 40 | tee /dev/stderr | grep "^harisekhon/[A-Za-z0-9_-]*$" | wc -l) = 40 ]' "DockerHub Search quiet mode for shell scripting"
+check '[ "$(./dockerhub_search.py -q harisekhon | head -n 40 | tee /dev/stderr | grep -c "^harisekhon/[A-Za-z0-9_-]*$")" = 40 ]' "DockerHub Search quiet mode for shell scripting"
 
 echo
 echo
