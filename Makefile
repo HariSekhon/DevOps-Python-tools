@@ -189,8 +189,8 @@ apk-packages-multimedia:
 # Debian 9 Stretch onwards, not available in Debian 8 Jessie
 .PHONY: apt-packages-multimedia
 apt-packages-multimedia:
-	$(SUDO) apt-get update
-	$(SUDO) apt-get install -y --no-install-recommends ffmpeg
+	$(SUDO) apt-get update  -o DPkg::Lock::Timeout=1200
+	$(SUDO) apt-get install -o DPkg::Lock::Timeout=1200 -y --no-install-recommends ffmpeg
 
 # for validate_multimedia.py
 .PHONY: yum-packages-multimedia
