@@ -32,7 +32,7 @@ if ! type -P ffmpeg &>/dev/null; then
     echo "WARNING: ffmpeg not installed, skipping validate_multimedia.py tests"
     exit 0
     if type -P apt-get &>/dev/null; then
-        sudo apt-get install -y ffmpeg
+        sudo apt-get install -o DPkg::Lock::Timeout=1200 -y ffmpeg
     elif type -P yum &>/dev/null; then
         echo "WARNING: cannot auto-install ffmpeg on RHEL/CentOS, the 3rd party repos and deps are seriously broken"
     fi
