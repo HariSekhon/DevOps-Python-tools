@@ -200,9 +200,10 @@ yum-packages-multimedia:
 
 .PHONY: jython
 jython:
-	if [ -x /sbin/apk ];        then apk add --no-cache wget expect; fi
-	if [ -x /usr/bin/apt-get ]; then apt-get install -y wget expect; fi
-	if [ -x /usr/bin/yum ];     then yum install -y wget expect; fi
+	@#if [ -x /sbin/apk ];        then apk add --no-cache wget expect; fi
+	@#if [ -x /usr/bin/apt-get ]; then apt-get install -y wget expect; fi
+	@#if [ -x /usr/bin/yum ];     then yum install -y wget expect; fi
+	bash-tools/packages/install_packages.sh wget expect
 	sh jython_install.sh
 
 .PHONY: test-lib
