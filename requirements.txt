@@ -36,10 +36,16 @@ ldif3==3.2.2
 #MarkupSafe==0.23
 #Markdown==2.6.8
 
+matplotlib==3.7.5
+
 # Python 3.5+
 #numpy==1.17.2
 # XXX: install broken on new M1 Mac Python 3.9
 #numpy==1.16.5
+
+# for plot_uk_marriage_rates.py
+openpyxl==3.1.5
+pandas==2.0.3
 
 # requires pg_config to build from source
 #psycopg2==2.8.4
