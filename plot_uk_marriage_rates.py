@@ -68,10 +68,10 @@ class PlotUKMarriageRates(CLI):
     #     super(PlotUKMarriageRates, self).process_options()
 
     def run(self):
-        if not self.args:
-            self.usage("Provide path to datadownload.xlsx")
-
-        file_path = self.args[0]
+        file_path = f"{srcdir}/tests/data/uk_marriage_rates_2022.xslx"
+        if self.args:
+            file_path = self.args[0]
+            #self.usage("Provide path to datadownload.xlsx")
 
         if not os.path.isfile(file_path):
             self.usage(f"Invalid argument provided, not a file: {file_path}")
