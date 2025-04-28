@@ -95,3 +95,4 @@ xmltodict==0.10.2
 yamllint==1.15.0
 
 #pyyaml>=5.4 # not directly required, pinned by Snyk to avoid a vulnerability. update: this breaks Python 3.5 build where this requirement is not found
+pyyaml>=5.3.1 # not directly required, pinned by Snyk to avoid a vulnerability
