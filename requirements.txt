@@ -20,7 +20,7 @@ dicttoxml==1.7.4
 
 # fails on requiring newer version of setuptools
 #Flask==0.10.1
-GitPython==2.1.15
+GitPython==3.1.30
 
 # this GCP API is surprisingly awful, not using
 #google-api-python-client==1.11.0
