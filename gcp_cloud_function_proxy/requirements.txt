@@ -1,2 +1,2 @@
 # https://cloud.google.com/functions/docs/writing/specifying-dependencies-python
-requests==2.24.0
+requests==2.31.0
